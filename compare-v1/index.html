@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap Compare Preview</title>
+  <style>
+    :root{--bg:#FCFCFA;--text:#151515;--muted:#686864;--green:#2D5A43;--greenTint:#EEF4F0}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    .section{max-width:1240px;margin:0 auto;padding:110px 56px 130px;display:grid;grid-template-columns:360px minmax(0,1fr);gap:76px;align-items:start}
+    .copy{padding-top:20px}
+    .eyebrow{font-size:11px;line-height:1.2;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+    h1{margin:17px 0 0;font-size:48px;line-height:1.06;letter-spacing:-.035em;font-weight:560;max-width:360px}
+    .lead{margin:26px 0 0;font-size:18px;line-height:1.55;color:var(--muted);max-width:350px}
+    .visual{min-width:0}
+    .people{display:grid;grid-template-columns:1fr 1fr;gap:42px;margin-bottom:38px}
+    .person{display:flex;align-items:center;gap:18px;min-width:0}
+    .avatar{width:94px;height:94px;border-radius:50%;display:grid;place-items:center;background:#ECECE7;font-size:18px;font-weight:650;letter-spacing:-.02em;flex:none}
+    .name{font-size:23px;line-height:1.08;font-weight:630;letter-spacing:-.025em}
+    .role{margin-top:6px;font-size:15px;line-height:1.4;color:var(--muted)}
+    .comparison{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);column-gap:24px;row-gap:0;align-items:start}
+    .dimension{grid-column:1/-1;margin-top:25px;margin-bottom:10px;font-size:10px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+    .dimension:first-child{margin-top:0}
+    .value{font-size:16px;line-height:1.45;max-width:270px}
+    .signal{justify-self:center;align-self:start;margin-top:2px;padding:6px 9px;border-radius:999px;background:rgba(45,90,67,.07);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+    .synthesis{margin-top:38px;padding:26px 28px 27px;border-radius:12px;background:var(--greenTint)}
+    .synthesis p{margin:11px 0 0;font-size:19px;line-height:1.48;letter-spacing:-.008em;max-width:690px}
+    .bottom{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:30px}
+    .bottom p{margin:10px 0 0;font-size:15px;line-height:1.5;color:#3f3f3c}
+    .note{max-width:1240px;margin:-78px auto 0;padding:0 56px 60px;color:#8a8a84;font-size:12px}
+    @media(max-width:900px){.section{grid-template-columns:1fr;padding:74px 28px 95px;gap:54px}.copy{padding-top:0}.lead{max-width:620px}.visual{max-width:760px}.note{margin:-55px auto 0;padding:0 28px 45px}}
+    @media(max-width:620px){.section{padding:58px 20px 80px;gap:44px}h1{font-size:38px}.people{gap:20px}.person{align-items:flex-start;flex-direction:column;gap:12px}.avatar{width:72px;height:72px}.name{font-size:20px}.comparison{grid-template-columns:1fr;row-gap:7px}.dimension{margin-top:24px}.signal{justify-self:start;order:-1;margin:0 0 2px}.synthesis{margin-top:30px;padding:22px}.synthesis p{font-size:17px}.bottom{grid-template-columns:1fr;gap:24px}.note{padding:0 20px 38px}}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="section">
+      <div class="copy">
+        <div class="eyebrow">HumaMap Compare · Coming soon</div>
+        <h1>Understand each other.<br>Work better together.</h1>
+        <p class="lead">See where two people naturally align, where their differences complement each other, where friction may arise and how to work better together.</p>
+      </div>
+
+      <div class="visual">
+        <div class="people">
+          <div class="person">
+            <div class="avatar">AK</div>
+            <div><div class="name">August Kring</div><div class="role">Founder at HumaMap</div></div>
+          </div>
+          <div class="person">
+            <div class="avatar">SL</div>
+            <div><div class="name">Sofia Lindqvist</div><div class="role">Head of Engineering</div></div>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <div class="dimension">Decision pace</div>
+          <div class="value">Moves quickly once direction is clear.</div>
+          <div class="signal">Complement</div>
+          <div class="value">Validates more before committing.</div>
+
+          <div class="dimension">Ownership</div>
+          <div class="value">Prefers clear responsibility.</div>
+          <div class="signal">Align</div>
+          <div class="value">Prefers clear responsibility.</div>
+
+          <div class="dimension">Communication</div>
+          <div class="value">Direct and fast.</div>
+          <div class="signal">Differ</div>
+          <div class="value">Direct, more deliberate.</div>
+        </div>
+
+        <div class="synthesis">
+          <div class="eyebrow">Where you strengthen each other</div>
+          <p>August brings pace and momentum. Sofia brings more validation and technical depth. Together, those differences can help the team move quickly without losing robustness.</p>
+        </div>
+
+        <div class="bottom">
+          <div>
+            <div class="eyebrow">Potential friction</div>
+            <p>Different decision speeds may create tension when expectations are unclear.</p>
+          </div>
+          <div>
+            <div class="eyebrow">Work better together</div>
+            <p>Agree early on what needs validation and what can move quickly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="note">Design preview only. Names and profile insights are placeholder content.</div>
+  </main>
+</body>
+</html>
