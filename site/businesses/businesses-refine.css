@@ -52,10 +52,25 @@
 .people-work-points{margin-top:32px;border-top:1px solid var(--line)}
 .people-work-points span{display:block;padding:15px 0;border-bottom:1px solid var(--line);color:#343431;font-size:14px;line-height:1.45;font-weight:520}
 
-/* Keep the remaining chapter rhythm close to the homepage without stacking large gaps. */
+/* Company HumaMap remains a real product object; benefits stay open underneath. */
 .free-company-section{padding-top:58px;padding-bottom:104px}
-.why-now-section{padding-top:48px;padding-bottom:92px}
+.free-company-copy .section-eyebrow{margin-bottom:16px}
+.free-company-copy .free-label{color:var(--quiet)}
+.company-free-benefits strong{max-width:220px}
+
+/* Privacy, ownership and control: open rows, not cards. */
 .trust-section{padding-top:48px;padding-bottom:104px}
+.privacy-layout{grid-template-columns:440px minmax(0,1fr);gap:100px;align-items:start}
+.privacy-copy{max-width:440px}
+.privacy-principles{border-top:1px solid var(--line)}
+.privacy-principles article{display:grid;grid-template-columns:50px minmax(0,1fr);gap:18px;padding:22px 0 23px;border-bottom:1px solid var(--line)}
+.privacy-principles article>span{padding-top:2px;color:var(--green);font-size:10px;line-height:1.4;font-weight:650;letter-spacing:.06em}
+.privacy-principles h3{margin:0;font-size:18px;line-height:1.3;letter-spacing:-.016em;font-weight:560}
+.privacy-principles p{max-width:580px;margin:7px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+.privacy-footnote{margin:18px 0 0;color:var(--quiet);font-size:11.5px;line-height:1.5}
+
+/* Keep the remaining chapter rhythm close to the homepage without stacking large gaps. */
+.why-now-section{padding-top:48px;padding-bottom:92px}
 .business-final-section{padding-top:68px;padding-bottom:96px}
 
 @media(max-width:1120px){
@@ -63,6 +78,7 @@
   .company-intelligence-stage{transform:scale(.94);transform-origin:right center}
   .people-work-layout{grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:72px}
   .not-one-mark{font-size:124px}
+  .privacy-layout{grid-template-columns:400px minmax(0,1fr);gap:65px}
 }
 
 @media(max-width:980px){
@@ -85,6 +101,8 @@
   .free-company-section{padding-top:54px;padding-bottom:88px}
   .why-now-section{padding-top:44px;padding-bottom:80px}
   .trust-section{padding-top:42px;padding-bottom:88px}
+  .privacy-layout{grid-template-columns:1fr;gap:42px}
+  .privacy-copy{max-width:680px}
   .business-final-section{padding-top:60px;padding-bottom:82px}
 }
 
@@ -117,5 +135,9 @@
   .free-company-section{padding-top:44px;padding-bottom:72px}
   .why-now-section{padding-top:40px;padding-bottom:68px}
   .trust-section{padding-top:34px;padding-bottom:72px}
+  .privacy-layout{gap:34px}
+  .privacy-principles article{grid-template-columns:38px minmax(0,1fr);gap:14px;padding:18px 0 19px}
+  .privacy-principles h3{font-size:17px}
+  .privacy-principles p{font-size:13.5px}
   .business-final-section{padding-top:52px;padding-bottom:68px}
 }
