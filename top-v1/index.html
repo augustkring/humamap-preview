@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Homepage Top v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --canvas:#FCFCFA;
+      --surface:#FFFFFF;
+      --text:#151515;
+      --muted:#686864;
+      --green:#2D5A43;
+      --green-dark:#1A241E;
+      --green-soft:#EDF3F0;
+      --bar:#F7F7F4;
+      --max:1240px;
+    }
+
+    *{box-sizing:border-box}
+    html{background:var(--canvas);scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-width:320px;
+      background:var(--canvas);
+      color:var(--text);
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    a{color:inherit}
+
+    .shell{
+      max-width:var(--max);
+      margin:0 auto;
+      padding-left:56px;
+      padding-right:56px;
+    }
+
+    .nav{
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .brand{
+      font-size:19px;
+      line-height:1;
+      font-weight:650;
+      letter-spacing:-.035em;
+      text-decoration:none;
+    }
+
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:28px;
+      font-size:13px;
+      line-height:1;
+    }
+
+    .nav-link{
+      color:var(--muted);
+      text-decoration:none;
+      font-weight:500;
+    }
+
+    .nav-cta{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .hero{
+      padding-top:78px;
+      padding-bottom:78px;
+    }
+
+    .hero-copy{
+      max-width:900px;
+    }
+
+    h1{
+      max-width:890px;
+      margin:0;
+      font-size:68px;
+      line-height:1.035;
+      letter-spacing:-.042em;
+      font-weight:550;
+      text-wrap:balance;
+    }
+
+    .hero-lead{
+      max-width:650px;
+      margin:28px 0 0;
+      color:var(--muted);
+      font-size:20px;
+      line-height:1.52;
+      letter-spacing:-.008em;
+    }
+
+    .hero-action-group{
+      display:inline-flex;
+      flex-direction:column;
+      align-items:center;
+      margin-top:34px;
+    }
+
+    .hero-actions{
+      display:flex;
+      align-items:center;
+      gap:31px;
+    }
+
+    .primary-btn{
+      min-height:50px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 24px;
+      border-radius:8px;
+      background:var(--text);
+      color:#FAFAF7;
+      text-decoration:none;
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:-.008em;
+    }
+
+    .secondary-link{
+      display:inline-flex;
+      align-items:center;
+      min-height:44px;
+      text-decoration:none;
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:-.008em;
+    }
+
+    .microcopy{
+      margin:12px 0 0;
+      color:#858580;
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .person-stage{
+      position:relative;
+      padding-top:42px;
+      padding-bottom:132px;
+    }
+
+    .stage-grid{
+      display:grid;
+      grid-template-columns:340px minmax(0,1fr);
+      gap:70px;
+      align-items:start;
+    }
+
+    .story-column{
+      padding-top:108px;
+    }
+
+    .story-column h2{
+      max-width:335px;
+      margin:0;
+      font-size:48px;
+      line-height:1.075;
+      letter-spacing:-.034em;
+      font-weight:550;
+    }
+
+    .story-copy{
+      max-width:330px;
+      margin-top:25px;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.56;
+      letter-spacing:-.006em;
+    }
+
+    .story-copy p{margin:0}
+    .story-copy p+p{margin-top:17px}
+
+    .ai-card{
+      margin-top:40px;
+      max-width:330px;
+      padding:24px 25px 25px;
+      border-radius:14px;
+      background:var(--green-dark);
+      color:#F6F7F3;
+      box-shadow:0 18px 44px rgba(21,21,21,.08);
+    }
+
+    .micro-label{
+      display:block;
+      margin:0;
+      color:var(--green);
+      font-size:11px;
+      line-height:1.2;
+      font-weight:650;
+      letter-spacing:.085em;
+      text-transform:uppercase;
+    }
+
+    .ai-card .micro-label{color:#9FBAAA}
+
+    .ai-card h3{
+      margin:11px 0 0;
+      font-size:18px;
+      line-height:1.35;
+      letter-spacing:-.016em;
+      font-weight:600;
+    }
+
+    .ai-card p{
+      margin:9px 0 0;
+      color:#BEC8C0;
+      font-size:14px;
+      line-height:1.52;
+      letter-spacing:-.003em;
+    }
+
+    .ai-link{
+      display:inline-flex;
+      align-items:center;
+      margin-top:18px;
+      color:#F5F6F2;
+      text-decoration:none;
+      font-size:13px;
+      line-height:1.4;
+      font-weight:600;
+    }
+
+    .product-column{
+      min-width:0;
+    }
+
+    .product-kicker{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin:0 0 13px;
+    }
+
+    .product-kicker .micro-label{color:var(--green)}
+
+    .product-meta{
+      color:#8B8B86;
+      font-size:12px;
+      line-height:1.3;
+    }
+
+    .browser{
+      width:100%;
+      overflow:hidden;
+      border-radius:16px;
+      background:var(--surface);
+      box-shadow:0 26px 74px rgba(21,21,21,.072), 0 2px 8px rgba(21,21,21,.025);
+    }
+
+    .browser-bar{
+      height:40px;
+      display:flex;
+      align-items:center;
+      padding:0 20px;
+      background:var(--bar);
+      color:rgba(21,21,21,.43);
+      font-size:12px;
+      line-height:1;
+    }
+
+    .profile{
+      padding:38px 42px 42px;
+    }
+
+    .profile-head{
+      display:flex;
+      align-items:center;
+      gap:20px;
+    }
+
+    .avatar{
+      width:92px;
+      height:92px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:var(--green-soft);
+      color:var(--green);
+      font-size:20px;
+      line-height:1;
+      font-weight:650;
+      letter-spacing:-.03em;
+    }
+
+    .profile-name{
+      margin:0;
+      font-size:29px;
+      line-height:1.08;
+      letter-spacing:-.035em;
+      font-weight:600;
+    }
+
+    .profile-role{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.4;
+    }
+
+    .profile-body{
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(220px,.85fr);
+      gap:48px;
+      margin-top:39px;
+    }
+
+    .profile-block+.profile-block{margin-top:34px}
+
+    .profile-block .micro-label{margin-bottom:11px}
+
+    .profile-block p{
+      margin:0;
+      color:var(--text);
+      font-size:16px;
+      line-height:1.5;
+      letter-spacing:-.005em;
+    }
+
+    .profile-block p+p{margin-top:7px}
+
+    .working-with-me{
+      font-size:18px !important;
+      line-height:1.48 !important;
+      letter-spacing:-.013em !important;
+    }
+
+    .profile-basis .micro-label{color:rgba(21,21,21,.38)}
+    .profile-basis p{
+      color:rgba(21,21,21,.48);
+      font-size:13px;
+      line-height:1.48;
+    }
+
+    .profile-link-row{
+      margin-top:19px;
+    }
+
+    .profile-link{
+      text-decoration:none;
+      font-size:15px;
+      line-height:1.4;
+      font-weight:600;
+      letter-spacing:-.008em;
+    }
+
+    .end-space{height:34px}
+
+    @media (hover:hover){
+      .primary-btn,.secondary-link,.profile-link,.ai-link,.nav-cta,.nav-link{transition:opacity .18s ease,color .18s ease}
+      .primary-btn:hover{opacity:.9}
+      .secondary-link:hover,.profile-link:hover,.nav-cta:hover{color:var(--green)}
+      .nav-link:hover{color:var(--text)}
+      .ai-link:hover{opacity:.74}
+    }
+
+    @media(max-width:980px){
+      .shell{padding-left:28px;padding-right:28px}
+      .hero{padding-top:62px;padding-bottom:62px}
+      h1{font-size:58px;max-width:800px}
+      .stage-grid{grid-template-columns:1fr;gap:48px}
+      .story-column{padding-top:0;max-width:650px}
+      .story-column h2,.story-copy{max-width:620px}
+      .ai-card{max-width:500px}
+      .product-column{grid-row:1}
+      .profile-body{gap:36px}
+      .person-stage{padding-top:24px}
+    }
+
+    @media(max-width:680px){
+      .shell{padding-left:20px;padding-right:20px}
+      .nav{height:64px}
+      .nav-actions{gap:18px}
+      .nav-link{display:none}
+      .hero{padding-top:44px;padding-bottom:48px}
+      h1{font-size:45px;line-height:1.055;letter-spacing:-.038em;text-wrap:pretty}
+      .hero-lead{margin-top:23px;font-size:18px;line-height:1.52}
+      .hero-action-group{display:flex;align-items:flex-start;width:100%;margin-top:29px}
+      .hero-actions{width:100%;flex-direction:column;align-items:stretch;gap:11px}
+      .primary-btn{width:100%}
+      .secondary-link{justify-content:flex-start}
+      .microcopy{align-self:center;margin-top:10px}
+      .person-stage{padding-top:20px;padding-bottom:86px}
+      .stage-grid{gap:44px}
+      .product-kicker{margin-bottom:10px}
+      .product-meta{display:none}
+      .browser{border-radius:13px}
+      .profile{padding:28px 23px 31px}
+      .profile-head{gap:15px}
+      .avatar{width:72px;height:72px;font-size:16px}
+      .profile-name{font-size:25px}
+      .profile-role{font-size:14px}
+      .profile-body{grid-template-columns:1fr;gap:31px;margin-top:32px}
+      .profile-block+.profile-block{margin-top:29px}
+      .profile-block p{font-size:16px}
+      .working-with-me{font-size:17px !important}
+      .story-column h2{font-size:38px;line-height:1.08}
+      .story-copy{font-size:17px;line-height:1.56;margin-top:21px}
+      .ai-card{margin-top:31px;max-width:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="#">HumaMap</a>
+      <div class="nav-actions">
+        <a class="nav-link" href="#">Individuals</a>
+        <a class="nav-link" href="#">Businesses</a>
+        <a class="nav-cta" href="#">Create HumaMap →</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="hero-copy">
+        <h1>Better work starts with better understanding of people.</h1>
+        <p class="hero-lead">HumaMap makes it easier to understand how the people you work with think, work and collaborate, so you can build better teams, lead better and make better decisions about people.</p>
+
+        <div class="hero-action-group">
+          <div class="hero-actions">
+            <a class="primary-btn" href="#">Create your Company HumaMap</a>
+            <a class="secondary-link" href="#">Create your personal HumaMap →</a>
+          </div>
+          <p class="microcopy">Free to use. Takes just a few minutes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="person-stage shell" aria-label="Personal HumaMap">
+      <div class="stage-grid">
+        <div class="story-column">
+          <h2>See more than a role or a CV.</h2>
+          <div class="story-copy">
+            <p>Roles, experience and skills tell you a lot about what someone has done and what they can do.</p>
+            <p>HumaMap adds what is harder to see: how they work, what drives them, how they make decisions and how they work with others.</p>
+          </div>
+
+          <aside class="ai-card" aria-label="HumaMap AI">
+            <span class="micro-label">HumaMap AI</span>
+            <h3>Go deeper than the public profile.</h3>
+            <p>Ask HumaMap about your profile, the insights behind it and how you work with others.</p>
+            <a class="ai-link" href="#">Ask HumaMap →</a>
+          </aside>
+        </div>
+
+        <div class="product-column">
+          <div class="product-kicker">
+            <span class="micro-label">Personal HumaMap</span>
+            <span class="product-meta">Public profile</span>
+          </div>
+
+          <article class="browser">
+            <div class="browser-bar">humamap.com/august</div>
+            <div class="profile">
+              <div class="profile-head">
+                <div class="avatar" aria-hidden="true">AK</div>
+                <div>
+                  <h3 class="profile-name">August Kring</h3>
+                  <p class="profile-role">Founder at HumaMap</p>
+                </div>
+              </div>
+
+              <div class="profile-body">
+                <div>
+                  <section class="profile-block">
+                    <span class="micro-label">How I work</span>
+                    <p>Moves quickly once there is enough information to act.</p>
+                    <p>Prefers clear ownership and direct communication.</p>
+                    <p>Works best with context, autonomy and room to decide.</p>
+                  </section>
+
+                  <section class="profile-block">
+                    <span class="micro-label">What drives me</span>
+                    <p>Building things that create meaningful progress.</p>
+                    <p>High ownership and clear responsibility.</p>
+                  </section>
+                </div>
+
+                <div>
+                  <section class="profile-block">
+                    <span class="micro-label">Working with me</span>
+                    <p class="working-with-me">Be direct, give context and make ownership clear.</p>
+                  </section>
+
+                  <section class="profile-block profile-basis">
+                    <span class="micro-label">Profile basis</span>
+                    <p>Built from your answers and professional background, with optional evidence and reflection.</p>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="profile-link-row">
+            <a class="profile-link" href="#">See August's full HumaMap →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="end-space" aria-hidden="true"></div>
+  </main>
+</body>
+</html>
