@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Homepage + Proof v26</title>
+</head>
+<body>
+<script>
+(async () => {
+  const response = await fetch('../top-v25/index.html');
+  let source = await response.text();
+  source = source
+    .replace('<title>HumaMap — Homepage + Proof v25</title>', '<title>HumaMap — Homepage + Proof v26</title>')
+    .replace('const allStyles = decisionStyles + proofStyles;', 'const allStyles = decisionStyles;');
+  document.open();
+  document.write(source);
+  document.close();
+})();
+</script>
+</body>
+</html>
