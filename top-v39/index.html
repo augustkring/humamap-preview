@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Leadership journey v39</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v38/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const styles = `
+        .leadership-section{padding-top:66px!important;padding-bottom:126px!important}
+        .lead39{max-width:1128px;margin:0 auto}
+        .lead39-top{display:grid;grid-template-columns:430px minmax(0,1fr);gap:86px;align-items:start}
+        .lead39-top h2{max-width:425px;margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+        .lead39-copy{max-width:520px;padding-top:24px}
+        .lead39-copy p{margin:0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+        .lead39-cta{display:inline-flex;margin-top:25px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}
+
+        .lead39-programme{margin-top:70px}
+        .lead39-kicker{display:block;margin-bottom:24px;color:var(--green);font-size:12px;line-height:1.3;font-weight:650;letter-spacing:.085em;text-transform:uppercase}
+        .lead39-steps{position:relative}
+        .lead39-steps::before{content:"";position:absolute;left:35px;top:30px;bottom:34px;width:1px;background:#DCE5DF}
+        .lead39-step{position:relative;display:grid;grid-template-columns:88px minmax(0,1fr) 255px;gap:28px;align-items:start;padding:0 0 34px}
+        .lead39-step:last-child{padding-bottom:0}
+        .lead39-num{position:relative;z-index:1;width:70px;height:70px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FCFCFA;color:#9DB5A6;font-size:32px;line-height:1;letter-spacing:-.045em;font-weight:550}
+        .lead39-step:first-child .lead39-num{color:var(--green)}
+        .lead39-main{padding-top:7px}
+        .lead39-week{display:block;color:var(--green);font-size:10.5px;line-height:1.3;font-weight:650;letter-spacing:.075em;text-transform:uppercase}
+        .lead39-main h3{margin:8px 0 0;font-size:25px;line-height:1.16;letter-spacing:-.026em;font-weight:600}
+        .lead39-main p{max-width:560px;margin:10px 0 0;color:var(--muted);font-size:14.5px;line-height:1.52;letter-spacing:-.003em}
+        .lead39-output{padding-top:24px}
+        .lead39-output span{display:block;color:#8A8A85;font-size:10.5px;line-height:1.3;font-weight:650;letter-spacing:.065em;text-transform:uppercase}
+        .lead39-output strong{display:block;margin-top:7px;color:#333330;font-size:13.5px;line-height:1.45;font-weight:600}
+
+        @media(max-width:1120px){
+          .lead39-top{grid-template-columns:400px minmax(0,1fr);gap:58px}
+          .lead39-step{grid-template-columns:82px minmax(0,1fr) 220px;gap:24px}
+        }
+        @media(max-width:980px){
+          .leadership-section{padding-top:58px!important;padding-bottom:110px!important}
+          .lead39-top{grid-template-columns:1fr;gap:22px}
+          .lead39-top h2{max-width:680px;font-size:44px}
+          .lead39-copy{max-width:650px;padding-top:0}
+          .lead39-programme{margin-top:58px}
+          .lead39-step{grid-template-columns:74px minmax(0,1fr);gap:22px;padding-bottom:34px}
+          .lead39-output{grid-column:2;padding-top:14px}
+          .lead39-steps::before{left:34px}
+          .lead39-num{width:68px;height:68px}
+        }
+        @media(max-width:680px){
+          .leadership-section{padding-top:48px!important;padding-bottom:92px!important}
+          .lead39-top h2{font-size:38px}
+          .lead39-copy p{font-size:17px}
+          .lead39-programme{margin-top:48px}
+          .lead39-kicker{margin-bottom:20px}
+          .lead39-step{grid-template-columns:58px minmax(0,1fr);gap:18px;padding-bottom:30px}
+          .lead39-steps::before{left:27px;top:24px;bottom:28px}
+          .lead39-num{width:54px;height:54px;font-size:26px}
+          .lead39-main{padding-top:3px}
+          .lead39-main h3{font-size:22px}
+          .lead39-output{grid-column:2;padding-top:12px}
+        }
+      `;
+
+      const section = `
+        <section class="leadership-section shell" aria-label="HumaMap Leadership">
+          <div class="lead39">
+            <div class="lead39-top">
+              <div>
+                <span class="section-eyebrow">Leadership</span>
+                <h2>Better companies start with better leadership.</h2>
+              </div>
+              <div class="lead39-copy">
+                <p>HumaMap Leadership is a three-week programme for founders, leadership teams and boards to understand themselves, understand each other and turn that insight into better ways of leading together.</p>
+                <a class="lead39-cta" href="#">Explore HumaMap Leadership →</a>
+              </div>
+            </div>
+
+            <div class="lead39-programme">
+              <span class="lead39-kicker">3-week programme</span>
+              <div class="lead39-steps">
+                <section class="lead39-step">
+                  <div class="lead39-num">01</div>
+                  <div class="lead39-main">
+                    <span class="lead39-week">Week one</span>
+                    <h3>Understand yourself</h3>
+                    <p>Build your complete HumaMap and add recognised assessments so you understand how you work, decide and lead.</p>
+                  </div>
+                  <div class="lead39-output"><span>Output</span><strong>Your leadership profile.</strong></div>
+                </section>
+
+                <section class="lead39-step">
+                  <div class="lead39-num">02</div>
+                  <div class="lead39-main">
+                    <span class="lead39-week">Week two</span>
+                    <h3>Understand each other</h3>
+                    <p>Explore and compare the leadership team's HumaMaps to uncover complementarity, friction and the patterns between you.</p>
+                  </div>
+                  <div class="lead39-output"><span>Output</span><strong>A shared understanding of the team.</strong></div>
+                </section>
+
+                <section class="lead39-step">
+                  <div class="lead39-num">03</div>
+                  <div class="lead39-main">
+                    <span class="lead39-week">Week three</span>
+                    <h3>Lead differently</h3>
+                    <p>Turn what you have learned into clearer decision rights, ownership, communication and practical ways of working together.</p>
+                  </div>
+                  <div class="lead39-output"><span>Output</span><strong>Clear leadership agreements and a shared way of working.</strong></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          const current = doc && doc.querySelector('.leadership-section');
+          if (!doc || !current || !doc.querySelector('.company-section')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = styles;
+          doc.head.appendChild(style);
+
+          const holder = doc.createElement('div');
+          holder.innerHTML = section.trim();
+          current.replaceWith(holder.firstElementChild);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
