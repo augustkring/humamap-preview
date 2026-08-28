@@ -38,7 +38,7 @@
 .robust-section .value-head h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
 
 /* Better workplace: one clear idea, one typographic visual. */
-.people-work-section{padding-top:54px;padding-bottom:104px;scroll-margin-top:96px}
+.people-work-section{padding-top:54px;padding-bottom:82px;scroll-margin-top:96px}
 .people-work-layout{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:112px;align-items:center}
 .people-work-copy{max-width:520px}
 .people-work-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
@@ -52,33 +52,49 @@
 .people-work-points{margin-top:32px;border-top:1px solid var(--line)}
 .people-work-points span{display:block;padding:15px 0;border-bottom:1px solid var(--line);color:#343431;font-size:14px;line-height:1.45;font-weight:520}
 
+/* Why now: a quiet editorial bridge, not a standalone manifesto. */
+.why-now-section{padding-top:42px;padding-bottom:76px}
+.why-now-inner{max-width:1128px;margin:0 auto;display:grid;grid-template-columns:minmax(0,610px) minmax(300px,390px);gap:108px;align-items:start;text-align:left}
+.why-now-inner h2{max-width:610px;margin:0;font-size:44px;line-height:1.08;letter-spacing:-.033em;font-weight:550;text-wrap:balance}
+.why-now-copy{padding-top:4px}
+.why-now-copy p{margin:0;color:var(--muted);font-size:17px;line-height:1.56;letter-spacing:-.005em}
+.why-now-copy p+p{margin-top:14px}
+
 /* Company HumaMap remains a real product object; benefits stay open underneath. */
-.free-company-section{padding-top:58px;padding-bottom:104px}
+.free-company-section{padding-top:54px;padding-bottom:96px}
 .free-company-copy .section-eyebrow{margin-bottom:16px}
 .free-company-copy .free-label{color:var(--quiet)}
 .company-free-benefits strong{max-width:220px}
 
-/* Privacy, ownership and control: open rows, not cards. */
-.trust-section{padding-top:48px;padding-bottom:104px}
-.privacy-layout{grid-template-columns:440px minmax(0,1fr);gap:100px;align-items:start}
-.privacy-copy{max-width:440px}
-.privacy-principles{border-top:1px solid var(--line)}
-.privacy-principles article{display:grid;grid-template-columns:50px minmax(0,1fr);gap:18px;padding:22px 0 23px;border-bottom:1px solid var(--line)}
-.privacy-principles article>span{padding-top:2px;color:var(--green);font-size:10px;line-height:1.4;font-weight:650;letter-spacing:.06em}
-.privacy-principles h3{margin:0;font-size:18px;line-height:1.3;letter-spacing:-.016em;font-weight:560}
-.privacy-principles p{max-width:580px;margin:7px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
-.privacy-footnote{margin:18px 0 0;color:var(--quiet);font-size:11.5px;line-height:1.5}
+/* Privacy: one intro and four horizontal principles. */
+.privacy-section{padding-top:58px;padding-bottom:100px}
+.privacy-head{max-width:800px}
+.privacy-head h2{max-width:760px;margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
+.privacy-head>p{max-width:700px;margin:24px 0 0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+.privacy-head .trust-link{margin-top:24px}
+.privacy-principles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;margin-top:50px}
+.privacy-principles article{padding-top:19px;border-top:1px solid var(--line)}
+.privacy-principles article>span{display:block;color:var(--green);font-size:10px;line-height:1.4;font-weight:650;letter-spacing:.06em}
+.privacy-principles h3{margin:13px 0 0;font-size:17px;line-height:1.3;letter-spacing:-.016em;font-weight:560}
+.privacy-principles p{margin:8px 0 0;color:var(--muted);font-size:13.5px;line-height:1.55}
+.privacy-footnote{margin:26px 0 0;color:var(--quiet);font-size:11.5px;line-height:1.5}
 
-/* Keep the remaining chapter rhythm close to the homepage without stacking large gaps. */
-.why-now-section{padding-top:48px;padding-bottom:92px}
-.business-final-section{padding-top:68px;padding-bottom:96px}
+/* Final CTA follows the homepage: one decision, no repeated pricing grid. */
+.business-final-section{padding-top:88px;padding-bottom:108px}
+.business-final-inner{max-width:980px;margin:0 auto;text-align:center}
+.business-final-inner h2{max-width:860px;margin:0 auto;font-size:54px;line-height:1.04;letter-spacing:-.04em;font-weight:550;text-wrap:balance}
+.business-final-inner>p{max-width:620px;margin:24px auto 0;color:var(--muted);font-size:18px;line-height:1.55}
+.business-final-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 26px;margin-top:34px}
+.business-final-actions .primary-btn{margin-right:2px}
+.business-final-micro{margin:12px 0 0;color:var(--quiet);font-size:12.5px;line-height:1.45}
 
 @media(max-width:1120px){
   .company-intelligence-layout{grid-template-columns:400px minmax(0,1fr);gap:55px}
   .company-intelligence-stage{transform:scale(.94);transform-origin:right center}
   .people-work-layout{grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:72px}
   .not-one-mark{font-size:124px}
-  .privacy-layout{grid-template-columns:400px minmax(0,1fr);gap:65px}
+  .why-now-inner{grid-template-columns:minmax(0,560px) minmax(280px,360px);gap:70px}
+  .privacy-principles{gap:22px}
 }
 
 @media(max-width:980px){
@@ -93,17 +109,22 @@
   .company-intelligence-stage{width:650px;max-width:100%;margin:0 auto;transform:none}
   .company-intelligence-ask{left:82px;bottom:18px}
   .robust-section{padding-top:42px;padding-bottom:80px}
-  .people-work-section{padding-top:50px;padding-bottom:88px}
+  .people-work-section{padding-top:50px;padding-bottom:74px}
   .people-work-layout{grid-template-columns:1fr;gap:46px}
   .people-work-copy{max-width:680px}
   .people-work-visual{max-width:620px;margin-left:0}
   .not-one-mark{font-size:118px}
-  .free-company-section{padding-top:54px;padding-bottom:88px}
-  .why-now-section{padding-top:44px;padding-bottom:80px}
-  .trust-section{padding-top:42px;padding-bottom:88px}
-  .privacy-layout{grid-template-columns:1fr;gap:42px}
-  .privacy-copy{max-width:680px}
-  .business-final-section{padding-top:60px;padding-bottom:82px}
+  .why-now-section{padding-top:38px;padding-bottom:68px}
+  .why-now-inner{grid-template-columns:1fr;gap:24px;max-width:760px;margin-left:0}
+  .why-now-inner h2{font-size:40px}
+  .why-now-copy{max-width:620px;padding-top:0}
+  .free-company-section{padding-top:50px;padding-bottom:88px}
+  .privacy-section{padding-top:50px;padding-bottom:88px}
+  .privacy-head{max-width:720px}
+  .privacy-head h2{font-size:44px}
+  .privacy-principles{grid-template-columns:1fr 1fr;gap:34px 26px;margin-top:42px}
+  .business-final-section{padding-top:78px;padding-bottom:92px}
+  .business-final-inner h2{font-size:48px}
 }
 
 @media(max-width:680px){
@@ -126,18 +147,28 @@
   .company-intelligence-stage .p1{left:0}.company-intelligence-stage .p2{right:0}.company-intelligence-stage .p3{left:4px;bottom:62px}
   .company-intelligence-ask{left:35px;bottom:0;font-size:13px}
   .robust-section{padding-top:36px;padding-bottom:68px}
-  .people-work-section{padding-top:38px;padding-bottom:72px}
+  .people-work-section{padding-top:38px;padding-bottom:64px}
   .people-work-layout{gap:34px}
   .not-one-mark{gap:10px;font-size:88px;line-height:.88}
   .people-work-visual>p{margin-top:22px;font-size:16px}
   .people-work-points{margin-top:26px}
   .people-work-points span{padding:13px 0;font-size:13px}
+  .why-now-section{padding-top:34px;padding-bottom:58px}
+  .why-now-inner{gap:18px}
+  .why-now-inner h2{font-size:34px}
+  .why-now-copy p{font-size:16px}
   .free-company-section{padding-top:44px;padding-bottom:72px}
-  .why-now-section{padding-top:40px;padding-bottom:68px}
-  .trust-section{padding-top:34px;padding-bottom:72px}
-  .privacy-layout{gap:34px}
-  .privacy-principles article{grid-template-columns:38px minmax(0,1fr);gap:14px;padding:18px 0 19px}
+  .privacy-section{padding-top:42px;padding-bottom:76px}
+  .privacy-head h2{font-size:38px}
+  .privacy-head>p{font-size:17px}
+  .privacy-principles{grid-template-columns:1fr;gap:24px;margin-top:34px}
+  .privacy-principles article{padding-top:16px}
   .privacy-principles h3{font-size:17px}
   .privacy-principles p{font-size:13.5px}
-  .business-final-section{padding-top:52px;padding-bottom:68px}
+  .privacy-footnote{margin-top:22px}
+  .business-final-section{padding-top:68px;padding-bottom:76px}
+  .business-final-inner h2{font-size:40px;text-align:center}
+  .business-final-inner>p{font-size:17px}
+  .business-final-actions{flex-direction:column;align-items:stretch;gap:6px;margin-top:30px}
+  .business-final-actions .primary-btn,.business-final-actions .secondary-link{width:100%;justify-content:center}
 }
