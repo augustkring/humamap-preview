@@ -5,7 +5,7 @@
 .business-hero-copy{max-width:940px}
 .business-hero-copy h1{max-width:940px;font-size:68px;line-height:1.035;letter-spacing:-.042em;font-weight:550;text-wrap:balance}
 .business-hero-copy>p{max-width:720px;margin-top:28px;font-size:20px;line-height:1.52;letter-spacing:-.008em;color:var(--muted)}
-.products-section{padding-top:0;padding-bottom:124px}
+.products-section{padding-top:0;padding-bottom:116px}
 .product-panels{margin-top:0;gap:24px}
 .product-panel{min-height:600px;padding:36px 36px 32px;border-radius:14px}
 .product-panel h3{margin-top:17px;font-size:36px;line-height:1.08}
@@ -17,7 +17,7 @@
 .product-panel-actions{padding-top:27px}
 
 /* One simple chapter: people knowledge becomes company knowledge. */
-.company-intelligence-section{padding-top:72px;padding-bottom:126px;scroll-margin-top:96px}
+.company-intelligence-section{padding-top:72px;padding-bottom:116px;scroll-margin-top:96px}
 .company-intelligence-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:88px;align-items:center}
 .company-intelligence-copy{max-width:455px}
 .company-intelligence-copy h2{font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
@@ -31,14 +31,37 @@
 .company-intelligence-stage .team-primary{margin-top:23px}
 .company-intelligence-stage .team-insight p{max-width:300px}
 
-/* Stronger company: robustness is the outcome. */
-.robust-section{padding-top:58px;padding-bottom:126px}
+/* Stronger company: robustness is the business outcome. */
+.robust-section{padding-top:54px;padding-bottom:108px}
 .robust-section .value-head{max-width:720px}
 .robust-section .value-head h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
+
+/* Better workplace: one clear idea, one typographic visual. */
+.people-work-section{padding-top:64px;padding-bottom:124px;scroll-margin-top:96px}
+.people-work-layout{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:112px;align-items:center}
+.people-work-copy{max-width:520px}
+.people-work-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
+.people-work-copy>p{max-width:510px;margin:24px 0 0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+.people-work-copy>p+p{margin-top:16px}
+.people-work-visual{width:100%;max-width:530px;margin-left:auto}
+.not-one-mark{display:flex;align-items:baseline;gap:16px;color:var(--text);font-size:142px;line-height:.82;letter-spacing:-.065em;font-weight:520}
+.not-one-mark span:first-child{text-transform:lowercase}
+.not-one-mark span:nth-child(2){color:var(--green);font-weight:400;letter-spacing:-.02em}
+.people-work-visual>p{max-width:420px;margin:28px 0 0;color:var(--muted);font-size:18px;line-height:1.48;letter-spacing:-.006em}
+.people-work-points{margin-top:32px;border-top:1px solid var(--line)}
+.people-work-points span{display:block;padding:15px 0;border-bottom:1px solid var(--line);color:#343431;font-size:14px;line-height:1.45;font-weight:520}
+
+/* Keep the remaining chapter rhythm close to the homepage. */
+.free-company-section{padding-top:70px;padding-bottom:128px}
+.why-now-section{padding-top:58px;padding-bottom:104px}
+.trust-section{padding-top:54px;padding-bottom:120px}
+.business-final-section{padding-top:74px;padding-bottom:104px}
 
 @media(max-width:1120px){
   .company-intelligence-layout{grid-template-columns:400px minmax(0,1fr);gap:55px}
   .company-intelligence-stage{transform:scale(.94);transform-origin:right center}
+  .people-work-layout{grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:72px}
+  .not-one-mark{font-size:124px}
 }
 
 @media(max-width:980px){
@@ -49,9 +72,15 @@
   .company-intelligence-section{padding-top:58px;padding-bottom:104px}
   .company-intelligence-layout{grid-template-columns:1fr;gap:46px}
   .company-intelligence-copy{max-width:680px}
-  .company-intelligence-copy h2,.robust-section .value-head h2{font-size:44px}
+  .company-intelligence-copy h2,.robust-section .value-head h2,.people-work-copy h2{font-size:44px}
   .company-intelligence-stage{width:650px;max-width:100%;margin:0 auto;transform:none}
-  .robust-section{padding-top:48px;padding-bottom:104px}
+  .robust-section{padding-top:48px;padding-bottom:96px}
+  .people-work-section{padding-top:58px;padding-bottom:104px}
+  .people-work-layout{grid-template-columns:1fr;gap:46px}
+  .people-work-copy{max-width:680px}
+  .people-work-visual{max-width:620px;margin-left:0}
+  .not-one-mark{font-size:118px}
+  .free-company-section{padding-top:62px;padding-bottom:110px}
 }
 
 @media(max-width:680px){
@@ -65,12 +94,22 @@
   .product-panel-retention{font-size:14px!important}
   .company-intelligence-section{padding-top:42px;padding-bottom:84px}
   .company-intelligence-layout{gap:34px}
-  .company-intelligence-copy h2,.robust-section .value-head h2{font-size:38px}
-  .company-intelligence-copy>p{font-size:17px}
+  .company-intelligence-copy h2,.robust-section .value-head h2,.people-work-copy h2{font-size:38px}
+  .company-intelligence-copy>p,.people-work-copy>p{font-size:17px}
   .company-intelligence-meta{display:grid;gap:7px;margin-top:24px;padding-top:17px}
   .company-intelligence-meta span+span::before{display:none}
   .company-intelligence-stage{width:100%;height:510px}
   .company-intelligence-stage .team-card{left:35px;top:120px;width:calc(100% - 35px);max-width:425px}
   .company-intelligence-stage .p1{left:0}.company-intelligence-stage .p2{right:0}.company-intelligence-stage .p3{left:4px;bottom:45px}
-  .robust-section{padding-top:38px;padding-bottom:88px}
+  .robust-section{padding-top:38px;padding-bottom:82px}
+  .people-work-section{padding-top:42px;padding-bottom:84px}
+  .people-work-layout{gap:34px}
+  .not-one-mark{gap:10px;font-size:88px;line-height:.88}
+  .people-work-visual>p{margin-top:22px;font-size:16px}
+  .people-work-points{margin-top:26px}
+  .people-work-points span{padding:13px 0;font-size:13px}
+  .free-company-section{padding-top:48px;padding-bottom:92px}
+  .why-now-section{padding-top:44px;padding-bottom:80px}
+  .trust-section{padding-top:38px;padding-bottom:90px}
+  .business-final-section{padding-top:58px;padding-bottom:82px}
 }
