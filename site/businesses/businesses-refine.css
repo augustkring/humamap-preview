@@ -1,255 +1,104 @@
-/* Focused refinement: direct product entry, simple missing layer, clear company anchoring. */
+/* Focused Businesses page refinements. */
 
-/* Hero */
-.business-hero{padding-bottom:36px}
-.products-section{padding-top:0;padding-bottom:116px}
+/* Hero and product entry */
+.business-hero{padding-bottom:84px}
+.business-hero-copy{max-width:940px}
+.business-hero-copy h1{max-width:940px;font-size:68px;line-height:1.035;letter-spacing:-.042em;font-weight:550;text-wrap:balance}
+.business-hero-copy>p{max-width:720px;margin-top:28px;font-size:20px;line-height:1.52;letter-spacing:-.008em;color:var(--muted)}
+.products-section{padding-top:0;padding-bottom:96px}
 .product-panels{margin-top:0;gap:24px}
 .product-panel{min-height:600px;padding:36px 36px 32px;border-radius:14px}
 .product-panel h3{margin-top:17px;font-size:36px;line-height:1.08}
 .product-panel-top>p{margin-top:17px}
+.product-panel-retention{margin-top:8px!important;color:#34453C!important;font-size:14.5px!important;line-height:1.45!important;font-weight:600}
 .product-panel-audience{margin-top:25px}
 .product-panel-points{margin-top:23px}
 .product-panel-meta{margin-top:24px}
 .product-panel-actions{padding-top:27px}
 
-.business-hero-copy h1{font-size:0;line-height:0;max-width:940px}
-.business-hero-copy h1::after{
-  content:"Understand how people work. Build a stronger company.";
-  display:block;
-  font-size:68px;
-  line-height:1.035;
-  letter-spacing:-.042em;
-  font-weight:550;
-  color:var(--text);
-  text-wrap:balance;
-}
-.business-hero-copy>p:nth-of-type(1){font-size:0;line-height:0;max-width:720px;margin-top:28px}
-.business-hero-copy>p:nth-of-type(1)::after{
-  content:"HumaMap turns understanding of how people work into shared company knowledge, helping teams lead better, onboard faster and make better people decisions.";
-  display:block;
-  font-size:20px;
-  line-height:1.52;
-  letter-spacing:-.008em;
-  color:var(--muted);
-}
-.business-hero-copy>p:nth-of-type(2){display:none}
-
-/* Keep the existing Teams explanation and add the retention value as one extra line. */
-.product-panel-teams .product-panel-top>p::after{
-  content:"Keep this knowledge in the company, not in people's heads.";
-  display:block;
-  margin-top:8px;
-  color:#34453C;
-  font-size:14.5px;
-  line-height:1.45;
-  font-weight:600;
-  white-space:nowrap;
-}
-
-/* Missing layer: three open text groups. No cards, no diagram. */
-.layer-section{padding-top:52px;padding-bottom:104px}
-.layer-layout{grid-template-columns:430px minmax(0,1fr);gap:96px;align-items:center}
+/* Know more than roles and skills. Open text, no diagram. */
+.layer-section{padding-top:52px;padding-bottom:92px}
+.layer-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:96px;align-items:center}
 .layer-copy-strong{margin-top:20px!important}
-.layer-visual{
-  min-height:0;
-  padding:0;
-  display:block;
-  position:relative;
-}
-.layer-visual::before,.layer-visual::after{display:none!important}
-.layer-stack{
-  width:100%;
-  max-width:610px;
-  margin-left:auto;
-  padding:0;
-  display:flex;
-  flex-direction:column;
-  background:transparent;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-  transform:none;
-  overflow:visible;
-}
-.stack-direction{display:none!important}
-.stack-layer{
-  width:100%!important;
-  margin:0!important;
-  padding:24px 0 25px!important;
-  background:transparent!important;
-  border:0!important;
-  border-top:1px solid var(--line)!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  transform:none!important;
-}
-.stack-base{order:1}
-.stack-human{order:2}
-.stack-result{order:3}
-.stack-layer-head{display:grid;grid-template-columns:190px 1fr;gap:28px;align-items:baseline}
-.stack-layer-label{font-size:10px;line-height:1.3;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
-.stack-base .stack-layer-label{color:#777772}
-.stack-human .stack-layer-label{font-size:0}
-.stack-human .stack-layer-label::after{content:"What HumaMap adds";font-size:10px}
-.stack-result .stack-layer-label{font-size:0}
-.stack-result .stack-layer-label::after{content:"What it helps with";font-size:10px}
-.stack-layer-title{font-size:20px;line-height:1.22;letter-spacing:-.02em;font-weight:600;color:var(--text)}
-.stack-layer-items{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px 18px;
-  margin:13px 0 0 218px;
-  padding:0;
-  border:0!important;
-}
-.stack-layer-items span{font-size:12.5px;line-height:1.45;color:var(--muted)}
-.stack-human .stack-layer-title{color:var(--green)}
-.stack-human .stack-layer-items span{color:#486052}
-.stack-result .stack-layer-items span{color:#454541;font-weight:520}
+.context-groups{width:100%;max-width:620px;margin-left:auto;border-top:1px solid var(--line)}
+.context-group{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;padding:24px 0 25px;border-bottom:1px solid var(--line);align-items:start}
+.context-group>span{color:#777772;font-size:10px;line-height:1.35;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+.context-group-human>span{color:var(--green)}
+.context-group-use>span{color:var(--green)}
+.context-group>div{display:flex;flex-wrap:wrap;gap:8px 18px}
+.context-group strong{color:var(--muted);font-size:12.5px;line-height:1.45;font-weight:500}
+.context-group-human strong{color:#3F5548}
+.context-group-use strong{color:#454541;font-weight:560}
 
-/* Collective intelligence: people -> orchestration -> knowledge anchored in the company. */
-.intelligence-section{padding-top:68px;padding-bottom:96px}
-.intelligence-layout{grid-template-columns:430px minmax(0,1fr);gap:92px;align-items:center}
-.intelligence-copy h2{font-size:0;line-height:0}
-.intelligence-copy h2::after{
-  content:"Keep people knowledge in the company.";
-  display:block;
-  font-size:48px;
-  line-height:1.075;
-  letter-spacing:-.034em;
-  font-weight:550;
-  color:var(--text);
-}
-.intelligence-copy>p{font-size:0;line-height:0}
-.intelligence-copy>p:nth-of-type(1)::after{
-  content:"When knowledge about how people work is anchored in the company, it does not disappear when managers or employees change. That makes the company more robust.";
-  display:block;
-  margin-top:24px;
-  color:var(--muted);
-  font-size:18px;
-  line-height:1.56;
-  letter-spacing:-.006em;
-}
-.intelligence-copy>p:nth-of-type(2)::after{
-  content:"HumaMap keeps that knowledge easy to use in day-to-day work, without requiring anyone to be an expert.";
-  display:block;
-  margin-top:16px;
-  color:var(--muted);
-  font-size:18px;
-  line-height:1.56;
-  letter-spacing:-.006em;
-}
-.intelligence-visual{min-height:530px;display:flex;align-items:center;justify-content:flex-end}
-.company-frame{
-  position:relative;
-  width:570px;
-  min-height:0;
-  padding:28px 0 0;
-  border:0;
-  background:transparent;
-}
-.company-frame-label{
-  position:static;
-  display:block;
-  padding:0;
-  margin:0 0 18px;
-  background:transparent;
-  color:var(--green);
-  font-size:0;
-  line-height:0;
-}
-.company-frame-label::after{content:"People";font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.people-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.people-input{
-  padding:17px 14px 15px;
-  text-align:left;
-  border-radius:14px;
-  background:#fff;
-  box-shadow:0 14px 34px rgba(21,21,21,.05);
-}
-.people-avatar{width:42px;height:42px;margin:0;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:650}
+/* Collective intelligence: people -> HumaMap orchestration -> knowledge anchored in the company. */
+.intelligence-section{padding-top:56px;padding-bottom:96px}
+.intelligence-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:92px;align-items:center}
+.collective-visual{width:570px;max-width:100%;margin-left:auto;padding-top:8px}
+.collective-label{display:block;margin:0 0 14px 11%;color:var(--green);font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.collective-people{width:78%;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.collective-people article{display:flex;align-items:center;gap:10px;min-width:0;padding:14px 13px;border-radius:12px;background:#fff;box-shadow:0 14px 34px rgba(21,21,21,.05)}
+.collective-people article>div{min-width:0}
+.people-avatar{width:40px;height:40px;flex:0 0 auto;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:650}
 .people-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
-.people-input strong{display:block;margin-top:10px;font-size:12px}
-.people-input small{display:block;margin-top:3px;color:var(--quiet);font-size:9.5px}
-.intelligence-lines{height:52px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative}
-.intelligence-lines::after{content:"";position:absolute;left:16.5%;right:16.5%;bottom:0;height:1px;background:rgba(45,90,67,.2)}
-.intelligence-lines i{position:relative}
-.intelligence-lines i::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(45,90,67,.2)}
-.shared-intelligence{
-  margin-top:0;
-  padding:21px 23px 20px;
-  background:#DDEAE2;
-  border:1px solid rgba(45,90,67,.1);
-  border-radius:14px 14px 10px 10px;
-  text-align:left;
-}
-.shared-intelligence span,.shared-intelligence strong,.shared-intelligence small{font-size:0;line-height:0}
-.shared-intelligence span::after{content:"HumaMap orchestration";display:block;color:var(--green);font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
-.shared-intelligence strong::after{content:"Keeps people context useful in day-to-day work.";display:block;margin-top:7px;color:#233E30;font-size:20px;line-height:1.28;letter-spacing:-.018em;font-weight:600}
-.shared-intelligence small::after{content:"Easy to use · Quick to get started · No expertise required";display:block;margin-top:8px;color:#637068;font-size:10.5px;line-height:1.4}
-.shared-access{
-  display:block;
-  margin-top:12px;
-  padding:24px 24px 25px;
-  text-align:left;
-  background:#ECECE7;
-  border-radius:10px 10px 14px 14px;
-}
-.shared-access span{display:none}
-.shared-access::before{content:"Anchored in the company";display:block;color:#70706B;font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
-.shared-access::after{content:"Shared people knowledge stays useful when managers, roles and teams change.";display:block;max-width:450px;margin-top:7px;color:#2F2F2C;font-size:18px;line-height:1.38;letter-spacing:-.012em;font-weight:560}
+.collective-people strong{display:block;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;white-space:nowrap}
+.collective-people small{display:block;margin-top:2px;color:var(--quiet);font-size:9px;white-space:nowrap}
+.orchestration-layer{width:92%;margin:24px auto 0;padding:22px 24px 21px;border:1px solid rgba(45,90,67,.1);border-radius:12px;background:#DDEAE2}
+.orchestration-layer>span,.knowledge-foundation>span{display:block;font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
+.orchestration-layer>span{color:var(--green)}
+.orchestration-layer>strong{display:block;margin-top:7px;color:#233E30;font-size:20px;line-height:1.28;letter-spacing:-.018em;font-weight:600}
+.orchestration-layer>small{display:block;margin-top:8px;color:#637068;font-size:10.5px;line-height:1.4}
+.knowledge-foundation{width:100%;margin:12px auto 0;padding:25px 27px 26px;border:1px solid rgba(21,21,21,.07);border-radius:9px;background:#ECECE7}
+.knowledge-foundation>span{color:#70706B}
+.knowledge-foundation>strong{display:block;margin-top:7px;color:#2F2F2C;font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
+.knowledge-foundation>p{max-width:440px;margin:7px 0 0;color:#62625E;font-size:13px;line-height:1.48}
 .intelligence-payoff{display:grid;grid-template-columns:1.05fr .95fr;gap:70px;max-width:1030px;margin:54px auto 0;padding-top:32px;border-top:1px solid var(--line)}
-.intelligence-payoff p,.intelligence-payoff strong{font-size:0;line-height:0;margin:0}
-.intelligence-payoff p::after{content:"Less knowledge is lost when someone is away, changes role or leaves.";display:block;color:var(--muted);font-size:16px;line-height:1.55}
-.intelligence-payoff strong::after{content:"More continuity. A more robust company.";display:block;color:var(--text);font-size:24px;line-height:1.32;letter-spacing:-.022em;font-weight:550}
+.intelligence-payoff p{margin:0;color:var(--muted);font-size:16px;line-height:1.55}
+.intelligence-payoff strong{font-size:24px;line-height:1.32;letter-spacing:-.022em;font-weight:550}
 
 @media(max-width:1120px){
-  .product-panel-teams .product-panel-top>p::after{white-space:normal}
   .layer-layout,.intelligence-layout{grid-template-columns:400px minmax(0,1fr);gap:58px}
-  .company-frame{width:520px}
+  .collective-visual{width:520px}
 }
 
 @media(max-width:980px){
-  .business-hero{padding-bottom:32px}
-  .products-section{padding-bottom:98px}
+  .business-hero{padding-bottom:70px}
+  .business-hero-copy h1{font-size:58px}
+  .products-section{padding-bottom:84px}
   .product-panel{min-height:0;border-radius:13px}
+  .layer-section{padding-top:48px;padding-bottom:82px}
   .layer-layout,.intelligence-layout{grid-template-columns:1fr;gap:42px}
   .layer-copy,.intelligence-copy{max-width:680px}
-  .layer-stack{max-width:680px;margin-left:0}
-  .intelligence-visual{min-height:0;justify-content:flex-start}
-  .company-frame{width:min(620px,100%)}
+  .context-groups{max-width:680px;margin-left:0}
+  .intelligence-section{padding-top:48px;padding-bottom:84px}
+  .collective-visual{width:min(620px,100%);margin-left:0}
 }
 
 @media(max-width:680px){
-  .business-hero{padding-bottom:30px}
-  .business-hero-copy h1::after{font-size:45px;line-height:1.055;text-wrap:pretty}
-  .business-hero-copy>p:nth-of-type(1){margin-top:23px}
-  .business-hero-copy>p:nth-of-type(1)::after{font-size:18px;line-height:1.5}
-  .products-section{padding-top:0;padding-bottom:78px}
+  .business-hero{padding-bottom:58px}
+  .business-hero-copy h1{font-size:45px;line-height:1.055;text-wrap:pretty}
+  .business-hero-copy>p{margin-top:23px;font-size:18px;line-height:1.5}
+  .products-section{padding-bottom:72px}
   .product-panels{gap:14px}
   .product-panel{padding:27px 23px 25px;border-radius:12px}
   .product-panel h3{font-size:30px}
-  .product-panel-teams .product-panel-top>p::after{font-size:14px;line-height:1.45}
-  .layer-section{padding-top:38px;padding-bottom:78px}
-  .stack-layer{padding:20px 0 21px!important}
-  .stack-layer-head{grid-template-columns:1fr;gap:5px}
-  .stack-layer-title{font-size:18px}
-  .stack-layer-items{margin:11px 0 0;gap:6px 14px}
-  .stack-layer-items span{font-size:11.5px}
-  .intelligence-section{padding-top:42px;padding-bottom:78px}
-  .intelligence-copy h2::after{font-size:38px}
-  .intelligence-copy>p:nth-of-type(1)::after,.intelligence-copy>p:nth-of-type(2)::after{font-size:17px}
-  .company-frame{padding-top:12px}
-  .people-inputs{gap:8px}
-  .people-input{padding:14px 11px 13px;border-radius:12px}
+  .product-panel-retention{font-size:14px!important}
+  .layer-section{padding-top:36px;padding-bottom:72px}
+  .context-group{grid-template-columns:1fr;gap:8px;padding:20px 0 21px}
+  .context-group>div{gap:6px 14px}
+  .context-group strong{font-size:11.5px}
+  .intelligence-section{padding-top:40px;padding-bottom:72px}
+  .collective-label{margin-left:0}
+  .collective-people{width:100%;gap:8px}
+  .collective-people article{display:block;padding:13px 10px;border-radius:11px}
+  .collective-people strong{margin-top:8px;font-size:10.5px}
+  .collective-people small{font-size:8.5px}
   .people-avatar{width:38px;height:38px}
-  .people-input strong{font-size:10.5px}.people-input small{font-size:8.5px}
-  .intelligence-lines{height:42px;gap:8px}
-  .shared-intelligence{padding:18px 17px 17px;border-radius:12px 12px 9px 9px}
-  .shared-intelligence strong::after{font-size:18px}
-  .shared-intelligence small::after{font-size:9.5px}
-  .shared-access{margin-top:9px;padding:20px 18px 21px;border-radius:9px 9px 12px 12px}
-  .shared-access::after{font-size:16px}
+  .orchestration-layer{width:96%;margin-top:18px;padding:18px 17px 17px;border-radius:10px}
+  .orchestration-layer>strong{font-size:18px}
+  .orchestration-layer>small{font-size:9.5px}
+  .knowledge-foundation{padding:21px 19px 22px;border-radius:8px}
+  .knowledge-foundation>strong{font-size:19px}
+  .knowledge-foundation>p{font-size:12px}
   .intelligence-payoff{grid-template-columns:1fr;gap:22px;margin-top:34px;padding-top:26px}
-  .intelligence-payoff strong::after{font-size:21px}
+  .intelligence-payoff strong{font-size:21px}
 }
