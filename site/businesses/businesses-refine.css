@@ -1,11 +1,11 @@
-/* Focused Businesses page refinements. */
+/* Businesses page refinements aligned with the homepage design system. */
 
 /* Hero and product entry */
-.business-hero{padding-bottom:84px}
+.business-hero{padding-bottom:104px}
 .business-hero-copy{max-width:940px}
 .business-hero-copy h1{max-width:940px;font-size:68px;line-height:1.035;letter-spacing:-.042em;font-weight:550;text-wrap:balance}
 .business-hero-copy>p{max-width:720px;margin-top:28px;font-size:20px;line-height:1.52;letter-spacing:-.008em;color:var(--muted)}
-.products-section{padding-top:0;padding-bottom:96px}
+.products-section{padding-top:0;padding-bottom:124px}
 .product-panels{margin-top:0;gap:24px}
 .product-panel{min-height:600px;padding:36px 36px 32px;border-radius:14px}
 .product-panel h3{margin-top:17px;font-size:36px;line-height:1.08}
@@ -16,89 +16,61 @@
 .product-panel-meta{margin-top:24px}
 .product-panel-actions{padding-top:27px}
 
-/* Know more than roles and skills. Open text, no diagram. */
-.layer-section{padding-top:52px;padding-bottom:92px}
-.layer-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:96px;align-items:center}
-.layer-copy-strong{margin-top:20px!important}
-.context-groups{width:100%;max-width:620px;margin-left:auto;border-top:1px solid var(--line)}
-.context-group{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;padding:24px 0 25px;border-bottom:1px solid var(--line);align-items:start}
-.context-group>span{color:#777772;font-size:10px;line-height:1.35;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
-.context-group-human>span{color:var(--green)}
-.context-group-use>span{color:var(--green)}
-.context-group>div{display:flex;flex-wrap:wrap;gap:8px 18px}
-.context-group strong{color:var(--muted);font-size:12.5px;line-height:1.45;font-weight:500}
-.context-group-human strong{color:#3F5548}
-.context-group-use strong{color:#454541;font-weight:560}
+/* One simple chapter: people knowledge becomes company knowledge. */
+.company-intelligence-section{padding-top:72px;padding-bottom:126px;scroll-margin-top:96px}
+.company-intelligence-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:88px;align-items:center}
+.company-intelligence-copy{max-width:455px}
+.company-intelligence-copy h2{font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
+.company-intelligence-copy>p{font-size:18px;line-height:1.56}
+.company-intelligence-copy>p+p{margin-top:16px}
+.company-intelligence-meta{display:flex;flex-wrap:wrap;gap:9px 20px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);color:var(--quiet);font-size:11.5px;line-height:1.45}
+.company-intelligence-meta span{position:relative}
+.company-intelligence-meta span+span::before{content:"·";position:absolute;left:-12px;color:#A0A09A}
+.company-intelligence-stage{height:650px}
+.company-intelligence-stage .team-card{left:82px;top:128px;width:500px}
+.company-intelligence-stage .team-primary{margin-top:23px}
+.company-intelligence-stage .team-insight p{max-width:300px}
 
-/* Collective intelligence: people -> HumaMap orchestration -> knowledge anchored in the company. */
-.intelligence-section{padding-top:56px;padding-bottom:96px}
-.intelligence-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:92px;align-items:center}
-.collective-visual{width:570px;max-width:100%;margin-left:auto;padding-top:8px}
-.collective-label{display:block;margin:0 0 14px 11%;color:var(--green);font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.collective-people{width:78%;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.collective-people article{display:flex;align-items:center;gap:10px;min-width:0;padding:14px 13px;border-radius:12px;background:#fff;box-shadow:0 14px 34px rgba(21,21,21,.05)}
-.collective-people article>div{min-width:0}
-.people-avatar{width:40px;height:40px;flex:0 0 auto;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:650}
-.people-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
-.collective-people strong{display:block;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;white-space:nowrap}
-.collective-people small{display:block;margin-top:2px;color:var(--quiet);font-size:9px;white-space:nowrap}
-.orchestration-layer{width:92%;margin:24px auto 0;padding:22px 24px 21px;border:1px solid rgba(45,90,67,.1);border-radius:12px;background:#DDEAE2}
-.orchestration-layer>span,.knowledge-foundation>span{display:block;font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
-.orchestration-layer>span{color:var(--green)}
-.orchestration-layer>strong{display:block;margin-top:7px;color:#233E30;font-size:20px;line-height:1.28;letter-spacing:-.018em;font-weight:600}
-.orchestration-layer>small{display:block;margin-top:8px;color:#637068;font-size:10.5px;line-height:1.4}
-.knowledge-foundation{width:100%;margin:12px auto 0;padding:25px 27px 26px;border:1px solid rgba(21,21,21,.07);border-radius:9px;background:#ECECE7}
-.knowledge-foundation>span{color:#70706B}
-.knowledge-foundation>strong{display:block;margin-top:7px;color:#2F2F2C;font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
-.knowledge-foundation>p{max-width:440px;margin:7px 0 0;color:#62625E;font-size:13px;line-height:1.48}
-.intelligence-payoff{display:grid;grid-template-columns:1.05fr .95fr;gap:70px;max-width:1030px;margin:54px auto 0;padding-top:32px;border-top:1px solid var(--line)}
-.intelligence-payoff p{margin:0;color:var(--muted);font-size:16px;line-height:1.55}
-.intelligence-payoff strong{font-size:24px;line-height:1.32;letter-spacing:-.022em;font-weight:550}
+/* Stronger company: robustness is the outcome. */
+.robust-section{padding-top:58px;padding-bottom:126px}
+.robust-section .value-head{max-width:720px}
+.robust-section .value-head h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550;text-wrap:balance}
 
 @media(max-width:1120px){
-  .layer-layout,.intelligence-layout{grid-template-columns:400px minmax(0,1fr);gap:58px}
-  .collective-visual{width:520px}
+  .company-intelligence-layout{grid-template-columns:400px minmax(0,1fr);gap:55px}
+  .company-intelligence-stage{transform:scale(.94);transform-origin:right center}
 }
 
 @media(max-width:980px){
-  .business-hero{padding-bottom:70px}
+  .business-hero{padding-bottom:86px}
   .business-hero-copy h1{font-size:58px}
-  .products-section{padding-bottom:84px}
+  .products-section{padding-bottom:104px}
   .product-panel{min-height:0;border-radius:13px}
-  .layer-section{padding-top:48px;padding-bottom:82px}
-  .layer-layout,.intelligence-layout{grid-template-columns:1fr;gap:42px}
-  .layer-copy,.intelligence-copy{max-width:680px}
-  .context-groups{max-width:680px;margin-left:0}
-  .intelligence-section{padding-top:48px;padding-bottom:84px}
-  .collective-visual{width:min(620px,100%);margin-left:0}
+  .company-intelligence-section{padding-top:58px;padding-bottom:104px}
+  .company-intelligence-layout{grid-template-columns:1fr;gap:46px}
+  .company-intelligence-copy{max-width:680px}
+  .company-intelligence-copy h2,.robust-section .value-head h2{font-size:44px}
+  .company-intelligence-stage{width:650px;max-width:100%;margin:0 auto;transform:none}
+  .robust-section{padding-top:48px;padding-bottom:104px}
 }
 
 @media(max-width:680px){
-  .business-hero{padding-bottom:58px}
+  .business-hero{padding-bottom:72px}
   .business-hero-copy h1{font-size:45px;line-height:1.055;text-wrap:pretty}
   .business-hero-copy>p{margin-top:23px;font-size:18px;line-height:1.5}
-  .products-section{padding-bottom:72px}
+  .products-section{padding-bottom:84px}
   .product-panels{gap:14px}
   .product-panel{padding:27px 23px 25px;border-radius:12px}
   .product-panel h3{font-size:30px}
   .product-panel-retention{font-size:14px!important}
-  .layer-section{padding-top:36px;padding-bottom:72px}
-  .context-group{grid-template-columns:1fr;gap:8px;padding:20px 0 21px}
-  .context-group>div{gap:6px 14px}
-  .context-group strong{font-size:11.5px}
-  .intelligence-section{padding-top:40px;padding-bottom:72px}
-  .collective-label{margin-left:0}
-  .collective-people{width:100%;gap:8px}
-  .collective-people article{display:block;padding:13px 10px;border-radius:11px}
-  .collective-people strong{margin-top:8px;font-size:10.5px}
-  .collective-people small{font-size:8.5px}
-  .people-avatar{width:38px;height:38px}
-  .orchestration-layer{width:96%;margin-top:18px;padding:18px 17px 17px;border-radius:10px}
-  .orchestration-layer>strong{font-size:18px}
-  .orchestration-layer>small{font-size:9.5px}
-  .knowledge-foundation{padding:21px 19px 22px;border-radius:8px}
-  .knowledge-foundation>strong{font-size:19px}
-  .knowledge-foundation>p{font-size:12px}
-  .intelligence-payoff{grid-template-columns:1fr;gap:22px;margin-top:34px;padding-top:26px}
-  .intelligence-payoff strong{font-size:21px}
+  .company-intelligence-section{padding-top:42px;padding-bottom:84px}
+  .company-intelligence-layout{gap:34px}
+  .company-intelligence-copy h2,.robust-section .value-head h2{font-size:38px}
+  .company-intelligence-copy>p{font-size:17px}
+  .company-intelligence-meta{display:grid;gap:7px;margin-top:24px;padding-top:17px}
+  .company-intelligence-meta span+span::before{display:none}
+  .company-intelligence-stage{width:100%;height:510px}
+  .company-intelligence-stage .team-card{left:35px;top:120px;width:calc(100% - 35px);max-width:425px}
+  .company-intelligence-stage .p1{left:0}.company-intelligence-stage .p2{right:0}.company-intelligence-stage .p3{left:4px;bottom:45px}
+  .robust-section{padding-top:38px;padding-bottom:88px}
 }
