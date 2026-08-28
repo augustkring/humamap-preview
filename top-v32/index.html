@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Leadership section v32</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v31/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const leadershipStyles = `
+        /* Leadership */
+        .leadership-section{padding:0 0 190px}
+        .leadership-layout{display:grid;grid-template-columns:minmax(0,650px) 420px;gap:86px;align-items:center}
+        .leadership-copy{max-width:420px}
+        .leadership-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+        .leadership-copy>p{margin:26px 0 0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+        .leadership-cta{display:inline-flex;margin-top:29px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}
+
+        .leadership-stage{position:relative;height:660px;isolation:isolate}
+        .leadership-stage::before,.leadership-stage::after{content:"";position:absolute;z-index:0;pointer-events:none;border-radius:50%}
+        .leadership-stage::before{left:18px;top:116px;width:520px;height:392px;background:#EFF5F1;transform:rotate(-6deg)}
+        .leadership-stage::after{left:344px;top:58px;width:182px;height:182px;background:#DEEAE3;box-shadow:-246px 326px 0 #F5F8F6}
+
+        .leader-tab{position:absolute;width:218px;height:116px;padding:18px 19px;border-radius:20px;background:#fff;box-shadow:0 16px 40px rgba(21,21,21,.055);z-index:1}
+        .leader-tab.l1{left:10px;top:92px;transform:rotate(-5deg)}
+        .leader-tab.l2{left:206px;top:48px;transform:rotate(-1deg)}
+        .leader-tab.l3{right:18px;top:98px;transform:rotate(5deg)}
+        .leader-person{display:flex;align-items:center;gap:11px}
+        .leader-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:0 0 auto;background:#EDF3F0;color:var(--green);font-size:11px;font-weight:650}
+        .leader-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
+        .leader-person strong{display:block;font-size:14px;line-height:1.2;font-weight:600;letter-spacing:-.018em}
+        .leader-person span{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.35}
+        .leader-tab-lines{display:grid;gap:5px;margin-top:14px}
+        .leader-tab-line{height:3px;border-radius:999px;background:rgba(21,21,21,.055)}
+        .leader-tab-line:first-child{width:78%}.leader-tab-line:last-child{width:52%}
+
+        .leadership-work{position:absolute;left:76px;top:158px;width:500px;padding:30px 31px 29px;border-radius:25px;background:#fff;box-shadow:0 32px 76px rgba(21,21,21,.115),0 8px 22px rgba(21,21,21,.035);transform:rotate(.25deg);z-index:4}
+        .leadership-work-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+        .leadership-work-kicker{display:block;color:var(--green);font-size:11.5px;line-height:1.3;font-weight:650}
+        .leadership-work h3{margin:6px 0 0;font-size:25px;line-height:1.12;letter-spacing:-.028em;font-weight:600}
+        .leadership-guided{padding-top:3px;color:#858580;font-size:10.5px;line-height:1.35;text-align:right}
+        .leadership-guided strong{display:block;margin-top:2px;color:#555550;font-weight:600}
+
+        .leadership-primary{margin-top:24px;padding:20px 21px 21px;border-radius:14px;background:#F1F5F2}
+        .leadership-label{display:block;color:var(--green);font-size:11.5px;line-height:1.3;font-weight:650}
+        .leadership-primary p{margin:8px 0 0;font-size:15px;line-height:1.48;letter-spacing:-.005em}
+        .leadership-row{display:grid;grid-template-columns:128px 1fr;gap:20px;padding:16px 0;border-top:1px solid rgba(21,21,21,.07)}
+        .leadership-row.first{margin-top:21px;border-top:0;padding-top:0}
+        .leadership-row strong{font-size:11px;line-height:1.4;font-weight:650;color:#555550}
+        .leadership-row p{margin:0;color:#343431;font-size:13.5px;line-height:1.46}
+        .leadership-practice{margin-top:5px;padding-top:18px;border-top:1px solid rgba(21,21,21,.07)}
+        .leadership-practice-title{display:block;color:#555550;font-size:11px;line-height:1.4;font-weight:650}
+        .leadership-practice-lines{display:grid;gap:8px;margin-top:12px}
+        .leadership-practice-line{display:flex;align-items:center;gap:10px;color:#555550;font-size:12px;line-height:1.35}
+        .leadership-practice-line::before{content:"";width:5px;height:5px;border-radius:50%;background:#AFC5B8;flex:0 0 auto}
+
+        @media(max-width:1120px){.leadership-layout{grid-template-columns:580px minmax(0,1fr);gap:52px}.leadership-stage{transform:scale(.92);transform-origin:left center}}
+        @media(max-width:980px){.leadership-section{padding-bottom:150px}.leadership-layout{grid-template-columns:1fr;gap:48px}.leadership-copy{max-width:680px;order:1}.leadership-stage{order:2;width:650px;max-width:100%;transform:none}.leadership-copy h2{font-size:44px}}
+        @media(max-width:680px){.leadership-section{padding:0 0 105px;overflow:hidden}.leadership-copy h2{font-size:38px}.leadership-copy>p{font-size:17px;margin-top:21px}.leadership-stage{width:650px;height:625px;transform:scale(.76);transform-origin:top left}}
+      `;
+
+      const leadershipSection = `
+        <section class="leadership-section shell" aria-label="HumaMap Leadership">
+          <div class="leadership-layout">
+            <div class="leadership-stage" aria-label="Example HumaMap Leadership working session">
+              <article class="leader-tab l1" aria-hidden="true">
+                <div class="leader-person"><div class="leader-avatar"><img src="https://raw.githubusercontent.com/augustkring/augustkring.github.io/main/assets/august_profile.jpg" alt="" /></div><div><strong>August</strong><span>Founder</span></div></div>
+                <div class="leader-tab-lines"><div class="leader-tab-line"></div><div class="leader-tab-line"></div></div>
+              </article>
+              <article class="leader-tab l2" aria-hidden="true">
+                <div class="leader-person"><div class="leader-avatar">S</div><div><strong>Sofia</strong><span>Engineering</span></div></div>
+                <div class="leader-tab-lines"><div class="leader-tab-line"></div><div class="leader-tab-line"></div></div>
+              </article>
+              <article class="leader-tab l3" aria-hidden="true">
+                <div class="leader-person"><div class="leader-avatar">E</div><div><strong>Emma</strong><span>Operations</span></div></div>
+                <div class="leader-tab-lines"><div class="leader-tab-line"></div><div class="leader-tab-line"></div></div>
+              </article>
+
+              <article class="leadership-work">
+                <header class="leadership-work-head">
+                  <div><span class="leadership-work-kicker">Leadership working session</span><h3>How we lead together</h3></div>
+                  <div class="leadership-guided">HumaMap Leadership<strong>Guided programme</strong></div>
+                </header>
+
+                <section class="leadership-primary">
+                  <span class="leadership-label">Where this leadership team strengthens each other</span>
+                  <p>August brings pace and direction, Sofia deeper validation and Emma structure and follow-through. Used deliberately, those differences can make the leadership team stronger.</p>
+                </section>
+
+                <div class="leadership-row first"><strong>What gets in the way</strong><p>Fast decisions can move ahead of shared context and create unclear ownership.</p></div>
+                <div class="leadership-row"><strong>What to make explicit</strong><p>Who decides, who needs to be involved and when the team has enough information to move.</p></div>
+
+                <div class="leadership-practice">
+                  <span class="leadership-practice-title">Put the insight into practice</span>
+                  <div class="leadership-practice-lines">
+                    <div class="leadership-practice-line">Make decision rights clear.</div>
+                    <div class="leadership-practice-line">Use differences deliberately.</div>
+                    <div class="leadership-practice-line">Turn insights into ways of working.</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="leadership-copy">
+              <span class="section-eyebrow">Leadership</span>
+              <h2>The people leading the company need to work well together too.</h2>
+              <p>HumaMap Leadership is a guided programme for founders and executive teams to understand themselves and each other, use their differences deliberately and turn that insight into better ways of leading and working together.</p>
+              <a class="leadership-cta" href="#">Explore HumaMap Leadership →</a>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.querySelector('.company-section') || !doc.querySelector('main')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = leadershipStyles;
+          doc.head.appendChild(style);
+
+          const holder = doc.createElement('div');
+          holder.innerHTML = leadershipSection.trim();
+          doc.querySelector('main').appendChild(holder.firstElementChild);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
