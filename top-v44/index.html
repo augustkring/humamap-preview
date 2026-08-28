@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Launch polish v44</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v43/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const styles = `
+        /* Final launch polish */
+        :where(a,button,[tabindex]):focus-visible{outline:2px solid var(--green);outline-offset:4px;border-radius:4px}
+        html{scroll-behavior:smooth}
+        .privacy-note{max-width:390px;margin:22px 0 0;color:#777772;font-size:12.5px;line-height:1.5}
+        .decision-need{margin-top:22px!important;color:var(--text)!important;font-size:16px!important;line-height:1.52!important;letter-spacing:-.004em!important}
+        .footer{background:#151515;color:#F7F7F3;padding:58px 0 38px}
+        .footer-inner{max-width:1128px;margin:0 auto}
+        .footer-top{display:grid;grid-template-columns:minmax(250px,1.3fr) repeat(3,minmax(130px,.7fr));gap:48px;align-items:start}
+        .footer-brand img{display:block;height:34px;width:auto;filter:invert(1)}
+        .footer-brand p{max-width:330px;margin:18px 0 0;color:#B9B9B3;font-size:13.5px;line-height:1.55}
+        .footer-group strong{display:block;color:#F7F7F3;font-size:12px;line-height:1.35;font-weight:650;margin-bottom:14px}
+        .footer-group a{display:block;width:max-content;max-width:100%;margin-top:10px;color:#B9B9B3;text-decoration:none;font-size:13px;line-height:1.4}
+        .footer-group a:hover{color:#fff}
+        .footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:52px;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);color:#8E8E89;font-size:11.5px;line-height:1.4}
+        .proof-source a{color:inherit;text-underline-offset:2px}
+        @media(max-width:980px){
+          .footer-top{grid-template-columns:1fr 1fr;gap:38px 52px}
+          .footer-brand{grid-column:1/-1}
+        }
+        @media(max-width:680px){
+          .privacy-note{margin-top:18px}
+          .footer{padding:48px 0 32px}
+          .footer-top{grid-template-columns:1fr;gap:30px}
+          .footer-brand{grid-column:auto}
+          .footer-bottom{display:block;margin-top:38px}
+          .footer-bottom span+span{display:block;margin-top:8px}
+        }
+      `;
+
+      const footer = `
+        <footer class="footer shell" aria-label="Footer">
+          <div class="footer-inner">
+            <div class="footer-top">
+              <div class="footer-brand">
+                <img src="../assets/humamap-horizontal-black-transparent.png" alt="HumaMap" />
+                <p>Better work starts with better understanding of people.</p>
+              </div>
+              <nav class="footer-group" aria-label="Product">
+                <strong>Product</strong>
+                <a href="#individuals">Individuals</a>
+                <a href="#businesses">Teams</a>
+                <a href="#company">Company</a>
+                <a href="#leadership">Leadership</a>
+              </nav>
+              <nav class="footer-group" aria-label="Trust">
+                <strong>Trust</strong>
+                <a href="/privacy">Privacy</a>
+                <a href="/security">Security</a>
+                <a href="/terms">Terms</a>
+              </nav>
+              <nav class="footer-group" aria-label="Get started">
+                <strong>Get started</strong>
+                <a href="/signup?type=personal">Create personal HumaMap</a>
+                <a href="/signup?type=company">Create Company HumaMap</a>
+              </nav>
+            </div>
+            <div class="footer-bottom"><span>© 2026 HumaMap</span><span>Built in Europe.</span></div>
+          </div>
+        </footer>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.querySelector('.final-cta-section') || !doc.querySelector('.lead40') || !doc.querySelector('.decisions-copy')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = styles;
+          doc.head.appendChild(style);
+
+          /* Section anchors */
+          const person = doc.querySelector('.person-stage'); if (person) person.id = 'individuals';
+          const team = doc.querySelector('.team-section'); if (team) team.id = 'businesses';
+          const decisions = doc.querySelector('.decisions-section'); if (decisions) decisions.id = 'people-decisions';
+          const company = doc.querySelector('.company-section'); if (company) company.id = 'company';
+          const leadership = doc.querySelector('.leadership-section'); if (leadership) leadership.id = 'leadership';
+          const finalCta = doc.querySelector('.final-cta-section'); if (finalCta) finalCta.id = 'create';
+
+          /* Header journeys */
+          const navLinks = doc.querySelectorAll('.nav-actions a');
+          if (navLinks[0]) navLinks[0].setAttribute('href','#individuals');
+          if (navLinks[1]) navLinks[1].setAttribute('href','#businesses');
+          if (navLinks[2]) navLinks[2].setAttribute('href','#create');
+
+          /* Hero */
+          const heroLead = doc.querySelector('.hero-lead');
+          if (heroLead) heroLead.textContent = 'HumaMap helps you understand how the people you work with think, work and collaborate, so you can build better teams, lead better and make better people decisions.';
+          const heroMicro = doc.querySelector('.hero .microcopy');
+          if (heroMicro) heroMicro.textContent = 'Personal and Company HumaMaps are free to create.';
+          const heroButtons = doc.querySelectorAll('.hero-actions a');
+          if (heroButtons[0]) heroButtons[0].setAttribute('href','/signup?type=company');
+          if (heroButtons[1]) heroButtons[1].setAttribute('href','/signup?type=personal');
+
+          /* Individuals */
+          const aiPersonal = doc.querySelector('.ai-note p');
+          if (aiPersonal) aiPersonal.textContent = 'Ask HumaMap AI about how you work, what drives you and how to work with you.';
+          const storyLink = doc.querySelector('.story-link');
+          if (storyLink) storyLink.setAttribute('href','/august');
+          const storyColumn = doc.querySelector('.story-column');
+          if (storyColumn && !storyColumn.querySelector('.privacy-note')) {
+            const privacy = doc.createElement('p');
+            privacy.className = 'privacy-note';
+            privacy.textContent = 'You control what is visible and who can see it.';
+            storyColumn.appendChild(privacy);
+          }
+
+          /* Compare */
+          const compareAi = doc.querySelector('.compare-ai p');
+          if (compareAi) compareAi.textContent = 'Ask HumaMap AI where you align, where you differ and how to work better together.';
+          const compareCta = doc.querySelector('.compare-cta');
+          if (compareCta) compareCta.setAttribute('href','/individuals');
+
+          /* Teams */
+          const teamCta = doc.querySelector('.team-cta');
+          if (teamCta) teamCta.setAttribute('href','/businesses#teams');
+
+          /* People decisions: strengthen need + trust */
+          const decisionsCopy = doc.querySelector('.decisions-copy');
+          if (decisionsCopy && !decisionsCopy.querySelector('.decision-need')) {
+            const need = doc.createElement('p');
+            need.className = 'decision-need';
+            need.textContent = 'These decisions are easier when you understand the people involved, not just their roles and experience.';
+            const firstPara = decisionsCopy.querySelector('p');
+            if (firstPara) decisionsCopy.insertBefore(need, firstPara);
+          }
+          const gov = doc.querySelector('.governance-note');
+          if (gov) {
+            const strong = gov.querySelector('strong');
+            const p = gov.querySelector('p');
+            if (strong) strong.textContent = 'Privacy, governance & control';
+            if (p) p.textContent = 'European AI infrastructure. HumaMap data is hosted and processed in Europe, with privacy and organisational controls built in.';
+          }
+
+          /* Company */
+          const companyCopy = doc.querySelector('.company-copy > p');
+          if (companyCopy) companyCopy.textContent = 'A Company HumaMap gives people a clear, shareable picture of how your company works, what it values, what it is building and what people can expect. Create it for free and share it anywhere.';
+          const companyCta = doc.querySelector('.company-cta');
+          if (companyCta) companyCta.setAttribute('href','/signup?type=company');
+
+          /* Leadership */
+          const leadershipCta = doc.querySelector('.lead40-cta');
+          if (leadershipCta) leadershipCta.setAttribute('href','/leadership');
+
+          /* Proof source becomes navigable */
+          const proofSource = doc.querySelector('.proof-source');
+          if (proofSource) proofSource.innerHTML = 'Median percentage differences between top- and bottom-quartile business units in employee engagement. Source: <a href="https://www.gallup.com/workplace/321725/gallup-q12-meta-analysis-report.aspx" target="_blank" rel="noopener noreferrer">Gallup, Q12® Meta-Analysis, 11th Edition, 2024</a>. These are not HumaMap results.';
+
+          /* Final CTA */
+          const finalMicro = doc.querySelector('.final-cta-micro');
+          if (finalMicro) finalMicro.textContent = 'Personal and Company HumaMaps are free.';
+          const finalButtons = doc.querySelectorAll('.final-cta-actions a');
+          if (finalButtons[0]) finalButtons[0].setAttribute('href','/signup?type=company');
+          if (finalButtons[1]) finalButtons[1].setAttribute('href','/signup?type=personal');
+
+          /* Footer */
+          if (!doc.querySelector('.footer')) {
+            const holder = doc.createElement('div');
+            holder.innerHTML = footer.trim();
+            doc.body.appendChild(holder.firstElementChild);
+          }
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
