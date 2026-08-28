@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Exact copy alignment v35</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v32/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const fixes = `
+        /* Keep text inside the content grid. Graphics may bleed. */
+        .team-copy,.company-copy{
+          margin-left:0!important;
+          margin-right:0!important;
+          padding-left:0!important;
+          padding-right:0!important;
+          transform:none!important;
+          box-sizing:border-box!important;
+        }
+        .team-stage,.company-stage{overflow:visible!important}
+
+        /* Compact Business Impact -> Company transition. */
+        .proof-section{padding-bottom:54px!important}
+        .company-section{padding-top:24px!important}
+
+        @media(max-width:980px){
+          .team-copy,.company-copy{transform:none!important;width:auto!important;max-width:680px!important}
+          .proof-section{padding-bottom:64px!important}
+          .company-section{padding-top:30px!important}
+        }
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          const reference = doc && doc.querySelector('.story-column');
+          const teamCopy = doc && doc.querySelector('.team-copy');
+          const companyCopy = doc && doc.querySelector('.company-copy');
+          const leadership = doc && doc.querySelector('.leadership-section');
+          if (!doc || !reference || !teamCopy || !companyCopy || !leadership) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = fixes;
+          doc.head.appendChild(style);
+
+          const viewportWidth = doc.documentElement.clientWidth;
+          if (viewportWidth > 980) {
+            const refRect = reference.getBoundingClientRect();
+            [teamCopy, companyCopy].forEach(copy => {
+              const rect = copy.getBoundingClientRect();
+              const delta = refRect.left - rect.left;
+              copy.style.setProperty('position', 'relative', 'important');
+              copy.style.setProperty('left', `${delta}px`, 'important');
+              copy.style.setProperty('width', `${Math.min(refRect.width, 430)}px`, 'important');
+              copy.style.setProperty('max-width', `${Math.min(refRect.width, 430)}px`, 'important');
+              copy.style.setProperty('margin-left', '0', 'important');
+              copy.style.setProperty('padding-left', '0', 'important');
+            });
+          }
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
