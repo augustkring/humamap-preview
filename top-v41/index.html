@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Leadership polish v41</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v40/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const polishStyles = `
+        .lead40-facts{display:flex;align-items:center;flex-wrap:wrap;gap:9px 22px;margin-top:21px;color:#555550;font-size:12.5px;line-height:1.4}
+        .lead40-fact{display:flex;align-items:baseline;gap:7px}
+        .lead40-fact span{color:#8A8A85;font-size:10.5px;font-weight:650;letter-spacing:.055em;text-transform:uppercase}
+        .lead40-fact strong{font-weight:600;color:#3F3F3B}
+        .lead40-card{min-height:338px}
+        .lead40-agreement-intro{margin-top:18px}
+        .lead40-bottom{margin-top:29px}
+        @media(max-width:680px){.lead40-facts{display:grid;gap:8px;margin-top:18px}.lead40-card{min-height:0}}
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          const root = doc && doc.querySelector('.lead40');
+          if (!doc || !root || !doc.querySelector('.company-section')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = polishStyles;
+          doc.head.appendChild(style);
+
+          const copy = doc.querySelector('.lead40-copy');
+          const intro = copy && copy.querySelector('p');
+          const cta = copy && copy.querySelector('.lead40-cta');
+          if (intro) intro.textContent = 'A guided programme to understand yourselves, understand each other and turn that insight into better ways of leading together.';
+
+          if (copy && cta && !copy.querySelector('.lead40-facts')) {
+            const facts = doc.createElement('div');
+            facts.className = 'lead40-facts';
+            facts.innerHTML = '<div class="lead40-fact"><span>For</span><strong>Founders · Leadership teams · Boards</strong></div><div class="lead40-fact"><span>Format</span><strong>3 weeks · 2–8 people</strong></div>';
+            cta.insertAdjacentElement('afterend', facts);
+          }
+
+          const programmeKicker = doc.querySelector('.lead40-kicker');
+          if (programmeKicker) programmeKicker.textContent = 'What you build';
+
+          const programmeLead = doc.querySelector('.lead40-programme-head p');
+          if (programmeLead) programmeLead.textContent = 'Individual understanding → shared understanding → clearer leadership agreements';
+
+          const cards = doc.querySelectorAll('.lead40-artifact');
+          if (cards[0]) {
+            const sub = cards[0].querySelector('.lead40-card-sub');
+            if (sub) sub.textContent = 'Understand yourself before you lead the team.';
+          }
+          if (cards[1]) {
+            const sub = cards[1].querySelector('.lead40-card-sub');
+            if (sub) sub.textContent = 'See how the leadership team works together.';
+            const insight = cards[1].querySelector('.lead40-insight p');
+            if (insight) insight.textContent = 'Pace and direction balanced by validation and follow-through.';
+          }
+          if (cards[2]) {
+            const sub = cards[2].querySelector('.lead40-card-sub');
+            if (sub) sub.textContent = 'Turn insight into clear ways of working together.';
+            const agreementIntro = cards[2].querySelector('.lead40-agreement-intro');
+            if (agreementIntro) agreementIntro.textContent = 'Shared agreements built around how your team actually works.';
+            const agreements = cards[2].querySelectorAll('.lead40-agreement p');
+            if (agreements[0]) agreements[0].textContent = 'Who decides, who contributes and when to move.';
+            if (agreements[1]) agreements[1].textContent = 'Make responsibility explicit.';
+            if (agreements[2]) agreements[2].textContent = 'Agree how you communicate, challenge and stay aligned.';
+          }
+
+          const bottom = doc.querySelector('.lead40-bottom p');
+          if (bottom) bottom.textContent = 'A leadership team that understands itself, each other and how to work together.';
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
