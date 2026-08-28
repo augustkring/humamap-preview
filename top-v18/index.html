@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Homepage Top + Compare v18</title>
+</head>
+<body>
+<script>
+(async () => {
+  const response = await fetch('../top-v17/index.html');
+  let html = await response.text();
+
+  html = html
+    .replace('<title>HumaMap — Homepage Top + Compare v17</title>', '<title>HumaMap — Homepage Top + Compare v18</title>')
+    .replace('.person-stage{padding-top:0;padding-bottom:124px}', '.person-stage{padding-top:0;padding-bottom:52px}')
+    .replace('.compare-section{padding:108px 0 172px}', '.compare-section{padding:36px 0 172px}')
+    .replace('.story-link{display:inline-flex;margin-top:27px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}', '.story-links{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:27px}.story-link{display:inline-flex;margin-top:0;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}')
+    .replace('<a class="story-link" href="#">See August\'s full HumaMap →</a>', '<div class="story-links"><a class="story-link" href="#">Create your own free profile →</a><a class="story-link" href="#">See August\'s full HumaMap →</a></div>');
+
+  document.open();
+  document.write(html);
+  document.close();
+})();
+</script>
+</body>
+</html>
