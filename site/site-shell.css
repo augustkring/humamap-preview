@@ -6,7 +6,7 @@
   width:100%;
   background:#FCFCFA;
 }
-.header-shell{width:100%;}
+.header-shell{width:100%;max-width:1320px!important;margin:0 auto;}
 .nav{height:80px;display:flex;align-items:center;justify-content:space-between;gap:32px}
 .nav-right{display:flex;align-items:center;justify-content:flex-end;gap:26px;min-width:0}
 .nav-pages{display:flex;align-items:center;gap:28px;white-space:nowrap}
