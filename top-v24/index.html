@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Homepage + People Decisions v24</title>
+</head>
+<body>
+<script>
+(async () => {
+  const response = await fetch('../top-v22/index.html');
+  let source = await response.text();
+
+  source = source
+    .replace('<title>HumaMap — Homepage Top + Compare + Team v22</title>', '<title>HumaMap — Homepage + People Decisions v24</title>')
+    .replace("    .replace('.person-stage{padding-top:0;padding-bottom:124px}', '.person-stage{padding-top:0;padding-bottom:95px}')", "    .replace('Sofia Lindqvist', 'Sofia')\n    .replace('.person-stage{padding-top:0;padding-bottom:124px}', '.person-stage{padding-top:0;padding-bottom:95px}')")
+    .replace('Create your own free profile →', 'Explore HumaMap for Individuals →')
+    .replace('.team-ai p{margin:8px 0 0;color:var(--text);font-size:16px;line-height:1.52;letter-spacing:-.004em}', '.team-ai p{margin:8px 0 0;color:var(--text);font-size:16px;line-height:1.52;letter-spacing:-.004em}.team-cta{display:inline-flex;margin-top:27px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}')
+    .replace('          </div>\n        </div>\n\n        <div class="team-stage" aria-label="Example Product Team HumaMap">', '          </div>\n          <a class="team-cta" href="#">Explore HumaMap for Teams →</a>\n        </div>\n\n        <div class="team-stage" aria-label="Example Product Team HumaMap">');
+
+  const decisionStyles = `
+    /* People decisions */
+    .decisions-section{padding:0 0 184px}
+    .decisions-layout{display:grid;grid-template-columns:minmax(0,650px) 420px;gap:86px;align-items:center}
+    .decisions-copy{max-width:420px}
+    .decisions-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+    .decisions-copy p{margin:26px 0 0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+    .decisions-copy p+p{margin-top:18px;color:var(--text);font-size:16px;line-height:1.52}
+
+    .decisions-stage{position:relative;height:650px}
+    .decision-slip{position:absolute;width:270px;height:164px;padding:21px 22px;border-radius:22px;background:#fff;box-shadow:0 17px 42px rgba(21,21,21,.055);overflow:hidden}
+    .decision-slip.s1{left:8px;top:86px;transform:rotate(-6deg)}
+    .decision-slip.s2{right:18px;top:55px;transform:rotate(5deg)}
+    .decision-slip.s3{left:22px;bottom:84px;transform:rotate(4deg)}
+    .decision-slip.s4{right:5px;bottom:92px;transform:rotate(-5deg)}
+    .decision-slip strong{display:block;color:var(--green);font-size:11.5px;line-height:1.3;font-weight:650}
+    .decision-slip span{display:block;margin-top:8px;font-size:17px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
+    .decision-slip-lines{display:grid;gap:6px;margin-top:18px}
+    .decision-slip-line{height:3px;border-radius:999px;background:rgba(21,21,21,.06)}
+    .decision-slip-line:nth-child(1){width:82%}.decision-slip-line:nth-child(2){width:58%}
+
+    .decision-card{position:absolute;left:94px;top:112px;width:470px;padding:29px 30px 28px;border-radius:25px;background:#fff;box-shadow:0 32px 76px rgba(21,21,21,.115),0 8px 22px rgba(21,21,21,.035);transform:rotate(.3deg);z-index:4}
+    .decision-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+    .decision-kicker{display:block;color:var(--green);font-size:11.5px;line-height:1.3;font-weight:650}
+    .decision-card h3{margin:6px 0 0;font-size:25px;line-height:1.12;letter-spacing:-.028em;font-weight:600}
+    .decision-context{color:#777772;font-size:11px;line-height:1.35;text-align:right;padding-top:2px}
+    .decision-people{display:flex;align-items:center;gap:12px;margin-top:23px}
+    .decision-person{display:flex;align-items:center;gap:8px}
+    .decision-person-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:#EDF3F0;color:var(--green);font-size:10px;font-weight:650}
+    .decision-person-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
+    .decision-person span{font-size:12px;line-height:1.3;font-weight:600;color:#444440}
+    .decision-dot{width:3px;height:3px;border-radius:50%;background:#B0B0AA}
+
+    .decision-primary{margin-top:24px;padding:20px 21px 21px;border-radius:14px;background:#F1F5F2}
+    .decision-label{display:block;color:var(--green);font-size:11.5px;line-height:1.3;font-weight:650}
+    .decision-primary p{margin:8px 0 0;font-size:15px;line-height:1.48;letter-spacing:-.005em}
+    .decision-note{display:grid;grid-template-columns:114px 1fr;gap:18px;padding:16px 0;border-top:1px solid rgba(21,21,21,.07)}
+    .decision-note.first{margin-top:21px;border-top:0;padding-top:0}
+    .decision-note strong{font-size:11px;line-height:1.4;font-weight:650;color:#555550}
+    .decision-note p{margin:0;color:#343431;font-size:13.5px;line-height:1.46}
+    .decision-more{margin-top:20px;padding-top:17px;border-top:1px solid rgba(21,21,21,.07);display:flex;align-items:center;gap:18px;color:#858580;font-size:10.5px;font-weight:600}
+    .decision-more-line{height:3px;flex:1;border-radius:999px;background:rgba(21,21,21,.06)}
+
+    @media(max-width:1120px){.decisions-layout{grid-template-columns:580px minmax(0,1fr);gap:52px}.decisions-stage{transform:scale(.92);transform-origin:left center}}
+    @media(max-width:980px){.decisions-section{padding-top:0}.decisions-layout{grid-template-columns:1fr;gap:48px}.decisions-copy{max-width:680px;order:1}.decisions-stage{order:2;width:650px;max-width:100%;transform:none}.decisions-copy h2{font-size:44px}}
+    @media(max-width:680px){.decisions-section{padding:0 0 100px;overflow:hidden}.decisions-copy h2{font-size:38px}.decisions-copy p{font-size:17px;margin-top:21px}.decisions-copy p+p{font-size:15px;margin-top:17px}.decisions-stage{width:650px;height:620px;transform:scale(.76);transform-origin:top left}}
+  `;
+
+  const decisionSection = `
+    <section class="decisions-section shell" aria-label="Better people decisions">
+      <div class="decisions-layout">
+        <div class="decisions-stage" aria-label="Example HumaMap context for a people decision">
+          <article class="decision-slip s1" aria-hidden="true"><strong>Hiring</strong><span>Understand the person beyond the CV.</span><div class="decision-slip-lines"><div class="decision-slip-line"></div><div class="decision-slip-line"></div></div></article>
+          <article class="decision-slip s2" aria-hidden="true"><strong>1:1</strong><span>Prepare with more context.</span><div class="decision-slip-lines"><div class="decision-slip-line"></div><div class="decision-slip-line"></div></div></article>
+          <article class="decision-slip s3" aria-hidden="true"><strong>Responsibility</strong><span>Match ownership to the person.</span><div class="decision-slip-lines"><div class="decision-slip-line"></div><div class="decision-slip-line"></div></div></article>
+          <article class="decision-slip s4" aria-hidden="true"><strong>Team design</strong><span>See what the situation may need.</span><div class="decision-slip-lines"><div class="decision-slip-line"></div><div class="decision-slip-line"></div></div></article>
+
+          <article class="decision-card">
+            <header class="decision-card-head"><div><span class="decision-kicker">Project team</span><h3>New product launch</h3></div><div class="decision-context">People context<br>for this decision</div></header>
+            <div class="decision-people"><div class="decision-person"><div class="decision-person-avatar"><img src="https://raw.githubusercontent.com/augustkring/augustkring.github.io/main/assets/august_profile.jpg" alt="August" /></div><span>August</span></div><div class="decision-dot"></div><div class="decision-person"><div class="decision-person-avatar">S</div><span>Sofia</span></div><div class="decision-dot"></div><div class="decision-person"><div class="decision-person-avatar">E</div><span>Emma</span></div></div>
+
+            <section class="decision-primary"><span class="decision-label">What HumaMap adds</span><p>August brings pace and direction, Sofia deeper validation and Emma a strong user perspective. Their differences may make the team stronger together.</p></section>
+            <div class="decision-note first"><strong>Watch for</strong><p>Different decision speeds may create friction when ownership is unclear.</p></div>
+            <div class="decision-note"><strong>Make clear</strong><p>Who owns the final call, and what needs validation before the team moves.</p></div>
+            <div class="decision-more"><span>More context available</span><div class="decision-more-line"></div></div>
+          </article>
+        </div>
+
+        <div class="decisions-copy">
+          <h2>Make better people decisions with more context.</h2>
+          <p>Use what HumaMap reveals when you hire someone, build a project team, assign responsibility, prepare a 1:1 or rethink how a team is organised.</p>
+          <p>The decisions are still yours. HumaMap gives you another layer of context to make them with.</p>
+        </div>
+      </div>
+    </section>
+  `;
+
+  const injection = "\n  html = html.replace('</style>', " + JSON.stringify(decisionStyles) + " + '\\n  </style>');\n  html = html.replace('</main>', " + JSON.stringify(decisionSection) + " + '\\n  </main>');\n";
+  source = source.replace('  document.open();\n  document.write(html);', injection + '\n  document.open();\n  document.write(html);');
+
+  document.open();
+  document.write(source);
+  document.close();
+})();
+</script>
+</body>
+</html>
