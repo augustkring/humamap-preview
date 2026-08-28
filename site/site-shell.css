@@ -30,6 +30,10 @@
 .footer-address::after{content:"Ragnagade 7\A2100 Copenhagen\ADenmark";display:block;white-space:pre;font-size:13px;line-height:1.55;color:#B9B9B3}
 .footer-bottom{font-size:13.5px;line-height:1.45}
 
+/* Use the same HumaMap symbol treatment in Company HumaMap product mockups. */
+.business-company-logo{font-size:0!important;background:transparent!important;border-radius:0!important;overflow:hidden!important;display:block!important;position:relative!important}
+.business-company-logo::before{content:"";display:block;width:54px;height:54px;background-image:url('https://raw.githubusercontent.com/augustkring/humamap-preview/main/assets/humamap-horizontal-black-transparent.png');background-repeat:no-repeat;background-position:left center;background-size:190px auto}
+
 @media(max-width:1120px){
   .nav-right{gap:21px}.nav-pages{gap:21px}.nav-account{gap:14px}
   .footer-top{grid-template-columns:minmax(260px,1.25fr) repeat(3,minmax(105px,.7fr));gap:34px 30px}
