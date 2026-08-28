@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Simplified Leadership v38</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v36/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const leadershipStyles = `
+        /* Leadership: one compact premium story */
+        .leadership-section{
+          padding-top:70px!important;
+          padding-bottom:138px!important;
+        }
+
+        .leadership-simple{max-width:1128px;margin:0 auto}
+        .leadership-top{display:grid;grid-template-columns:430px minmax(0,1fr);gap:86px;align-items:start}
+        .leadership-top h2{max-width:425px;margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+        .leadership-copy{max-width:510px;padding-top:26px}
+        .leadership-copy p{margin:0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+        .leadership-cta{display:inline-flex;margin-top:25px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}
+
+        .leadership-for{display:flex;align-items:center;flex-wrap:wrap;gap:9px 14px;margin-top:48px;font-size:13.5px;line-height:1.4;color:#555550}
+        .leadership-for-label{color:var(--green);font-weight:650}
+        .leadership-for strong{font-weight:600;color:#333330}
+        .leadership-for-dot{width:3px;height:3px;border-radius:50%;background:#B4B4AE}
+
+        .leadership-process{margin-top:74px}
+        .leadership-process-label{display:block;color:var(--green);font-size:12px;line-height:1.3;font-weight:650;letter-spacing:.085em;text-transform:uppercase}
+
+        .leadership-track{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:30px;padding-top:34px}
+        .leadership-track::before{content:"";position:absolute;left:17px;right:17px;top:16px;height:1px;background:#DDE6E0}
+        .leadership-step{position:relative;min-width:0}
+        .leadership-step::before{content:"";position:absolute;top:-22px;left:0;width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 7px #FCFCFA}
+        .leadership-step:last-child::before{background:#789985}
+        .leadership-step-number{display:block;color:#AFC2B6;font-size:36px;line-height:1;letter-spacing:-.04em;font-weight:550}
+        .leadership-step-week{display:block;margin-top:8px;color:var(--green);font-size:10.5px;line-height:1.3;font-weight:650;letter-spacing:.075em;text-transform:uppercase}
+        .leadership-step h3{margin:18px 0 0;font-size:22px;line-height:1.17;letter-spacing:-.024em;font-weight:600}
+        .leadership-step p{max-width:310px;margin:10px 0 0;color:var(--muted);font-size:14.5px;line-height:1.52;letter-spacing:-.003em}
+
+        .leadership-outcome{display:flex;align-items:baseline;gap:14px;margin-top:48px;padding-top:23px;border-top:1px solid rgba(21,21,21,.07)}
+        .leadership-outcome strong{flex:0 0 auto;color:var(--green);font-size:11.5px;line-height:1.35;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+        .leadership-outcome span{max-width:760px;color:#333330;font-size:16px;line-height:1.5;letter-spacing:-.004em;font-weight:500}
+
+        @media(max-width:1120px){
+          .leadership-top{grid-template-columns:400px minmax(0,1fr);gap:58px}
+          .leadership-track{gap:38px}
+        }
+
+        @media(max-width:980px){
+          .leadership-section{padding-top:60px!important;padding-bottom:120px!important}
+          .leadership-top{grid-template-columns:1fr;gap:24px}
+          .leadership-top h2{max-width:680px;font-size:44px}
+          .leadership-copy{max-width:650px;padding-top:0}
+          .leadership-for{margin-top:38px}
+          .leadership-process{margin-top:62px}
+          .leadership-track{grid-template-columns:1fr;gap:42px;margin-top:28px;padding-top:0}
+          .leadership-track::before{left:4px;right:auto;top:8px;bottom:8px;width:1px;height:auto}
+          .leadership-step{padding-left:32px}
+          .leadership-step::before{top:3px;left:0}
+          .leadership-step p{max-width:650px}
+          .leadership-step-number{font-size:30px}
+          .leadership-outcome{align-items:flex-start}
+        }
+
+        @media(max-width:680px){
+          .leadership-section{padding-top:50px!important;padding-bottom:96px!important}
+          .leadership-top h2{font-size:38px}
+          .leadership-copy p{font-size:17px}
+          .leadership-for{margin-top:32px;gap:8px 11px;font-size:13px}
+          .leadership-process{margin-top:52px}
+          .leadership-step h3{font-size:21px}
+          .leadership-outcome{display:block;margin-top:40px}
+          .leadership-outcome span{display:block;margin-top:8px;font-size:15px}
+        }
+      `;
+
+      const leadershipSection = `
+        <section class="leadership-section shell" aria-label="HumaMap Leadership">
+          <div class="leadership-simple">
+            <div class="leadership-top">
+              <div>
+                <span class="section-eyebrow">Leadership</span>
+                <h2>Better companies start with better leadership.</h2>
+              </div>
+              <div class="leadership-copy">
+                <p>HumaMap Leadership helps founders and leadership teams understand themselves and each other, then turn that understanding into clearer decisions, stronger collaboration and better ways of leading together.</p>
+                <a class="leadership-cta" href="#">Explore HumaMap Leadership →</a>
+              </div>
+            </div>
+
+            <div class="leadership-for" aria-label="Who HumaMap Leadership is for">
+              <span class="leadership-for-label">For</span>
+              <strong>Founders &amp; co-founders</strong>
+              <span class="leadership-for-dot" aria-hidden="true"></span>
+              <strong>Leadership teams</strong>
+              <span class="leadership-for-dot" aria-hidden="true"></span>
+              <strong>Boards &amp; management</strong>
+            </div>
+
+            <div class="leadership-process">
+              <span class="leadership-process-label">3-week programme</span>
+
+              <div class="leadership-track">
+                <section class="leadership-step">
+                  <span class="leadership-step-number">01</span>
+                  <span class="leadership-step-week">Week one</span>
+                  <h3>Understand yourself</h3>
+                  <p>Build your complete HumaMap, add recognised assessments and understand how you work, decide and lead.</p>
+                </section>
+
+                <section class="leadership-step">
+                  <span class="leadership-step-number">02</span>
+                  <span class="leadership-step-week">Week two</span>
+                  <h3>Understand each other</h3>
+                  <p>Explore and compare each other's HumaMaps to see complementarity, friction and patterns across the team.</p>
+                </section>
+
+                <section class="leadership-step">
+                  <span class="leadership-step-number">03</span>
+                  <span class="leadership-step-week">Week three</span>
+                  <h3>Lead differently</h3>
+                  <p>Turn the insights into clearer decision rights, ownership, communication and leadership practices.</p>
+                </section>
+              </div>
+
+              <div class="leadership-outcome">
+                <strong>Outcome</strong>
+                <span>A leadership team that understands itself, understands each other and works with clearer agreements.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          const current = doc && doc.querySelector('.leadership-section');
+          if (!doc || !current || !doc.querySelector('.company-section')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = leadershipStyles;
+          doc.head.appendChild(style);
+
+          const holder = doc.createElement('div');
+          holder.innerHTML = leadershipSection.trim();
+          current.replaceWith(holder.firstElementChild);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
