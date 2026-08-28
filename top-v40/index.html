@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Leadership outputs v40</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v36/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const styles = `
+        .leadership-section{padding-top:64px!important;padding-bottom:132px!important}
+        .lead40{max-width:1128px;margin:0 auto}
+
+        .lead40-top{display:grid;grid-template-columns:430px minmax(0,1fr);gap:86px;align-items:start}
+        .lead40-top h2{max-width:425px;margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+        .lead40-copy{max-width:520px;padding-top:24px}
+        .lead40-copy p{margin:0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+        .lead40-cta{display:inline-flex;margin-top:25px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}
+
+        .lead40-programme{margin-top:68px}
+        .lead40-programme-head{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:26px}
+        .lead40-kicker{color:var(--green);font-size:12px;line-height:1.3;font-weight:650;letter-spacing:.085em;text-transform:uppercase}
+        .lead40-programme-head p{margin:0;color:#858580;font-size:13px;line-height:1.45}
+
+        .lead40-artifacts{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+        .lead40-artifacts::before{content:"";position:absolute;left:8%;right:8%;top:54%;height:210px;border-radius:50%;background:#F2F6F3;transform:translateY(-50%) rotate(-2deg);z-index:0;pointer-events:none}
+        .lead40-artifact{position:relative;z-index:1}
+        .lead40-artifact:nth-child(2){margin-top:18px}
+        .lead40-artifact:nth-child(3){margin-top:36px}
+        .lead40-meta{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px;padding:0 4px}
+        .lead40-week{color:var(--green);font-size:10.5px;line-height:1.3;font-weight:650;letter-spacing:.075em;text-transform:uppercase}
+        .lead40-output-label{color:#94948E;font-size:10px;line-height:1.3;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+
+        .lead40-card{min-height:360px;padding:25px 25px 23px;border-radius:23px;background:#fff;box-shadow:0 25px 58px rgba(21,21,21,.085),0 6px 18px rgba(21,21,21,.025)}
+        .lead40-artifact:nth-child(1) .lead40-card{transform:rotate(-1.2deg)}
+        .lead40-artifact:nth-child(2) .lead40-card{transform:rotate(.45deg)}
+        .lead40-artifact:nth-child(3) .lead40-card{transform:rotate(1.1deg)}
+        .lead40-card-title{margin:0;font-size:22px;line-height:1.15;letter-spacing:-.025em;font-weight:600}
+        .lead40-card-sub{margin:6px 0 0;color:var(--muted);font-size:12.5px;line-height:1.42}
+
+        /* Week 1 artifact */
+        .lead40-profile-head{display:flex;align-items:center;gap:13px;margin-top:22px}
+        .lead40-avatar{width:50px;height:50px;border-radius:50%;overflow:hidden;flex:0 0 auto;background:#EDF3F0;display:grid;place-items:center;color:var(--green);font-size:12px;font-weight:650}
+        .lead40-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
+        .lead40-profile-head strong{display:block;font-size:15px;line-height:1.2;font-weight:600}
+        .lead40-profile-head span{display:block;margin-top:3px;color:var(--muted);font-size:10.5px;line-height:1.35}
+        .lead40-mini-section{margin-top:20px}
+        .lead40-mini-label{display:block;color:var(--green);font-size:9.5px;line-height:1.25;font-weight:650;letter-spacing:.075em;text-transform:uppercase}
+        .lead40-mini-section p{margin:7px 0 0;color:#343431;font-size:12.5px;line-height:1.45}
+        .lead40-mini-lines{display:grid;gap:5px;margin-top:8px}
+        .lead40-mini-line{height:3px;border-radius:999px;background:rgba(21,21,21,.06)}
+        .lead40-mini-line:first-child{width:82%}.lead40-mini-line:last-child{width:56%}
+
+        /* Week 2 artifact */
+        .lead40-team-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:22px}
+        .lead40-members{display:flex;align-items:center}
+        .lead40-member{width:38px;height:38px;margin-left:-7px;border:3px solid #fff;border-radius:50%;overflow:hidden;background:#EDF3F0;display:grid;place-items:center;color:var(--green);font-size:10px;font-weight:650}
+        .lead40-member:first-child{margin-left:0}
+        .lead40-member img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
+        .lead40-team-head span{color:#858580;font-size:10.5px;line-height:1.35}
+        .lead40-insight{margin-top:20px;padding:16px 17px;border-radius:13px;background:#F1F5F2}
+        .lead40-insight strong{display:block;color:var(--green);font-size:10.5px;line-height:1.35;font-weight:650}
+        .lead40-insight p{margin:7px 0 0;font-size:12.8px;line-height:1.46;color:#2F2F2C}
+        .lead40-compare-row{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid rgba(21,21,21,.07)}
+        .lead40-compare-row span{color:#666661;font-size:10px;line-height:1.3;font-weight:600}
+        .lead40-compare-lines{display:grid;gap:5px}
+        .lead40-compare-line{height:3px;border-radius:999px;background:rgba(21,21,21,.06)}
+        .lead40-compare-line:first-child{width:78%}.lead40-compare-line:last-child{width:54%}
+
+        /* Week 3 artifact */
+        .lead40-agreement-intro{margin:22px 0 0;color:#343431;font-size:12.8px;line-height:1.47}
+        .lead40-agreements{margin-top:18px}
+        .lead40-agreement{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:13px 0;border-top:1px solid rgba(21,21,21,.07)}
+        .lead40-agreement:first-child{border-top:0;padding-top:0}
+        .lead40-agreement-num{color:#AFC2B6;font-size:12px;line-height:1.4;font-weight:650}
+        .lead40-agreement strong{display:block;font-size:12.5px;line-height:1.4;font-weight:650;color:#343431}
+        .lead40-agreement p{margin:4px 0 0;color:var(--muted);font-size:11.5px;line-height:1.4}
+
+        .lead40-bottom{display:flex;align-items:baseline;justify-content:space-between;gap:30px;margin-top:34px}
+        .lead40-bottom p{max-width:760px;margin:0;color:#333330;font-size:16px;line-height:1.52;letter-spacing:-.004em;font-weight:500}
+        .lead40-bottom span{flex:0 0 auto;color:var(--green);font-size:11px;line-height:1.35;font-weight:650;letter-spacing:.065em;text-transform:uppercase}
+
+        @media(max-width:1120px){
+          .lead40-top{grid-template-columns:400px minmax(0,1fr);gap:58px}
+          .lead40-artifacts{gap:18px}
+          .lead40-card{padding:22px 21px 21px}
+        }
+        @media(max-width:980px){
+          .leadership-section{padding-top:58px!important;padding-bottom:112px!important}
+          .lead40-top{grid-template-columns:1fr;gap:22px}
+          .lead40-top h2{max-width:680px;font-size:44px}
+          .lead40-copy{max-width:650px;padding-top:0}
+          .lead40-programme{margin-top:56px}
+          .lead40-programme-head{display:block}
+          .lead40-programme-head p{margin-top:7px}
+          .lead40-artifacts{grid-template-columns:1fr;gap:28px;max-width:620px;margin-top:0}
+          .lead40-artifacts::before{display:none}
+          .lead40-artifact:nth-child(2),.lead40-artifact:nth-child(3){margin-top:0}
+          .lead40-card{min-height:0;transform:none!important}
+          .lead40-bottom{display:block;max-width:650px}
+          .lead40-bottom span{display:block;margin-bottom:8px}
+        }
+        @media(max-width:680px){
+          .leadership-section{padding-top:48px!important;padding-bottom:92px!important}
+          .lead40-top h2{font-size:38px}
+          .lead40-copy p{font-size:17px}
+          .lead40-programme{margin-top:46px}
+          .lead40-card-title{font-size:21px}
+          .lead40-bottom p{font-size:15px}
+        }
+      `;
+
+      const section = `
+        <section class="leadership-section shell" aria-label="HumaMap Leadership">
+          <div class="lead40">
+            <div class="lead40-top">
+              <div>
+                <span class="section-eyebrow">Leadership</span>
+                <h2>Better companies start with better leadership.</h2>
+              </div>
+              <div class="lead40-copy">
+                <p>HumaMap Leadership is a three-week programme for founders, leadership teams and boards to understand themselves, understand each other and turn that insight into better ways of leading together.</p>
+                <a class="lead40-cta" href="#">Explore HumaMap Leadership →</a>
+              </div>
+            </div>
+
+            <div class="lead40-programme">
+              <div class="lead40-programme-head">
+                <span class="lead40-kicker">What you build in three weeks</span>
+                <p>Individual understanding → shared understanding → clearer ways of working</p>
+              </div>
+
+              <div class="lead40-artifacts">
+                <section class="lead40-artifact">
+                  <div class="lead40-meta"><span class="lead40-week">Week one</span><span class="lead40-output-label">Your HumaMap</span></div>
+                  <article class="lead40-card">
+                    <h3 class="lead40-card-title">Your leadership profile</h3>
+                    <p class="lead40-card-sub">Understand yourself before you try to change the team.</p>
+
+                    <div class="lead40-profile-head">
+                      <div class="lead40-avatar"><img src="https://raw.githubusercontent.com/augustkring/augustkring.github.io/main/assets/august_profile.jpg" alt="August" /></div>
+                      <div><strong>August</strong><span>Founder</span></div>
+                    </div>
+
+                    <div class="lead40-mini-section"><span class="lead40-mini-label">How I lead</span><p>Moves quickly once there is enough information to act.</p><div class="lead40-mini-lines"><div class="lead40-mini-line"></div><div class="lead40-mini-line"></div></div></div>
+                    <div class="lead40-mini-section"><span class="lead40-mini-label">Decision making</span><div class="lead40-mini-lines"><div class="lead40-mini-line"></div><div class="lead40-mini-line"></div></div></div>
+                    <div class="lead40-mini-section"><span class="lead40-mini-label">Working with me</span><div class="lead40-mini-lines"><div class="lead40-mini-line"></div><div class="lead40-mini-line"></div></div></div>
+                  </article>
+                </section>
+
+                <section class="lead40-artifact">
+                  <div class="lead40-meta"><span class="lead40-week">Week two</span><span class="lead40-output-label">Leadership Team Map</span></div>
+                  <article class="lead40-card">
+                    <h3 class="lead40-card-title">Understand each other</h3>
+                    <p class="lead40-card-sub">See how the leadership team works as a system.</p>
+
+                    <div class="lead40-team-head">
+                      <div class="lead40-members"><div class="lead40-member"><img src="https://raw.githubusercontent.com/augustkring/augustkring.github.io/main/assets/august_profile.jpg" alt="August" /></div><div class="lead40-member">S</div><div class="lead40-member">E</div></div>
+                      <span>Leadership team</span>
+                    </div>
+
+                    <div class="lead40-insight"><strong>Where you strengthen each other</strong><p>Pace and direction are balanced by deeper validation and stronger follow-through.</p></div>
+                    <div class="lead40-compare-row"><span>Potential friction</span><div class="lead40-compare-lines"><div class="lead40-compare-line"></div><div class="lead40-compare-line"></div></div></div>
+                    <div class="lead40-compare-row"><span>Decision patterns</span><div class="lead40-compare-lines"><div class="lead40-compare-line"></div><div class="lead40-compare-line"></div></div></div>
+                    <div class="lead40-compare-row"><span>Complementarity</span><div class="lead40-compare-lines"><div class="lead40-compare-line"></div><div class="lead40-compare-line"></div></div></div>
+                  </article>
+                </section>
+
+                <section class="lead40-artifact">
+                  <div class="lead40-meta"><span class="lead40-week">Week three</span><span class="lead40-output-label">Leadership Agreements</span></div>
+                  <article class="lead40-card">
+                    <h3 class="lead40-card-title">Lead differently</h3>
+                    <p class="lead40-card-sub">Turn understanding into concrete ways of working together.</p>
+                    <p class="lead40-agreement-intro">The programme ends with a shared set of leadership agreements built around how your team actually works.</p>
+
+                    <div class="lead40-agreements">
+                      <div class="lead40-agreement"><span class="lead40-agreement-num">01</span><div><strong>Decision rights</strong><p>Who decides, who contributes and when you have enough information to move.</p></div></div>
+                      <div class="lead40-agreement"><span class="lead40-agreement-num">02</span><div><strong>Ownership</strong><p>Make responsibility explicit before work starts moving.</p></div></div>
+                      <div class="lead40-agreement"><span class="lead40-agreement-num">03</span><div><strong>Ways of working</strong><p>Agree how you communicate, challenge each other and stay aligned.</p></div></div>
+                    </div>
+                  </article>
+                </section>
+              </div>
+
+              <div class="lead40-bottom"><span>After three weeks</span><p>You leave with a complete understanding of the people in the leadership team and clearer agreements for how you lead together.</p></div>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          const current = doc && doc.querySelector('.leadership-section');
+          if (!doc || !current || !doc.querySelector('.company-section')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = styles;
+          doc.head.appendChild(style);
+
+          const holder = doc.createElement('div');
+          holder.innerHTML = section.trim();
+          current.replaceWith(holder.firstElementChild);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
