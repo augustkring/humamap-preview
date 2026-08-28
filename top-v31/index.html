@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Company section v31</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v30/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+      const companyStyles = `
+        /* Company HumaMap */
+        .company-section{padding:104px 0 184px}
+        .company-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:86px;align-items:center}
+        .company-copy{max-width:420px}
+        .company-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
+        .company-copy>p{margin:26px 0 0;color:var(--muted);font-size:18px;line-height:1.56;letter-spacing:-.006em}
+        .company-note{margin-top:26px;color:var(--text);font-size:15px;line-height:1.52;max-width:390px}
+        .company-cta{display:inline-flex;margin-top:29px;text-decoration:none;font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.008em}
+        .company-free{display:block;margin-top:8px;color:#858580;font-size:12px;line-height:1.4}
+
+        .company-stage{position:relative;height:650px;isolation:isolate}
+        .company-stage::before,.company-stage::after{content:"";position:absolute;z-index:0;pointer-events:none;border-radius:50%}
+        .company-stage::before{right:18px;top:118px;width:520px;height:386px;background:#EFF5F1;transform:rotate(7deg)}
+        .company-stage::after{right:346px;top:60px;width:182px;height:182px;background:#DEEAE3;box-shadow:248px 322px 0 #F5F8F6}
+
+        .company-profile-card{position:absolute;right:38px;top:54px;width:490px;padding:31px 32px 30px;border-radius:27px;background:#fff;box-shadow:0 31px 74px rgba(21,21,21,.105),0 8px 22px rgba(21,21,21,.03);transform:rotate(.35deg);z-index:3}
+        .company-profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:22px}
+        .company-mark{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:#EDF3F0;color:var(--green);font-size:21px;font-weight:650;letter-spacing:-.04em}
+        .company-identity{display:flex;align-items:center;gap:15px}
+        .company-name{margin:0;font-size:25px;line-height:1.1;letter-spacing:-.032em;font-weight:600}
+        .company-tagline{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+        .company-shared{padding-top:3px;color:#8A8A85;font-size:10.5px;line-height:1.35;text-align:right}
+        .company-shared strong{display:block;margin-top:2px;color:#5F5F5A;font-weight:600}
+        .company-profile-intro{margin:27px 0 0;font-size:16px;line-height:1.5;letter-spacing:-.006em;max-width:390px}
+        .company-profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin-top:28px}
+        .company-profile-block{padding:19px 0 18px;border-top:1px solid rgba(21,21,21,.07)}
+        .company-profile-block strong{display:block;color:var(--green);font-size:10.5px;line-height:1.3;font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+        .company-profile-block p{margin:8px 0 0;color:#343431;font-size:13.5px;line-height:1.47}
+        .company-ghosts{display:grid;gap:6px;margin-top:10px}
+        .company-ghost{height:3px;border-radius:999px;background:rgba(21,21,21,.055)}
+        .company-ghost:first-child{width:82%}.company-ghost:last-child{width:56%}
+        .company-profile-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:17px;padding-top:18px;border-top:1px solid rgba(21,21,21,.07)}
+        .company-profile-footer span{color:#858580;font-size:10.5px;line-height:1.4}
+        .company-profile-footer strong{color:#555550;font-size:10.5px;line-height:1.4;font-weight:600}
+
+        @media(max-width:1120px){.company-layout{grid-template-columns:400px minmax(0,1fr);gap:52px}.company-stage{transform:scale(.92);transform-origin:right center}}
+        @media(max-width:980px){.company-section{padding:82px 0 150px}.company-layout{grid-template-columns:1fr;gap:50px}.company-copy{max-width:680px}.company-copy h2{font-size:44px}.company-stage{width:650px;max-width:100%;margin:0 auto;transform:none}}
+        @media(max-width:680px){.company-section{padding:68px 0 105px;overflow:hidden}.company-copy h2{font-size:38px}.company-copy>p{font-size:17px;margin-top:21px}.company-note{font-size:15px;margin-top:22px}.company-stage{width:650px;height:620px;transform:scale(.76);transform-origin:top left}}
+      `;
+
+      const companySection = `
+        <section class="company-section shell" aria-label="Company HumaMap">
+          <div class="company-layout">
+            <div class="company-copy">
+              <span class="section-eyebrow">Company</span>
+              <h2>Make your company easier to understand.</h2>
+              <p>A Company HumaMap gives people a clear, shareable view of how your company works, what it values, what it is building and what people can expect.</p>
+              <p class="company-note">It is your company's own profile, useful for hiring and onboarding. It is not a score or a claim to measure your “true culture”.</p>
+              <a class="company-cta" href="#">Create your Company HumaMap →</a>
+              <span class="company-free">Free to create.</span>
+            </div>
+
+            <div class="company-stage" aria-label="Example Company HumaMap">
+              <article class="company-profile-card">
+                <header class="company-profile-head">
+                  <div class="company-identity">
+                    <div class="company-mark">H</div>
+                    <div><h3 class="company-name">HumaMap</h3><p class="company-tagline">Better understanding for better work.</p></div>
+                  </div>
+                  <div class="company-shared">Company HumaMap<strong>Shared by the company</strong></div>
+                </header>
+
+                <p class="company-profile-intro">A clearer picture of what the company is building, how it wants to work and what people can expect when they join.</p>
+
+                <div class="company-profile-grid">
+                  <section class="company-profile-block"><strong>How we work</strong><p>Clear ownership, direct communication and enough context to act.</p><div class="company-ghosts"><div class="company-ghost"></div><div class="company-ghost"></div></div></section>
+                  <section class="company-profile-block"><strong>What we're building</strong><p>A better way to understand how people think, work and collaborate.</p><div class="company-ghosts"><div class="company-ghost"></div><div class="company-ghost"></div></div></section>
+                  <section class="company-profile-block"><strong>What people can expect</strong><p>Responsibility, transparency and room to shape the work.</p><div class="company-ghosts"><div class="company-ghost"></div><div class="company-ghost"></div></div></section>
+                  <section class="company-profile-block"><strong>Who we're looking for</strong><p>People who take ownership and care about building useful things.</p><div class="company-ghosts"><div class="company-ghost"></div><div class="company-ghost"></div></div></section>
+                </div>
+
+                <footer class="company-profile-footer"><span>Public company profile</span><strong>Useful across hiring and onboarding</strong></footer>
+              </article>
+            </div>
+          </div>
+        </section>
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.querySelector('.proof-section') || !doc.querySelector('main')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = companyStyles;
+          doc.head.appendChild(style);
+
+          const holder = doc.createElement('div');
+          holder.innerHTML = companySection.trim();
+          doc.querySelector('main').appendChild(holder.firstElementChild);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
