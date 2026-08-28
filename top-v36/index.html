@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HumaMap — Correct content grid v36</title>
+  <style>html,body{margin:0;background:#FCFCFA}</style>
+</head>
+<body>
+  <iframe id="base" src="../top-v32/index.html" title="" style="position:fixed;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0"></iframe>
+  <script>
+    (() => {
+      const frame = document.getElementById('base');
+
+      const fixes = `
+        /*
+          ROOT GRID FIX
+          These sections also carry .shell. Their vertical padding shorthand
+          previously reset the shell's horizontal 56px padding to zero.
+          Copy now stays on the same safe content grid as the hero/person section.
+          Product graphics may still overflow their own grid tracks.
+        */
+        .compare-section,
+        .team-section,
+        .decisions-section,
+        .proof-section,
+        .company-section,
+        .leadership-section{
+          padding-left:56px!important;
+          padding-right:56px!important;
+        }
+
+        /* Remove the compensation hacks introduced after the shell padding was lost. */
+        .team-layout{
+          grid-template-columns:430px minmax(0,1fr)!important;
+          gap:88px!important;
+        }
+        .team-copy{
+          max-width:430px!important;
+          margin-left:0!important;
+          margin-right:0!important;
+          padding-left:0!important;
+          padding-right:0!important;
+          position:static!important;
+          left:auto!important;
+          transform:none!important;
+        }
+        .company-copy{
+          max-width:420px!important;
+          margin-left:0!important;
+          margin-right:0!important;
+          padding-left:0!important;
+          padding-right:0!important;
+          position:static!important;
+          left:auto!important;
+          transform:none!important;
+        }
+
+        /* Graphics can bleed; copy cannot. */
+        .compare-stage,
+        .team-stage,
+        .decisions-stage,
+        .company-stage,
+        .leadership-stage{
+          overflow:visible!important;
+        }
+
+        /* Keep the business-impact transition compact using vertical longhands only. */
+        .proof-section{padding-bottom:54px!important}
+        .company-section{padding-top:24px!important}
+
+        @media(max-width:1120px){
+          .team-layout{grid-template-columns:400px minmax(0,1fr)!important;gap:50px!important}
+          .team-copy{max-width:400px!important;margin-left:0!important}
+          .company-copy{margin-left:0!important}
+        }
+
+        @media(max-width:980px){
+          .compare-section,
+          .team-section,
+          .decisions-section,
+          .proof-section,
+          .company-section,
+          .leadership-section{
+            padding-left:28px!important;
+            padding-right:28px!important;
+          }
+          .team-layout{grid-template-columns:1fr!important;gap:48px!important}
+          .team-copy,.company-copy{max-width:680px!important;margin-left:0!important}
+          .proof-section{padding-bottom:64px!important}
+          .company-section{padding-top:30px!important}
+        }
+
+        @media(max-width:680px){
+          .compare-section,
+          .team-section,
+          .decisions-section,
+          .proof-section,
+          .company-section,
+          .leadership-section{
+            padding-left:20px!important;
+            padding-right:20px!important;
+          }
+          .team-copy,.company-copy{max-width:100%!important;margin-left:0!important}
+        }
+      `;
+
+      const render = () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.querySelector('.leadership-section') || !doc.querySelector('.company-section') || !doc.querySelector('.team-section')) return false;
+
+          const style = doc.createElement('style');
+          style.textContent = fixes;
+          doc.head.appendChild(style);
+
+          const clone = doc.documentElement.cloneNode(true);
+          clone.querySelectorAll('script').forEach(script => script.remove());
+          clone.querySelectorAll('#base').forEach(node => node.remove());
+
+          document.open();
+          document.write('<!doctype html>' + clone.outerHTML);
+          document.close();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const timer = setInterval(() => {
+        if (render()) clearInterval(timer);
+      }, 120);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+</body>
+</html>
