@@ -10,29 +10,32 @@
   <meta property="og:title" content="HumaMap — Better understanding for better work" />
   <meta property="og:description" content="Understand how people think, work and collaborate. Build better teams, lead better and make better people decisions." />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./site-shell.css" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
-    <nav class="nav shell" aria-label="Main navigation">
-      <a class="brand" href="#top" aria-label="HumaMap home">
-        <img class="brand-logo" src="https://raw.githubusercontent.com/augustkring/humamap-preview/main/assets/humamap-horizontal-black-transparent.png" alt="HumaMap" />
-      </a>
-      <div class="nav-actions">
-        <div class="nav-pages">
-          <a class="nav-link" href="/individuals">Individuals</a>
-          <a class="nav-link" href="/businesses">Businesses</a>
-          <a class="nav-link" href="/how-it-works">How it works</a>
-          <a class="nav-link" href="/about">About</a>
+    <div class="header-shell shell">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="HumaMap home">
+          <img class="brand-logo" src="https://raw.githubusercontent.com/augustkring/humamap-preview/main/assets/humamap-horizontal-black-transparent.png" alt="HumaMap" />
+        </a>
+        <div class="nav-right">
+          <div class="nav-pages">
+            <a class="nav-link" href="/individuals">Individuals</a>
+            <a class="nav-link" href="/businesses">Businesses</a>
+            <a class="nav-link" href="/how-it-works">How it works</a>
+            <a class="nav-link" href="/about">About</a>
+          </div>
+          <span class="nav-divider" aria-hidden="true"></span>
+          <div class="nav-account">
+            <a class="login-link" href="/login">Log in</a>
+            <a class="nav-create" href="/signup">Create HumaMap</a>
+          </div>
         </div>
-        <span class="nav-divider" aria-hidden="true"></span>
-        <div class="nav-auth">
-          <a class="nav-login" href="/login">Log in</a>
-          <a class="nav-create" href="/signup">Create HumaMap</a>
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   </header>
 
   <main id="main">
@@ -312,13 +315,15 @@
   </main>
 
   <footer class="footer" aria-label="Footer">
-    <div class="shell">
+    <div class="footer-shell shell">
       <div class="footer-inner">
         <div class="footer-top">
           <div class="footer-brand"><img src="https://raw.githubusercontent.com/augustkring/humamap-preview/main/assets/humamap-horizontal-black-transparent.png" alt="HumaMap" /><p>Better work starts with better understanding of people.</p></div>
           <nav class="footer-group" aria-label="Explore"><strong>Explore</strong><a href="/individuals">Individuals</a><a href="/businesses">Businesses</a><a href="/how-it-works">How it works</a><a href="/about">About</a></nav>
           <nav class="footer-group" aria-label="Trust"><strong>Trust</strong><a href="/privacy">Privacy</a><a href="/security">Security</a><a href="/terms">Terms</a></nav>
-          <nav class="footer-group" aria-label="Get started"><strong>Get started</strong><a href="/login">Log in</a><a href="/signup?type=personal">Create personal HumaMap</a><a href="/signup?type=company">Create Company HumaMap</a></nav>
+          <nav class="footer-group" aria-label="Get started"><strong>Get started</strong><a href="/signup?type=personal">Create personal HumaMap</a><a href="/signup?type=company">Create Company HumaMap</a><a href="/login">Log in</a></nav>
+          <div class="footer-group" aria-label="Socials"><strong>Socials</strong><span class="footer-placeholder">LinkedIn</span></div>
+          <div class="footer-group footer-contact" aria-label="Contact"><strong>Contact</strong><a href="mailto:hello@humanmap.com">hello@humanmap.com</a><address class="footer-address">Ravnsgade 7<br />2100 København<br />Danmark</address></div>
         </div>
         <div class="footer-bottom"><span>© 2026 HumaMap</span><span>Built in Denmark 🇩🇰 · Made for Europe 🇪🇺</span></div>
       </div>
