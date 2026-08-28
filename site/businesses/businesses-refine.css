@@ -12,14 +12,16 @@
 .product-panel-meta{margin-top:24px}
 .product-panel-actions{padding-top:27px}
 
-/* Put the anchoring value directly into Teams, in one short line. */
-.product-panel-teams .product-panel-top>p{font-size:0;line-height:0;white-space:nowrap}
+/* Keep the original Teams description and add one short company-retention line. */
 .product-panel-teams .product-panel-top>p::after{
-  content:"Move people understanding from individual heads into the company.";
+  content:"Keep that knowledge in the company, not just in people's heads.";
   display:block;
-  font-size:15px;
+  margin-top:8px;
+  color:#34453C;
+  font-size:14.5px;
   line-height:1.5;
-  color:#4C514E;
+  font-weight:600;
+  white-space:nowrap;
 }
 
 /* Keep the company-anchoring value visible in the hero as well. */
@@ -146,7 +148,7 @@
 .stack-result .stack-layer-items span{color:#454541;font-weight:520}
 
 @media(max-width:1120px){
-  .product-panel-teams .product-panel-top>p{white-space:normal}
+  .product-panel-teams .product-panel-top>p::after{white-space:normal}
 }
 
 @media(max-width:980px){
