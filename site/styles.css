@@ -35,10 +35,29 @@
 }
 .lead40-agreement-num{color:#6E8D79}
 
+/* Global navigation */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  width:100%;
+  background:rgba(252,252,250,.97);
+}
+.nav{height:80px}
+.nav-actions{display:flex;align-items:center;gap:20px}
+.nav-pages,.nav-auth{display:flex;align-items:center}
+.nav-pages{gap:26px}
+.nav-auth{gap:14px}
+.nav-divider{width:1px;height:20px;background:rgba(21,21,21,.14);flex:0 0 auto}
+.nav-login{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding-inline:3px}
+.nav-create{min-height:42px;padding:0 16px;border-radius:8px;background:var(--text);color:#FAFAF7;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:-.005em}
+
 /* Interaction targets: text links remain visually light but are easy to hit. */
 .brand,
 .nav-link,
 .nav-cta,
+.nav-login,
+.nav-create,
 .secondary-link,
 .text-link,
 .company-cta,
@@ -52,10 +71,10 @@
 
 /* Reserve logo geometry to reduce layout shift while the remote asset loads. */
 .brand-logo{width:183px;height:38px;object-fit:contain}
-.footer-brand img{width:164px;height:34px;object-fit:contain}
+.footer-brand img{width:308px;height:64px;object-fit:contain}
 
 /* Anchor navigation should land with comfortable breathing room. */
-#individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:88px}
+#individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:96px}
 
 /*
   Section rhythm.
@@ -89,8 +108,17 @@
 .final-cta-inner>p{margin-top:22px}
 .final-cta-actions{margin-top:30px}
 
+@media(hover:hover){
+  .nav-login,.nav-create{transition:color .18s ease,opacity .18s ease}
+  .nav-login:hover{color:var(--text)}
+  .nav-create:hover{opacity:.9}
+}
+
 @media(max-width:980px){
   .brand-logo{width:173px;height:36px}
+  .nav-pages{gap:20px}
+  .nav-actions{gap:16px}
+  .nav-auth{gap:11px}
   .hero{padding-top:82px;padding-bottom:40px}
   .person-section{padding-bottom:92px}
   .compare-section{padding-top:64px;padding-bottom:116px}
@@ -100,12 +128,19 @@
   .company-section{padding-top:48px;padding-bottom:108px}
   .leadership-section{padding-top:64px;padding-bottom:96px}
   .final-cta-section{padding-top:88px;padding-bottom:80px}
-  #individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:76px}
+  #individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:84px}
+}
+
+@media(max-width:840px){
+  .nav-pages,.nav-divider{display:none}
 }
 
 @media(max-width:680px){
   .brand-logo{width:149px;height:31px}
-  .nav-cta{min-height:44px}
+  .nav-actions{gap:10px}
+  .nav-auth{gap:8px}
+  .nav-login{font-size:12.5px}
+  .nav-create{min-height:40px;padding:0 13px;font-size:12.5px}
   .hero{padding-top:54px;padding-bottom:38px}
   .person-section{padding-bottom:72px}
   .compare-section{padding-top:52px;padding-bottom:88px}
@@ -116,6 +151,7 @@
   .leadership-section{padding-top:48px;padding-bottom:80px}
   .final-cta-section{padding-top:72px;padding-bottom:64px}
   .footer{padding-top:44px;padding-bottom:30px}
+  .footer-brand img{width:240px;height:50px}
 
   /* A CSS transform does not change layout geometry. Match the flow box to the
      scaled product object so it cannot leave a ~150px false gap below it. */
@@ -129,7 +165,7 @@
   .governance-note{margin-top:24px}
   .lead40-programme{margin-top:30px}
   .final-cta-actions{margin-top:26px}
-  #individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:68px}
+  #individuals,#businesses,#people-decisions,#company,#leadership,#create{scroll-margin-top:76px}
 }
 
 @media(prefers-reduced-motion:reduce){
