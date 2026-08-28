@@ -96,7 +96,7 @@
 .people-work-points span{display:block;padding:15px 0;border-bottom:1px solid var(--line);color:#343431;font-size:14px;line-height:1.45;font-weight:520}
 
 /* Company HumaMap */
-.free-company-section{padding-top:54px;padding-bottom:72px}
+.free-company-section{padding-top:54px;padding-bottom:88px}
 .free-company-layout{display:grid;grid-template-columns:450px minmax(0,1fr);gap:82px;align-items:center}
 .business-product-copy{max-width:470px}
 .business-product-copy h2{margin:0;font-size:48px;line-height:1.075;letter-spacing:-.034em;font-weight:550}
@@ -104,7 +104,7 @@
 .free-company-copy .section-eyebrow{margin-bottom:16px}
 .free-company-section .primary-btn{margin-top:28px}
 .free-label{display:block;margin-top:10px;color:var(--quiet);font-size:11px}
-.company-profile-stage{position:relative;height:650px}
+.company-profile-stage{position:relative;height:560px}
 .company-profile-stage::before{right:18px;top:118px;width:520px;height:386px;transform:rotate(7deg)}
 .company-profile-stage::after{right:346px;top:60px;width:182px;height:182px;box-shadow:248px 322px 0 #F5F8F6}
 .business-company-card{position:absolute;right:38px;top:54px;width:500px;padding:31px 32px 30px;border-radius:27px;background:#fff;box-shadow:0 31px 74px rgba(21,21,21,.105),0 8px 22px rgba(21,21,21,.03);transform:rotate(.35deg);z-index:3}
@@ -120,12 +120,12 @@
 .business-company-grid p{margin:7px 0 0;color:#343431;font-size:12.8px;line-height:1.46}
 .business-company-card footer{display:flex;justify-content:space-between;gap:20px;margin-top:15px;padding-top:17px;border-top:1px solid var(--line);color:var(--quiet);font-size:10px}
 .business-company-card footer strong{color:#555550}
-.company-free-benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:34px;padding-top:28px;border-top:1px solid var(--line)}
+.company-free-benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:16px;padding-top:24px;border-top:1px solid var(--line)}
 .company-free-benefits strong{display:block;max-width:220px;font-size:13px}
 .company-free-benefits span{display:block;margin-top:7px;color:var(--muted);font-size:12.5px;line-height:1.48}
 
 /* Privacy */
-.privacy-section{padding-top:64px;padding-bottom:0}
+.privacy-section{padding-top:64px;padding-bottom:96px}
 .privacy-top{display:grid;grid-template-columns:430px minmax(0,520px);gap:86px;align-items:start}
 .privacy-title{max-width:430px}
 .privacy-copy{max-width:520px;padding-top:23px}
@@ -168,12 +168,12 @@
   .people-work-copy{max-width:680px}
   .people-work-visual{max-width:620px;margin-left:0}
   .not-one-mark{font-size:118px}
-  .free-company-section{padding-top:50px;padding-bottom:64px}
+  .free-company-section{padding-top:50px;padding-bottom:76px}
   .free-company-layout{grid-template-columns:1fr;gap:42px}
   .business-product-copy{max-width:680px}
-  .company-profile-stage{width:650px;max-width:100%;margin:0 auto}
-  .company-free-benefits{grid-template-columns:1fr 1fr}
-  .privacy-section{padding-top:54px}
+  .company-profile-stage{width:650px;max-width:100%;height:560px;margin:0 auto}
+  .company-free-benefits{grid-template-columns:1fr 1fr;margin-top:18px}
+  .privacy-section{padding-top:54px;padding-bottom:80px}
   .privacy-top{grid-template-columns:1fr;gap:22px}
   .privacy-title,.privacy-copy{max-width:680px}
   .privacy-copy{padding-top:0}
@@ -215,7 +215,7 @@
   .people-work-visual>p{margin-top:22px;font-size:16px}
   .people-work-points{margin-top:26px}
   .people-work-points span{padding:13px 0;font-size:13px}
-  .free-company-section{padding-top:44px;padding-bottom:56px}
+  .free-company-section{padding-top:44px;padding-bottom:64px}
   .company-profile-stage{width:100%;height:510px}
   .company-profile-stage::before{right:-110px;width:430px}
   .company-profile-stage::after{display:none}
@@ -224,9 +224,9 @@
   .business-company-grid section{padding:13px 0}
   .business-company-card footer{display:block}
   .business-company-card footer strong{display:block;margin-top:4px}
-  .company-free-benefits{grid-template-columns:1fr;gap:0;margin-top:30px}
+  .company-free-benefits{grid-template-columns:1fr;gap:0;margin-top:22px}
   .company-free-benefits>div{padding:15px 0;border-bottom:1px solid var(--line)}
-  .privacy-section{padding-top:48px}
+  .privacy-section{padding-top:48px;padding-bottom:64px}
   .privacy-top{gap:18px}
   .privacy-copy>p{font-size:17px}
   .privacy-principles{grid-template-columns:1fr;gap:24px;margin-top:34px}
