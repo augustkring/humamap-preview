@@ -26,7 +26,8 @@
 .footer-group strong{margin-bottom:14px}
 .footer-placeholder{display:flex;align-items:center;min-height:32px;color:#B9B9B3;font-size:13px;line-height:1.4}
 .footer-contact a{word-break:break-word}
-.footer-address{margin:6px 0 0;color:#B9B9B3;font-size:13px;line-height:1.55;font-style:normal}
+.footer-address{margin:6px 0 0;color:#B9B9B3;font-size:0;line-height:0;font-style:normal}
+.footer-address::after{content:"Ragnagade 7\A2100 Copenhagen\ADenmark";display:block;white-space:pre;font-size:13px;line-height:1.55;color:#B9B9B3}
 .footer-bottom{font-size:13.5px;line-height:1.45}
 
 @media(max-width:1120px){
