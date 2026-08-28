@@ -1,4 +1,4 @@
-/* Focused refinement: direct product entry + one coherent HumaMap context surface. */
+/* Focused refinement: direct product entry + homepage-style company context surface. */
 
 /* Hero should lead directly into the two products. */
 .business-hero{padding-bottom:58px}
@@ -12,7 +12,17 @@
 .product-panel-meta{margin-top:24px}
 .product-panel-actions{padding-top:27px}
 
-/* Replace the weaker second hero sentence with the core company-anchoring value. */
+/* Put the anchoring value directly into Teams, in one short line. */
+.product-panel-teams .product-panel-top>p{font-size:0;line-height:0;white-space:nowrap}
+.product-panel-teams .product-panel-top>p::after{
+  content:"Move people understanding from individual heads into the company.";
+  display:block;
+  font-size:15px;
+  line-height:1.5;
+  color:#4C514E;
+}
+
+/* Keep the company-anchoring value visible in the hero as well. */
 .business-hero-copy>p:nth-of-type(2){font-size:0;line-height:0;max-width:690px}
 .business-hero-copy>p:nth-of-type(2)::after{
   content:"HumaMap turns that understanding into shared company knowledge, so it stays useful as managers, people and teams change.";
@@ -23,17 +33,17 @@
 }
 
 /*
-  The missing layer is one product-like object, not a diagram of separate cards.
-  The company knowledge is the foundation, HumaMap is the added context band,
-  and the top of the same surface shows where the combined context becomes useful.
+  The missing layer is shown as one HumaMap-like product surface.
+  Existing company knowledge is normal content, HumaMap is one highlighted insight block,
+  and the result is an open footer area. No diagram arrows or stacked cards.
 */
 .layer-section{padding-top:48px;padding-bottom:108px}
 .layer-layout{grid-template-columns:430px minmax(0,1fr);gap:92px}
 .layer-copy-strong{margin-top:20px!important}
 .layer-visual{
   position:relative;
-  min-height:540px;
-  padding:58px 36px 44px;
+  min-height:555px;
+  padding:44px 34px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -43,10 +53,10 @@
   content:"";
   position:absolute;
   z-index:0;
-  right:5px;
+  right:0;
   top:112px;
   width:520px;
-  height:350px;
+  height:360px;
   border-radius:50%;
   background:#EFF5F1;
   transform:rotate(6deg);
@@ -55,71 +65,89 @@
   content:"";
   position:absolute;
   z-index:0;
-  right:372px;
+  right:368px;
   top:70px;
-  width:150px;
-  height:150px;
+  width:152px;
+  height:152px;
   border-radius:50%;
   background:#DEEAE3;
 }
 .layer-stack{
   position:relative;
   z-index:2;
-  width:min(555px,100%);
-  overflow:hidden;
-  border-radius:24px;
+  width:min(520px,100%);
+  padding:29px 30px 27px;
+  border-radius:25px;
   background:#fff;
-  box-shadow:0 30px 70px rgba(21,21,21,.105),0 7px 20px rgba(21,21,21,.028);
-  transform:rotate(.25deg);
+  box-shadow:0 31px 74px rgba(21,21,21,.105),0 8px 22px rgba(21,21,21,.03);
+  transform:rotate(.3deg);
+  display:flex;
+  flex-direction:column;
 }
+.stack-direction{display:none!important}
 .stack-layer{
   width:100%!important;
   margin:0!important;
-  padding:25px 29px 24px;
   border:0!important;
   border-radius:0!important;
   box-shadow:none!important;
   transform:none!important;
+}
+.stack-base{order:1;padding:0;background:transparent!important;color:var(--text)}
+.stack-human{
+  order:2;
+  margin-top:24px!important;
+  padding:19px 20px 18px;
+  border-radius:14px!important;
+  background:#F1F5F2!important;
+  color:var(--text)
+}
+.stack-result{
+  order:3;
+  margin-top:22px!important;
+  padding:20px 0 0;
+  border-top:1px solid var(--line)!important;
+  background:transparent!important;
+  color:var(--text)
 }
 .stack-layer-head{display:block}
 .stack-layer-label{
   display:block;
   font-size:10px;
   line-height:1.3;
-  font-weight:700;
+  font-weight:650;
   letter-spacing:.06em;
   text-transform:uppercase;
 }
 .stack-layer-title{
   display:block;
   margin-top:6px;
-  font-size:22px;
-  line-height:1.18;
-  letter-spacing:-.022em;
+  font-size:23px;
+  line-height:1.16;
+  letter-spacing:-.025em;
   font-weight:600;
 }
+.stack-base .stack-layer-label{color:#777772}
+.stack-human .stack-layer-label,.stack-result .stack-layer-label{color:var(--green)}
+.stack-human .stack-layer-title{font-size:19px;color:#274536}
+.stack-result .stack-layer-title{font-size:20px}
 .stack-layer-items{
   display:flex;
   flex-wrap:wrap;
   gap:8px 18px;
-  margin-top:18px;
-  padding-top:15px;
-  border-top:1px solid;
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
 }
-.stack-layer-items span{font-size:11.5px;line-height:1.4}
-.stack-result{background:#fff;color:var(--text)}
-.stack-result .stack-layer-label{color:var(--green)}
-.stack-result .stack-layer-items{border-color:rgba(21,21,21,.075)}
-.stack-result .stack-layer-items span{color:#4A4A46}
-.stack-human{background:#F1F5F2;color:#203D2E}
-.stack-human .stack-layer-label{color:var(--green)}
-.stack-human .stack-layer-items{border-color:rgba(45,90,67,.12)}
-.stack-human .stack-layer-items span{color:#355344}
-.stack-base{background:#FAFAF7;color:#343431}
-.stack-base .stack-layer-label{color:#777772}
-.stack-base .stack-layer-items{border-color:rgba(21,21,21,.075)}
-.stack-base .stack-layer-items span{color:#555550}
-.stack-direction{display:none!important}
+.stack-layer-items span{font-size:11.5px;line-height:1.4;color:#555550}
+.stack-human .stack-layer-items{margin-top:13px;padding-top:12px;border-color:rgba(45,90,67,.12)}
+.stack-human .stack-layer-items span{color:#486052}
+.stack-result .stack-layer-items{margin-top:13px;padding-top:0;border-top:0}
+.stack-result .stack-layer-items span{color:#454541;font-weight:520}
+
+@media(max-width:1120px){
+  .product-panel-teams .product-panel-top>p{white-space:normal}
+}
 
 @media(max-width:980px){
   .business-hero{padding-bottom:50px}
@@ -128,7 +156,7 @@
   .layer-layout{grid-template-columns:1fr;gap:42px}
   .layer-copy{max-width:680px}
   .layer-visual{min-height:500px;justify-content:flex-start;padding-inline:26px}
-  .layer-stack{max-width:620px}
+  .layer-stack{max-width:560px}
 }
 
 @media(max-width:680px){
@@ -137,13 +165,17 @@
   .product-panels{gap:14px}
   .product-panel{padding:27px 23px 25px;border-radius:15px}
   .product-panel h3{font-size:30px}
+  .product-panel-teams .product-panel-top>p::after{font-size:14px;line-height:1.5}
   .layer-section{padding-top:34px;padding-bottom:78px}
   .layer-visual{min-height:430px;padding:28px 0 20px}
   .layer-visual::before{right:-110px;top:74px;width:430px;height:300px}
   .layer-visual::after{display:none}
-  .layer-stack{width:100%;border-radius:21px;transform:none}
-  .stack-layer{padding:21px 20px 20px}
-  .stack-layer-title{font-size:19px}
-  .stack-layer-items{gap:7px 14px;margin-top:14px;padding-top:13px}
+  .layer-stack{width:100%;padding:24px 23px 22px;border-radius:23px;transform:none}
+  .stack-layer-title{font-size:20px}
+  .stack-human{margin-top:20px!important;padding:17px 17px 16px}
+  .stack-human .stack-layer-title{font-size:18px}
+  .stack-result{margin-top:19px!important;padding-top:18px}
+  .stack-result .stack-layer-title{font-size:18px}
+  .stack-layer-items{gap:7px 14px;margin-top:13px;padding-top:12px}
   .stack-layer-items span{font-size:10.5px}
 }
