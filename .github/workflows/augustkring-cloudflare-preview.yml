@@ -1,0 +1,36 @@
+name: AugustKring Cloudflare Preview
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "cloudflare-augustkring/**"
+      - ".github/workflows/augustkring-cloudflare-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Deploy temporary Cloudflare Worker
+        env:
+          CI: "true"
+        run: |
+          npx --yes wrangler@4.135.0 deploy --temporary --config cloudflare-augustkring/wrangler.jsonc 2>&1 | tee cloudflare-deploy.log
+
+      - name: Show deployment output
+        if: always()
+        run: cat cloudflare-deploy.log || true
