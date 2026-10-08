@@ -603,13 +603,14 @@ a:focus-visible {
 .about-more { margin-top: 28px; }
 .perspective-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 4vw, 44px); margin-top: 26px; }
 .perspective-link { padding-top: 18px; display: flex; flex-direction: column; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
-.perspective-link-title { max-width: 330px; margin: 0; font-family: 'AKOutfit', Arial, sans-serif; font-size: clamp(23px, 2vw, 28px); line-height: 1.08; letter-spacing: -.032em; }
+.perspective-link-title { max-width: 330px; margin: 0; display: flex; align-items: center; gap: 10px; font-family: 'AKOutfit', Arial, sans-serif; font-size: clamp(23px, 2vw, 28px); line-height: 1.08; letter-spacing: -.032em; }
+.perspective-link-title span { min-width: 0; }
+.perspective-link-title .arrow { width: 15px; height: 15px; flex: 0 0 15px; fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform 160ms ease, stroke 160ms ease; }
+.perspective-link:hover .perspective-link-title .arrow,
+.perspective-link:focus-visible .perspective-link-title .arrow { stroke: var(--red); transform: translateX(3px); }
 .perspective-link-copy { max-width: 360px; margin-top: 13px; display: -webkit-box; overflow: hidden; color: var(--copy); font-size: 16px; line-height: 1.55; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.perspective-link-action, .perspective-index-action { width: fit-content; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-family: 'AKOutfit', Arial, sans-serif; font-weight: 700; }
-.perspective-link-action { position: relative; margin-top: 12px; padding: 0 0 4px; font-size: 13px; }
-.perspective-link-action::after { content: ''; position: absolute; inset: auto 0 0; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
-.perspective-link:hover .perspective-link-action::after, .perspective-link:focus-visible .perspective-link-action::after { transform: scaleX(1); }
-.perspective-link-action .arrow, .perspective-index-action .arrow { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: var(--red); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.perspective-index-action { width: fit-content; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-family: 'AKOutfit', Arial, sans-serif; font-weight: 700; }
+.perspective-index-action .arrow { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: var(--red); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 .header-wordmark { font-size: 22px; }
 .home-navigation a[aria-current="page"] { color: var(--ink); }
