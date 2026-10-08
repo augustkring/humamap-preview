@@ -265,16 +265,17 @@ a:focus-visible {
 
 .perspective-story {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(260px, .9fr);
-  column-gap: clamp(56px, 6.8vw, 92px);
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  gap: clamp(54px, 7vw, 92px);
   align-items: start;
 }
 
 .perspective-copy {
-  max-width: 680px;
+  max-width: 600px;
+  padding-top: 2px;
 }
 
-.perspective-copy h2,
+.perspective-lead h2,
 .work-heading h2,
 .thread-lead h2,
 .values-lead h2 {
@@ -294,31 +295,19 @@ a:focus-visible {
   line-height: 1.60;
 }
 
-.perspective-copy h2 + .lead-copy {
-  margin-top: 25px;
-}
-
 .perspective-copy p + p {
-  margin-top: 17px;
+  margin-top: 18px;
 }
 
-.perspective-copy .lead-copy {
-  color: var(--ink);
-  font-size: 19px;
-  font-weight: 400;
-  line-height: 1.55;
-}
-
-.perspective-statement {
-  align-self: end;
-  max-width: 360px;
-  margin: 0 0 10px;
+.perspective-copy .perspective-statement {
+  max-width: 520px;
+  margin-top: clamp(32px, 3.8vw, 46px);
   color: var(--ink);
   font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(27px, 2.8vw, 33px);
+  font-size: clamp(23px, 2.35vw, 29px);
   font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: -.035em;
+  line-height: 1.24;
+  letter-spacing: -.032em;
   text-wrap: balance;
 }
 
@@ -374,6 +363,7 @@ a:focus-visible {
 }
 
 .thread-lead > p,
+.perspective-lead > p,
 .values-lead > p {
   max-width: 500px;
   margin: 24px 0 0;
@@ -419,40 +409,70 @@ a:focus-visible {
 
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(24px, 3.2vw, 38px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: clamp(24px, 3vw, 34px);
+  row-gap: clamp(38px, 4vw, 50px);
 }
 
 .work-card {
   min-width: 0;
 }
 
-.work-image {
+.work-brand-title {
+  margin: 0;
+  font: inherit;
+}
+
+.work-brand {
+  min-height: 82px;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  display: block;
-  overflow: hidden;
-  border-radius: 4px;
-  background: var(--surface);
-  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  color: var(--ink);
   text-decoration: none;
 }
 
-.work-image img {
-  width: 100%;
-  height: 100%;
+.work-brand-link .arrow {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 160ms ease, stroke 160ms ease;
+}
+
+.work-brand-link:hover .arrow,
+.work-brand-link:focus-visible .arrow {
+  stroke: var(--red);
+  transform: translate(2px, -2px);
+}
+
+.work-brand-image {
+  width: auto;
+  max-width: calc(100% - 24px);
+  max-height: 58px;
+  height: auto;
   display: block;
   object-fit: contain;
-  object-position: center top;
+  object-position: left center;
 }
 
-.work-image-placeholder {
-  display: grid;
-  place-items: center;
-  background: var(--surface);
-}
+.work-brand-august { max-width: min(192px, calc(100% - 24px)); }
+.work-brand-humamap { max-width: min(174px, calc(100% - 24px)); }
 
-.blentera-word { font-family: 'AKOutfit', Arial, sans-serif; color: var(--ink); font-size: clamp(28px, 2.5vw, 34px); font-weight: 700; line-height: 1; letter-spacing: -.025em; }
+.blentera-word {
+  font-family: 'AKOutfit', Arial, sans-serif;
+  color: var(--ink);
+  font-size: clamp(26px, 2.5vw, 31px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.025em;
+}
 
 .waymaking-logo {
   display: inline-flex;
@@ -464,7 +484,7 @@ a:focus-visible {
 }
 
 .waymaking-word {
-  font-size: clamp(28px, 2.5vw, 34px);
+  font-size: clamp(23px, 2.2vw, 28px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -.035em;
@@ -497,34 +517,16 @@ a:focus-visible {
   transform: translateX(-50%);
 }
 
-
-.work-card-title {
-  margin: 17px 0 0;
-  font: inherit;
-}
-
-.work-link,
-.work-link-static {
-  margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
-  color: var(--ink);
-  font-size: 19px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -.022em;
-}
-
-.work-link-static {
-  display: inline-block;
-  margin: 17px 0 0;
-}
-
 .work-card p {
-  max-width: 470px;
-  margin: 11px 0 0;
+  margin: 14px 0 0;
   color: var(--copy);
-  font-size: 16px;
-  line-height: 1.58;
+  font-size: 15px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 .values-section {
@@ -1176,14 +1178,17 @@ a:focus-visible {
 @media (max-width: 920px) {
   .perspective-story {
     grid-template-columns: 1fr;
-    gap: 38px;
+    gap: 42px;
   }
 
-  .perspective-statement {
-    align-self: auto;
-    max-width: 680px;
-    margin: 0;
-    font-size: clamp(27px, 4.3vw, 33px);
+  .perspective-lead,
+  .perspective-copy {
+    max-width: 720px;
+  }
+
+  .perspective-copy .perspective-statement {
+    max-width: 560px;
+    margin-top: 32px;
   }
 
   .home-hero {
@@ -1256,15 +1261,7 @@ a:focus-visible {
   }
 
   .work-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .work-card {
-    max-width: 620px;
-  }
-
-  .work-card + .work-card {
-    margin-top: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1301,7 +1298,7 @@ a:focus-visible {
     padding: 70px 0;
   }
 
-  .perspective-copy h2,
+  .perspective-lead h2,
   .work-heading h2,
   .thread-lead h2,
   .values-lead h2 {
@@ -1309,6 +1306,7 @@ a:focus-visible {
   }
 
   .thread-lead > p,
+  .perspective-lead > p,
   .values-lead > p {
     max-width: 620px;
     font-size: 18px;
@@ -1375,6 +1373,17 @@ a:focus-visible {
   .article-next { margin-top: 72px; }
   .perspective-links { grid-template-columns: 1fr; }
   .perspective-link { min-height: 0; padding-bottom: 20px; }
+}
+
+@media (max-width: 600px) {
+  .work-grid {
+    grid-template-columns: 1fr;
+    row-gap: 32px;
+  }
+
+  .work-card {
+    max-width: 460px;
+  }
 }
 
 @media (max-width: 520px) {

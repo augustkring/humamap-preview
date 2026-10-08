@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261008-hero-v7">
+  <link rel="stylesheet" href="styles.css?v=20261008-layout-v8">
 
   <script type="application/ld+json">
   {
@@ -177,15 +177,17 @@
 
     <section id="perspective" class="story-section perspective-section" aria-labelledby="perspective-title">
       <div class="perspective-story">
-        <div class="perspective-copy">
+        <div class="perspective-lead">
           <h2 id="perspective-title">The shift I see</h2>
-          <p class="lead-copy">The next decade will test even the strongest market positions.</p>
+          <p>The next decade will test even the strongest market positions.</p>
+        </div>
+        <div class="perspective-copy">
           <p>AI is changing how companies are built and run. Even market leaders may face unexpected competition from companies a fraction of their size. The challenge is turning AI into a core capability that creates greater value for customers and strengthens the business.</p>
           <p>Large organisations can combine their scale and customer trust with startup-like agility. Startups can gain capabilities that once required much larger teams. Both can increase productivity, use capital more efficiently and bring the right ideas to market faster.</p>
           <p>But greater capacity doesn't automatically make a company more competitive. When companies put products before customers, AI can amplify that mistake many times over.</p>
           <p>Realising AI's potential means rethinking how companies are organised and led. That takes a customer-centric mindset, a culture that innovates and adapts quickly, and the judgement to prioritise and know when to stop.</p>
+          <p class="perspective-statement">The real opportunity isn't AI itself. It's the companies we can build around it.</p>
         </div>
-        <p class="perspective-statement">The real opportunity isn't AI itself. It's the companies we can build around it.</p>
       </div>
 
       <div class="perspectives-block">
@@ -216,57 +218,43 @@
 
       <div class="work-grid">
         <article class="work-card">
-          <div class="work-image work-image-placeholder blentera-placeholder" role="img" aria-label="BLENTERA project placeholder">
-            <span class="blentera-word" aria-hidden="true">BLENTERA</span>
-          </div>
-          <h3 class="work-link-static">BLENTERA</h3>
-          <p>In development.</p>
-        </article>
-
-        <article class="work-card">
-          <a class="work-image" href="https://augustworks.dk" target="_blank" rel="noopener" aria-label="Visit August Works">
-            <img
-              src="assets/august-works-site-focused.webp"
-              alt="August Works live website"
-              width="1280"
-              height="720"
-              loading="lazy"
-              decoding="async">
-          </a>
-          <h3 class="work-card-title">
-            <a class="arrow-link work-link" href="https://augustworks.dk" target="_blank" rel="noopener">
-              <span>August Works</span><svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
-            </a>
-          </h3>
-          <p>Helping SMBs adopt AI where it creates business value, so they can increase capacity and build a stronger, more resilient business.</p>
-        </article>
-
-        <article class="work-card">
-          <a class="work-image" href="https://humamap.com" target="_blank" rel="noopener" aria-label="Visit HumaMap">
-            <img
-              src="https://augustkring.com/assets/humamap-site-focused.jpg"
-              alt="HumaMap website"
-              width="1600"
-              height="1000"
-              loading="lazy"
-              decoding="async">
-          </a>
-          <h3 class="work-card-title">
-            <a class="arrow-link work-link" href="https://humamap.com" target="_blank" rel="noopener">
-              <span>HumaMap</span><svg class="arrow arrow-up-right" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
-            </a>
-          </h3>
-          <p>Empowering companies to understand people and collaboration more clearly, and make better decisions about teams, roles and leadership.</p>
-        </article>
-
-        <article class="work-card">
-          <div class="work-image work-image-placeholder waymaking-placeholder" role="img" aria-label="Waymaking">
-            <span class="waymaking-logo" aria-hidden="true">
-              <span class="waymaking-word">Waymak<span class="waymaking-i">ı</span>ng<sup>™</sup></span>
+          <h3 class="work-brand-title">
+            <span class="work-brand" aria-label="BLENTERA">
+              <span class="blentera-word">BLENTERA</span>
             </span>
-          </div>
-          <h3 class="work-link-static">Waymaking</h3>
-          <p>An AI-native approach to turning bold ideas into impact-driven ventures, with people, planet and profit built in from the start.</p>
+          </h3>
+          <p>Building an AI foundation that makes company knowledge and capability last.</p>
+        </article>
+
+        <article class="work-card">
+          <h3 class="work-brand-title">
+            <a class="work-brand work-brand-link" href="https://augustworks.dk" target="_blank" rel="noopener noreferrer" aria-label="Visit August Works (opens in a new tab)">
+              <img class="work-brand-image work-brand-august" src="assets/august-works-logo.png" alt="August Works" loading="lazy" decoding="async">
+              <svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
+            </a>
+          </h3>
+          <p>Helping businesses turn AI into more capacity and lasting business value.</p>
+        </article>
+
+        <article class="work-card">
+          <h3 class="work-brand-title">
+            <a class="work-brand work-brand-link" href="https://humamap.com" target="_blank" rel="noopener noreferrer" aria-label="Visit HumaMap (opens in a new tab)">
+              <img class="work-brand-image work-brand-humamap" src="assets/humamap-logo.png" alt="HumaMap" loading="lazy" decoding="async">
+              <svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
+            </a>
+          </h3>
+          <p>Helping people understand how they work, so teams collaborate and lead better.</p>
+        </article>
+
+        <article class="work-card">
+          <h3 class="work-brand-title">
+            <span class="work-brand" aria-label="Waymaking">
+              <span class="waymaking-logo">
+                <span class="waymaking-word">Waymak<span class="waymaking-i">ı</span>ng<sup>™</sup></span>
+              </span>
+            </span>
+          </h3>
+          <p>Turning bold ideas into AI-native ventures with people, planet and profit built in.</p>
         </article>
       </div>
     </section>
@@ -286,7 +274,7 @@
         <p>I’m curious by nature, direct in how I communicate and most engaged when I am learning something new, connecting ideas or helping build something that did not exist before.</p>
 
         <a class="arrow-link about-more" href="about/">
-          <span>Get to know me</span><svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
+          <span>Get to know me</span><svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M2 7h9M8 4l3 3-3 3"/></svg>
         </a>
       </div>
     </section>
