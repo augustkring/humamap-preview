@@ -257,6 +257,13 @@ a:focus-visible {
   padding-top: clamp(72px, 6.8vw, 92px);
 }
 
+.perspective-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(260px, .9fr);
+  column-gap: clamp(56px, 6.8vw, 92px);
+  align-items: start;
+}
+
 .perspective-copy {
   max-width: 680px;
 }
@@ -294,6 +301,19 @@ a:focus-visible {
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
+}
+
+.perspective-statement {
+  align-self: end;
+  max-width: 360px;
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: 'AKOutfit', Arial, sans-serif;
+  font-size: clamp(27px, 2.8vw, 33px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  text-wrap: balance;
 }
 
 .arrow-link {
@@ -1147,6 +1167,18 @@ a:focus-visible {
 .article-next a span { color: var(--copy); font-size: 15px; line-height: 1.5; }
 
 @media (max-width: 920px) {
+  .perspective-story {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  .perspective-statement {
+    align-self: auto;
+    max-width: 680px;
+    margin: 0;
+    font-size: clamp(27px, 4.3vw, 33px);
+  }
+
   .home-hero {
     grid-template-columns: minmax(0, 1fr) minmax(330px, .86fr);
     gap: 44px;
