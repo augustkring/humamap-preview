@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261008-carousel-v11">
+  <link rel="stylesheet" href="styles.css?v=20261008-header-ventures-v13">
 
   <script type="application/ld+json">
   {
@@ -128,18 +128,33 @@
       <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">LinkedIn</a>
     </nav>
 
-    <details class="mobile-navigation">
-      <summary>
-        <span class="mobile-navigation-icon" aria-hidden="true"><span></span><span></span></span>
-        <span class="sr-only">Menu</span>
-      </summary>
+    <div class="mobile-navigation">
+      <button class="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-controls="mobile-menu" aria-haspopup="dialog" aria-expanded="false" data-mobile-nav-open>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </div>
+  </header>
+  <dialog class="mobile-menu-dialog" id="mobile-menu" aria-label="Site navigation">
+    <div class="mobile-menu-inner">
+      <div class="mobile-menu-top">
+        <a class="brand august-wordmark mobile-menu-wordmark" href="./" aria-label="August Kring home">
+          <span>August Kr<span class="wordmark-i">i</span>ng</span>
+        </a>
+        <button class="mobile-menu-close" type="button" aria-label="Close navigation" data-mobile-nav-close autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </div>
       <nav class="mobile-navigation-panel" aria-label="Mobile navigation">
         <a href="perspectives/">Perspectives</a>
         <a href="about/">About</a>
         <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">LinkedIn</a>
       </nav>
-    </details>
-  </header>
+      <div class="mobile-menu-footer">
+        <a href="mailto:ak@augustkring.com">Email me</a>
+        <span>Based in Denmark</span>
+      </div>
+    </div>
+  </dialog>
 
   <main id="main-content" class="home-main" tabindex="-1">
     <section class="home-hero" aria-labelledby="hero-title">
@@ -224,9 +239,8 @@
         <article class="work-card work-card--linked">
           <a class="work-card-link" href="https://blentera.com/" target="_blank" rel="noopener noreferrer" aria-label="Blentera: Read more at blentera.com (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><span class="blentera-word">BLENTERA</span></span></h3>
-            <p>In development: an AI-native platform for organising teams of AI agents. Shared knowledge, workflows and human oversight bring their work into one place.</p>
+            <p>In development: an AI-native platform for organising and managing teams of AI agents. Shared company knowledge, coordinated workflows and human oversight help agents handle real business tasks together.</p>
             <span class="work-cta" aria-hidden="true">
-              <span class="work-cta-text">Read more</span>
               <span class="work-cta-domain">blentera.com</span>
               <svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
             </span>
@@ -236,9 +250,8 @@
         <article class="work-card work-card--linked">
           <a class="work-card-link" href="https://augustworks.dk/" target="_blank" rel="noopener noreferrer" aria-label="August Works: Read more at augustworks.dk (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><img class="work-brand-image work-brand-august" src="assets/august-works-logo.png" alt="August Works" loading="lazy" decoding="async"></span></h3>
-            <p>Helping owner-led businesses put AI to work in everyday operations. Shared knowledge, an AI employee and practical workflows help small teams get more done.</p>
+            <p>Helping smaller businesses put AI to work where it matters. We bring company knowledge, an AI employee and practical workflows together so teams can serve customers better, work faster and build lasting capacity.</p>
             <span class="work-cta" aria-hidden="true">
-              <span class="work-cta-text">Read more</span>
               <span class="work-cta-domain">augustworks.dk</span>
               <svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
             </span>
@@ -248,9 +261,8 @@
         <article class="work-card work-card--linked">
           <a class="work-card-link" href="https://humamap.com/" target="_blank" rel="noopener noreferrer" aria-label="HumaMap: Read more at humamap.com (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><img class="work-brand-image work-brand-humamap" src="assets/humamap-logo.png" alt="HumaMap" loading="lazy" decoding="async"></span></h3>
-            <p>A better way to understand how people work, make decisions and collaborate. HumaMap gives individuals, teams and leaders clearer context to work better together.</p>
+            <p>HumaMap helps people understand and communicate how they work, beyond what a CV can show. That shared understanding supports better collaboration, stronger teams and more informed leadership and people decisions.</p>
             <span class="work-cta" aria-hidden="true">
-              <span class="work-cta-text">Read more</span>
               <span class="work-cta-domain">humamap.com</span>
               <svg class="arrow" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg>
             </span>
@@ -264,7 +276,7 @@
                 <span class="waymaking-logo"><span class="waymaking-word">Waymak<span class="waymaking-i">ı</span>ng<sup>™</sup></span></span>
               </span>
             </h3>
-            <p>An AI-native approach to building impact-driven ventures. Start with real needs, validate ideas early and design for people, planet and profit from day one.</p>
+            <p>An AI-native approach to turning early ideas into viable ventures. Start with real human needs, test demand before investing heavily and build businesses where people, planet and profit can reinforce each other.</p>
           </div>
         </article>
       </div>
@@ -334,5 +346,6 @@
     </div>
   </footer>
   <script src="work-carousel.js" defer></script>
+  <script src="mobile-nav.js" defer></script>
 </body>
 </html>

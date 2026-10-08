@@ -45,7 +45,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Outfit-Latin-Bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261006-audit-v2">
+  <link rel="stylesheet" href="styles.css?v=20261008-header-ventures-v13">
 
   <script type="application/ld+json">
   {
@@ -123,18 +123,33 @@
       <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">LinkedIn</a>
     </nav>
 
-    <details class="mobile-navigation">
-      <summary>
-        <span class="mobile-navigation-icon" aria-hidden="true"><span></span><span></span></span>
-        <span class="sr-only">Menu</span>
-      </summary>
+    <div class="mobile-navigation">
+      <button class="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-controls="mobile-menu" aria-haspopup="dialog" aria-expanded="false" data-mobile-nav-open>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </div>
+  </header>
+  <dialog class="mobile-menu-dialog" id="mobile-menu" aria-label="Site navigation">
+    <div class="mobile-menu-inner">
+      <div class="mobile-menu-top">
+        <a class="brand august-wordmark mobile-menu-wordmark" href="./" aria-label="August Kring home">
+          <span>August Kr<span class="wordmark-i">i</span>ng</span>
+        </a>
+        <button class="mobile-menu-close" type="button" aria-label="Close navigation" data-mobile-nav-close autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </div>
       <nav class="mobile-navigation-panel" aria-label="Mobile navigation">
         <a href="perspectives/">Perspectives</a>
         <a href="about/" aria-current="page">About</a>
         <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">LinkedIn</a>
       </nav>
-    </details>
-  </header>
+      <div class="mobile-menu-footer">
+        <a href="mailto:ak@augustkring.com">Email me</a>
+        <span>Based in Denmark</span>
+      </div>
+    </div>
+  </dialog>
 
   <main id="main-content" class="home-main about-page" tabindex="-1">
     <section class="about-personal-hero" aria-labelledby="about-page-title">
@@ -373,5 +388,6 @@
     </div>
   </footer>
   <script src="about/about.js" defer></script>
+  <script src="mobile-nav.js" defer></script>
 </body>
 </html>

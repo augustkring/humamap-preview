@@ -112,7 +112,7 @@ a:focus-visible {
   width: min(calc(100% - (var(--gutter) * 2)), var(--max));
   height: auto;
   margin-inline: auto;
-  padding: 30px 0 18px;
+  padding: 27px 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -153,7 +153,7 @@ a:focus-visible {
 .home-navigation a {
   position: relative;
   color: var(--copy);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   padding-block: 6px;
@@ -168,17 +168,38 @@ a:focus-visible {
   color: var(--ink);
 }
 
-.mobile-navigation { display: none; position: relative; margin-left: auto; }
-.mobile-navigation summary { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: #fff; cursor: pointer; list-style: none; }
-.mobile-navigation summary::-webkit-details-marker { display: none; }
-.mobile-navigation summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.mobile-navigation-icon { width: 17px; display: grid; gap: 5px; }
-.mobile-navigation-icon span { width: 100%; height: 1.5px; display: block; background: var(--ink); transition: transform 160ms ease; }
-.mobile-navigation[open] .mobile-navigation-icon span:first-child { transform: translateY(3.25px) rotate(45deg); }
-.mobile-navigation[open] .mobile-navigation-icon span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
-.mobile-navigation-panel { position: absolute; z-index: 20; top: calc(100% + 10px); right: 0; width: 190px; padding: 10px; display: grid; gap: 2px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
-.mobile-navigation-panel a { padding: 10px 11px; border-radius: 6px; color: var(--copy); font-size: 15px; font-weight: 500; text-decoration: none; }
-.mobile-navigation-panel a:hover, .mobile-navigation-panel a:focus-visible, .mobile-navigation-panel a[aria-current="page"] { color: var(--ink); background: var(--surface); }
+.mobile-navigation { display: none; margin-left: auto; }
+.mobile-menu-toggle, .mobile-menu-close {
+  width: 46px; height: 46px; padding: 0; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--ink); cursor: pointer;
+}
+.mobile-menu-toggle svg, .mobile-menu-close svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.mobile-menu-dialog {
+  position: fixed; inset: 0; width: 100%; max-width: none; height: 100vh;
+  height: 100dvh; max-height: none; margin: 0; padding: 0;
+  border: 0; border-radius: 0; background: var(--page); color: var(--ink); overflow-y: auto;
+}
+.mobile-menu-dialog:not([open]) { display: none; }
+.mobile-menu-dialog[open] { display: block; }
+.mobile-menu-dialog::backdrop { background: rgba(11, 34, 61, .12); }
+.mobile-menu-inner {
+  width: min(calc(100% - (var(--gutter) * 2)), var(--max)); min-height: 100vh; min-height: 100dvh;
+  margin: auto; padding: max(14px, env(safe-area-inset-top)) 0 max(26px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column;
+}
+.mobile-menu-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.mobile-menu-wordmark { font-size: 28px; }
+.mobile-navigation-panel { display: flex; flex-direction: column; gap: 10px; margin: clamp(56px, 10vh, 108px) 0 44px; }
+.mobile-navigation-panel a {
+  width: fit-content; color: var(--ink); font: 700 clamp(34px, 8vw, 50px)/1.13 'AKOutfit', Arial, sans-serif;
+  letter-spacing: -.04em; text-decoration: none; padding: 10px 0;
+}
+.mobile-navigation-panel a:hover, .mobile-navigation-panel a:focus-visible,
+.mobile-navigation-panel a[aria-current="page"] { color: var(--red); }
+.mobile-menu-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-top: auto; color: var(--muted); font-size: 14px; }
+.mobile-menu-footer a { color: inherit; text-decoration: none; }
+.mobile-menu-footer a:hover, .mobile-menu-footer a:focus-visible { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+html.nav-open { overflow: hidden; }
 
 .home-main {
   min-height: 70vh;
@@ -452,21 +473,19 @@ a:focus-visible {
   align-items: center; justify-content: center; color: var(--ink);
 }
 .work-brand-image {
-  width: auto; height: auto; max-width: min(100%, 198px); max-height: 58px;
+  width: auto; height: 32px; max-width: 100%; max-height: 32px;
   display: block; object-fit: contain; object-position: center;
 }
-.work-brand-august { max-width: min(100%, 198px); }
-.work-brand-humamap { max-width: min(100%, 190px); }
 .blentera-word {
   font-family: 'AKOutfit', Arial, sans-serif; color: var(--ink);
-  font-size: clamp(24px, 2.35vw, 29px); font-weight: 700;
+  font-size: 36px; font-weight: 700;
   line-height: 1; letter-spacing: -.025em;
 }
 .waymaking-logo {
   display: inline-flex; align-items: center;
   font-family: 'AKOutfit', Arial, sans-serif; color: var(--ink);
 }
-.waymaking-word { font-size: clamp(22px, 2.2vw, 28px); font-weight: 700; line-height: 1; letter-spacing: -.035em; }
+.waymaking-word { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -.035em; }
 .waymaking-word sup { margin-left: 2px; font-size: .32em; font-weight: 300; vertical-align: top; position: relative; top: .10em; left: 1px; }
 .waymaking-i { position: relative; display: inline-block; }
 .waymaking-i::after {
@@ -485,15 +504,16 @@ a:focus-visible {
   font-family: 'AKFigtree', Arial, sans-serif; font-size: 13px;
   font-weight: 500; line-height: 1.25;
 }
-.work-cta-text { position: relative; padding-bottom: 4px; white-space: nowrap; }
-.work-cta-text::after {
-  position: absolute; content: ''; height: 1px;
-  bottom: 0; left: 0; right: 0; background: var(--red);
-  transform: scaleX(0); transform-origin: left; transition: transform 160ms ease;
+.work-cta-domain {
+  position: relative; color: var(--ink); font-size: 13px; font-weight: 500;
+  padding-bottom: 4px; white-space: nowrap;
 }
-.work-card-link:hover .work-cta-text::after,
-.work-card-link:focus-visible .work-cta-text::after { transform: scaleX(1); }
-.work-cta-domain { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.work-cta-domain::after {
+  position: absolute; content: ''; height: 1px; bottom: 0; left: 0; right: 0;
+  background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform 160ms ease;
+}
+.work-card-link:hover .work-cta-domain::after,
+.work-card-link:focus-visible .work-cta-domain::after { transform: scaleX(1); }
 .work-cta .arrow {
   width: 14px; height: 14px; flex: 0 0 14px; fill: none;
   stroke: var(--red); stroke-width: 1.6; stroke-linecap: round;
@@ -593,7 +613,7 @@ a:focus-visible {
 .perspective-index-action { width: fit-content; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-family: 'AKOutfit', Arial, sans-serif; font-weight: 700; }
 .perspective-index-action .arrow { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: var(--red); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-.header-wordmark { font-size: 22px; }
+.header-wordmark { font-size: 28px; }
 .home-navigation a[aria-current="page"] { color: var(--ink); }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -1198,7 +1218,7 @@ a:focus-visible {
 @media (max-width: 840px) {
   .home-navigation { display: none; }
   .mobile-navigation { display: block; }
-  .site-header.home-header { align-items: center; }
+  .site-header.home-header { align-items: center; padding: 13px 0 8px; }
   .about-personal-hero,
   .about-home-section,
   .about-principles-band,
@@ -1234,12 +1254,12 @@ a:focus-visible {
 
 @media (max-width: 760px) {
   .site-header.home-header {
-    padding-top: 24px;
+    padding-top: 12px;
+    padding-bottom: 8px;
     align-items: center;
   }
 
-  .august-wordmark { font-size: 21px; }
-  .header-wordmark,
+  .header-wordmark, .mobile-menu-wordmark { font-size: 27px; }
   .footer-wordmark { font-size: 23px; }
 
   .home-hero {
