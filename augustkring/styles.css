@@ -202,16 +202,12 @@ a:focus-visible {
   margin: 0;
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
-  font-size: clamp(52px, 5vw, 64px);
+  font-size: clamp(43px, 4.4vw, 55px);
   font-weight: 700;
-  line-height: .96;
-  letter-spacing: -.052em;
+  line-height: 1.04;
+  letter-spacing: -.045em;
   text-wrap: balance;
 }
-
-.hero-name-i { position: relative; display: inline-block; color: inherit; }
-.hero-name-i::before { content: ''; position: absolute; z-index: 1; width: .44em; height: .35em; left: 50%; top: -.03em; background: var(--page); transform: translateX(-50%); pointer-events: none; }
-.hero-name-i::after { content: ''; position: absolute; z-index: 2; width: .30em; height: .30em; left: 62%; top: .03em; border-radius: 999px; background: var(--red); transform: translateX(-50%); pointer-events: none; }
 
 .hero-copy > p {
   max-width: 540px;
@@ -223,11 +219,11 @@ a:focus-visible {
 }
 
 .hero-copy > .hero-role {
-  margin-top: 16px;
+  margin-top: 20px;
   color: var(--ink);
-  font-size: clamp(18px, 1.4vw, 20px);
+  font-size: clamp(16px, 1.35vw, 18px);
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .hero-portrait {
