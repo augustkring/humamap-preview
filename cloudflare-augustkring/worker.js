@@ -1,4 +1,4 @@
-const SNAPSHOT = "https://raw.githubusercontent.com/augustkring/humamap-preview/3e9a50ed2f4b70bd521aa787b208846246828af5/augustkring";
+const SNAPSHOT = "https://raw.githubusercontent.com/augustkring/humamap-preview/1a33a7a76db2ae5848dee590a1ff7835e18173d1/augustkring";
 
 function fileForPath(pathname) {
   if (pathname === "/") return "/index.html";
