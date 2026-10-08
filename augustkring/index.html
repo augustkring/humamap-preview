@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261008-ventures-v9">
+  <link rel="stylesheet" href="styles.css?v=20261008-carousel-v10">
 
   <script type="application/ld+json">
   {
@@ -211,12 +211,16 @@
       </div>
     </section>
 
-    <section id="work" class="story-section work-section" aria-labelledby="work-title">
+    <section id="work" class="story-section work-section" aria-labelledby="work-title" data-work-carousel>
       <header class="work-heading">
         <h2 id="work-title">What I’m focused on</h2>
+        <div class="work-carousel-controls" data-work-controls hidden aria-label="Browse ventures">
+          <button class="work-carousel-button" type="button" data-work-prev aria-label="Previous venture" aria-controls="work-carousel-track"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M16 10H4m5-5-5 5 5 5"/></svg></button>
+          <button class="work-carousel-button" type="button" data-work-next aria-label="Next venture" aria-controls="work-carousel-track"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></button>
+        </div>
       </header>
 
-      <div class="work-grid">
+      <div class="work-grid" id="work-carousel-track" data-work-track role="region" aria-roledescription="carousel" aria-label="Ventures and projects" tabindex="0">
         <article class="work-card work-card--linked">
           <a class="work-card-link" href="https://blentera.com/" target="_blank" rel="noopener noreferrer" aria-label="Blentera: Read more at blentera.com (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><span class="blentera-word">BLENTERA</span></span></h3>
@@ -264,6 +268,7 @@
           </div>
         </article>
       </div>
+      <span class="sr-only" aria-live="polite" aria-atomic="true" data-work-status></span>
     </section>
 
 
@@ -328,5 +333,6 @@
       <span>Based in Denmark</span>
     </div>
   </footer>
+  <script src="work-carousel.js" defer></script>
 </body>
 </html>
