@@ -202,7 +202,7 @@ a:focus-visible {
   margin: 0;
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
-  font-size: clamp(43px, 4.4vw, 55px);
+  font-size: clamp(50px, 5.2vw, 67px);
   font-weight: 700;
   line-height: 1.04;
   letter-spacing: -.045em;
@@ -301,13 +301,13 @@ a:focus-visible {
 
 .perspective-copy .perspective-statement {
   max-width: 520px;
-  margin-top: clamp(32px, 3.8vw, 46px);
+  margin-top: clamp(28px, 3vw, 36px);
   color: var(--ink);
   font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(23px, 2.35vw, 29px);
+  font-size: clamp(20px, 2vw, 24px);
   font-weight: 700;
-  line-height: 1.24;
-  letter-spacing: -.032em;
+  line-height: 1.28;
+  letter-spacing: -.025em;
   text-wrap: balance;
 }
 
@@ -410,12 +410,35 @@ a:focus-visible {
 .work-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: clamp(24px, 3vw, 34px);
-  row-gap: clamp(38px, 4vw, 50px);
+  column-gap: clamp(20px, 2.8vw, 32px);
+  row-gap: clamp(38px, 4vw, 52px);
 }
 
 .work-card {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-card + .work-card {
+  padding-left: clamp(16px, 1.6vw, 24px);
+  border-left: 1px solid var(--line);
+}
+
+.work-card-link,
+.work-card-content {
+  min-height: 304px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.work-card-link:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 6px;
 }
 
 .work-brand-title {
@@ -424,51 +447,31 @@ a:focus-visible {
 }
 
 .work-brand {
-  min-height: 82px;
   width: 100%;
+  height: 92px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+  justify-content: center;
   color: var(--ink);
-  text-decoration: none;
-}
-
-.work-brand-link .arrow {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 14px;
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 160ms ease, stroke 160ms ease;
-}
-
-.work-brand-link:hover .arrow,
-.work-brand-link:focus-visible .arrow {
-  stroke: var(--red);
-  transform: translate(2px, -2px);
 }
 
 .work-brand-image {
   width: auto;
-  max-width: calc(100% - 24px);
-  max-height: 58px;
   height: auto;
+  max-width: min(100%, 198px);
+  max-height: 58px;
   display: block;
   object-fit: contain;
-  object-position: left center;
+  object-position: center;
 }
 
-.work-brand-august { max-width: min(192px, calc(100% - 24px)); }
-.work-brand-humamap { max-width: min(174px, calc(100% - 24px)); }
+.work-brand-august { max-width: min(100%, 198px); }
+.work-brand-humamap { max-width: min(100%, 190px); }
 
 .blentera-word {
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
-  font-size: clamp(26px, 2.5vw, 31px);
+  font-size: clamp(24px, 2.35vw, 29px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -.025em;
@@ -476,15 +479,13 @@ a:focus-visible {
 
 .waymaking-logo {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
+  align-items: center;
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
 }
 
 .waymaking-word {
-  font-size: clamp(23px, 2.2vw, 28px);
+  font-size: clamp(22px, 2.2vw, 28px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -.035em;
@@ -500,10 +501,7 @@ a:focus-visible {
   left: 1px;
 }
 
-.waymaking-i {
-  position: relative;
-  display: inline-block;
-}
+.waymaking-i { position: relative; display: inline-block; }
 
 .waymaking-i::after {
   content: '';
@@ -518,16 +516,76 @@ a:focus-visible {
 }
 
 .work-card p {
-  margin: 14px 0 0;
+  margin: 18px 0 0;
   color: var(--copy);
   font-size: 15px;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
   overflow: hidden;
 }
+
+.work-cta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  align-self: flex-start;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: var(--ink);
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.work-cta-text {
+  position: relative;
+  padding-bottom: 4px;
+  white-space: nowrap;
+}
+
+.work-cta-text::after {
+  position: absolute;
+  content: '';
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 160ms ease;
+}
+
+.work-card-link:hover .work-cta-text::after,
+.work-card-link:focus-visible .work-cta-text::after {
+  transform: scaleX(1);
+}
+
+.work-cta-domain {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.work-cta .arrow {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 160ms ease;
+}
+
+.work-card-link:hover .work-cta .arrow,
+.work-card-link:focus-visible .work-cta .arrow { transform: translate(2px, -2px); }
 
 .values-section {
   padding-top: clamp(72px, 6.8vw, 92px);
@@ -1211,7 +1269,12 @@ a:focus-visible {
 
   .work-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px;
+    gap: 38px 30px;
+  }
+
+  .work-card:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
   }
 }
 
@@ -1260,9 +1323,7 @@ a:focus-visible {
     margin-left: 0;
   }
 
-  .work-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+
 }
 
 @media (max-width: 760px) {
@@ -1287,7 +1348,7 @@ a:focus-visible {
   }
 
   .hero-copy h1 {
-    font-size: clamp(42px, 11vw, 48px);
+    font-size: clamp(44px, 11.5vw, 52px);
   }
 
   .hero-copy > .hero-focus {
@@ -1378,12 +1439,23 @@ a:focus-visible {
 @media (max-width: 600px) {
   .work-grid {
     grid-template-columns: 1fr;
-    row-gap: 32px;
+    row-gap: 24px;
   }
 
   .work-card {
-    max-width: 460px;
+    max-width: 500px;
   }
+
+  .work-card + .work-card {
+    padding: 22px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .work-card-link,
+  .work-card-content { min-height: 0; }
+
+  .work-cta { margin-top: 20px; padding-top: 0; }
 }
 
 @media (max-width: 520px) {
