@@ -220,12 +220,18 @@ a:focus-visible {
 
 .hero-copy > .hero-focus {
   max-width: 400px;
+  color: var(--ink);
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
 }
 
 .hero-copy > .hero-role {
   margin-top: 20px;
   color: var(--ink);
-  font-size: clamp(16px, 1.35vw, 18px);
+  font-size: clamp(18px, calc(1.35vw + 2px), 20px);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -1285,6 +1291,10 @@ a:focus-visible {
 
   .hero-copy h1 {
     font-size: clamp(42px, 11vw, 48px);
+  }
+
+  .hero-copy > .hero-focus {
+    font-size: 18px;
   }
 
   .story-section {
