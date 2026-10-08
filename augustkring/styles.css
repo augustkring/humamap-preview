@@ -426,7 +426,7 @@ a:focus-visible {
 .work-grid {
   --work-gap: clamp(16px, 2.3vw, 26px);
   width: 100%; display: grid; grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 2 * var(--work-gap)) / 3);
+  grid-auto-columns: calc((100% - var(--work-gap) - var(--work-gap)) / 3);
   gap: var(--work-gap); overflow-x: auto; overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory; scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
@@ -440,12 +440,12 @@ a:focus-visible {
   scroll-snap-stop: always; background: #f8fafc; border-radius: 4px;
   transition: background-color 160ms ease;
 }
-.work-card--linked:hover { background: #f3f7fb; }
+.work-card--linked:hover, .work-card--linked:focus-within { background: #f3f7fb; }
 .work-card-link, .work-card-content {
   min-height: 0; width: 100%; flex: 1; display: flex; flex-direction: column;
   color: inherit; text-decoration: none;
 }
-.work-card-link:focus-visible { outline: 2px solid var(--red); outline-offset: 5px; }
+.work-card-link:focus-visible { outline: 2px solid var(--red); outline-offset: -4px; }
 .work-brand-title { margin: 0; font: inherit; }
 .work-brand {
   width: 100%; height: 92px; display: flex;
