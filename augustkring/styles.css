@@ -218,6 +218,10 @@ a:focus-visible {
   line-height: 1.60;
 }
 
+.hero-copy > .hero-focus {
+  max-width: 400px;
+}
+
 .hero-copy > .hero-role {
   margin-top: 20px;
   color: var(--ink);
