@@ -478,7 +478,7 @@ html.nav-open { overflow: hidden; }
 }
 .work-brand-image {
   display: block; width: auto; max-width: 100%; object-position: center;
-  object-fit: cover; filter: brightness(0) saturate(100%) invert(11%) sepia(20%) saturate(1800%) hue-rotate(177deg) brightness(90%) contrast(102%);
+  object-fit: contain; filter: brightness(0) saturate(100%) invert(11%) sepia(20%) saturate(1800%) hue-rotate(177deg) brightness(90%) contrast(102%);
 }
 .work-brand-august { width: min(100%, 262px); height: 42px; }
 .work-brand-humamap { width: min(100%, 194px); height: 41px; }
