@@ -1,14 +1,13 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next"
 
-import { siteConfig } from '@/config/site'
-import { getSiteUrl } from '@/lib/site-url'
+export const dynamic = "force-static"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: getSiteUrl(),
-      lastModified: siteConfig.lastUpdated,
-      changeFrequency: 'weekly',
+      url: "https://blentera.com",
+      lastModified: new Date("2026-10-09"),
+      changeFrequency: "weekly",
       priority: 1,
     },
   ]
