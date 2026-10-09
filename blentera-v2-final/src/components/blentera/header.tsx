@@ -29,7 +29,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-6">
-        <a href="#" className="flex shrink-0 items-center">
+        <a href="/" className="flex shrink-0 items-center">
           <span className="text-sm font-bold tracking-[0.16em]">BLENTERA</span>
         </a>
 
