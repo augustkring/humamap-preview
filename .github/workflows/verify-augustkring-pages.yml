@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-signature-v25"
+          expected="styles.css?v=20261009-authentic-signature-footer-v26"
           expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -48,8 +48,8 @@ jobs:
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
-          curl -fsSL --max-time 20 "${base}assets/august-signature.svg" -o /tmp/august-signature.svg
-          grep -Fq 'viewBox="0 0 335 314"' /tmp/august-signature.svg
+          curl -fsSL --max-time 20 "${base}assets/august-signature.svg?v=20261009-original-trace-v2" -o /tmp/august-signature.svg
+          grep -Fq 'viewBox="58 16 352 331"' /tmp/august-signature.svg
           echo "Public HTML and CSS contain the approved content and responsive width rules."
 
       - name: Check hero text rendering in desktop and mobile Chrome
@@ -115,9 +115,26 @@ jobs:
                 console.log('Signature rendering',width,signature);
                 assert.equal(signature.heading,'Current focus');
                 assert.ok(signature.naturalWidth > 0,'Original handwritten signature loaded');
-                assert.ok(signature.width >= 110 && signature.width <= 140,'Understated signature dimensions');
-                assert.ok(signature.opacity <= .7,'Subtle signature opacity');
+                assert.ok(signature.width >= 140 && signature.width <= 162,'Faithful signature has legible dimensions');
+                assert.ok(signature.opacity >= .72 && signature.opacity <= .84,'Signature is appropriately subtle');
                 assert.equal(signature.horizontalOverflow,false,'No horizontal overflow around sign-off');
+                const footer=await page.evaluate(() => {
+                  const footer=document.querySelector('.home-footer');
+                  const primary=document.querySelector('.footer-primary');
+                  const secondary=document.querySelector('.footer-secondary');
+                  const computed=getComputedStyle(footer);
+                  return {
+                    topRule:parseFloat(computed.borderTopWidth),
+                    middleRule:parseFloat(getComputedStyle(primary).borderBottomWidth),
+                    footerWidth:footer.getBoundingClientRect().width,
+                    legalVisible:secondary.getBoundingClientRect().height>0,
+                    navLinks:[...document.querySelectorAll('.footer-links a')].length
+                  };
+                });
+                console.log('Footer rendering',width,footer);
+                assert.equal(footer.topRule,1,'Footer has a single upper rule');
+                assert.equal(footer.middleRule,0,'Footer has no second internal rule');
+                assert.ok(footer.legalVisible && footer.navLinks>=3,'Footer links and copyright are visible');
                 await page.close();
               }
             } finally {await browser.close();}
