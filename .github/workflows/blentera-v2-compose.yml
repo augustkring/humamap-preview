@@ -1,0 +1,127 @@
+name: Compose BLENTERA V2 From OSS
+
+on:
+  push:
+    branches:
+      - blentera-v2-oss-source
+    paths:
+      - ".github/workflows/blentera-v2-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compose from exact open-source sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf blentera-v2-final
+          cp -a blentera-v2-source/saas-landing-2 blentera-v2-final
+          rm -rf blentera-v2-final/.next blentera-v2-final/node_modules
+
+          mkdir -p blentera-v2-final/src/components/blentera
+
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/header.tsx blentera-v2-final/src/components/blentera/header.tsx
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/hero.tsx blentera-v2-final/src/components/blentera/hero.tsx
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/pricing.tsx blentera-v2-final/src/components/blentera/pricing.tsx
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/faqs.tsx blentera-v2-final/src/components/blentera/faqs.tsx
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/cta.tsx blentera-v2-final/src/components/blentera/cta.tsx
+          cp blentera-v2-source/saas-landing/src/components/saas-landing/footer.tsx blentera-v2-final/src/components/blentera/footer.tsx
+
+          cp blentera-v2-source/saas-landing-2/src/components/saas-landing-2/features.tsx blentera-v2-final/src/components/blentera/features.tsx
+          cp blentera-v2-source/saas-landing-2/src/components/saas-landing-2/how-it-works.tsx blentera-v2-final/src/components/blentera/how-it-works.tsx
+          cp blentera-v2-source/saas-landing-2/src/components/saas-landing-2/comparison.tsx blentera-v2-final/src/components/blentera/comparison.tsx
+
+          cat > blentera-v2-final/src/components/blentera/page.tsx <<'EOF'
+          import { Toaster } from "@/components/ui/sonner"
+          import Comparison from "@/components/blentera/comparison"
+          import Cta from "@/components/blentera/cta"
+          import Faqs from "@/components/blentera/faqs"
+          import Features from "@/components/blentera/features"
+          import Footer from "@/components/blentera/footer"
+          import Header from "@/components/blentera/header"
+          import Hero from "@/components/blentera/hero"
+          import HowItWorks from "@/components/blentera/how-it-works"
+          import Pricing from "@/components/blentera/pricing"
+
+          export default function BlenteraPage() {
+            return (
+              <div className="flex min-h-svh w-full flex-col bg-background text-foreground">
+                <Toaster />
+                <Header />
+                <main className="flex w-full flex-col">
+                  <Hero />
+                  <Features />
+                  <HowItWorks />
+                  <Comparison />
+                  <Pricing />
+                  <Faqs />
+                  <Cta />
+                </main>
+                <div className="border-t border-border/50">
+                  <Footer />
+                </div>
+              </div>
+            )
+          }
+          EOF
+
+          cat > blentera-v2-final/src/app/page.tsx <<'EOF'
+          export { default } from "@/components/blentera/page"
+          EOF
+
+          cat > blentera-v2-final/src/app/layout.tsx <<'EOF'
+          import { Geist, Geist_Mono } from "next/font/google"
+
+          import "./globals.css"
+          import { ThemeProvider } from "@/components/theme-provider"
+          import { cn } from "@/lib/utils"
+
+          const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
+          const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
+
+          export const metadata = {
+            title: "BLENTERA — Company AI foundation",
+            description:
+              "BLENTERA keeps company knowledge, work, governance and learning usable across people, agents, models and tools.",
+          }
+
+          export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+            return (
+              <html lang="en" suppressHydrationWarning className={cn("antialiased font-sans", geist.variable, mono.variable)}>
+                <body>
+                  <ThemeProvider>
+                    <a href="#main" className="sr-only rounded-md bg-background text-sm font-medium shadow-md ring-2 ring-ring focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-3 focus:py-2">
+                      Skip to content
+                    </a>
+                    <div id="main">{children}</div>
+                  </ThemeProvider>
+                </body>
+              </html>
+            )
+          }
+          EOF
+
+      - name: Build composed OSS site
+        working-directory: blentera-v2-final
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.1 --activate
+          pnpm install
+          pnpm build
+
+      - name: Commit composed source
+        run: |
+          git config user.name "BLENTERA OSS Composer"
+          git config user.email "actions@github.com"
+          git add blentera-v2-final
+          git commit -m "build: compose BLENTERA v2 from exact OSS blocks" || exit 0
+          git push origin HEAD:blentera-v2-oss-source
