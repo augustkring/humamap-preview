@@ -174,7 +174,7 @@ a:focus-visible {
 .mobile-navigation { display: none; margin-left: auto; }
 .mobile-menu-toggle, .mobile-menu-close { width: 52px; height: 52px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 4px; appearance: none; -webkit-appearance: none; background: transparent; color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .mobile-menu-toggle:focus, .mobile-menu-close:focus { outline: 0; box-shadow: none; }
-.mobile-menu-toggle:focus-visible, .mobile-menu-close:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.mobile-menu-toggle:focus-visible, .mobile-menu-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .mobile-menu-toggle svg { width: 30px; height: 30px; }
 .mobile-menu-close svg { width: 28px; height: 28px; }
 .mobile-menu-toggle svg, .mobile-menu-close svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -184,12 +184,13 @@ a:focus-visible {
   border: 0; border-radius: 0; background: var(--page); color: var(--ink);
   overflow: hidden; overscroll-behavior: contain;
 }
+.mobile-menu-dialog:focus { outline: none; }
 .mobile-menu-dialog:not([open]) { display: none; }
 .mobile-menu-dialog[open] { display: block; }
 .mobile-menu-dialog::backdrop { background: rgba(11, 34, 61, .12); }
 .mobile-menu-inner {
   width: min(calc(100% - (var(--gutter) * 2)), var(--max)); height: 100vh; height: 100dvh;
-  margin: auto; padding: max(14px, env(safe-area-inset-top)) 0 max(26px, env(safe-area-inset-bottom));
+  margin: auto; padding: max(10px, env(safe-area-inset-top)) 0 max(26px, env(safe-area-inset-bottom));
   display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
@@ -202,7 +203,10 @@ a:focus-visible {
 }
 .mobile-navigation-panel a:hover, .mobile-navigation-panel a:focus-visible,
 .mobile-navigation-panel a[aria-current="page"] { color: var(--red); }
-html.nav-open { overflow: hidden; overscroll-behavior: none; }
+@media (max-width: 840px) {
+  html { scrollbar-gutter: stable; }
+  html.nav-open { overflow: hidden; overscroll-behavior: none; }
+}
 
 .home-main {
   min-height: 70vh;
@@ -543,8 +547,17 @@ html.nav-open { overflow: hidden; overscroll-behavior: none; }
   opacity: .72;
 }
 
-.personal-signoff .signoff-name {
+.personal-signoff .signoff-signature {
+  display: block;
+  width: clamp(108px, 10vw, 122px);
+  max-width: 100%;
+  height: auto;
   margin-top: 12px;
+  opacity: 1;
+}
+
+.personal-signoff .signoff-name {
+  margin-top: 7px;
   color: var(--ink);
   font-family: 'AKFigtree', Arial, sans-serif;
   font-size: clamp(17px, 1.7vw, 19px);
