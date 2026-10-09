@@ -1,0 +1,106 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "jsPlugins": ["@shadcn/lint"],
+  "plugins": [
+    "import",
+    "jsx-a11y",
+    "nextjs",
+    "oxc",
+    "promise",
+    "react",
+    "typescript",
+    "unicorn",
+    "vitest"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "categories": {
+    "correctness": "error",
+    "perf": "warn",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }
+    ],
+    "typescript/no-explicit-any": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "react/jsx-key": "error",
+    "react/no-array-index-key": "warn",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": "off",
+    "unicorn/prefer-node-protocol": "error",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "shadcn/no-restyle": "error",
+    "shadcn/no-raw-colors": "error",
+    "shadcn/no-arbitrary-values": "error",
+    "shadcn/no-unknown-classes": "error",
+    "shadcn/require-static-classes": "error",
+    "shadcn/no-inline-styles": "error",
+    "import/no-named-as-default-member": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/components/blocks/**"],
+      "rules": {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-raw-colors": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/require-static-classes": "off",
+        "shadcn/no-inline-styles": "off",
+        "react/only-export-components": "off",
+        "react/no-array-index-key": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+        "jsx-a11y/control-has-associated-label": "off"
+      }
+    },
+    {
+      "files": ["src/components/icons.tsx"],
+      "rules": {
+        "shadcn/no-raw-colors": "off"
+      }
+    },
+    {
+      "files": ["src/app/**"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    },
+    {
+      "files": ["src/lib/og.tsx"],
+      "rules": {
+        "shadcn/no-inline-styles": "off",
+        "shadcn/no-raw-colors": "off",
+        "nextjs/no-img-element": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    ".next/**",
+    "next-env.d.ts",
+    "src/components/ui/**",
+    ".claude/skills/**",
+    ".agents/skills/**"
+  ]
+}

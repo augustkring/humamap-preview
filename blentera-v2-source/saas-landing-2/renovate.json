@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScopeDisabled"
+  ],
+  "schedule": ["before 6am"],
+  "minimumReleaseAge": "1 day",
+  "rangeStrategy": "bump",
+  "automergeStrategy": "squash",
+  "packageRules": [
+    {
+      "description": "Group stable minor and patch updates into one PR that merges once CI passes",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "groupName": "non-major dependencies",
+      "groupSlug": "non-major",
+      "automerge": true
+    },
+    {
+      "description": "Keep the Node types on the Node major the project targets",
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "<25"
+    },
+    {
+      "description": "Hold the shadcn CLI until its transitive braces vulnerability has an upstream fix",
+      "matchPackageNames": ["shadcn"],
+      "enabled": false
+    },
+    {
+      "description": "Keep the Node and pnpm versions in engines, packageManager and CI, raised by hand",
+      "matchDepNames": ["node", "pnpm"],
+      "enabled": false
+    }
+  ]
+}

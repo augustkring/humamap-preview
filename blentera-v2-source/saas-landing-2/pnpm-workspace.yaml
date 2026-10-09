@@ -1,0 +1,7 @@
+packages: []
+
+allowBuilds:
+  # Hooks install through the prepare script instead.
+  lefthook: false
+  # Next optimises images with it.
+  sharp: true
