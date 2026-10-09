@@ -498,8 +498,7 @@ html.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 .work-card p {
   margin: 18px 0 0; color: var(--copy); font-size: var(--venture-copy-size); line-height: 1.5;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
-  line-clamp: 6; overflow: hidden;
+  overflow-wrap: break-word;
 }
 .work-cta {
   display: inline-flex; flex-wrap: wrap; align-items: center; align-self: flex-start;
