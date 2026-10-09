@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-working-links-v24"
+          expected="styles.css?v=20261009-signature-v25"
           expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -41,10 +41,15 @@ jobs:
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Send email</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
+          grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
+          grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
+          ! grep -Fq '<p class="signoff-name">August</p>' /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
+          curl -fsSL --max-time 20 "${base}assets/august-signature.svg" -o /tmp/august-signature.svg
+          grep -Fq 'viewBox="0 0 335 314"' /tmp/august-signature.svg
           echo "Public HTML and CSS contain the approved content and responsive width rules."
 
       - name: Check hero text rendering in desktop and mobile Chrome
@@ -92,6 +97,27 @@ jobs:
                 assert.equal(metrics.horizontalOverflow,false,'No horizontal viewport overflow');
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
+                await page.locator('.signoff-signature').scrollIntoViewIfNeeded();
+                await page.waitForFunction(() => {
+                  const img = document.querySelector('.signoff-signature');
+                  return img && img.complete && img.naturalWidth > 0;
+                }, {timeout: 12000});
+                const signature = await page.evaluate(() => {
+                  const img = document.querySelector('.signoff-signature');
+                  return {
+                    heading: document.querySelector('#work-title').textContent.trim(),
+                    width: img.getBoundingClientRect().width,
+                    opacity: parseFloat(getComputedStyle(img).opacity),
+                    naturalWidth: img.naturalWidth,
+                    horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1
+                  };
+                });
+                console.log('Signature rendering',width,signature);
+                assert.equal(signature.heading,'Current focus');
+                assert.ok(signature.naturalWidth > 0,'Original handwritten signature loaded');
+                assert.ok(signature.width >= 110 && signature.width <= 140,'Understated signature dimensions');
+                assert.ok(signature.opacity <= .7,'Subtle signature opacity');
+                assert.equal(signature.horizontalOverflow,false,'No horizontal overflow around sign-off');
                 await page.close();
               }
             } finally {await browser.close();}
