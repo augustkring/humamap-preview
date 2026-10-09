@@ -30,12 +30,12 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-reading-v33"
+          expected="styles.css?v=20261009-story-v34"
           expected_copy="Taking ideas to market by shaping business models, validating demand with customers and building the first viable product."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "I've always been curious about how businesses evolve, technology advances and people grow." /tmp/augustkring.html && grep -Fq "It became my own kind of business school" /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve." /tmp/augustkring.html && grep -Fq "taking responsibility for daily operations, customers and a team of around ten people." /tmp/augustkring.html; then
               echo "Approved About, profile copy and stylesheet version are published."
               break
             fi
@@ -61,8 +61,10 @@ jobs:
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
           grep -Fq 'width: clamp(136px, 12.5vw, 156px);' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}assets/august-signature-refined-4x.png?v=20261009-ink-refined-v1" -o /tmp/august-signature.png
-          file /tmp/august-signature.png | grep -Fq 'PNG image data, 1040 x 980'
+          curl -fsSL --max-time 20 "${base}assets/august-signature-vector-fine.svg?v=20261009-fine-ink-v1" -o /tmp/august-signature.svg
+          grep -Fq 'viewBox="0 0 340 314"' /tmp/august-signature.svg
+          grep -Fq '<path d=' /tmp/august-signature.svg
+          ! grep -Eq '<(script|image|foreignObject)' /tmp/august-signature.svg
           curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-input-focus-v4" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
           ! grep -Fq 'document.body.style.position' /tmp/augustkring-mobile-nav.js
@@ -132,6 +134,8 @@ jobs:
                     marketCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
                     workHeading: document.querySelector('#work-title').textContent.trim(),
                     storyHeading: document.querySelector('#about-title').textContent.trim(),
+                    storyIntro: document.querySelector('.values-lead > p').textContent.trim(),
+                    storyCopy: [...document.querySelectorAll('.values-copy > p')].map(el=>el.textContent.trim()),
                     statementTypeface: getComputedStyle(statement).fontFamily,
                     statementWeight: getComputedStyle(statement).fontWeight,
                     perspectiveSpacing: parseFloat(getComputedStyle(perspectivesBlock).marginTop),
@@ -145,6 +149,10 @@ jobs:
                 assert.equal(editorial.marketCopy,'Taking ideas to market by shaping business models, validating demand with customers and building the first viable product. That’s how my creative thinking, strategic judgement and drive to build come together.');
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.storyHeading,'My story');
+                assert.equal(editorial.storyIntro,"Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve.");
+                assert.equal(editorial.storyCopy.length,2);
+                assert.ok(editorial.storyCopy[0].includes('VR arcade in Copenhagen') && editorial.storyCopy[0].includes('around ten people'));
+                assert.ok(editorial.storyCopy[1].includes('Blentera, August Works and HumaMap'));
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
@@ -167,7 +175,7 @@ jobs:
                     salutation: salutation.textContent.trim(),
                     heading: document.querySelector('#work-title').textContent.trim(),
                     nameVisible: nameBox.height > 0 && nameBox.width > 0,
-                    signatureLoaded: signature.complete && signature.naturalWidth === 1040 && signature.naturalHeight === 980,
+                    signatureLoaded: signature.complete && signature.naturalWidth === 340 && signature.naturalHeight === 314,
                     signatureAlt: signature.alt,
                     signatureWidth: sigBox.width,
                     imageBeforeName: sigBox.bottom < nameBox.top,
@@ -290,6 +298,42 @@ jobs:
                 assert.equal(footer.topRule,1,'Footer has a single upper rule');
                 assert.equal(footer.middleRule,0,'Footer has no second internal rule');
                 assert.ok(footer.legalVisible && footer.navLinks>=3,'Footer links and copyright are visible');
+
+                await page.goto('https://augustkring.github.io/humamap-preview/augustkring/about/',{waitUntil:'networkidle',timeout:45000});
+                await page.evaluate(() => document.fonts.ready);
+                const aboutProof = await page.evaluate(() => {
+                  const hero=document.querySelector('.about-personal-hero');
+                  const story=document.querySelector('#story');
+                  const skills=document.querySelector('#skills');
+                  const paragraphs=[...document.querySelectorAll('#story .about-story-content p')];
+                  const externalLinks=[...document.querySelectorAll('#story .about-story-content p a')].map(a=>({text:a.textContent.trim(),href:a.href}));
+                  const style=getComputedStyle(paragraphs[0]);
+                  return {
+                    heading:document.querySelector('#story-title')?.textContent.trim(),
+                    subtitle:document.querySelector('.about-story-intro > p')?.textContent.trim(),
+                    paragraphCount:paragraphs.length,
+                    curiosity:paragraphs[0]?.textContent.includes('primary school'),
+                    earlyResponsibility:paragraphs[1]?.textContent.includes('team of around ten people'),
+                    subsequentWork:paragraphs[2]?.textContent.includes('venture building'),
+                    currentWork:paragraphs[3]?.textContent.includes('Blentera'),
+                    storyTop:story?.getBoundingClientRect().top + scrollY,
+                    skillsTop:skills?.getBoundingClientRect().top + scrollY,
+                    heroBottom:hero?.getBoundingClientRect().bottom + scrollY,
+                    fontSize:parseFloat(style.fontSize),
+                    externalLinks,bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
+                  };
+                });
+                console.log('About chronology and concrete proof',width,aboutProof);
+                assert.equal(aboutProof.heading,'The story so far.');
+                assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
+                assert.equal(aboutProof.paragraphCount,5);
+                assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.subsequentWork && aboutProof.currentWork);
+                assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
+                assert.deepEqual(aboutProof.externalLinks.map(x=>x.text),['Blentera','August Works','HumaMap']);
+                assert.ok(aboutProof.externalLinks.every(x=>x.href.startsWith('https://')));
+                assert.ok(Math.abs(aboutProof.fontSize-(width<=760?17:18))<.1);
+                assert.equal(aboutProof.bodyOverflow,false);
+                if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
                 await page.close();
               }
             } finally {await browser.close();}
@@ -383,5 +427,6 @@ jobs:
             /tmp/ak-browser-check/perspectives-*.png
             /tmp/ak-browser-check/focus-heading-*.png
             /tmp/ak-browser-check/typography-*.png
+            /tmp/ak-browser-check/about-story-*.png
           if-no-files-found: warn
           retention-days: 7
