@@ -1,4 +1,5 @@
 name: BLENTERA V2 Preview
+# Rebuild after audited lockfile refresh
 
 on:
   push:
