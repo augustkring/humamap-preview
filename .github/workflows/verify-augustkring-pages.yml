@@ -1,0 +1,40 @@
+name: Verify August Kring GitHub Pages
+
+on:
+  push:
+    paths:
+      - ".github/workflows/verify-augustkring-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify real public HTML, CSS and logo
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://augustkring.github.io/humamap-preview/augustkring/"
+          for attempt in $(seq 1 18); do
+            status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
+            echo "Attempt ${attempt}: homepage HTTP ${status}"
+            if [ "$status" = "200" ] && grep -q "I do my best work in the early stages" /tmp/augustkring.html; then
+              echo "Public homepage contains the approved text."
+              break
+            fi
+            if [ "$attempt" = "18" ]; then
+              echo "::error::Public Pages homepage did not serve approved text"
+              exit 1
+            fi
+            sleep 10
+          done
+          for asset in "styles.css?v=20261009-venture-fulltext-v21" "assets/blentera-horizontal-color.svg"; do
+            status="$(curl -sSL --max-time 15 -o /dev/null -w '%{http_code}' "${base}${asset}" || true)"
+            echo "Asset ${asset}: HTTP ${status}"
+            [ "$status" = "200" ] || { echo "::error::Missing public asset ${asset}"; exit 1; }
+          done
+          echo "PUBLIC_PREVIEW_OK: ${base}"
