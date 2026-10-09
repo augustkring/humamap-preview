@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-mobile-focus-hero-v30"
+          expected="styles.css?v=20261009-focus-signature-v31"
           expected_copy="Taking ideas to market by shaping business models, validating demand with customers and building the first viable product."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -60,7 +60,8 @@ jobs:
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}assets/august-signature-smooth-4x.png?v=20261009-smoothed-v1" -o /tmp/august-signature.png
+          grep -Fq 'width: clamp(136px, 12.5vw, 156px);' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}assets/august-signature-refined-4x.png?v=20261009-ink-refined-v1" -o /tmp/august-signature.png
           file /tmp/august-signature.png | grep -Fq 'PNG image data, 1040 x 980'
           curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-input-focus-v4" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
@@ -182,7 +183,7 @@ jobs:
                 assert.equal(signoff.nameVisible, true);
                 assert.equal(signoff.signatureLoaded, true);
                 assert.equal(signoff.signatureAlt, 'Handwritten signature of August Kring');
-                assert.ok(signoff.signatureWidth >= 107 && signoff.signatureWidth <= 123);
+                assert.ok(signoff.signatureWidth >= 135 && signoff.signatureWidth <= 157,'Signature is large enough to make original fine strokes legible');
                 assert.ok(signoff.fontSize >= 17 && signoff.fontSize <= 19);
                 assert.ok(signoff.imageBeforeName && signoff.insideContent);
                 assert.equal(signoff.horizontalOverflow, false);
