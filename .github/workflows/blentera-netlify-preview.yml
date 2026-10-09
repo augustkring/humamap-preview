@@ -54,6 +54,7 @@ jobs:
             --dir=blentera-host/site/out \
             --no-build \
             --allow-anonymous \
+            --created-via blentera-preview \
             --json | tee /tmp/netlify-deploy.json
 
           node <<'NODE' >> "$GITHUB_OUTPUT"
@@ -72,6 +73,7 @@ jobs:
             console.error("No Netlify preview URL found");
             process.exit(1);
           }
+          url = url.replace(/^http:\/\//, "https://");
           console.log("preview_url=" + url);
           console.error("BLENTERA_PREVIEW_URL=" + url);
           NODE
