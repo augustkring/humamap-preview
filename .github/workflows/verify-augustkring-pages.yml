@@ -51,7 +51,7 @@ jobs:
           grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
-          grep -Fq 'src="mobile-nav.js?v=20261009-stable-v2"' /tmp/augustkring.html
+          grep -Fq 'src="mobile-nav.js?v=20261009-stable-v3"' /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
@@ -61,13 +61,13 @@ jobs:
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/august-signature-authentic.png?v=20261009-signature-both-v6" -o /tmp/august-signature.png
           file /tmp/august-signature.png | grep -Fq 'PNG image data, 260 x 245'
-          curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-stable-v2" -o /tmp/augustkring-mobile-nav.js
+          curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-stable-v3" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
           ! grep -Fq 'document.body.style.position' /tmp/augustkring-mobile-nav.js
           for route in about/ perspectives/ perspectives/rethinking-the-company/ perspectives/europe-at-a-crossroads/ privacy/ unsubscribe/; do
             curl -fsSL --max-time 20 "${base}${route}" -o /tmp/augustkring-subpage.html
             grep -Fq "$expected" /tmp/augustkring-subpage.html
-            grep -Fq 'src="mobile-nav.js?v=20261009-stable-v2"' /tmp/augustkring-subpage.html
+            grep -Fq 'src="mobile-nav.js?v=20261009-stable-v3"' /tmp/augustkring-subpage.html
           done
           echo "Published hero, signature+name, shared mobile menu and CSS are consistent across pages."
 
@@ -194,7 +194,7 @@ jobs:
                   await page.waitForTimeout(60);
                   assert.ok(Math.abs((await page.evaluate(() => scrollY))-before.scrollY)<1.1,'Background stays locked while menu is open');
                   await page.locator('[data-mobile-nav-close]').click();
-                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open && document.querySelector('[data-mobile-nav-open]').getAttribute('aria-expanded') === 'false');
                   assert.equal(await page.locator('[data-mobile-nav-open]').getAttribute('aria-expanded'),'false');
                   assert.ok(Math.abs((await page.evaluate(() => scrollY))-before.scrollY)<1.1,'Closing does not jump page');
 
@@ -210,7 +210,7 @@ jobs:
                   assert.equal(focus.outline,'solid','Keyboard control retains a visible focus indicator');
                   assert.notEqual(focus.color,'rgb(218, 56, 49)','Close focus ring is not red');
                   await page.keyboard.press('Escape');
-                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open && document.querySelector('[data-mobile-nav-open]').getAttribute('aria-expanded') === 'false');
                   assert.equal(await page.locator('[data-mobile-nav-open]').getAttribute('aria-expanded'),'false');
                   assert.equal(await page.locator('[data-mobile-nav-open]').evaluate(el => document.activeElement===el),true,'Focus returns to opener on Escape');
 
@@ -222,7 +222,7 @@ jobs:
                   assert.equal(await page.locator('#mobile-menu').evaluate(el => el.open),true);
                   assert.ok(Math.abs((await page.evaluate(() => scrollY))-middleBefore)<1.1,'Opening at prior scroll position must not jump');
                   await page.keyboard.press('Escape');
-                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open && document.querySelector('[data-mobile-nav-open]').getAttribute('aria-expanded') === 'false');
                   assert.ok(Math.abs((await page.evaluate(() => scrollY))-middleBefore)<1.1,'Closing restores the same scroll position');
                 } else {
                   assert.equal(await page.locator('[data-mobile-nav-open]').isVisible(),false);
