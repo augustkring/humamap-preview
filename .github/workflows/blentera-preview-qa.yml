@@ -1,0 +1,117 @@
+name: BLENTERA Preview QA
+
+on:
+  push:
+    branches:
+      - blentera-preview-host
+    paths:
+      - ".github/workflows/blentera-preview-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SITE_URL: "https://blentera-preview.lavish-grape.workers.dev"
+    steps:
+      - name: Route and asset smoke tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in / /product /control /pricing /robots.txt /sitemap.xml /manifest.webmanifest /favicon.svg; do
+            code=$(curl -sS -L --retry 4 --retry-delay 2 -o /tmp/body -w "%{http_code}" "$SITE_URL$path")
+            echo "$path -> $code"
+            test "$code" = "200"
+          done
+          curl -fsSL "$SITE_URL/" | grep -q "Build your company"
+          curl -fsSL "$SITE_URL/product" | grep -q "The company layer beneath changing AI technology"
+          curl -fsSL "$SITE_URL/control" | grep -q "Let AI act without making AI the authority"
+          curl -fsSL "$SITE_URL/pricing" | grep -q "Start with the foundation"
+
+      - name: Security and preview headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers=$(curl -fsSI "$SITE_URL/")
+          echo "$headers"
+          echo "$headers" | grep -qi "x-robots-tag: noindex, nofollow"
+          echo "$headers" | grep -qi "x-content-type-options: nosniff"
+          echo "$headers" | grep -qi "referrer-policy: strict-origin-when-cross-origin"
+
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/blentera-qa
+          cd /tmp/blentera-qa
+          npm init -y >/dev/null
+          npm install playwright@1.56.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Browser QA desktop and mobile
+        shell: bash
+        run: |
+          cat > /tmp/blentera-qa/qa.mjs <<'EOF'
+          import { chromium } from "playwright";
+
+          const base = process.env.SITE_URL;
+          const browser = await chromium.launch();
+          const failures = [];
+
+          async function checkPage(path, viewport, label) {
+            const page = await browser.newPage({ viewportSize: viewport });
+            const consoleErrors = [];
+            const pageErrors = [];
+            page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
+            page.on("pageerror", e => pageErrors.push(String(e)));
+
+            const response = await page.goto(base + path, { waitUntil: "networkidle" });
+            if (!response || response.status() !== 200) failures.push(label + " status " + (response?.status() ?? "none"));
+
+            const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+            if (overflow) failures.push(label + " horizontal overflow");
+
+            const title = await page.title();
+            if (!title.includes("BLENTERA")) failures.push(label + " title missing BLENTERA");
+
+            if (consoleErrors.length) failures.push(label + " console errors: " + consoleErrors.join(" | "));
+            if (pageErrors.length) failures.push(label + " page errors: " + pageErrors.join(" | "));
+
+            await page.close();
+          }
+
+          for (const path of ["/", "/product", "/control", "/pricing"]) {
+            await checkPage(path, { width: 1440, height: 1000 }, "desktop " + path);
+            await checkPage(path, { width: 390, height: 844 }, "mobile " + path);
+          }
+
+          const home = await browser.newPage({ viewportSize: { width: 1440, height: 1000 } });
+          await home.goto(base + "/", { waitUntil: "networkidle" });
+          const workTab = home.getByRole("button", { name: /Work & organisation/i });
+          await workTab.click();
+          await home.getByText("How people and AI coordinate real work.").waitFor({ state: "visible" });
+          const faq = home.locator("details").first();
+          await faq.locator("summary").click();
+          if (!(await faq.getAttribute("open")) && !(await faq.evaluate(el => el.hasAttribute("open")))) failures.push("FAQ did not open");
+          await home.close();
+
+          const mobile = await browser.newPage({ viewportSize: { width: 390, height: 844 } });
+          await mobile.goto(base + "/", { waitUntil: "networkidle" });
+          await mobile.getByText("Menu", { exact: true }).click();
+          const productLink = mobile.getByRole("link", { name: "Product", exact: true }).first();
+          if (!(await productLink.isVisible())) failures.push("Mobile menu Product link not visible");
+          await mobile.close();
+
+          await browser.close();
+
+          if (failures.length) {
+            console.error("QA FAILURES");
+            for (const failure of failures) console.error("- " + failure);
+            process.exit(1);
+          }
+          console.log("Browser QA passed: 4 routes × desktop/mobile, hydration, product tabs, FAQ, mobile menu, overflow, titles, console/page errors.");
+          EOF
+          cd /tmp/blentera-qa
+          node qa.mjs
