@@ -1,0 +1,184 @@
+name: BLENTERA Netlify Preview
+
+on:
+  push:
+    branches:
+      - blentera-preview-host
+    paths:
+      - ".github/workflows/blentera-netlify-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install exact website dependencies
+        working-directory: blentera-host/site
+        run: npm install
+
+      - name: Production dependency audit
+        working-directory: blentera-host/site
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Typecheck
+        working-directory: blentera-host/site
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: blentera-host/site
+        run: npm run lint
+
+      - name: Production build
+        working-directory: blentera-host/site
+        run: npm run build
+
+      - name: Anonymous Netlify preview deploy
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes netlify-cli@latest deploy \
+            --dir=blentera-host/site/out \
+            --no-build \
+            --allow-anonymous \
+            --json | tee /tmp/netlify-deploy.json
+
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require("fs");
+          const raw = fs.readFileSync("/tmp/netlify-deploy.json", "utf8");
+          let url = "";
+          try {
+            const data = JSON.parse(raw);
+            url = data.deploy_url || data.url || data.ssl_url || data.site_url || "";
+          } catch {}
+          if (!url) {
+            const matches = raw.match(/https:\/\/[^\s"'<>]+\.netlify\.app[^\s"'<>]*/g) || [];
+            url = matches[0] || "";
+          }
+          if (!url) {
+            console.error("No Netlify preview URL found");
+            process.exit(1);
+          }
+          console.log("preview_url=" + url);
+          console.error("BLENTERA_PREVIEW_URL=" + url);
+          NODE
+
+      - name: Route and content smoke tests
+        env:
+          SITE_URL: ${{ steps.deploy.outputs.preview_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Testing $SITE_URL"
+          for path in / /product /control /pricing /robots.txt /sitemap.xml /manifest.webmanifest /favicon.svg; do
+            code=$(curl -sS -L --retry 4 --retry-delay 2 -o /tmp/body -w "%{http_code}" "$SITE_URL$path")
+            echo "$path -> $code"
+            test "$code" = "200"
+          done
+          curl -fsSL "$SITE_URL/" | grep -q "Build your company"
+          curl -fsSL "$SITE_URL/product" | grep -q "The company layer beneath changing AI technology"
+          curl -fsSL "$SITE_URL/control" | grep -q "Let AI act without making AI the authority"
+          curl -fsSL "$SITE_URL/pricing" | grep -q "Start with the foundation"
+
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/blentera-qa
+          cd /tmp/blentera-qa
+          npm init -y >/dev/null
+          npm install playwright@1.56.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Browser QA desktop and mobile
+        env:
+          SITE_URL: ${{ steps.deploy.outputs.preview_url }}
+        shell: bash
+        run: |
+          cat > /tmp/blentera-qa/qa.mjs <<'EOF'
+          import { chromium } from "playwright";
+
+          const base = process.env.SITE_URL;
+          const browser = await chromium.launch();
+          const failures = [];
+
+          async function checkPage(path, viewport, label) {
+            const page = await browser.newPage({ viewportSize: viewport });
+            const consoleErrors = [];
+            const pageErrors = [];
+            page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
+            page.on("pageerror", e => pageErrors.push(String(e)));
+
+            const response = await page.goto(base + path, { waitUntil: "networkidle" });
+            if (!response || response.status() !== 200) failures.push(label + " status " + (response?.status() ?? "none"));
+
+            const state = await page.evaluate(() => ({
+              overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+              h1s: document.querySelectorAll("h1").length,
+              title: document.title,
+            }));
+            if (state.overflow) failures.push(label + " horizontal overflow");
+            if (state.h1s !== 1) failures.push(label + " expected one h1, got " + state.h1s);
+            if (!state.title.includes("BLENTERA")) failures.push(label + " title missing BLENTERA");
+            if (consoleErrors.length) failures.push(label + " console errors: " + consoleErrors.join(" | "));
+            if (pageErrors.length) failures.push(label + " page errors: " + pageErrors.join(" | "));
+
+            await page.close();
+          }
+
+          for (const path of ["/", "/product", "/control", "/pricing"]) {
+            await checkPage(path, { width: 1440, height: 1000 }, "desktop " + path);
+            await checkPage(path, { width: 390, height: 844 }, "mobile " + path);
+          }
+
+          const home = await browser.newPage({ viewportSize: { width: 1440, height: 1000 } });
+          await home.goto(base + "/", { waitUntil: "networkidle" });
+
+          const workTab = home.getByRole("button", { name: /Work & organisation/i });
+          await workTab.click();
+          await home.getByText("How people and AI coordinate real work.").waitFor({ state: "visible" });
+
+          const faq = home.locator("details").first();
+          await faq.locator("summary").click();
+          if (!(await faq.evaluate(el => el.hasAttribute("open")))) failures.push("FAQ did not open");
+
+          const earlyAccess = home.getByRole("link", { name: "Join early access", exact: true }).first();
+          if (!(await earlyAccess.isVisible())) failures.push("Primary CTA not visible");
+          await home.close();
+
+          const mobile = await browser.newPage({ viewportSize: { width: 390, height: 844 } });
+          await mobile.goto(base + "/", { waitUntil: "networkidle" });
+          await mobile.getByText("Menu", { exact: true }).click();
+          const productLink = mobile.getByRole("link", { name: "Product", exact: true }).first();
+          if (!(await productLink.isVisible())) failures.push("Mobile menu Product link not visible");
+          await mobile.close();
+
+          await browser.close();
+
+          if (failures.length) {
+            console.error("QA FAILURES");
+            for (const failure of failures) console.error("- " + failure);
+            process.exit(1);
+          }
+
+          console.log("Browser QA passed: 4 routes × desktop/mobile; no overflow; one h1; no console/page errors; tabs, FAQ, CTA and mobile menu work.");
+          EOF
+          cd /tmp/blentera-qa
+          node qa.mjs
+
+      - name: Publish final preview URL
+        env:
+          SITE_URL: ${{ steps.deploy.outputs.preview_url }}
+        run: |
+          echo "BLENTERA preview passed build, production audit, typecheck, lint, route smoke tests and browser QA."
+          echo "PREVIEW_URL=$SITE_URL"
