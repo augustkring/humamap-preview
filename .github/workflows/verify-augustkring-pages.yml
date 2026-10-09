@@ -48,9 +48,9 @@ jobs:
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
-          curl -fsSL --max-time 20 "${base}assets/august-signature.svg?v=20261009-original-pixels-v3" -o /tmp/august-signature.svg
-          grep -Fq 'viewBox="0 0 260 245"' /tmp/august-signature.svg
-          grep -Fq 'href="data:image/png;base64,iVBORw0KGgo' /tmp/august-signature.svg
+          curl -fsSL --max-time 20 "${base}assets/august-signature.png?v=20261009-original-pixels-v4" -o /tmp/august-signature.png
+          file /tmp/august-signature.png | grep -Fq 'PNG image data, 260 x 245'
+          python3 -c "import struct; p=open('/tmp/august-signature.png','rb').read(); assert p[:8]==bytes([137,80,78,71,13,10,26,10]); assert struct.unpack('>II',p[16:24])==(260,245); assert b'tRNS' in p"
           echo "Public HTML and CSS contain the approved content and responsive width rules."
 
       - name: Check hero text rendering in desktop and mobile Chrome
