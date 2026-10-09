@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-reading-v32"
+          expected="styles.css?v=20261009-reading-v33"
           expected_copy="Taking ideas to market by shaping business models, validating demand with customers and building the first viable product."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
