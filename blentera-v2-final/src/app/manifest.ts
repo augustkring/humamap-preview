@@ -1,17 +1,18 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next"
 
-import { siteConfig } from '@/config/site'
+import { siteConfig } from "@/config/site"
+
+export const dynamic = "force-static"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: siteConfig.name,
-    short_name: '7Ovr Landing',
+    short_name: "BLENTERA",
     description: siteConfig.description,
-    start_url: '/',
-    display: 'standalone',
-    icons: [
-      { src: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
-      { src: '/brand/7ovr-logo-512.png', type: 'image/png', sizes: '512x512' },
-    ],
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#0a0a0a",
+    icons: [{ src: "/icon.svg", type: "image/svg+xml", sizes: "any" }],
   }
 }
