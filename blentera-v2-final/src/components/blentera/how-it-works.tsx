@@ -2,38 +2,30 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { UserPlus, Palette, Users, Rocket, Check } from "lucide-react"
+import { Database, SlidersHorizontal, Play, RotateCcw, Check } from "lucide-react"
 
 type IconProps = { className?: string; size?: number | string }
 
 const steps = [
   {
-    icon: (p: IconProps) => (
-      <UserPlus {...p} />
-    ),
-    title: "Create your account",
-    copy: "Sign up in under two minutes, no card required to get started.",
+    icon: (p: IconProps) => <Database {...p} />,
+    title: "Connect company knowledge",
+    copy: "Give people and AI the same approved company context and connected knowledge to start from.",
   },
   {
-    icon: (p: IconProps) => (
-      <Palette {...p} />
-    ),
-    title: "Customize your space",
-    copy: "Pick a template and tune Acme to match how your team already works.",
+    icon: (p: IconProps) => <SlidersHorizontal {...p} />,
+    title: "Define work and authority",
+    copy: "Set goals, roles, workflows, permissions, approvals and budgets before execution begins.",
   },
   {
-    icon: (p: IconProps) => (
-      <Users {...p} />
-    ),
-    title: "Invite your team",
-    copy: "Send role-based invites in bulk and let colleagues join in one click.",
+    icon: (p: IconProps) => <Play {...p} />,
+    title: "Run real work",
+    copy: "Use software for stable steps and AI where judgement is useful, with state and exceptions kept visible.",
   },
   {
-    icon: (p: IconProps) => (
-      <Rocket {...p} />
-    ),
-    title: "Ship with confidence",
-    copy: "Run automated checks and deploy knowing Acme has your back.",
+    icon: (p: IconProps) => <RotateCcw {...p} />,
+    title: "Review and reuse",
+    copy: "Turn useful outcomes into reviewed memory, reusable standards and better starting points for the next run.",
   },
 ]
 
@@ -42,18 +34,22 @@ export default function HowItWorks() {
   const progress = ((active + 0.5) / steps.length) * 100
 
   return (
-    <section className="flex w-full items-center justify-center px-6 py-16 sm:py-24">
+    <section
+      id="how-it-works"
+      className="flex w-full items-center justify-center px-6 py-16 sm:py-24"
+    >
       <div className="mx-auto w-full max-w-4xl">
         <div className="mb-12 text-center">
           <span className="mb-4 block text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-            How It Works
+            How BLENTERA works
           </span>
           <h2 className="font-heading text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            Up and running in four steps
+            From company context to compounding capability
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Go from sign-up to full team collaboration without a single support
-            ticket.
+            The point is not another AI tool. It is a durable operating layer
+            that makes the next person, agent, model or workflow start from
+            what the company already knows.
           </p>
         </div>
 
