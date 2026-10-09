@@ -161,6 +161,9 @@ a:focus-visible {
   transition: color 150ms ease;
 }
 
+.home-navigation a::after { content: ''; position: absolute; inset: auto 0 0; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
+.home-navigation a:hover::after, .home-navigation a:focus-visible::after { transform: scaleX(1); }
+
 .home-navigation a:hover,
 .home-navigation a:focus-visible,
 .footer-links a:hover,
@@ -171,7 +174,7 @@ a:focus-visible {
 .mobile-navigation { display: none; margin-left: auto; }
 .mobile-menu-toggle, .mobile-menu-close {
   width: 46px; height: 46px; padding: 0; display: grid; place-items: center;
-  border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--ink); cursor: pointer;
+  border: 0; border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer;
 }
 .mobile-menu-toggle svg, .mobile-menu-close svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .mobile-menu-dialog {
@@ -474,13 +477,14 @@ html.nav-open { overflow: hidden; }
   align-items: center; justify-content: center; color: var(--ink);
 }
 .work-brand-image {
-  width: auto; height: 36px; max-width: 100%; max-height: 36px;
-  display: block; object-fit: contain; object-position: center;
+  display: block; width: auto; max-width: 100%; object-position: center;
+  object-fit: cover; filter: brightness(0) saturate(100%) invert(11%) sepia(20%) saturate(1800%) hue-rotate(177deg) brightness(90%) contrast(102%);
 }
-.work-brand-august { height: 44px; max-height: 44px; }
+.work-brand-august { width: min(100%, 262px); height: 42px; }
+.work-brand-humamap { width: min(100%, 194px); height: 41px; }
 .blentera-word {
   font-family: 'AKOutfit', Arial, sans-serif; color: var(--ink);
-  font-size: 32px; font-weight: 700;
+  font-size: 35px; font-weight: 700;
   line-height: 1; letter-spacing: -.025em;
 }
 .waymaking-logo {
