@@ -14,7 +14,7 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout host repo
         uses: actions/checkout@v4
@@ -29,25 +29,27 @@ jobs:
           corepack enable
           corepack prepare pnpm@10.15.1 --activate
 
-      - name: Clone exact MIT starter
+      - name: Generate exact 7Ovr SaaS Landing source
         run: |
-          rm -rf blentera-v2-source
-          git clone --depth 1 https://github.com/7Ovr/shadcn-next-starter.git blentera-v2-source
-          rm -rf blentera-v2-source/.git
-
-      - name: Install exact free MIT-0 SaaS templates
-        working-directory: blentera-v2-source
-        run: |
+          rm -rf blentera-v2-source/saas-landing
+          git clone --depth 1 https://github.com/7Ovr/shadcn-next-starter.git blentera-v2-source/saas-landing
+          rm -rf blentera-v2-source/saas-landing/.git
+          cd blentera-v2-source/saas-landing
           pnpm install
-          pnpm dlx shadcn@latest add @7ovr/saas-landing --yes
-          pnpm dlx shadcn@latest add @7ovr/saas-landing-2 --yes
-
-      - name: Verify generated source builds
-        working-directory: blentera-v2-source
-        run: |
+          pnpm dlx shadcn@latest add @7ovr/saas-landing --yes --overwrite
           pnpm build
 
-      - name: Commit generated open-source source
+      - name: Generate exact 7Ovr SaaS Landing 2 source
+        run: |
+          rm -rf blentera-v2-source/saas-landing-2
+          git clone --depth 1 https://github.com/7Ovr/shadcn-next-starter.git blentera-v2-source/saas-landing-2
+          rm -rf blentera-v2-source/saas-landing-2/.git
+          cd blentera-v2-source/saas-landing-2
+          pnpm install
+          pnpm dlx shadcn@latest add @7ovr/saas-landing-2 --yes --overwrite
+          pnpm build
+
+      - name: Commit exact open-source sources
         run: |
           git config user.name "BLENTERA OSS Generator"
           git config user.email "actions@github.com"
