@@ -6,19 +6,31 @@
 
   const desktop = window.matchMedia('(min-width: 841px)');
   const root = document.documentElement;
+  let needsCloseCleanup = false;
 
   // Focus the dialog itself after pointer opening: no unsolicited ring around the X.
   // Keyboard and assistive-technology activation retains a visible, non-red focus cue.
   dialog.tabIndex = -1;
 
+  const finishClose = () => {
+    if (dialog.open || !needsCloseCleanup) return;
+    needsCloseCleanup = false;
+    root.classList.remove('nav-open');
+    opener.setAttribute('aria-expanded', 'false');
+    if (!desktop.matches) opener.focus({ preventScroll: true });
+  };
+
   const closeMenu = () => {
-    if (dialog.open) dialog.close();
+    if (!dialog.open) return;
+    dialog.close();
+    finishClose();
   };
 
   opener.addEventListener('click', (event) => {
     if (dialog.open || desktop.matches) return;
 
     dialog.showModal();
+    needsCloseCleanup = true;
     root.classList.add('nav-open');
     opener.setAttribute('aria-expanded', 'true');
 
@@ -35,13 +47,8 @@
     link.addEventListener('click', closeMenu);
   });
 
-  dialog.addEventListener('close', () => {
-    // Ignore a stale close event if the user already reopened the dialog.
-    if (dialog.open) return;
-    root.classList.remove('nav-open');
-    opener.setAttribute('aria-expanded', 'false');
-    if (!desktop.matches) opener.focus({ preventScroll: true });
-  });
+  // Native Escape/Cancel dispatches a close event; explicit close updates immediately.
+  dialog.addEventListener('close', finishClose);
 
   desktop.addEventListener('change', (event) => {
     if (event.matches) closeMenu();
