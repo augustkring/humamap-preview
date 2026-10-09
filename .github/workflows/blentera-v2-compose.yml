@@ -35,6 +35,7 @@ jobs:
           cp blentera-v2-source/saas-landing/src/components/saas-landing/faqs.tsx blentera-v2-final/src/components/blentera/faqs.tsx
           cp blentera-v2-source/saas-landing/src/components/saas-landing/cta.tsx blentera-v2-final/src/components/blentera/cta.tsx
           cp blentera-v2-source/saas-landing/src/components/saas-landing/footer.tsx blentera-v2-final/src/components/blentera/footer.tsx
+          cp blentera-v2-source/saas-landing/src/components/ui/dropdown-menu.tsx blentera-v2-final/src/components/ui/dropdown-menu.tsx
 
           cp blentera-v2-source/saas-landing-2/src/components/saas-landing-2/features.tsx blentera-v2-final/src/components/blentera/features.tsx
           cp blentera-v2-source/saas-landing-2/src/components/saas-landing-2/how-it-works.tsx blentera-v2-final/src/components/blentera/how-it-works.tsx
