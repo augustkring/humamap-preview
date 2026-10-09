@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,169 +10,144 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { Sparkles, Check } from "lucide-react"
+import { Check } from "lucide-react"
+
+const earlyAccess =
+  "mailto:ak@augustkring.com?subject=BLENTERA%20early%20access"
 
 const tiers = [
   {
-    name: "Starter",
-    monthly: 0,
-    annual: 0,
-    description: "For side projects and getting started.",
-    features: ["Up to 3 projects", "Community support", "1 GB storage"],
-    cta: "Get Started",
+    name: "Free Core",
+    price: "€0",
+    suffix: "/company",
+    description:
+      "The planned entry point for companies starting to build a shared AI foundation.",
+    features: [
+      "Company foundation",
+      "Core work and workflow layer",
+      "Bring your own AI provider",
+      "Basic history and controls",
+    ],
+    cta: "Join early access",
     featured: false,
+    note: "Launch planning",
   },
   {
-    name: "Pro",
-    monthly: 29,
-    annual: 24,
-    description: "For growing teams that ship every day.",
+    name: "Premium",
+    price: "€499",
+    suffix: "/company/month",
+    description:
+      "The planned base tier for teams running recurring work and reusable company capability.",
     features: [
-      "Unlimited projects",
-      "Priority support",
-      "50 GB storage",
-      "Advanced analytics",
+      "Expanded workflows and history",
+      "Advanced memory",
+      "Collaboration",
+      "Expanded governance and controls",
     ],
-    cta: "Start Free Trial",
+    cta: "Talk to us",
     featured: true,
+    note: "Planning base",
   },
   {
     name: "Enterprise",
-    monthly: 99,
-    annual: 82,
-    description: "For organizations with advanced needs.",
+    price: "€30K",
+    suffix: "base ACV",
+    description:
+      "The planned enterprise path for stronger assurance, isolation and operating requirements.",
     features: [
-      "Everything in Pro",
-      "Dedicated support",
-      "Unlimited storage",
-      "SSO and audit logs",
+      "Advanced governance and IAM",
+      "Dedicated capacity options",
+      "Enterprise support path",
+      "API and integration requirements",
     ],
-    cta: "Contact Sales",
+    cta: "Discuss enterprise",
     featured: false,
+    note: "Planning base",
   },
 ]
 
 export default function Pricing() {
-  const [annual, setAnnual] = useState(false)
-
   return (
-    <section className="flex w-full items-center justify-center px-6 py-16 sm:py-24">
+    <section
+      id="pricing"
+      className="flex w-full items-center justify-center px-6 py-16 sm:py-24"
+    >
       <div className="mx-auto w-full max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
           <Badge variant="outline" className="mb-4 tracking-widest uppercase">
-            Acme Plans
+            Launch pricing
           </Badge>
           <h2 className="font-heading text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            Pricing that scales with you
+            Start with the foundation
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Start for free, then upgrade when you&apos;re ready to grow. Save up
-            to 17% with annual billing.
+            These prices reflect the current launch plan. They remain
+            hypotheses until customer evidence validates the final commercial
+            model.
           </p>
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <div
-            role="group"
-            aria-label="Billing period"
-            className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-1"
-          >
-            <button
-              type="button"
-              onClick={() => setAnnual(false)}
-              aria-pressed={!annual}
-              className={cn(
-                "px-4 py-1.5 text-sm font-medium transition-colors",
-                !annual
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnnual(true)}
-              aria-pressed={annual}
-              className={cn(
-                "flex items-center gap-2 px-4 py-1.5 text-sm font-medium transition-colors",
-                annual
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Annual
-              <Badge className="px-1.5 text-[10px] font-semibold">-17%</Badge>
-            </button>
-          </div>
-        </div>
-
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {tiers.map((tier) => {
-            const price = annual ? tier.annual : tier.monthly
-            return (
-              <Card
-                key={tier.name}
-                className={cn(
-                  "flex flex-col",
-                  tier.featured && "bg-muted/30 ring-2 ring-primary"
+          {tiers.map((tier) => (
+            <Card
+              key={tier.name}
+              className={cn(
+                "flex flex-col",
+                tier.featured && "bg-muted/30 ring-2 ring-primary"
+              )}
+            >
+              <CardHeader>
+                <CardTitle className="text-base font-semibold">
+                  {tier.name}
+                </CardTitle>
+                {tier.featured && (
+                  <CardAction>
+                    <Badge>{tier.note}</Badge>
+                  </CardAction>
                 )}
-              >
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">
-                    {tier.name}
-                  </CardTitle>
-                  {tier.featured && (
-                    <CardAction>
-                      <Badge className="gap-1.5">
-                        <Sparkles data-icon="inline-start" className="size-3.5" aria-hidden="true" />
-                        Most popular
-                      </Badge>
-                    </CardAction>
-                  )}
-                  <CardDescription className="text-sm sm:min-h-10">
-                    {tier.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col gap-6">
-                  <div>
-                    <p className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold tracking-tight text-foreground tabular-nums">
-                        ${price}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        /Month
-                      </span>
-                    </p>
-                    <p className="mt-1 h-5 text-xs text-muted-foreground">
-                      {annual && price > 0
-                        ? `$${price * 12} billed yearly`
-                        : " "}
-                    </p>
-                  </div>
-                  <ul className="flex flex-1 flex-col gap-3 text-sm text-foreground">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    nativeButton={false}
-                    variant={tier.featured ? "default" : "outline"}
-                    size="lg"
-                    className="w-full"
-                    render={<a href="#" />}
-                  >
-                    {tier.cta}
-                  </Button>
-                </CardFooter>
-              </Card>
-            )
-          })}
+                <CardDescription className="text-sm sm:min-h-16">
+                  {tier.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-6">
+                <div>
+                  <p className="flex flex-wrap items-baseline gap-1">
+                    <span className="text-4xl font-bold tracking-tight text-foreground tabular-nums">
+                      {tier.price}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {tier.suffix}
+                    </span>
+                  </p>
+                  <p className="mt-1 h-5 text-xs text-muted-foreground">
+                    {tier.note}
+                  </p>
+                </div>
+                <ul className="flex flex-1 flex-col gap-3 text-sm text-foreground">
+                  {tier.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2">
+                      <Check
+                        className="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  nativeButton={false}
+                  variant={tier.featured ? "default" : "outline"}
+                  size="lg"
+                  className="w-full"
+                  render={<a href={earlyAccess} />}
+                >
+                  {tier.cta}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
