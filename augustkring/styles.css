@@ -901,7 +901,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .about-home-lead h2,
 .about-principles-intro h2,
-.about-story-content h2 {
+.about-story-intro h2 {
   margin: 0;
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
@@ -1141,21 +1141,31 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 
 .about-story-bottom {
-  padding: clamp(76px, 7.5vw, 104px) 0 0;
+  padding: clamp(24px, 3.3vw, 44px) 0 clamp(8px, 1.5vw, 22px);
   display: grid;
-  grid-template-columns: minmax(0, .42fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
   gap: clamp(54px, 7vw, 92px);
   align-items: start;
 }
-.about-story-label {
-  padding-top: 16px;
-  color: var(--muted);
-  font: 500 14px/1.4 'AKFigtree', Arial, sans-serif;
+.about-story-intro > p {
+  max-width: 480px;
+  margin: 24px 0 0;
+  color: var(--ink);
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.55;
 }
-.about-story-content {
-  max-width: 620px;
+.about-story-content { max-width: 620px; }
+.about-story-content p a {
+  color: var(--ink);
+  text-decoration-color: var(--red);
+  text-underline-offset: 3px;
 }
-.about-story-content h2 { margin-bottom: 24px; }
+.about-story-content p a:hover,
+.about-story-content p a:focus-visible {
+  text-decoration-thickness: 2px;
+}
 .about-story-link { margin-top: 28px; }
 
 .article-page { padding-bottom: clamp(88px, 9vw, 132px); }
@@ -1282,7 +1292,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .about-personality-meaning { grid-template-columns: 1fr; gap: 24px; }
   .about-personality-meaning > div { max-width: 100%; }
   .about-personality-panel-head { display: grid; gap: 10px; }
-  .about-story-label { padding-top: 0; }
+
 
   .home-hero {
     grid-template-columns: 1fr;
@@ -1329,7 +1339,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .about-principle-primary { grid-column: auto; max-width: none; }
   .about-principles-band { margin-block: 0; padding: 46px 28px; }
   .about-personality { padding-top: 58px; padding-bottom: 58px; }
-  .about-story-bottom { padding-top: 58px; gap: 28px; }
+  .about-story-bottom { padding-top: 14px; gap: 28px; }
+  .about-story-intro > p { font-size: 18px; }
 
   .perspective-lead h2,
   .work-heading h2,
