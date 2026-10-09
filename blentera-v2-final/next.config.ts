@@ -1,16 +1,10 @@
-import type { NextConfig } from 'next'
-
-import { responseHeaders } from '@/lib/headers'
-import { isIndexable } from '@/lib/site-url'
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  // AGENTS.md is a pointer to CLAUDE.md, so next dev must not write its own block into it.
+  output: "export",
   agentRules: false,
   images: {
-    formats: ['image/avif', 'image/webp'],
-  },
-  async headers() {
-    return [{ source: '/:path*', headers: responseHeaders({ indexable: isIndexable() }) }]
+    unoptimized: true,
   },
 }
 
