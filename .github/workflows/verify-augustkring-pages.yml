@@ -43,7 +43,7 @@ jobs:
             sleep 10
           done
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
-          grep -Fq "I turn those opportunities into business concepts and take the lead on strategy and innovation." /tmp/augustkring.html
+          grep -Fq "I turn opportunities into business concepts and set the direction for strategy and innovation." /tmp/augustkring.html
           grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
