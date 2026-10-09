@@ -1,6 +1,17 @@
 import { site } from "@/content/site";
 
-const plans = [
+type Plan = {
+  name: string;
+  price: string;
+  suffix?: string;
+  note: string;
+  description: string;
+  features: readonly string[];
+  cta: string;
+  featured?: boolean;
+};
+
+const plans: readonly Plan[] = [
   {
     name: "Free Core",
     price: "€0",
@@ -28,7 +39,7 @@ const plans = [
     features: ["Advanced governance & IAM", "Dedicated capacity options", "SLA path", "API access", "Enterprise support"],
     cta: "Discuss enterprise",
   },
-] as const;
+];
 
 export function PricingGrid() {
   return (
