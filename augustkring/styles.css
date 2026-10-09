@@ -243,7 +243,9 @@ html.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 
 .hero-copy > .hero-focus {
-  max-width: 540px;
+  width: 100%;
+  max-width: none;
+  text-wrap: balance;
   color: var(--ink);
   font-family: 'AKFigtree', Arial, sans-serif;
   font-size: 19px;
