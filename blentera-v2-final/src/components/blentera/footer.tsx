@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 
 const columns = [
@@ -39,11 +40,11 @@ export default function Footer() {
       <footer className="mx-auto w-full max-w-6xl px-6 py-12">
         <div className="grid gap-10 md:grid-cols-2">
           <div className="max-w-sm">
-            <a href="/" className="flex items-center">
+            <Link href="/" className="flex items-center">
               <span className="text-sm font-bold tracking-[0.16em]">
                 BLENTERA
               </span>
-            </a>
+            </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               The company AI foundation that keeps knowledge, work, governance
               and learning usable as people and technology change.
