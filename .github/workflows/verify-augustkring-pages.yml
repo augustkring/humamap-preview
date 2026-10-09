@@ -35,7 +35,7 @@ jobs:
             sleep 10
           done
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more capable, resilient and sustainable." /tmp/augustkring.html
-          grep -Fq "I take responsibility for moving those concepts into practice" /tmp/augustkring.html
+          grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
