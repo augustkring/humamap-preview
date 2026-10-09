@@ -116,7 +116,7 @@ jobs:
           const failures = [];
 
           async function checkPage(path, viewport, label) {
-            const page = await browser.newPage({ viewportSize: viewport });
+            const page = await browser.newPage({ viewport: viewport });
             const consoleErrors = [];
             const pageErrors = [];
             page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
@@ -144,7 +144,7 @@ jobs:
             await checkPage(path, { width: 390, height: 844 }, "mobile " + path);
           }
 
-          const home = await browser.newPage({ viewportSize: { width: 1440, height: 1000 } });
+          const home = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
           await home.goto(base + "/", { waitUntil: "networkidle" });
 
           const workTab = home.getByRole("button", { name: /Work & organisation/i });
@@ -159,7 +159,7 @@ jobs:
           if (!(await earlyAccess.isVisible())) failures.push("Primary CTA not visible");
           await home.close();
 
-          const mobile = await browser.newPage({ viewportSize: { width: 390, height: 844 } });
+          const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
           await mobile.goto(base + "/", { waitUntil: "networkidle" });
           await mobile.getByText("Menu", { exact: true }).click();
           const productLink = mobile.getByRole("link", { name: "Product", exact: true }).first();
