@@ -1,52 +1,48 @@
 "use client"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, PlayCircle, Play, Check } from "lucide-react"
+import { ArrowRight, Check } from "lucide-react"
+
+const earlyAccess =
+  "mailto:ak@augustkring.com?subject=BLENTERA%20early%20access"
 
 const TRUST_ITEMS = [
-  "No credit card required",
-  "14-day free trial",
-  "Cancel anytime",
+  "Shared company context",
+  "Reviewed company memory",
+  "Replaceable models and runtimes",
 ]
 
 const SCREENSHOT_ROWS = [
   {
-    label: "Revenue",
-    value: "$48,290",
-    change: "+12.4%",
+    label: "Context",
+    value: "Shared",
+    change: "Company foundation",
   },
   {
-    label: "Users",
-    value: "3,841",
-    change: "+8.1%",
+    label: "Work",
+    value: "Persistent",
+    change: "Goals + workflows",
   },
   {
-    label: "Churn",
-    value: "1.7%",
-    change: "-0.3%",
+    label: "Memory",
+    value: "Reviewed",
+    change: "Useful learning",
   },
   {
-    label: "Session",
-    value: "4m 22s",
-    change: "+0.9%",
+    label: "Control",
+    value: "Explicit",
+    change: "Permissions + approvals",
   },
 ]
 
-const BAR_HEIGHTS = [30, 55, 42, 70, 48, 80, 65, 90, 58, 75, 62, 88]
+const BAR_HEIGHTS = [28, 36, 34, 45, 43, 52, 57, 61, 66, 73, 78, 86]
 
-const TOP_CHANNELS = [
-  { name: "Organic search", pct: 74, sessions: "2,841" },
-  { name: "Direct", pct: 53, sessions: "2,032" },
-  { name: "Referral", pct: 31, sessions: "1,190" },
+const FOUNDATION_LAYERS = [
+  { name: "Knowledge", pct: 92, state: "shared" },
+  { name: "Work", pct: 78, state: "linked" },
+  { name: "Control", pct: 66, state: "governed" },
 ]
 
 export default function Hero() {
@@ -55,54 +51,37 @@ export default function Hero() {
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-12 md:grid-cols-2 md:items-center md:gap-16">
         <div className="flex flex-col">
           <Badge variant="outline" className="w-fit">
-            Version 2.0 Is Live
+            Company AI foundation
           </Badge>
 
           <h1 className="mt-6 font-heading text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-            The analytics platform
-            <br className="hidden sm:block" /> built for scale.
+            Build your company&apos;s AI capability once.
+            <br className="hidden sm:block" /> Keep building on it.
           </h1>
 
           <p className="mt-5 text-lg text-muted-foreground">
-            Acme gives your team real-time visibility into every metric that
-            matters, from acquisition to retention, in a single, unified
-            dashboard.
+            BLENTERA keeps company knowledge, work, governance and learning
+            usable across people, agents, models and tools, so new capabilities
+            start from what the company already knows and controls.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
-              render={<a href="#" />}
+              render={<a href={earlyAccess} />}
               nativeButton={false}
               className="w-full sm:w-auto"
             >
-              Start for Free
+              Join early access
               <ArrowRight data-icon="inline-end" aria-hidden="true" />
             </Button>
-            <Dialog>
-              <DialogTrigger
-                render={<Button variant="ghost" className="w-full sm:w-auto" />}
-              >
-                <PlayCircle data-icon="inline-start" aria-hidden="true" />
-                Watch Demo
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Product demo</DialogTitle>
-                  <DialogDescription>
-                    A 2-minute tour of the Acme analytics dashboard.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="relative flex aspect-video w-full items-center justify-center rounded-lg border border-border bg-muted">
-                  <span
-                    className="flex size-14 items-center justify-center rounded-full bg-background/80 ring-1 ring-border"
-                    aria-hidden="true"
-                  >
-                    <Play className="size-6 text-foreground" />
-                  </span>
-                  <span className="sr-only">Demo video placeholder</span>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button
+              render={<a href="#how-it-works" />}
+              nativeButton={false}
+              variant="ghost"
+              className="w-full sm:w-auto"
+            >
+              See how it works
+            </Button>
           </div>
 
           <Separator className="my-8" />
@@ -113,20 +92,25 @@ export default function Hero() {
                 key={item}
                 className="flex items-center gap-2 text-sm text-muted-foreground"
               >
-                <Check className="size-4 shrink-0 text-foreground" aria-hidden="true" />
+                <Check
+                  className="size-4 shrink-0 text-foreground"
+                  aria-hidden="true"
+                />
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="relative">
+        <div className="relative" aria-label="Illustrative BLENTERA product view">
           <div className="rounded-xl border border-border bg-card p-1">
             <div className="flex items-center gap-1.5 rounded-t-lg border-b border-border bg-muted px-3 py-2">
               <span className="size-2.5 border border-border bg-background" />
               <span className="size-2.5 border border-border bg-background" />
               <span className="size-2.5 border border-border bg-background" />
-              <span className="ml-3 h-4 flex-1 rounded-md border border-border bg-background" />
+              <span className="ml-3 flex-1 truncate rounded-md border border-border bg-background px-2 py-0.5 text-[10px] text-muted-foreground">
+                Company foundation / overview
+              </span>
             </div>
 
             <div className="flex flex-col rounded-b-lg bg-background p-4">
@@ -137,11 +121,9 @@ export default function Hero() {
                     className="flex flex-col rounded-lg border border-border bg-card p-3"
                   >
                     <p className="text-xs text-muted-foreground">{row.label}</p>
-                    <p className="mt-1 text-lg font-bold tabular-nums">
-                      {row.value}
-                    </p>
+                    <p className="mt-1 text-lg font-bold">{row.value}</p>
                     <p className="mt-0.5 text-xs whitespace-nowrap text-muted-foreground">
-                      {row.change} vs last mo.
+                      {row.change}
                     </p>
                   </div>
                 ))}
@@ -149,9 +131,9 @@ export default function Hero() {
 
               <div className="mt-3 rounded-lg border border-border bg-card p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-xs font-semibold">Revenue over time</p>
+                  <p className="text-xs font-semibold">Capability reuse</p>
                   <Badge variant="secondary" className="text-xs">
-                    Last 12 months
+                    Across use cases
                   </Badge>
                 </div>
                 <div className="flex h-28 items-end gap-1">
@@ -165,19 +147,27 @@ export default function Hero() {
                   ))}
                 </div>
                 <div className="mt-2 flex justify-between">
-                  {["Jan", "Mar", "May", "Jul", "Sep", "Nov"].map((m) => (
-                    <span key={m} className="text-xs text-muted-foreground">
-                      {m}
-                    </span>
-                  ))}
+                  {["Start", "People", "Agents", "Models", "Tools", "Next"].map(
+                    (label) => (
+                      <span
+                        key={label}
+                        className="text-xs text-muted-foreground"
+                      >
+                        {label}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
 
               <div className="mt-3 rounded-lg border border-border bg-card">
                 <div className="flex items-center justify-between border-b border-border px-4 py-2">
-                  <p className="text-xs font-semibold">Top channels</p>
+                  <p className="text-xs font-semibold">Foundation layers</p>
+                  <span className="text-[10px] text-muted-foreground">
+                    Illustrative
+                  </span>
                 </div>
-                {TOP_CHANNELS.map((row) => (
+                {FOUNDATION_LAYERS.map((row) => (
                   <div
                     key={row.name}
                     className="flex items-center gap-3 border-b border-border px-4 py-2 last:border-0"
@@ -190,8 +180,8 @@ export default function Hero() {
                         aria-hidden="true"
                       />
                     </div>
-                    <span className="w-12 text-right text-xs text-muted-foreground tabular-nums">
-                      {row.sessions}
+                    <span className="w-14 text-right text-xs text-muted-foreground">
+                      {row.state}
                     </span>
                   </div>
                 ))}
