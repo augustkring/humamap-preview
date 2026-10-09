@@ -1,0 +1,56 @@
+name: Generate BLENTERA OSS Source
+
+on:
+  push:
+    branches:
+      - blentera-v2-oss-source
+    paths:
+      - ".github/workflows/blentera-v2-generate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout host repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.1 --activate
+
+      - name: Clone exact MIT starter
+        run: |
+          rm -rf blentera-v2-source
+          git clone --depth 1 https://github.com/7Ovr/shadcn-next-starter.git blentera-v2-source
+          rm -rf blentera-v2-source/.git
+
+      - name: Install exact free MIT-0 SaaS templates
+        working-directory: blentera-v2-source
+        run: |
+          pnpm install
+          pnpm dlx shadcn@latest add @7ovr/saas-landing --yes
+          pnpm dlx shadcn@latest add @7ovr/saas-landing-2 --yes
+
+      - name: Verify generated source builds
+        working-directory: blentera-v2-source
+        run: |
+          pnpm build
+
+      - name: Commit generated open-source source
+        run: |
+          git config user.name "BLENTERA OSS Generator"
+          git config user.email "actions@github.com"
+          git add blentera-v2-source
+          git commit -m "chore: vendor exact 7Ovr SaaS templates" || exit 0
+          git push origin HEAD:blentera-v2-oss-source
