@@ -1,9 +1,17 @@
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import { Group, MessageCircle, History, Flashlight, Bot, Timer, ShieldCheck, Key, Fingerprint, GitBranch } from "lucide-react"
-
-type IconProps = { className?: string; size?: number | string }
+import {
+  BookOpen,
+  BrainCircuit,
+  Database,
+  Goal,
+  GitBranch,
+  Network,
+  ShieldCheck,
+  Key,
+  History,
+} from "lucide-react"
 
 type Feature = {
   icon: React.ComponentType<{ className?: string }>
@@ -19,92 +27,74 @@ type FeatureTab = {
 
 const TABS: FeatureTab[] = [
   {
-    value: "collaboration",
-    label: "Collaboration",
+    value: "knowledge",
+    label: "Knowledge",
     features: [
       {
-        icon: (p: IconProps) => (
-          <Group {...p} />
-        ),
-        title: "Shared workspaces",
+        icon: BookOpen,
+        title: "Company foundation",
         description:
-          "Bring every team into one workspace with granular roles and instant invites.",
+          "Keep the company context people and AI should start from in one durable, reviewable layer.",
       },
       {
-        icon: (p: IconProps) => (
-          <MessageCircle {...p} />
-        ),
-        title: "Inline comments",
+        icon: Database,
+        title: "Connected knowledge",
         description:
-          "Discuss changes in context with threaded comments, mentions, and reactions.",
+          "Bring approved company information into the work without rebuilding context for every new tool.",
       },
       {
-        icon: (p: IconProps) => (
-          <History {...p} />
-        ),
-        title: "Version history",
+        icon: BrainCircuit,
+        title: "Governed memory",
         description:
-          "Track every edit and restore any previous state with a single click.",
+          "Useful learning can be reviewed, promoted and reused instead of disappearing into local chats or prompts.",
       },
     ],
   },
   {
-    value: "automation",
-    label: "Automation",
+    value: "work",
+    label: "Work",
     features: [
       {
-        icon: (p: IconProps) => (
-          <Flashlight {...p} />
-        ),
-        title: "Visual workflows",
+        icon: Goal,
+        title: "Goal-aware work",
         description:
-          "Chain triggers and actions on a drag-and-drop canvas, no code required.",
+          "Keep tasks, projects and workflows connected to the outcomes the company is actually trying to achieve.",
       },
       {
-        icon: (p: IconProps) => (
-          <Bot {...p} />
-        ),
-        title: "Smart agents",
+        icon: Network,
+        title: "People + agent organisation",
         description:
-          "Let Acme agents triage requests, draft replies, and route work for you.",
+          "Give people and agents clear roles, ownership and delegation inside the same operating structure.",
       },
       {
-        icon: (p: IconProps) => (
-          <Timer {...p} />
-        ),
-        title: "Scheduled runs",
+        icon: GitBranch,
+        title: "Durable workflows",
         description:
-          "Queue recurring jobs down to the minute with built-in retries and alerts.",
+          "Run recurring work with state, retries, approvals and exception paths instead of fragile one-off automation.",
       },
     ],
   },
   {
-    value: "security",
-    label: "Security",
+    value: "control",
+    label: "Control",
     features: [
       {
-        icon: (p: IconProps) => (
-          <ShieldCheck {...p} />
-        ),
-        title: "SOC 2 Type II",
+        icon: Key,
+        title: "Permissions & approvals",
         description:
-          "Independently audited controls keep your data compliant and protected.",
+          "Keep identity, authority, budgets and human checkpoints outside the model and visible to the company.",
       },
       {
-        icon: (p: IconProps) => (
-          <Key {...p} />
-        ),
-        title: "SSO & SCIM",
+        icon: History,
+        title: "Evidence & audit",
         description:
-          "Provision users through SAML, OIDC, and automated directory sync.",
+          "Retain the operating evidence needed to understand what acted, what context was used and what happened.",
       },
       {
-        icon: (p: IconProps) => (
-          <Fingerprint {...p} />
-        ),
-        title: "Audit logging",
+        icon: ShieldCheck,
+        title: "Portable execution",
         description:
-          "Every action is timestamped, immutable, and exportable to your SIEM.",
+          "Change models, agents or runtimes without throwing away the company layer underneath them.",
       },
     ],
   },
@@ -112,25 +102,25 @@ const TABS: FeatureTab[] = [
 
 export default function Features() {
   return (
-    <section className="flex w-full items-center justify-center px-6 py-16 sm:py-24">
+    <section
+      id="product"
+      className="flex w-full items-center justify-center px-6 py-16 sm:py-24"
+    >
       <div className="mx-auto w-full max-w-5xl">
         <div className="flex flex-col items-center text-center">
           <span className="mb-4 block text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-            Built For Teams
+            The foundation
           </span>
           <h2 className="font-heading text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            Everything you need to ship faster
+            One company layer that stays useful
           </h2>
           <p className="mt-4 max-w-xl text-pretty text-muted-foreground">
-            Acme brings collaboration, automation, and enterprise-grade security
-            together in one connected platform.
+            Keep company context, work, learning and control together while the
+            people and AI technology around them change.
           </p>
         </div>
 
-        <Tabs
-          defaultValue="collaboration"
-          className="mt-10 w-full items-center"
-        >
+        <Tabs defaultValue="knowledge" className="mt-10 w-full items-center">
           <TabsList className="h-auto flex-wrap gap-1 rounded-lg p-1">
             {TABS.map((tab) => (
               <TabsTrigger
@@ -172,7 +162,7 @@ export default function Features() {
                       </div>
                       <div className="mt-auto flex items-center gap-2 text-xs font-medium text-muted-foreground">
                         <GitBranch className="size-3.5" />
-                        Included on every plan
+                        Shared company capability
                       </div>
                     </Card>
                   )
