@@ -5,6 +5,7 @@ on:
     branches:
       - blentera-preview-host
     paths:
+      - "blentera-host/**"
       - ".github/workflows/blentera-netlify-preview.yml"
   workflow_dispatch:
 
