@@ -4,51 +4,29 @@
   const closer = dialog?.querySelector('[data-mobile-nav-close]');
   if (!opener || !dialog || !closer || typeof dialog.showModal !== 'function') return;
 
-  let lockedScrollY = 0;
-  const bodyStyle = {
-    position: '',
-    top: '',
-    left: '',
-    right: '',
-    width: '',
-  };
+  const desktop = window.matchMedia('(min-width: 841px)');
+  const root = document.documentElement;
 
-  const lockPage = () => {
-    lockedScrollY = window.scrollY;
-    bodyStyle.position = document.body.style.position;
-    bodyStyle.top = document.body.style.top;
-    bodyStyle.left = document.body.style.left;
-    bodyStyle.right = document.body.style.right;
-    bodyStyle.width = document.body.style.width;
-
-    document.documentElement.classList.add('nav-open');
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${lockedScrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-  };
-
-  const unlockPage = () => {
-    document.documentElement.classList.remove('nav-open');
-    document.body.style.position = bodyStyle.position;
-    document.body.style.top = bodyStyle.top;
-    document.body.style.left = bodyStyle.left;
-    document.body.style.right = bodyStyle.right;
-    document.body.style.width = bodyStyle.width;
-    window.scrollTo(0, lockedScrollY);
-  };
+  // Focus the dialog itself after pointer opening: no unsolicited ring around the X.
+  // Keyboard and assistive-technology activation retains a visible, non-red focus cue.
+  dialog.tabIndex = -1;
 
   const closeMenu = () => {
     if (dialog.open) dialog.close();
   };
 
-  opener.addEventListener('click', () => {
-    if (dialog.open) return;
-    lockPage();
-    opener.setAttribute('aria-expanded', 'true');
+  opener.addEventListener('click', (event) => {
+    if (dialog.open || desktop.matches) return;
+
     dialog.showModal();
-    queueMicrotask(() => closer.focus({ preventScroll: true }));
+    root.classList.add('nav-open');
+    opener.setAttribute('aria-expanded', 'true');
+
+    if (event.detail === 0) {
+      closer.focus({ preventScroll: true });
+    } else {
+      dialog.focus({ preventScroll: true });
+    }
   });
 
   closer.addEventListener('click', closeMenu);
@@ -58,12 +36,14 @@
   });
 
   dialog.addEventListener('close', () => {
-    unlockPage();
+    // Ignore a stale close event if the user already reopened the dialog.
+    if (dialog.open) return;
+    root.classList.remove('nav-open');
     opener.setAttribute('aria-expanded', 'false');
-    requestAnimationFrame(() => opener.focus({ preventScroll: true }));
+    if (!desktop.matches) opener.focus({ preventScroll: true });
   });
 
-  window.matchMedia('(min-width: 841px)').addEventListener('change', (event) => {
+  desktop.addEventListener('change', (event) => {
     if (event.matches) closeMenu();
   });
 })();
