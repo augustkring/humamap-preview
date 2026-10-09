@@ -79,6 +79,8 @@ jobs:
           git add augustkring/assets/august-signature-smooth-4x.png
           if ! git diff --staged --quiet; then
             git commit -m "Add smoothed high-density PNG derived from original signature"
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           else
             echo "Signature already up to date"
