@@ -24,17 +24,19 @@ jobs:
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected="styles.css?v=20261009-hero-column-v23"
+          expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html; then
-              echo "Correct stylesheet version is published."
+            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html; then
+              echo "Approved copy and stylesheet version are published."
               break
             fi
             if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
             sleep 10
           done
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more capable, resilient and sustainable." /tmp/augustkring.html
+          grep -Fq "I turn those opportunities into business concepts and take the lead on strategy and innovation." /tmp/augustkring.html
           grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
