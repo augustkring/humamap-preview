@@ -39,7 +39,7 @@ jobs:
           grep -Fq "I turn those opportunities into business concepts and take the lead on strategy and innovation." /tmp/augustkring.html
           grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
-          grep -Fq '<span>Send email</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
+          grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
@@ -48,8 +48,9 @@ jobs:
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
-          curl -fsSL --max-time 20 "${base}assets/august-signature.svg?v=20261009-original-trace-v2" -o /tmp/august-signature.svg
-          grep -Fq 'viewBox="58 16 352 331"' /tmp/august-signature.svg
+          curl -fsSL --max-time 20 "${base}assets/august-signature.svg?v=20261009-original-pixels-v3" -o /tmp/august-signature.svg
+          grep -Fq 'viewBox="0 0 260 245"' /tmp/august-signature.svg
+          grep -Fq 'href="data:image/png;base64,iVBORw0KGgo' /tmp/august-signature.svg
           echo "Public HTML and CSS contain the approved content and responsive width rules."
 
       - name: Check hero text rendering in desktop and mobile Chrome
@@ -115,6 +116,23 @@ jobs:
                 console.log('Signature rendering',width,signature);
                 assert.equal(signature.heading,'Current focus');
                 assert.ok(signature.naturalWidth > 0,'Original handwritten signature loaded');
+                const ink = await page.evaluate(() => {
+                  const img = document.querySelector('.signoff-signature');
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 260; canvas.height = 245;
+                  const ctx = canvas.getContext('2d',{willReadFrequently:true});
+                  ctx.drawImage(img,0,0,260,245);
+                  const data = ctx.getImageData(0,0,260,245).data;
+                  let opaque = 0, transparent = 0;
+                  for(let i=3;i<data.length;i+=4) {
+                    if(data[i]>100)opaque++;
+                    if(data[i]===0)transparent++;
+                  }
+                  return {opaque,transparent};
+                });
+                console.log('Signature pixels', width, ink);
+                assert.ok(ink.opaque>1200 && ink.opaque<16000,'Signature must contain original black strokes');
+                assert.ok(ink.transparent>30000,'Signature must have transparent background');
                 assert.ok(signature.width >= 140 && signature.width <= 162,'Faithful signature has legible dimensions');
                 assert.ok(signature.opacity >= .72 && signature.opacity <= .84,'Signature is appropriately subtle');
                 assert.equal(signature.horizontalOverflow,false,'No horizontal overflow around sign-off');
