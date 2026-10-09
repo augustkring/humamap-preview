@@ -532,24 +532,23 @@ html.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 
 .personal-signoff {
-  padding: 10px 0 clamp(78px, 8vw, 112px);
+  padding: 10px 0 clamp(62px, 6vw, 88px);
 }
 
 .personal-signoff p {
   margin: 0;
   color: var(--copy);
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: .72;
 }
 
-.personal-signoff .signoff-name {
-  margin-top: 9px;
-  font-family: 'AKOutfit', Arial, sans-serif;
-  color: var(--ink);
-  font-size: clamp(28px, 3vw, 36px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -.035em;
+.personal-signoff .signoff-signature {
+  display: block;
+  width: clamp(116px, 11vw, 138px);
+  height: auto;
+  margin-top: 12px;
+  opacity: .64;
 }
 
 .home-footer {
