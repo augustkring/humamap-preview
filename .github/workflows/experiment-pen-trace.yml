@@ -1,0 +1,93 @@
+name: Compare professional pen-stroke vectorisation
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/experiment-pen-trace.yml
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deterministic curve-fitting tool
+        run: python -m pip install --disable-pip-version-check 'vtracer==0.6.12' 'Pillow==11.3.0' 'CairoSVG==2.8.2'
+      - name: Build side-by-side candidates preserving the original handwriting
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          import io
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          import vtracer
+          import cairosvg
+          from xml.etree import ElementTree
+
+          img = Image.open('augustkring/assets/august-signature-authentic.png').convert('RGBA')
+          if img.size != (260,245):
+              raise ValueError(f'Original signature changed unexpectedly: {img.size}')
+          root=Path('/tmp/pen-trace-qa')
+          root.mkdir(parents=True,exist_ok=True)
+          side=Image.new('RGB',(1360,365),'white')
+          draw=ImageDraw.Draw(side)
+          scale=(320,302)
+          plain=Image.new('RGBA',img.size,'white')
+          plain.alpha_composite(img)
+          ref=plain.resize(scale,Image.Resampling.LANCZOS)
+          side.paste(ref.convert('RGB'),(12,40))
+          draw.text((16,10),'Original raster',fill='#0b223d')
+
+          variants=[
+            ('gentle',100,25,3.5),
+            ('standard',100,60,4.0),
+            ('sharp',165,75,3.5),
+          ]
+          for index,(name,threshold,corner,length) in enumerate(variants):
+              bw=Image.new('RGB',img.size,'white')
+              alpha=img.getchannel('A')
+              pixels=[(0,0,0) if value>=threshold else (255,255,255) for value in alpha.getdata()]
+              bw.putdata(pixels)
+              input_file=root/f'{name}-input.png'
+              output_file=root/f'{name}.svg'
+              bw.save(input_file)
+              vtracer.convert_image_to_svg_py(
+                  str(input_file),str(output_file),
+                  colormode='binary',mode='spline',hierarchical='cutout',
+                  filter_speckle=0,corner_threshold=corner,
+                  length_threshold=length,max_iterations=12,
+                  splice_threshold=45,path_precision=3
+              )
+              text=output_file.read_text()
+              assert '<svg' in text and '</svg>' in text
+              rendered=Image.open(io.BytesIO(
+                  cairosvg.svg2png(url=str(output_file),output_width=320,output_height=302)
+              )).convert('RGBA')
+              canvas=Image.new('RGBA',rendered.size,'white')
+              canvas.alpha_composite(rendered)
+              side.paste(canvas.convert('RGB'),(350+index*340,40))
+              draw.text((354+index*340,10),f'{name}, alpha>={threshold}',fill='#0b223d')
+              print(f'{name}: {len(text)} SVG bytes, {output_file.stat().st_size} on disk')
+          side.save(root/'comparison.png')
+          PY
+      - name: Retain experimental proof without changing live signature
+        uses: actions/upload-artifact@v4
+        with:
+          name: professional-signature-curve-comparison
+          path: /tmp/pen-trace-qa/*.svg
+          if-no-files-found: error
+          retention-days: 7
+      - name: Retain side-by-side preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: professional-signature-visual-proof
+          path: /tmp/pen-trace-qa/comparison.png
+          if-no-files-found: error
+          retention-days: 7
