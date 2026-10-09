@@ -8,6 +8,16 @@
   const root = document.documentElement;
   let needsCloseCleanup = false;
 
+  // Pointer focus must never trigger the keyboard-only visual treatment.
+  document.addEventListener('pointerdown', () => {
+    root.dataset.navPointer = '';
+  }, { capture: true, passive: true });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
+      delete root.dataset.navPointer;
+    }
+  }, true);
+
   // Focus the dialog itself after pointer opening: no unsolicited ring around the X.
   // Keyboard and assistive-technology activation retains a visible, non-red focus cue.
   dialog.tabIndex = -1;
