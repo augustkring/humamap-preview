@@ -1093,6 +1093,11 @@ html.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 .about-actions .arrow-link,
 .about-story-link { font-size: 16px; }
+.homepage-working .about-actions .arrow-link {
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
 
 .about-story-bottom {
   padding: clamp(76px, 7.5vw, 104px) 0 0;
