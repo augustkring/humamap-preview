@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   Accordion,
   AccordionContent,
@@ -9,60 +8,40 @@ import {
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner"
 import { Mail, ArrowRight } from "lucide-react"
 
 const faqs = [
   {
-    q: "How do I get started with Acme?",
-    a: "Sign up for a free account, create your first workspace, and follow the onboarding checklist. You will be up and running in under five minutes.",
+    q: "What is BLENTERA?",
+    a: "BLENTERA is a company AI foundation: a shared layer for company context, work, organisation, governance, learning and portable execution across people and AI.",
   },
   {
-    q: "Can I use Acme for multiple projects?",
-    a: "Yes. Every account supports unlimited projects. You can organise them into separate workspaces and control access permissions per workspace.",
+    q: "Is BLENTERA an AI agent platform?",
+    a: "Agents are one execution option. The product is positioned underneath them: the company layer that keeps context, work, authority and learning useful while agents, models and runtimes change.",
   },
   {
-    q: "What payment methods do you accept?",
-    a: "We accept all major credit and debit cards as well as ACH bank transfers for annual plans. Invoiced billing is available for Enterprise customers.",
+    q: "Does BLENTERA replace our existing AI tools?",
+    a: "The design goal is the opposite of forcing a single provider. Models, agents and runtimes should remain replaceable while the company foundation persists.",
   },
   {
-    q: "How do I cancel my subscription?",
-    a: "You can cancel at any time from Billing in your account settings. Your plan remains active until the end of the current billing period and will not renew.",
+    q: "How does company memory work?",
+    a: "Useful outcomes are not automatically treated as truth. Learning can be reviewed, corrected and promoted into shared company memory before it is reused in later work.",
   },
   {
-    q: "Is my data portable?",
-    a: "Absolutely. You can export all your data as JSON or CSV from the Settings page at any time, with no restrictions or exit fees.",
+    q: "Can we use our own models or runtime?",
+    a: "Provider portability is a core product principle. The current direction includes customer-owned model/provider access and customer-managed runtime options.",
   },
   {
-    q: "Do you offer discounts for non-profits?",
-    a: "We offer a 40% discount for verified non-profit organisations. Reach out to our team with your registration documents to apply.",
+    q: "Is BLENTERA production-ready today?",
+    a: "The technical foundation exists, but the current master product status remains production NO-GO until qualification, live operating evidence and customer gates are complete. The public website therefore uses an early-access CTA.",
+  },
+  {
+    q: "Does BLENTERA guarantee EU AI Act compliance?",
+    a: "No. BLENTERA is designed to provide controls and evidence that can support responsible operation. Exact legal obligations depend on the organisation, role and use case.",
   },
 ]
 
 export default function Faqs() {
-  const [open, setOpen] = useState(false)
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setOpen(false)
-    toast.success("Message sent", {
-      description: "Our support team typically replies within a few hours.",
-    })
-  }
-
   return (
     <section className="flex w-full items-center justify-center px-6 py-16 sm:py-24">
       <div className="mx-auto w-full max-w-6xl">
@@ -73,12 +52,11 @@ export default function Faqs() {
                 FAQ
               </Badge>
               <h2 className="font-heading text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-                Questions &amp; answers
+                What BLENTERA is, and what it is not
               </h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Browse the most common questions about Acme below. If you do not
-                find what you are looking for, our support team is always happy
-                to help.
+                The category comes first: BLENTERA is the company AI foundation,
+                not another model, agent wrapper or generic automation tool.
               </p>
             </div>
 
@@ -89,63 +67,23 @@ export default function Faqs() {
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium">
-                    Still have questions?
+                    Evaluating BLENTERA?
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    We typically reply within a few hours.
+                    Ask about the product, architecture or early access.
                   </span>
                 </div>
               </div>
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger
-                  render={<Button className="w-full justify-between" />}
-                >
-                  Contact Support
-                  <ArrowRight data-icon="inline-end" />
-                </DialogTrigger>
-                <DialogContent>
-                  <form onSubmit={handleSubmit}>
-                    <DialogHeader>
-                      <DialogTitle>Contact support</DialogTitle>
-                      <DialogDescription>
-                        Tell us what is going on and we will get back to you,
-                        usually within a few hours.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <FieldGroup className="my-4 gap-4">
-                      <Field>
-                        <FieldLabel htmlFor="support-email">Email</FieldLabel>
-                        <Input
-                          id="support-email"
-                          type="email"
-                          required
-                          placeholder="jane@company.com"
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="support-message">
-                          How can we help?
-                        </FieldLabel>
-                        <Textarea
-                          id="support-message"
-                          required
-                          rows={4}
-                          className="min-h-24 resize-none"
-                          placeholder="Describe your question or issue…"
-                        />
-                      </Field>
-                    </FieldGroup>
-
-                    <DialogFooter>
-                      <DialogClose render={<Button variant="outline" />}>
-                        Cancel
-                      </DialogClose>
-                      <Button type="submit">Send Message</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              <Button
+                nativeButton={false}
+                render={
+                  <a href="mailto:ak@augustkring.com?subject=BLENTERA%20question" />
+                }
+                className="w-full justify-between"
+              >
+                Contact BLENTERA
+                <ArrowRight data-icon="inline-end" />
+              </Button>
             </div>
           </div>
 
