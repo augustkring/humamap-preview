@@ -729,7 +729,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .newsletter-status { min-height: 18px; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; text-align: center; }
 .newsletter-status.is-error { color: #9d2f2a; }
 
-.newsletter-consent {
+.perspectives-hero > .newsletter-consent {
   max-width: 620px;
   margin: 12px auto 0;
   color: var(--muted);
