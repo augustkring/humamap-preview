@@ -1,0 +1,134 @@
+name: Reconstruct authentic signature as resolution-independent curves
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/build-faithful-signature-vector.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: faithful-signature-vector
+  cancel-in-progress: false
+
+jobs:
+  build-signature:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout authoritative original
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deterministic vectorisation tools
+        run: python -m pip install --disable-pip-version-check --no-input 'Pillow==11.3.0' 'opencv-python-headless==4.12.0.88' 'CairoSVG==2.8.2'
+      - name: Reconstruct continuous curves from existing original ink
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+          from xml.sax.saxutils import escape
+          import io
+          import numpy as np
+          import cv2
+          import cairosvg
+          from PIL import Image, ImageDraw
+
+          src = Path("augustkring/assets/august-signature-authentic.png")
+          dst = Path("augustkring/assets/august-signature-faithful.svg")
+          img = Image.open(src).convert("RGBA")
+          if img.size != (260, 245):
+              raise ValueError(f"Original asset unexpectedly changed: {img.size}")
+          alpha = np.asarray(img.getchannel("A"), dtype=np.uint8)
+          mask = (alpha >= 100).astype(np.uint8) * 255
+          if cv2.countNonZero(mask) < 1000:
+              raise ValueError("Too little original handwriting ink")
+          contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+          paths = []
+          for contour in contours:
+              if len(contour) < 4 or abs(cv2.contourArea(contour)) < 1.0:
+                  continue
+              pts = contour[:, 0, :].astype(np.float64)
+              # Smooth contour geometry only, retaining all original enclosed ink
+              # shapes and holes. Never infer new strokes, letters or a new signature.
+              pts = (np.roll(pts, 1, axis=0) + 2 * pts + np.roll(pts, -1, axis=0)) / 4
+              pts = cv2.approxPolyDP(
+                  pts.astype(np.float32).reshape(-1, 1, 2),
+                  epsilon=0.5,
+                  closed=True,
+              )[:, 0, :]
+              if len(pts) < 3:
+                  continue
+              midpoint = lambda a, b: (a + b) * 0.5
+              start = midpoint(pts[-1], pts[0])
+              commands = [f"M{start[0]:.1f} {start[1]:.1f}"]
+              for i, pt in enumerate(pts):
+                  mid = midpoint(pt, pts[(i + 1) % len(pts)])
+                  commands.append(f"Q{pt[0]:.1f} {pt[1]:.1f} {mid[0]:.1f} {mid[1]:.1f}")
+              commands.append("Z")
+              paths.append(" ".join(commands))
+
+          if not paths:
+              raise ValueError("Failed to extract any authentic ink contours")
+          geometry = " ".join(paths)
+          svg = (
+              '<svg xmlns="http://www.w3.org/2000/svg" width="260" height="245" '
+              'viewBox="0 0 260 245" fill="none" role="img" '
+              'aria-label="August Kring handwritten signature">'
+              f'<path d="{geometry}" fill="#0b223d" fill-rule="evenodd"/>'
+              '</svg>'
+          )
+          dst.write_text(svg, encoding="utf-8")
+          vector_png = cairosvg.svg2png(bytestring=svg.encode(), output_width=260, output_height=245)
+          v = np.asarray(Image.open(io.BytesIO(vector_png)).convert("RGBA").getchannel("A"))
+          m1 = alpha >= 100
+          m2 = v >= 100
+          intersection = np.logical_and(m1, m2).sum()
+          union = np.logical_or(m1, m2).sum()
+          iou = intersection / union if union else 0
+          print(f"Authentic ink mask overlap IoU={iou:.4f}, paths={len(paths)}, SVG bytes={dst.stat().st_size}")
+          if iou < 0.70:
+              raise ValueError(f"New vectors depart too far from original handwriting: IoU={iou:.3f}")
+
+          # QA preview compares both at their actual intended rendered scale on
+          # a white background; a human review remains necessary.
+          scale = (320, 302)
+          proof = Image.new("RGB", (690, 376), "white")
+          draw = ImageDraw.Draw(proof)
+          draw.text((16, 15), "ORIGINAL raster, scaled", fill="#0b223d")
+          draw.text((360, 15), "CURVE trace, same size", fill="#0b223d")
+          raw = img.resize(scale, Image.Resampling.LANCZOS)
+          traced = Image.open(io.BytesIO(
+              cairosvg.svg2png(bytestring=svg.encode(), output_width=320, output_height=302)
+          )).convert("RGBA")
+          proof.paste(raw, (12, 49), raw)
+          proof.paste(traced, (356, 49), traced)
+          proof.save("/tmp/signature-fidelity-proof.png")
+
+          if dst.stat().st_size > 100000:
+              raise ValueError("Unexpectedly oversized vector")
+          PY
+      - name: Upload side-by-side visual proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: authentic-signature-trace-proof
+          path: /tmp/signature-fidelity-proof.png
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit the reviewed-candidate SVG without overwriting any newer work
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add augustkring/assets/august-signature-faithful.svg
+          if ! git diff --staged --quiet; then
+            git commit -m "Store resolution-independent curves traced from original handwriting"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
