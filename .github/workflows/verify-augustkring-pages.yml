@@ -117,7 +117,8 @@ jobs:
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
                 assert.equal((await page.locator('.hero-focus').textContent()).trim(), 'Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable.');
-                await page.locator('.personal-signoff .signoff-name').scrollIntoViewIfNeeded();
+                await page.locator('.personal-signoff .signoff-signature').scrollIntoViewIfNeeded();
+                await page.locator('.personal-signoff .signoff-signature').evaluate(img => img.decode());
                 const signoff = await page.evaluate(() => {
                   const section = document.querySelector('.personal-signoff');
                   const name = section.querySelector('.signoff-name');
