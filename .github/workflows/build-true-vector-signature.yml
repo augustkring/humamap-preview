@@ -84,7 +84,7 @@ jobs:
               f'<path d="{data}" fill="#0b223d" fill-rule="evenodd"/>'
               '</svg>'
           )
-          if "<script" in svg or "<image" in svg or "http:" in svg:
+          if "<script" in svg or "<image" in svg or "xlink:" in svg:
               raise ValueError("Signature must contain only trusted local path geometry")
           output.write_text(svg, encoding="utf-8")
           if not 5000 < output.stat().st_size < 50000:
