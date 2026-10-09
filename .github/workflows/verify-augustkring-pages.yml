@@ -28,7 +28,7 @@ jobs:
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "I\x27ve always been curious about how businesses evolve, technology advances and people grow." /tmp/augustkring.html && grep -Fq "It became my own kind of business school" /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "I've always been curious about how businesses evolve, technology advances and people grow." /tmp/augustkring.html && grep -Fq "It became my own kind of business school" /tmp/augustkring.html; then
               echo "Approved About, profile copy and stylesheet version are published."
               break
             fi
