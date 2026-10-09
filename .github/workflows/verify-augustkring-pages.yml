@@ -2,7 +2,11 @@ name: Verify August Kring GitHub Pages
 
 on:
   push:
+    branches:
+      - main
     paths:
+      - "augustkring/index.html"
+      - "augustkring/styles.css"
       - ".github/workflows/verify-augustkring-pages.yml"
   workflow_dispatch:
 
@@ -12,29 +16,79 @@ permissions:
 jobs:
   verify-public-preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
-      - name: Verify real public HTML, CSS and logo
+      - name: Wait for published HTML and verify deployed CSS
         shell: bash
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          for attempt in $(seq 1 18); do
+          expected="styles.css?v=20261009-hero-column-v23"
+          for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
-            echo "Attempt ${attempt}: homepage HTTP ${status}"
-            if [ "$status" = "200" ] && grep -q "I do my best work in the early stages" /tmp/augustkring.html; then
-              echo "Public homepage contains the approved text."
+            echo "Attempt ${attempt}: public HTML HTTP ${status}"
+            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html; then
+              echo "Correct stylesheet version is published."
               break
             fi
-            if [ "$attempt" = "18" ]; then
-              echo "::error::Public Pages homepage did not serve approved text"
-              exit 1
-            fi
+            if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
             sleep 10
           done
-          for asset in "styles.css?v=20261009-venture-fulltext-v21" "assets/blentera-horizontal-color.svg"; do
-            status="$(curl -sSL --max-time 15 -o /dev/null -w '%{http_code}' "${base}${asset}" || true)"
-            echo "Asset ${asset}: HTTP ${status}"
-            [ "$status" = "200" ] || { echo "::error::Missing public asset ${asset}"; exit 1; }
-          done
-          echo "PUBLIC_PREVIEW_OK: ${base}"
+          grep -Fq "Exploring how AI and human-centric innovation can make businesses more capable, resilient and sustainable." /tmp/augustkring.html
+          grep -Fq "I take responsibility for moving those concepts into practice" /tmp/augustkring.html
+          curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
+          grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
+          grep -Fq 'max-width: none;' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
+          echo "Public HTML and CSS contain the approved content and responsive width rules."
+
+      - name: Check hero text rendering in desktop and mobile Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$chrome" || { echo "::error::Chrome not installed"; exit 1; }
+          mkdir -p /tmp/ak-browser-check
+          npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0
+          CHROME_BIN="$chrome" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
+          const assert = require('node:assert/strict');
+          const {chromium} = require('playwright-core');
+          (async () => {
+            const browser = await chromium.launch({executablePath:process.env.CHROME_BIN, headless:true, args:['--no-sandbox']});
+            try {
+              for (const width of [390, 768, 1440]) {
+                const page = await browser.newPage({viewport:{width,height:900}});
+                await page.goto('https://augustkring.github.io/humamap-preview/augustkring/', {waitUntil:'networkidle',timeout:45000});
+                await page.evaluate(() => document.fonts.ready);
+                const metrics = await page.evaluate(() => {
+                  const copy=document.querySelector('.hero-copy');
+                  const focus=document.querySelector('.hero-focus');
+                  const title=document.querySelector('#hero-title');
+                  const style=getComputedStyle(focus);
+                  const size=focus.getBoundingClientRect();
+                  const lineHeight=parseFloat(style.lineHeight);
+                  return {
+                    copyWidth:copy.getBoundingClientRect().width,
+                    focusWidth:size.width,
+                    titleWidth:title.getBoundingClientRect().width,
+                    maxWidth:style.maxWidth,
+                    textWrap:style.textWrap,
+                    textOverflow:style.textOverflow,
+                    overflow:style.overflow,
+                    approximateLines: Math.round(size.height/lineHeight),
+                    horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1,
+                    isVisible:size.width>0&&size.height>0
+                  };
+                });
+                console.log('Hero rendering',width,metrics);
+                assert.equal(metrics.maxWidth,'none','No arbitrary fixed max-width');
+                assert.equal(metrics.textWrap,'balance','Hero paragraph uses balanced wrapping');
+                assert.ok(Math.abs(metrics.focusWidth-metrics.copyWidth)<2,'Hero paragraph fills its column');
+                assert.equal(metrics.horizontalOverflow,false,'No horizontal viewport overflow');
+                assert.equal(metrics.isVisible,true,'Hero paragraph visible');
+                assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
+                await page.close();
+              }
+            } finally {await browser.close();}
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          NODE
