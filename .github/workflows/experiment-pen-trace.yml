@@ -46,15 +46,15 @@ jobs:
           draw.text((16,10),'Original raster',fill='#0b223d')
 
           variants=[
-            ('gentle',100,25,3.5),
-            ('standard',100,60,4.0),
-            ('sharp',165,75,3.5),
+            ('highres-160',160,25,5.0),
+            ('highres-205',205,40,5.0),
+            ('highres-235',235,60,5.0),
           ]
+          hi_alpha=img.getchannel('A').resize((1040,980),Image.Resampling.LANCZOS)
           for index,(name,threshold,corner,length) in enumerate(variants):
-              bw=Image.new('RGB',img.size,'white')
-              alpha=img.getchannel('A')
-              pixels=[(0,0,0) if value>=threshold else (255,255,255) for value in alpha.getdata()]
-              bw.putdata(pixels)
+              bw=Image.new('L',hi_alpha.size,255)
+              bw.putdata([0 if value>=threshold else 255 for value in hi_alpha.getdata()])
+              bw=bw.convert('RGB')
               input_file=root/f'{name}-input.png'
               output_file=root/f'{name}.svg'
               bw.save(input_file)
