@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-focus-signature-v31"
+          expected="styles.css?v=20261009-reading-v32"
           expected_copy="Taking ideas to market by shaping business models, validating demand with customers and building the first viable product."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -296,6 +296,82 @@ jobs:
           })().catch(error=>{console.error(error);process.exitCode=1;});
           NODE
 
+      - name: Audit real browser reading sizes and reflow across pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
+          const assert = require('node:assert/strict');
+          const { chromium } = require('playwright-core');
+          const base = 'https://augustkring.github.io/humamap-preview/augustkring/';
+          const cases = [
+            { path: '', selector: '.thread-copy p', desktop: 18, mobile: 17 },
+            { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 17 },
+            { path: '', selector: '.work-card p', desktop: 16, mobile: 16 },
+            { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 16 },
+            { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 16 },
+            { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 17 },
+            { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 18, mobile: 17 },
+            { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 17 },
+            { path: 'perspectives/', selector: '.newsletter-consent', desktop: 14, mobile: 14 },
+            { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
+            { path: 'perspectives/rethinking-the-company/', selector: '.article-comparison td', desktop: 16, mobile: 16 },
+            { path: 'perspectives/europe-at-a-crossroads/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
+            { path: 'privacy/', selector: '.legal-content p', desktop: 18, mobile: 17 },
+          ];
+          (async () => {
+            const browser = await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
+            try {
+              for (const width of [320,390,768,1440]) {
+                const page = await browser.newPage({ viewport: {width,height:940}});
+                const visited = new Set();
+                for (const target of cases) {
+                  if (!visited.has(target.path)) {
+                    await page.goto(base + target.path, { waitUntil: 'networkidle', timeout: 45000 });
+                    await page.evaluate(() => document.fonts.ready);
+                    visited.add(target.path);
+                  }
+                  const metrics = await page.locator(target.selector).first().evaluate(element => {
+                    const css=getComputedStyle(element);
+                    const rect=element.getBoundingClientRect();
+                    return {
+                      fontSize:parseFloat(css.fontSize),
+                      lineHeight:parseFloat(css.lineHeight),
+                      width:rect.width,
+                      height:rect.height,
+                      viewportOverflow:document.documentElement.scrollWidth>innerWidth+1
+                    };
+                  });
+                  const expected=width<=760?target.mobile:target.desktop;
+                  console.log('Typography',width,target.path||'home',target.selector,metrics);
+                  assert.ok(Math.abs(metrics.fontSize-expected)<0.1, `Expected ${expected}px for ${target.selector} at ${width}`);
+                  assert.ok(metrics.lineHeight/metrics.fontSize >= 1.45, `Readable line height for ${target.selector}`);
+                  assert.ok(metrics.width>0&&metrics.height>0, `Text block is visible: ${target.selector}`);
+                  assert.equal(metrics.viewportOverflow,false,`No horizontal scrolling on ${target.path} at ${width}px`);
+                }
+                for (const route of ['','about/','perspectives/rethinking-the-company/']) {
+                  await page.goto(base + route, {waitUntil:'networkidle',timeout:45000});
+                  await page.evaluate(() => document.fonts.ready);
+                  if (width===390||width===1440) {
+                    const section=route===''?'.thread-section':route==='about/'?'.about-skills':'.article-layout';
+                    await page.locator(section).first().screenshot({path:`/tmp/ak-browser-check/typography-${route.replaceAll('/','-')||'home'}-${width}.png`});
+                  }
+                  // Representative 200%-sized prose at narrow viewports checks text
+                  // growth and wrapping; this is not a complete WCAG conformance audit.
+                  if (width===390) {
+                    const selected=route===''?'.thread-copy p':route==='about/'?'.about-skill-grid p':'.article-prose > p:not(.article-lead)';
+                    await page.locator(selected).first().evaluate(e=>{e.style.fontSize='34px';e.style.lineHeight='1.5';});
+                    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`Scaled text must reflow on ${route||'home'}`);
+                  }
+                }
+                await page.close();
+              }
+            } finally {
+              await browser.close();
+            }
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          NODE
+
       - name: Save responsive sign-off and mobile navigation screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -306,5 +382,6 @@ jobs:
             /tmp/ak-browser-check/menu-open-*.png
             /tmp/ak-browser-check/perspectives-*.png
             /tmp/ak-browser-check/focus-heading-*.png
+            /tmp/ak-browser-check/typography-*.png
           if-no-files-found: warn
           retention-days: 7
