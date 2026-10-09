@@ -321,10 +321,10 @@ jobs:
                     heroBottom:hero?.getBoundingClientRect().bottom + scrollY,
                     fontSize:parseFloat(style.fontSize),
                     externalLinks,
-                    ctaLineCount:(() => {
-                      const range=document.createRange();
-                      range.selectNodeContents(document.querySelector('#story .about-story-link span'));
-                      return range.getClientRects().length;
+                    ctaMetrics:(() => {
+                      const span=document.querySelector('#story .about-story-link span');
+                      const box=span.getBoundingClientRect();
+                      return { height:box.height, fontSize:parseFloat(getComputedStyle(span).fontSize), text:span.textContent.trim() };
                     })(),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
@@ -337,7 +337,9 @@ jobs:
                 assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
                 assert.deepEqual(aboutProof.externalLinks.map(x=>x.text),['Blentera','August Works','HumaMap']);
                 assert.ok(aboutProof.externalLinks.every(x=>x.href.startsWith('https://')));
-                assert.equal(aboutProof.ctaLineCount,1,'Professional background CTA fits on one line');
+                assert.equal(aboutProof.ctaMetrics.text,'View my LinkedIn profile');
+                assert.ok(aboutProof.ctaMetrics.height <= aboutProof.ctaMetrics.fontSize*1.5,
+                  'LinkedIn link stays on one rendered line without shrinking or clipping');
                 assert.ok(Math.abs(aboutProof.fontSize-(width<=760?17:18))<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
