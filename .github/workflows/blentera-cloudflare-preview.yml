@@ -1,0 +1,42 @@
+name: BLENTERA Cloudflare Preview
+
+on:
+  push:
+    branches:
+      - blentera-preview-host
+    paths:
+      - "blentera-host/**"
+      - ".github/workflows/blentera-cloudflare-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        working-directory: blentera-host/site
+        run: npm install
+
+      - name: Build exact BLENTERA snapshot
+        working-directory: blentera-host/site
+        run: npm run build
+
+      - name: Deploy temporary Cloudflare Worker
+        run: |
+          npx --yes wrangler@4.135.0 deploy --temporary --config blentera-host/wrangler.jsonc 2>&1 | tee blentera-host/cloudflare-deploy.log
+
+      - name: Show deployment output
+        if: always()
+        run: cat blentera-host/cloudflare-deploy.log || true
