@@ -1,0 +1,131 @@
+name: Build fine-stroke signature vector from original PNG
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-true-vector-signature.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: signature-true-vector-fidelity
+  cancel-in-progress: false
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Prepare Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deterministic image libraries
+        run: python -m pip install --disable-pip-version-check --no-input "numpy==2.2.6" "Pillow==11.3.0" "scipy==1.16.2" "scikit-image==0.25.2" "opencv-python-headless==4.12.0.88" "CairoSVG==2.8.2"
+      - name: Trace real original strokes with subpixel quadratic curves
+        shell: bash
+        run: |
+          python <<'PY'
+          import io
+          from pathlib import Path
+          import numpy as np
+          import cv2
+          from scipy.ndimage import gaussian_filter1d
+          from skimage.measure import find_contours
+          from PIL import Image, ImageDraw
+          import cairosvg
+
+          source = Path("augustkring/assets/august-signature-authentic.png")
+          output = Path("augustkring/assets/august-signature-vector-fine.svg")
+          original = Image.open(source).convert("RGBA")
+          if original.size != (260, 245):
+              raise ValueError("Authentic signature unexpectedly changed")
+          resampled = original.getchannel("A").resize((340, 314), Image.Resampling.LANCZOS)
+          ink = np.asarray(resampled, dtype=float) / 255.0
+          if np.count_nonzero(ink > 0.45) < 1000:
+              raise ValueError("The source has no usable signature")
+
+          paths = []
+          for contour in find_contours(
+              ink, level=0.75, fully_connected="high", positive_orientation="high"
+          ):
+              if len(contour) < 7 or np.linalg.norm(contour[0] - contour[-1]) > 2:
+                  continue
+              points = gaussian_filter1d(
+                  contour[:, [1, 0]].astype(float),
+                  sigma=0.55, axis=0, mode="wrap"
+              )
+              points = cv2.approxPolyDP(
+                  points.astype("float32").reshape(-1, 1, 2),
+                  epsilon=0.20, closed=True
+              )[:, 0, :]
+              if len(points) < 4:
+                  continue
+              middle = (points[-1] + points[0]) / 2
+              segments = [f"M{middle[0]:.2f} {middle[1]:.2f}"]
+              for index, point in enumerate(points):
+                  between = (point + points[(index + 1) % len(points)]) / 2
+                  segments.append(
+                      f"Q{point[0]:.2f} {point[1]:.2f} "
+                      f"{between[0]:.2f} {between[1]:.2f}"
+                  )
+              segments.append("Z")
+              paths.append(" ".join(segments))
+          if len(paths) < 4 or len(paths) > 40:
+              raise ValueError(f"Unexpected signature topology: {len(paths)} paths")
+
+          data = " ".join(paths)
+          svg = (
+              '<svg xmlns="http://www.w3.org/2000/svg" '
+              'viewBox="0 0 340 314" width="340" height="314">'
+              f'<path d="{data}" fill="#0b223d" fill-rule="evenodd"/>'
+              '</svg>'
+          )
+          if "<script" in svg or "<image" in svg or "http:" in svg:
+              raise ValueError("Signature must contain only trusted local path geometry")
+          output.write_text(svg, encoding="utf-8")
+          if not 5000 < output.stat().st_size < 50000:
+              raise ValueError(f"Unexpected SVG size: {output.stat().st_size}")
+
+          # Re-render at CSS image size on a 2x retina surface.
+          pixel_image = Image.open(io.BytesIO(
+              cairosvg.svg2png(bytestring=svg.encode(),
+                               output_width=312, output_height=288)
+          )).convert("RGBA")
+          if pixel_image.getchannel("A").getbbox() is None:
+              raise ValueError("Vector signature rendered transparent")
+          source_image = original.resize((312, 288), Image.Resampling.LANCZOS)
+          review = Image.new("RGB", (660, 355), "white")
+          paint = ImageDraw.Draw(review)
+          paint.text((12, 8), "Previous pixel signature", fill="#0b223d")
+          paint.text((346, 8), "New resolution-independent signature", fill="#0b223d")
+          for ix, image in ((0, source_image), (1, pixel_image)):
+              white = Image.new("RGBA", (312, 288), "white")
+              white.alpha_composite(image)
+              review.paste(white.convert("RGB"), (ix * 334 + 4, 36))
+          review.save("/tmp/august-signature-fidelity-preview.png")
+          print(f"Created {output}, {output.stat().st_size} bytes with {len(paths)} native curves")
+          PY
+      - name: Keep before/after proof for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: august-signature-fidelity-proof
+          path: /tmp/august-signature-fidelity-preview.png
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit only the reviewed candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add augustkring/assets/august-signature-vector-fine.svg
+          if ! git diff --cached --quiet; then
+            git commit -m "Add thin-stroke vector preserving authentic handwritten signature"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
