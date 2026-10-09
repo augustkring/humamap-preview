@@ -7,6 +7,13 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
+      - "augustkring/mobile-nav.js"
+      - "augustkring/about/index.html"
+      - "augustkring/perspectives/index.html"
+      - "augustkring/perspectives/rethinking-the-company/index.html"
+      - "augustkring/perspectives/europe-at-a-crossroads/index.html"
+      - "augustkring/privacy/index.html"
+      - "augustkring/unsubscribe/index.html"
       - ".github/workflows/verify-augustkring-pages.yml"
   workflow_dispatch:
 
@@ -23,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-readable-signoff-v27"
+          expected="styles.css?v=20261009-stable-menu-signoff-v28"
           expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -35,7 +42,7 @@ jobs:
             if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
             sleep 10
           done
-          grep -Fq "Exploring how AI and human-centric innovation can make businesses more capable, resilient and sustainable." /tmp/augustkring.html
+          grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq "I turn those opportunities into business concepts and take the lead on strategy and innovation." /tmp/augustkring.html
           grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
@@ -43,13 +50,26 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
-          ! grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
+          grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
+          grep -Fq 'src="mobile-nav.js?v=20261009-stable-v2"' /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
-          echo "Public HTML and CSS contain the approved content and responsive width rules."
+          grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
+          grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}assets/august-signature-authentic.png?v=20261009-signature-both-v6" -o /tmp/august-signature.png
+          file /tmp/august-signature.png | grep -Fq 'PNG image data, 260 x 245'
+          curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-stable-v2" -o /tmp/augustkring-mobile-nav.js
+          grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
+          ! grep -Fq 'document.body.style.position' /tmp/augustkring-mobile-nav.js
+          for route in about/ perspectives/ perspectives/rethinking-the-company/ perspectives/europe-at-a-crossroads/ privacy/ unsubscribe/; do
+            curl -fsSL --max-time 20 "${base}${route}" -o /tmp/augustkring-subpage.html
+            grep -Fq "$expected" /tmp/augustkring-subpage.html
+            grep -Fq 'src="mobile-nav.js?v=20261009-stable-v2"' /tmp/augustkring-subpage.html
+          done
+          echo "Published hero, signature+name, shared mobile menu and CSS are consistent across pages."
 
       - name: Check hero text rendering in desktop and mobile Chrome
         shell: bash
@@ -96,39 +116,116 @@ jobs:
                 assert.equal(metrics.horizontalOverflow,false,'No horizontal viewport overflow');
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
+                assert.equal((await page.locator('.hero-focus').textContent()).trim(), 'Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable.');
                 await page.locator('.personal-signoff .signoff-name').scrollIntoViewIfNeeded();
                 const signoff = await page.evaluate(() => {
-                  const name = document.querySelector('.personal-signoff .signoff-name');
                   const section = document.querySelector('.personal-signoff');
+                  const name = section.querySelector('.signoff-name');
+                  const signature = section.querySelector('.signoff-signature');
                   const salutation = section.querySelector('p:not(.signoff-name)');
-                  const rect = name.getBoundingClientRect();
-                  const style = getComputedStyle(name);
-                  const boundary = section.getBoundingClientRect();
+                  const nameBox = name.getBoundingClientRect();
+                  const sigBox = signature.getBoundingClientRect();
+                  const sectionBox = section.getBoundingClientRect();
                   return {
                     name: name.textContent.trim(),
                     salutation: salutation.textContent.trim(),
                     heading: document.querySelector('#work-title').textContent.trim(),
-                    fontSize: parseFloat(style.fontSize),
-                    fontWeight: style.fontWeight,
-                    opacity: parseFloat(style.opacity),
-                    visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden',
-                    insideContent: rect.left >= boundary.left - 1 && rect.right <= boundary.right + 1,
-                    verticalGap: rect.top - salutation.getBoundingClientRect().bottom,
-                    unwantedImages: section.querySelectorAll('img').length,
+                    nameVisible: nameBox.height > 0 && nameBox.width > 0,
+                    signatureLoaded: signature.complete && signature.naturalWidth === 260 && signature.naturalHeight === 245,
+                    signatureAlt: signature.alt,
+                    signatureWidth: sigBox.width,
+                    imageBeforeName: sigBox.bottom < nameBox.top,
+                    insideContent: sigBox.left >= sectionBox.left - 1 && sigBox.right <= sectionBox.right + 1,
+                    fontSize: parseFloat(getComputedStyle(name).fontSize),
                     horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1
                   };
                 });
-                console.log('Readable sign-off rendering', width, signoff);
+                console.log('Name and original PNG signature', width, signoff);
                 assert.equal(signoff.heading, 'Current focus');
                 assert.equal(signoff.name, 'August Kring');
                 assert.equal(signoff.salutation, 'With curiosity and optimism,');
-                assert.equal(signoff.unwantedImages, 0, 'Distorted signature image is no longer rendered');
-                assert.ok(signoff.visible && signoff.fontSize >= 17 && signoff.fontSize <= 19);
-                assert.equal(signoff.fontWeight, '500');
-                assert.equal(signoff.opacity, 1);
-                assert.ok(signoff.insideContent && signoff.verticalGap >= 6 && signoff.verticalGap <= 18);
+                assert.equal(signoff.nameVisible, true);
+                assert.equal(signoff.signatureLoaded, true);
+                assert.equal(signoff.signatureAlt, 'Handwritten signature of August Kring');
+                assert.ok(signoff.signatureWidth >= 107 && signoff.signatureWidth <= 123);
+                assert.ok(signoff.fontSize >= 17 && signoff.fontSize <= 19);
+                assert.ok(signoff.imageBeforeName && signoff.insideContent);
                 assert.equal(signoff.horizontalOverflow, false);
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
+
+                if (width <= 840) {
+                  await page.evaluate(() => window.scrollTo(0, 0));
+                  await page.waitForTimeout(80);
+                  const before = await page.evaluate(() => {
+                    const header=document.querySelector('.home-header').getBoundingClientRect();
+                    const hero=document.querySelector('.home-hero').getBoundingClientRect();
+                    return {scrollY:scrollY, viewportWidth:document.documentElement.clientWidth, headerX:header.x, headerY:header.y, heroX:hero.x, heroY:hero.y};
+                  });
+                  await page.locator('[data-mobile-nav-open]').click();
+                  const during = await page.evaluate(() => {
+                    const header=document.querySelector('.home-header').getBoundingClientRect();
+                    const hero=document.querySelector('.home-hero').getBoundingClientRect();
+                    const button=document.querySelector('[data-mobile-nav-close]');
+                    const dialog=document.querySelector('#mobile-menu');
+                    return {
+                      scrollY:scrollY, viewportWidth:document.documentElement.clientWidth,
+                      headerX:header.x, headerY:header.y, heroX:hero.x, heroY:hero.y,
+                      dialogOpen:dialog.open, expanded:document.querySelector('[data-mobile-nav-open]').getAttribute('aria-expanded'),
+                      bodyPosition:getComputedStyle(document.body).position, bodyTop:document.body.style.top,
+                      closeOutline:getComputedStyle(button).outlineStyle,
+                      focusOnDialog:document.activeElement===dialog,
+                      horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
+                    };
+                  });
+                  console.log('Mobile menu pointer open',width,{before,during});
+                  assert.equal(during.dialogOpen,true);
+                  assert.equal(during.expanded,'true');
+                  assert.equal(during.bodyPosition,'static','Do not reposition the page while opening navigation');
+                  assert.equal(during.bodyTop,'','No negative body top');
+                  assert.equal(during.closeOutline,'none','No unsolicited focus ring on pointer-open X');
+                  assert.equal(during.focusOnDialog,true,'Pointer opening focuses dialog container');
+                  assert.equal(during.horizontalOverflow,false);
+                  for(const key of ['scrollY','viewportWidth','headerX','headerY','heroX','heroY']) {
+                    assert.ok(Math.abs(during[key]-before[key]) < 1.1,`No layout/scroll shift for ${key}`);
+                  }
+                  await page.screenshot({path:`/tmp/ak-browser-check/menu-open-${width}.png`});
+                  await page.mouse.wheel(0,450);
+                  await page.waitForTimeout(60);
+                  assert.ok(Math.abs((await page.evaluate(() => scrollY))-before.scrollY)<1.1,'Background stays locked while menu is open');
+                  await page.locator('[data-mobile-nav-close]').click();
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  assert.equal(await page.locator('[data-mobile-nav-open]').getAttribute('aria-expanded'),'false');
+                  assert.ok(Math.abs((await page.evaluate(() => scrollY))-before.scrollY)<1.1,'Closing does not jump page');
+
+                  await page.locator('[data-mobile-nav-open]').focus();
+                  await page.keyboard.press('Enter');
+                  const focus = await page.evaluate(() => {
+                    const button=document.querySelector('[data-mobile-nav-close]');
+                    const style=getComputedStyle(button);
+                    return {onClose:document.activeElement===button,outline:style.outlineStyle,color:style.outlineColor};
+                  });
+                  console.log('Mobile menu keyboard focus',width,focus);
+                  assert.equal(focus.onClose,true,'Keyboard navigation focuses close control');
+                  assert.equal(focus.outline,'solid','Keyboard control retains a visible focus indicator');
+                  assert.notEqual(focus.color,'rgb(218, 56, 49)','Close focus ring is not red');
+                  await page.keyboard.press('Escape');
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  assert.equal(await page.locator('[data-mobile-nav-open]').getAttribute('aria-expanded'),'false');
+                  assert.equal(await page.locator('[data-mobile-nav-open]').evaluate(el => document.activeElement===el),true,'Focus returns to opener on Escape');
+
+                  // Test scroll continuity beyond the first viewport, where fixed-body locking used to jump.
+                  await page.evaluate(() => window.scrollTo(0, 440));
+                  await page.waitForTimeout(100);
+                  const middleBefore=await page.evaluate(() => scrollY);
+                  await page.evaluate(() => document.querySelector('[data-mobile-nav-open]').click());
+                  assert.equal(await page.locator('#mobile-menu').evaluate(el => el.open),true);
+                  assert.ok(Math.abs((await page.evaluate(() => scrollY))-middleBefore)<1.1,'Opening at prior scroll position must not jump');
+                  await page.keyboard.press('Escape');
+                  await page.waitForFunction(() => !document.querySelector('#mobile-menu').open);
+                  assert.ok(Math.abs((await page.evaluate(() => scrollY))-middleBefore)<1.1,'Closing restores the same scroll position');
+                } else {
+                  assert.equal(await page.locator('[data-mobile-nav-open]').isVisible(),false);
+                }
                 const footer=await page.evaluate(() => {
                   const footer=document.querySelector('.home-footer');
                   const primary=document.querySelector('.footer-primary');
@@ -152,11 +249,13 @@ jobs:
           })().catch(error=>{console.error(error);process.exitCode=1;});
           NODE
 
-      - name: Save responsive sign-off screenshots
+      - name: Save responsive sign-off and mobile navigation screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: augustkring-signoff-responsive
-          path: /tmp/ak-browser-check/signoff-*.png
+          path: |
+            /tmp/ak-browser-check/signoff-*.png
+            /tmp/ak-browser-check/menu-open-*.png
           if-no-files-found: warn
           retention-days: 7
