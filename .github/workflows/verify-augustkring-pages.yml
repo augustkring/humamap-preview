@@ -73,6 +73,18 @@ jobs:
             grep -Fq "$expected" /tmp/augustkring-subpage.html
             grep -Fq 'src="mobile-nav.js?v=20261009-input-focus-v4"' /tmp/augustkring-subpage.html
           done
+          for attempt in $(seq 1 30); do
+            curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
+            if grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq 'The story so far.' /tmp/augustkring-about.html; then
+              echo "The updated About story and shortened professional proof link are published."
+              break
+            fi
+            if [ "$attempt" = "30" ]; then
+              echo "::error::GitHub Pages has not yet published the new About story revision"
+              exit 1
+            fi
+            sleep 10
+          done
           echo "Published hero, signature+name, shared mobile menu and CSS are consistent across pages."
 
       - name: Check hero text rendering in desktop and mobile Chrome
