@@ -11,6 +11,9 @@ import {
   ShieldCheck,
   Key,
   History,
+  BookCheck,
+  Repeat2,
+  Code2,
 } from "lucide-react"
 
 type Feature = {
@@ -71,6 +74,30 @@ const TABS: FeatureTab[] = [
         title: "Durable workflows",
         description:
           "Run recurring work with state, retries, approvals and exception paths instead of fragile one-off automation.",
+      },
+    ],
+  },
+  {
+    value: "learning",
+    label: "Learning",
+    features: [
+      {
+        icon: Repeat2,
+        title: "Reviewed learning",
+        description:
+          "Capture useful outcomes, review what is true, and let the next run start from what the company has learned.",
+      },
+      {
+        icon: BookCheck,
+        title: "Reusable standards",
+        description:
+          "Turn proven ways of working into versioned playbooks and skills that people and agents can reuse.",
+      },
+      {
+        icon: Code2,
+        title: "AI → software",
+        description:
+          "As work stabilises, move repeatable steps from model reasoning into deterministic workflows and software.",
       },
     ],
   },
