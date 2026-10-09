@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-authentic-signature-footer-v26"
+          expected="styles.css?v=20261009-readable-signoff-v27"
           expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -42,15 +42,13 @@ jobs:
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
-          grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
-          ! grep -Fq '<p class="signoff-name">August</p>' /tmp/augustkring.html
+          grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
+          ! grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: balance;' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
-          curl -fsSL --max-time 20 "${base}assets/august-signature-authentic.png?v=20261009-original-pixels-v5" -o /tmp/august-signature.png
-          file /tmp/august-signature.png | grep -Fq 'PNG image data, 260 x 245'
-          python3 -c "import struct; p=open('/tmp/august-signature.png','rb').read(); assert p[:8]==bytes([137,80,78,71,13,10,26,10]); assert struct.unpack('>II',p[16:24])==(260,245); assert b'tRNS' in p"
+          grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           echo "Public HTML and CSS contain the approved content and responsive width rules."
 
       - name: Check hero text rendering in desktop and mobile Chrome
@@ -98,44 +96,39 @@ jobs:
                 assert.equal(metrics.horizontalOverflow,false,'No horizontal viewport overflow');
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
-                await page.locator('.signoff-signature').scrollIntoViewIfNeeded();
-                await page.waitForFunction(() => {
-                  const img = document.querySelector('.signoff-signature');
-                  return img && img.complete && img.naturalWidth > 0;
-                }, {timeout: 12000});
-                const signature = await page.evaluate(() => {
-                  const img = document.querySelector('.signoff-signature');
+                await page.locator('.personal-signoff .signoff-name').scrollIntoViewIfNeeded();
+                const signoff = await page.evaluate(() => {
+                  const name = document.querySelector('.personal-signoff .signoff-name');
+                  const section = document.querySelector('.personal-signoff');
+                  const salutation = section.querySelector('p:not(.signoff-name)');
+                  const rect = name.getBoundingClientRect();
+                  const style = getComputedStyle(name);
+                  const boundary = section.getBoundingClientRect();
                   return {
+                    name: name.textContent.trim(),
+                    salutation: salutation.textContent.trim(),
                     heading: document.querySelector('#work-title').textContent.trim(),
-                    width: img.getBoundingClientRect().width,
-                    opacity: parseFloat(getComputedStyle(img).opacity),
-                    naturalWidth: img.naturalWidth,
+                    fontSize: parseFloat(style.fontSize),
+                    fontWeight: style.fontWeight,
+                    opacity: parseFloat(style.opacity),
+                    visible: rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden',
+                    insideContent: rect.left >= boundary.left - 1 && rect.right <= boundary.right + 1,
+                    verticalGap: rect.top - salutation.getBoundingClientRect().bottom,
+                    unwantedImages: section.querySelectorAll('img').length,
                     horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1
                   };
                 });
-                console.log('Signature rendering',width,signature);
-                assert.equal(signature.heading,'Current focus');
-                assert.ok(signature.naturalWidth > 0,'Original handwritten signature loaded');
-                const ink = await page.evaluate(() => {
-                  const img = document.querySelector('.signoff-signature');
-                  const canvas = document.createElement('canvas');
-                  canvas.width = 260; canvas.height = 245;
-                  const ctx = canvas.getContext('2d',{willReadFrequently:true});
-                  ctx.drawImage(img,0,0,260,245);
-                  const data = ctx.getImageData(0,0,260,245).data;
-                  let opaque = 0, transparent = 0;
-                  for(let i=3;i<data.length;i+=4) {
-                    if(data[i]>100)opaque++;
-                    if(data[i]===0)transparent++;
-                  }
-                  return {opaque,transparent};
-                });
-                console.log('Signature pixels', width, ink);
-                assert.ok(ink.opaque>1200 && ink.opaque<16000,'Signature must contain original black strokes');
-                assert.ok(ink.transparent>30000,'Signature must have transparent background');
-                assert.ok(signature.width >= 140 && signature.width <= 162,'Faithful signature has legible dimensions');
-                assert.ok(signature.opacity >= .72 && signature.opacity <= .84,'Signature is appropriately subtle');
-                assert.equal(signature.horizontalOverflow,false,'No horizontal overflow around sign-off');
+                console.log('Readable sign-off rendering', width, signoff);
+                assert.equal(signoff.heading, 'Current focus');
+                assert.equal(signoff.name, 'August Kring');
+                assert.equal(signoff.salutation, 'With curiosity and optimism,');
+                assert.equal(signoff.unwantedImages, 0, 'Distorted signature image is no longer rendered');
+                assert.ok(signoff.visible && signoff.fontSize >= 17 && signoff.fontSize <= 19);
+                assert.equal(signoff.fontWeight, '500');
+                assert.equal(signoff.opacity, 1);
+                assert.ok(signoff.insideContent && signoff.verticalGap >= 6 && signoff.verticalGap <= 18);
+                assert.equal(signoff.horizontalOverflow, false);
+                await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
                 const footer=await page.evaluate(() => {
                   const footer=document.querySelector('.home-footer');
                   const primary=document.querySelector('.footer-primary');
@@ -158,3 +151,12 @@ jobs:
             } finally {await browser.close();}
           })().catch(error=>{console.error(error);process.exitCode=1;});
           NODE
+
+      - name: Save responsive sign-off screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: augustkring-signoff-responsive
+          path: /tmp/ak-browser-check/signoff-*.png
+          if-no-files-found: warn
+          retention-days: 7
