@@ -151,7 +151,7 @@ jobs:
           await workTab.click();
           await home.getByText("How people and AI coordinate real work.").waitFor({ state: "visible" });
 
-          const faq = home.locator("details").first();
+          const faq = home.locator(".faq-list details").first();
           await faq.locator("summary").click();
           if (!(await faq.evaluate(el => el.hasAttribute("open")))) failures.push("FAQ did not open");
 
