@@ -114,7 +114,18 @@
         "shadcn/no-raw-colors": "off",
         "shadcn/no-arbitrary-values": "off",
         "shadcn/require-static-classes": "off",
-        "shadcn/no-inline-styles": "off"
+        "shadcn/no-inline-styles": "off",
+        "react/no-array-index-key": "off",
+        "jsx-a11y/control-has-associated-label": "off"
+      }
+    },
+    {
+      "files": [
+        "src/app/opengraph-image.tsx"
+      ],
+      "rules": {
+        "shadcn/no-inline-styles": "off",
+        "shadcn/no-raw-colors": "off"
       }
     }
   ],
