@@ -30,8 +30,8 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-stable-menu-signoff-v28"
-          expected_copy="From there, I shape the business model, validate demand with customers and get the first viable version built."
+          expected="styles.css?v=20261009-editorial-polish-v29"
+          expected_copy="I take ideas to market by shaping business models, validating demand with customers and building the first viable product."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
@@ -48,7 +48,7 @@ jobs:
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
-          grep -Fq '<h2 id="work-title">Current focus</h2>' /tmp/augustkring.html
+          grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
           grep -Fq 'src="mobile-nav.js?v=20261009-stable-v3"' /tmp/augustkring.html
@@ -117,6 +117,34 @@ jobs:
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
                 assert.equal((await page.locator('.hero-focus').textContent()).trim(), 'Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable.');
+                const editorial = await page.evaluate(() => {
+                  const statement = document.querySelector('.perspective-statement');
+                  const perspectivesBlock = document.querySelector('.perspectives-block');
+                  const cardTitle = document.querySelector('.perspective-link-title');
+                  return {
+                    opener: document.querySelector('.thread-lead p').textContent.trim(),
+                    strategicCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
+                    marketCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    workHeading: document.querySelector('#work-title').textContent.trim(),
+                    storyHeading: document.querySelector('#about-title').textContent.trim(),
+                    statementTypeface: getComputedStyle(statement).fontFamily,
+                    statementWeight: getComputedStyle(statement).fontWeight,
+                    perspectiveSpacing: parseFloat(getComputedStyle(perspectivesBlock).marginTop),
+                    cardTitleSize: parseFloat(getComputedStyle(cardTitle).fontSize),
+                    bodyOverflow: document.documentElement.scrollWidth > innerWidth + 1
+                  };
+                });
+                console.log('Editorial polish', width, editorial);
+                assert.equal(editorial.opener,'I do my best work in the early stages, spotting business opportunities and connecting ideas across fields.');
+                assert.equal(editorial.strategicCopy,'I turn opportunities into business concepts and set the direction for strategy and innovation. I consider their long-term potential, challenge assumptions, ask the difficult questions and decide what to pursue.');
+                assert.equal(editorial.marketCopy,'I take ideas to market by shaping business models, validating demand with customers and building the first viable product. That’s how my creative thinking, strategic judgement and drive to build come together.');
+                assert.equal(editorial.workHeading,'My current focus');
+                assert.equal(editorial.storyHeading,'My story');
+                assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
+                assert.equal(editorial.statementWeight,'700');
+                assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
+                assert.ok(editorial.cardTitleSize >= 20.9 && editorial.cardTitleSize <= 26.1,'Perspective titles approximately 2px smaller');
+                assert.equal(editorial.bodyOverflow,false);
                 await page.locator('.personal-signoff .signoff-signature').scrollIntoViewIfNeeded();
                 await page.locator('.personal-signoff .signoff-signature').evaluate(img => img.decode());
                 const signoff = await page.evaluate(() => {
@@ -142,7 +170,7 @@ jobs:
                   };
                 });
                 console.log('Name and original PNG signature', width, signoff);
-                assert.equal(signoff.heading, 'Current focus');
+                assert.equal(signoff.heading, 'My current focus');
                 assert.equal(signoff.name, 'August Kring');
                 assert.equal(signoff.salutation, 'With curiosity and optimism,');
                 assert.equal(signoff.nameVisible, true);
