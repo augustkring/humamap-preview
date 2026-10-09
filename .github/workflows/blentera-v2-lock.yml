@@ -1,0 +1,33 @@
+name: BLENTERA V2 Lockfile Refresh
+
+on:
+  push:
+    branches:
+      - blentera-v2-oss-source
+    paths:
+      - "blentera-v2-final/package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: |
+          corepack enable
+          corepack prepare pnpm@12.5.1 --activate
+      - working-directory: blentera-v2-final
+        run: pnpm install --lockfile-only
+      - run: |
+          git config user.name "BLENTERA Lockfile"
+          git config user.email "actions@github.com"
+          git add blentera-v2-final/package.json blentera-v2-final/pnpm-lock.yaml
+          git commit -m "chore: refresh BLENTERA v2 lockfile" || exit 0
+          git push origin HEAD:blentera-v2-oss-source
