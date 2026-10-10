@@ -592,17 +592,18 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   opacity: 1;
 }
 
-/* Homepage contact: one integrated editorial row, including the signature. */
-.homepage-contact {
-  display: grid;
-  grid-template-columns: minmax(0, 1.18fr) max-content minmax(196px, .64fr);
-  align-items: center;
-  gap: clamp(28px, 3.6vw, 50px);
-  padding: clamp(36px, 4vw, 54px) 0 clamp(72px, 7vw, 94px);
+/* Homepage: one editorial closing note, contact actions and handwritten sign-off. */
+.home-main .values-section {
+  padding-bottom: clamp(26px, 3.2vw, 44px);
 }
-.homepage-contact .about-home-lead { min-width: 0; }
+.homepage-contact {
+  width: min(100%, 580px);
+  margin: 0 0 0 auto;
+  padding: clamp(12px, 2vw, 24px) 0 clamp(68px, 7vw, 92px);
+}
+.homepage-contact-content { min-width: 0; }
 .homepage-contact .about-home-lead > p {
-  max-width: 420px;
+  max-width: 540px;
   margin-top: 18px;
   color: var(--copy);
   font-family: 'AKFigtree', Arial, sans-serif;
@@ -613,9 +614,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .homepage-contact-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin-top: 22px;
 }
 .homepage-contact-actions .arrow-link {
   min-height: 40px;
@@ -625,52 +627,27 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   white-space: nowrap;
 }
 .homepage-contact .personal-signoff {
-  min-width: 0;
+  margin-top: clamp(24px, 2.7vw, 34px);
   padding: 0;
-  justify-self: end;
 }
 .homepage-contact .personal-signoff .signoff-signature {
-  width: clamp(136px, 12vw, 156px);
-  margin-top: 8px;
+  width: clamp(130px, 12vw, 150px);
+  margin-top: 6px;
 }
 .homepage-contact .personal-signoff .signoff-name { margin-top: 4px; }
 
 @media (max-width: 920px) {
   .homepage-contact {
-    grid-template-columns: minmax(0, 1fr) minmax(196px, .55fr);
-    align-items: start;
-    row-gap: 30px;
-  }
-  .homepage-contact-actions {
-    grid-column: 1;
-    grid-row: 2;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 14px 28px;
-  }
-  .homepage-contact .personal-signoff {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+    width: min(100%, 660px);
+    margin-left: 0;
   }
 }
 @media (max-width: 600px) {
-  .homepage-contact {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 25px;
-    padding: 32px 0 64px;
-  }
+  .home-main .values-section { padding-bottom: 18px; }
+  .homepage-contact { padding: 12px 0 64px; }
   .homepage-contact .about-home-lead > p { font-size: 17px; }
-  .homepage-contact-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 14px 26px;
-  }
-  .homepage-contact .personal-signoff {
-    align-self: flex-start;
-    margin-top: 16px;
-  }
+  .homepage-contact-actions { gap: 8px 22px; }
+  .homepage-contact .personal-signoff { margin-top: 22px; }
 }
 
 .home-footer {
