@@ -884,13 +884,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .about-personal-lead {
   max-width: 760px;
-  margin: 22px 0 0;
+  margin: 24px 0 0;
   color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(21px, 1.9vw, 26px);
-  font-weight: 700;
-  line-height: 1.26;
-  letter-spacing: -.026em;
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: clamp(20px, 1.85vw, 23px);
+  font-weight: 500;
+  line-height: 1.48;
+  letter-spacing: -.01em;
 }
 .about-home-section {
   padding: clamp(68px, 6.8vw, 94px) 0;
@@ -939,8 +939,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .about-skill-grid article { min-width: 0; }
 .about-skills .about-home-lead > p {
   max-width: 470px;
-  font-size: clamp(19px, 1.7vw, 23px);
-  line-height: 1.28;
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
 }
 .about-skill-grid h3,
 .about-principle h3 {
@@ -994,6 +997,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .about-personality > .about-home-lead > p {
   max-width: 700px;
+  font-family: 'AKFigtree', Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
 }
 
 .about-personality-explorer {

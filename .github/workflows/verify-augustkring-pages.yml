@@ -68,14 +68,14 @@ jobs:
           curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-input-focus-v4" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
           ! grep -Fq 'document.body.style.position' /tmp/augustkring-mobile-nav.js
-          for route in about/ perspectives/ perspectives/rethinking-the-company/ perspectives/europe-at-a-crossroads/ privacy/ unsubscribe/; do
+          for route in perspectives/ perspectives/rethinking-the-company/ perspectives/europe-at-a-crossroads/ privacy/ unsubscribe/; do
             curl -fsSL --max-time 20 "${base}${route}" -o /tmp/augustkring-subpage.html
             grep -Fq "$expected" /tmp/augustkring-subpage.html
             grep -Fq 'src="mobile-nav.js?v=20261009-input-focus-v4"' /tmp/augustkring-subpage.html
           done
           for attempt in $(seq 1 30); do
             curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
-            if grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq 'The story so far.' /tmp/augustkring-about.html; then
+            if grep -Fq 'styles.css?v=20261010-about-v35' /tmp/augustkring-about.html && grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq '<h2 id="story-title">How I got here</h2>' /tmp/augustkring-about.html && grep -Fq 'I look at how people, technology and businesses develop together, and where connecting them differently can create new opportunities for commercial value and positive impact.' /tmp/augustkring-about.html; then
               echo "The updated About story and shortened professional proof link are published."
               break
             fi
@@ -322,6 +322,13 @@ jobs:
                   const style=getComputedStyle(paragraphs[0]);
                   return {
                     heading:document.querySelector('#story-title')?.textContent.trim(),
+                    heroMessage:document.querySelector('.about-personal-lead')?.textContent.trim(),
+                    heroFont:getComputedStyle(document.querySelector('.about-personal-lead')).fontFamily,
+                    skills:[...document.querySelectorAll('#skills h3')].map(x=>x.textContent.trim()),
+                    principles:[...document.querySelectorAll('#principles h3')].map(x=>x.textContent.trim()),
+                    personalityPanels:document.querySelectorAll('[data-personality-panel]').length,
+                    personalityMessage:document.querySelector('#personality .about-home-lead p')?.textContent.trim(),
+                    futureLead:document.querySelector('#future .about-home-lead p')?.textContent.trim(),
                     subtitle:document.querySelector('.about-story-intro > p')?.textContent.trim(),
                     paragraphCount:paragraphs.length,
                     curiosity:paragraphs[0]?.textContent.includes('primary school'),
@@ -342,8 +349,15 @@ jobs:
                   };
                 });
                 console.log('About chronology and concrete proof',width,aboutProof);
-                assert.equal(aboutProof.heading,'The story so far.');
-                assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
+                assert.equal(aboutProof.heading,'How I got here');
+                assert.equal(aboutProof.heroMessage,"I look at how people, technology and businesses develop together, and where connecting them differently can create new opportunities for commercial value and positive impact.");
+                assert.ok(aboutProof.heroFont.includes('AKFigtree'),'Core positioning is calm and readable in Figtree');
+                assert.equal(aboutProof.subtitle,'From running a business at 18 to developing new ventures today.');
+                assert.deepEqual(aboutProof.skills,['Spotting opportunities','Strategy & business models','Building the first version','Market validation','AI in real work','People & leadership']);
+                assert.deepEqual(aboutProof.principles,['See the whole picture.','Start with real needs.','Make ideas tangible.','Stay open to change.','Make impact sustainable.']);
+                assert.equal(aboutProof.personalityPanels,5);
+                assert.ok(aboutProof.personalityMessage.includes('not define who I am'));
+                assert.equal(aboutProof.futureLead,'Businesses where commercial success and positive impact can reinforce each other.');
                 assert.equal(aboutProof.paragraphCount,5);
                 assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.subsequentWork && aboutProof.currentWork);
                 assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
@@ -354,7 +368,17 @@ jobs:
                   'LinkedIn link stays on one rendered line without shrinking or clipping');
                 assert.ok(Math.abs(aboutProof.fontSize-(width<=760?17:18))<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
-                if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
+                if(width===390||width===1440) {
+                  await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
+                  await page.locator('.about-personal-hero').screenshot({path:`/tmp/ak-browser-check/about-hero-${width}.png`});
+                  await page.locator('#future').screenshot({path:`/tmp/ak-browser-check/about-future-${width}.png`});
+                }
+                await page.locator('[data-personality-tabs].is-enhanced').waitFor({timeout:10000});
+                await page.locator('#personality-tab-human-design').click();
+                assert.equal(await page.locator('#personality-tab-human-design').getAttribute('aria-selected'),'true');
+                assert.equal(await page.locator('#personality-panel-human-design').isVisible(),true);
+                await page.locator('#personality-tab-big-five').click();
+                assert.equal(await page.locator('#personality-tab-big-five').getAttribute('aria-selected'),'true');
                 await page.close();
               }
             } finally {await browser.close();}
@@ -449,5 +473,7 @@ jobs:
             /tmp/ak-browser-check/focus-heading-*.png
             /tmp/ak-browser-check/typography-*.png
             /tmp/ak-browser-check/about-story-*.png
+            /tmp/ak-browser-check/about-hero-*.png
+            /tmp/ak-browser-check/about-future-*.png
           if-no-files-found: warn
           retention-days: 7
