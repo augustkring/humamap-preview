@@ -25,17 +25,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Checkout approved site baseline
+        uses: actions/checkout@v4
+      - name: Check locked homepage and shared design
+        run: node augustkring/verify-baseline.mjs
       - name: Wait for published HTML and verify deployed CSS
         shell: bash
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261009-story-v34"
-          expected_copy="Taking ideas to market by shaping business models, validating demand with customers and building the first viable product."
+          expected="styles.css?v=20261010-design-v1"
+          expected_copy="I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve." /tmp/augustkring.html && grep -Fq "taking responsibility for daily operations, customers and a team of around ten people." /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve." /tmp/augustkring.html && grep -Fq "taking responsibility for daily operations and a team of around ten." /tmp/augustkring.html; then
               echo "Approved About, profile copy and stylesheet version are published."
               break
             fi
@@ -43,8 +47,8 @@ jobs:
             sleep 10
           done
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
-          grep -Fq "I turn opportunities into business concepts and set the direction for strategy and innovation." /tmp/augustkring.html
-          grep -Fq "That’s how my creative thinking, strategic judgement and drive to build come together." /tmp/augustkring.html
+          grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
+          grep -Fq 'My AI-native perspective broadens what I consider possible' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
@@ -156,15 +160,15 @@ jobs:
                   };
                 });
                 console.log('Editorial polish', width, editorial);
-                assert.equal(editorial.opener,'I do my best work in the early stages, spotting business opportunities and connecting ideas across fields.');
-                assert.equal(editorial.strategicCopy,'I turn opportunities into business concepts and set the direction for strategy and innovation. I consider their long-term potential, challenge assumptions, ask the difficult questions and decide what to pursue.');
-                assert.equal(editorial.marketCopy,'Taking ideas to market by shaping business models, validating demand with customers and building the first viable product. That’s how my creative thinking, strategic judgement and drive to build come together.');
+                assert.equal(editorial.opener,'I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction.');
+                assert.ok(editorial.strategicCopy.includes('I see connections between people, organisations, markets and technology'));
+                assert.ok(editorial.marketCopy.includes('strategic judgement and commercial understanding'));
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.storyHeading,'My story');
                 assert.equal(editorial.storyIntro,"Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve.");
-                assert.equal(editorial.storyCopy.length,2);
-                assert.ok(editorial.storyCopy[0].includes('VR arcade in Copenhagen') && editorial.storyCopy[0].includes('around ten people'));
-                assert.ok(editorial.storyCopy[1].includes('Blentera, August Works and HumaMap'));
+                assert.equal(editorial.storyCopy.length,3);
+                assert.ok(editorial.storyCopy[0].includes('VR arcade in Copenhagen') && editorial.storyCopy[0].includes('team of around ten'));
+                assert.ok(editorial.storyCopy[1].includes('Experiencing burnout at a young age') && editorial.storyCopy[2].includes('AI now playing a central role'));
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
@@ -203,10 +207,20 @@ jobs:
                 assert.equal(signoff.nameVisible, true);
                 assert.equal(signoff.signatureLoaded, true);
                 assert.equal(signoff.signatureAlt, 'Handwritten signature of August Kring');
-                assert.ok(signoff.signatureWidth >= 135 && signoff.signatureWidth <= 157,'Signature is large enough to make original fine strokes legible');
+                assert.ok(signoff.signatureWidth >= 125 && signoff.signatureWidth <= 144,'Signature matches approved scale');
                 assert.ok(signoff.fontSize >= 17 && signoff.fontSize <= 19);
                 assert.ok(signoff.imageBeforeName && signoff.insideContent);
                 assert.equal(signoff.horizontalOverflow, false);
+                const contact = await page.evaluate(() => {
+                  const invite=document.querySelector('.homepage-contact-invite').getBoundingClientRect();
+                  const signature=document.querySelector('.homepage-contact-signoff').getBoundingClientRect();
+                  return {sideBySide:signature.left>invite.right-1,stacked:signature.top>=invite.bottom-1,
+                    spacing:parseFloat(getComputedStyle(document.querySelector('.values-section')).paddingBottom)};
+                });
+                if(width>760) assert.ok(contact.sideBySide,'Approved desktop two-group contact');
+                else assert.ok(contact.stacked,'Approved mobile contact stacking');
+                assert.ok(contact.spacing>=57,'Approved story rhythm');
+                await page.locator('.homepage-contact').screenshot({path:`/tmp/ak-browser-check/contact-${width}.png`});
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
 
                 if (width <= 840) {
@@ -325,9 +339,10 @@ jobs:
                     subtitle:document.querySelector('.about-story-intro > p')?.textContent.trim(),
                     paragraphCount:paragraphs.length,
                     curiosity:paragraphs[0]?.textContent.includes('primary school'),
-                    earlyResponsibility:paragraphs[1]?.textContent.includes('team of around ten people'),
-                    subsequentWork:paragraphs[2]?.textContent.includes('venture building'),
-                    currentWork:paragraphs[3]?.textContent.includes('Blentera'),
+                    earlyResponsibility:paragraphs[1]?.textContent.includes('team of around ten'),
+                    burnout:paragraphs[2]?.textContent.includes('burnout'),
+                    subsequentWork:paragraphs[3]?.textContent.includes('KRING'),
+                    currentWork:paragraphs[4]?.textContent.includes('Blentera'),
                     storyTop:story?.getBoundingClientRect().top + scrollY,
                     skillsTop:skills?.getBoundingClientRect().top + scrollY,
                     heroBottom:hero?.getBoundingClientRect().bottom + scrollY,
@@ -345,7 +360,7 @@ jobs:
                 assert.equal(aboutProof.heading,'The story so far.');
                 assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
                 assert.equal(aboutProof.paragraphCount,5);
-                assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.subsequentWork && aboutProof.currentWork);
+                assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.burnout && aboutProof.subsequentWork && aboutProof.currentWork);
                 assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
                 assert.deepEqual(aboutProof.externalLinks.map(x=>x.text),['Blentera','August Works','HumaMap']);
                 assert.ok(aboutProof.externalLinks.every(x=>x.href.startsWith('https://')));
@@ -444,6 +459,7 @@ jobs:
           name: augustkring-signoff-responsive
           path: |
             /tmp/ak-browser-check/signoff-*.png
+            /tmp/ak-browser-check/contact-*.png
             /tmp/ak-browser-check/menu-open-*.png
             /tmp/ak-browser-check/perspectives-*.png
             /tmp/ak-browser-check/focus-heading-*.png
