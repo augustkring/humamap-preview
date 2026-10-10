@@ -592,14 +592,14 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   opacity: 1;
 }
 
-/* Homepage: one editorial closing note, contact actions and handwritten sign-off. */
+/* Homepage: one centred editorial closing note with a personal sign-off. */
 .home-main .values-section {
-  padding-bottom: clamp(26px, 3.2vw, 44px);
+  padding-bottom: clamp(24px, 3vw, 38px);
 }
 .homepage-contact {
-  width: min(100%, 580px);
-  margin: 0 0 0 auto;
-  padding: clamp(12px, 2vw, 24px) 0 clamp(68px, 7vw, 92px);
+  width: min(100%, 560px);
+  margin-inline: auto;
+  padding: clamp(8px, 1.4vw, 16px) 0 clamp(58px, 6vw, 76px);
 }
 .homepage-contact-content { min-width: 0; }
 .homepage-contact .about-home-lead > p {
@@ -616,8 +616,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px 28px;
-  margin-top: 22px;
+  gap: 8px 28px;
+  margin-top: 20px;
 }
 .homepage-contact-actions .arrow-link {
   min-height: 40px;
@@ -627,27 +627,21 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   white-space: nowrap;
 }
 .homepage-contact .personal-signoff {
-  margin-top: clamp(24px, 2.7vw, 34px);
+  margin-top: clamp(20px, 2.2vw, 28px);
   padding: 0;
 }
 .homepage-contact .personal-signoff .signoff-signature {
-  width: clamp(130px, 12vw, 150px);
+  width: clamp(120px, 11.5vw, 138px);
   margin-top: 6px;
 }
-.homepage-contact .personal-signoff .signoff-name { margin-top: 4px; }
+.homepage-contact .personal-signoff .signoff-name { margin-top: 3px; }
 
-@media (max-width: 920px) {
-  .homepage-contact {
-    width: min(100%, 660px);
-    margin-left: 0;
-  }
-}
 @media (max-width: 600px) {
   .home-main .values-section { padding-bottom: 18px; }
-  .homepage-contact { padding: 12px 0 64px; }
+  .homepage-contact { padding: 12px 0 58px; }
   .homepage-contact .about-home-lead > p { font-size: 17px; }
   .homepage-contact-actions { gap: 8px 22px; }
-  .homepage-contact .personal-signoff { margin-top: 22px; }
+  .homepage-contact .personal-signoff { margin-top: 20px; }
 }
 
 .home-footer {
