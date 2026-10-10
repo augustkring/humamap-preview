@@ -593,13 +593,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 
 /* Homepage closing note: invitation and links together, signature beside them. */
-.home-main .values-section {
-  padding-bottom: clamp(24px, 3vw, 38px);
-}
 .homepage-contact {
   width: 100%;
   margin: 0;
-  padding: clamp(10px, 1.6vw, 20px) 0 clamp(58px, 6vw, 76px);
+  padding: clamp(18px, 2.4vw, 28px) 0 clamp(58px, 6vw, 76px);
 }
 .homepage-contact-content {
   display: grid;
@@ -657,8 +654,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
 }
 @media (max-width: 600px) {
-  .home-main .values-section { padding-bottom: 18px; }
-  .homepage-contact { padding: 12px 0 58px; }
+  .homepage-contact { padding: 18px 0 58px; }
   .homepage-contact .about-home-lead > p { font-size: 17px; }
   .homepage-contact-actions { gap: 8px 22px; }
 }
