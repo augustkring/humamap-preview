@@ -75,7 +75,7 @@ jobs:
           done
           for attempt in $(seq 1 30); do
             curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
-            if grep -Fq 'styles.css?v=20261010-about-v35' /tmp/augustkring-about.html && grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq '<h2 id="story-title">How I got here</h2>' /tmp/augustkring-about.html && grep -Fq 'I look at how people, technology and businesses develop together, and where connecting them differently can create new opportunities for commercial value and positive impact.' /tmp/augustkring-about.html; then
+            if grep -Fq 'styles.css?v=20261010-about-v35' /tmp/augustkring-about.html && grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq '<h2 id="story-title">How I got here</h2>' /tmp/augustkring-about.html && grep -Fq 'I look at how people, technology and businesses develop together, and where connecting them differently can create new opportunities for commercial value and positive impact.' /tmp/augustkring-about.html && grep -Fq "I don't start with a particular industry or technology." /tmp/augustkring-about.html; then
               echo "The updated About story and shortened professional proof link are published."
               break
             fi
@@ -329,6 +329,7 @@ jobs:
                     personalityPanels:document.querySelectorAll('[data-personality-panel]').length,
                     personalityMessage:document.querySelector('#personality .about-home-lead p')?.textContent.trim(),
                     futureLead:document.querySelector('#future .about-home-lead p')?.textContent.trim(),
+                    futureFirst:document.querySelector('#future .about-future-copy p')?.textContent.trim(),
                     subtitle:document.querySelector('.about-story-intro > p')?.textContent.trim(),
                     paragraphCount:paragraphs.length,
                     curiosity:paragraphs[0]?.textContent.includes('primary school'),
@@ -358,6 +359,7 @@ jobs:
                 assert.equal(aboutProof.personalityPanels,5);
                 assert.ok(aboutProof.personalityMessage.includes('not define who I am'));
                 assert.equal(aboutProof.futureLead,'Businesses where commercial success and positive impact can reinforce each other.');
+                assert.ok(aboutProof.futureFirst.startsWith("I don't start with a particular industry or technology."));
                 assert.equal(aboutProof.paragraphCount,5);
                 assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.subsequentWork && aboutProof.currentWork);
                 assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
