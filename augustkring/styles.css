@@ -618,6 +618,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   gap: 22px;
 }
 .homepage-contact-actions .arrow-link {
+  min-height: 40px;
   font-size: 17px;
   line-height: 1.25;
   letter-spacing: -.012em;
