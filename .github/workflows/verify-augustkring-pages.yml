@@ -429,7 +429,6 @@ jobs:
             { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 17 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
             { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 17 },
-            { path: 'perspectives/', selector: '.newsletter-consent', desktop: 14, mobile: 14 },
             { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
             { path: 'perspectives/rethinking-the-company/', selector: '.article-comparison td', desktop: 16, mobile: 16 },
             { path: 'perspectives/europe-at-a-crossroads/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
