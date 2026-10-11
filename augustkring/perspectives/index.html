@@ -43,7 +43,7 @@
 
   <link rel="preload" href="assets/fonts/Figtree-Latin-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Outfit-Latin-Bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261010-design-v1">
+  <link rel="stylesheet" href="styles.css?v=20261011-unified-v1">
 
   <script type="application/ld+json">
   {
@@ -143,17 +143,16 @@
   <main id="main-content" class="home-main perspectives-page" tabindex="-1">
     <section id="subscribe" class="perspectives-hero" aria-labelledby="perspectives-title">
       <h1 id="perspectives-title">Perspectives</h1>
-      <p>I write about the questions I keep coming back to: how technology changes what is possible, how organisations respond, and what kind of progress is worth pursuing.</p>
+      <p>Ideas, observations and questions I write down to understand better, and share when they might be useful to others.</p>
 
-      <form class="perspectives-newsletter-form" action="/api/subscribe" method="post" aria-describedby="newsletter-status newsletter-consent">
+      <form class="perspectives-newsletter-form" action="/api/subscribe" method="post" aria-describedby="newsletter-status">
         <label class="sr-only" for="perspectives-email">Email address</label>
         <input id="perspectives-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="Your email" required maxlength="254">
         <input class="newsletter-honeypot" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
         <button type="submit">Subscribe</button>
       </form>
       <p id="newsletter-status" class="newsletter-status" role="status" aria-live="polite"></p>
-      <p id="newsletter-consent" class="newsletter-consent">By subscribing, you agree to receive Perspectives by email from August Kring. You can unsubscribe at any time. <a href="privacy/">Privacy</a></p>
-    </section>
+          </section>
 
     <section class="perspectives-library" aria-labelledby="latest-title">
       <h2 id="latest-title" class="perspectives-latest-label">Latest</h2>
@@ -185,19 +184,14 @@
   </main>
 
   <footer class="home-footer">
-    <div>
-      <a class="brand august-wordmark footer-wordmark" href="./" aria-label="August Kring home">
-        <span>August Kr<span class="wordmark-i">i</span>ng</span>
-      </a>
-    </div>
-    <nav class="footer-links" aria-label="Contact">
+    <nav class="footer-links" aria-label="Footer navigation">
       <a href="mailto:ak@augustkring.com">ak@augustkring.com</a>
       <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">Connect on LinkedIn</a>
       <a href="perspectives/#subscribe">Subscribe to Perspectives</a>
-      <a href="privacy/">Privacy</a>
     </nav>
     <div class="footer-meta">
       <span>© 2026 August Kring</span>
+      <a href="privacy/">Privacy</a>
     </div>
   </footer>
 

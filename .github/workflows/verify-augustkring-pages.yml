@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261010-design-v1"
+          expected="styles.css?v=20261011-unified-v1"
           expected_copy="I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -140,6 +140,12 @@ jobs:
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
                 assert.equal((await page.locator('.hero-focus').textContent()).trim(), 'Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable.');
+                const homepageTypography=await page.evaluate(() => ({
+                  h1:parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
+                  h2:parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
+                  lead:parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
+                  leadFamily:getComputedStyle(document.querySelector('.hero-focus')).fontFamily
+                }));
                 const editorial = await page.evaluate(() => {
                   const statement = document.querySelector('.perspective-statement');
                   const perspectivesBlock = document.querySelector('.perspectives-block');
@@ -308,22 +314,23 @@ jobs:
                   assert.equal(await page.locator('[data-mobile-nav-open]').isVisible(),false);
                 }
                 const footer=await page.evaluate(() => {
-                  const footer=document.querySelector('.home-footer');
-                  const primary=document.querySelector('.footer-primary');
-                  const secondary=document.querySelector('.footer-secondary');
-                  const computed=getComputedStyle(footer);
+                  const container=document.querySelector('.home-footer');
+                  const nav=container.querySelector('.footer-links');
+                  const meta=container.querySelector('.footer-meta');
+                  const computed=getComputedStyle(container);
                   return {
                     topRule:parseFloat(computed.borderTopWidth),
-                    middleRule:parseFloat(getComputedStyle(primary).borderBottomWidth),
-                    footerWidth:footer.getBoundingClientRect().width,
-                    legalVisible:secondary.getBoundingClientRect().height>0,
-                    navLinks:[...document.querySelectorAll('.footer-links a')].length
+                    copyrightVisible:meta.getBoundingClientRect().height>0 && meta.textContent.includes('August Kring'),
+                    privacyVisible:!!meta.querySelector('a[href="privacy/"]'),
+                    noWordmark:!container.querySelector('.footer-wordmark'),
+                    navLinks:nav.querySelectorAll('a').length,
+                    horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('Footer rendering',width,footer);
-                assert.equal(footer.topRule,1,'Footer has a single upper rule');
-                assert.equal(footer.middleRule,0,'Footer has no second internal rule');
-                assert.ok(footer.legalVisible && footer.navLinks>=3,'Footer links and copyright are visible');
+                console.log('Unified footer rendering',width,footer);
+                assert.equal(footer.topRule,1,'Footer has one upper rule');
+                assert.ok(footer.copyrightVisible && footer.privacyVisible && footer.navLinks===3,'Footer navigation and privacy');
+                assert.ok(footer.noWordmark && !footer.horizontalOverflow,'No footer wordmark or horizontal overflow');
 
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/about/',{waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
@@ -357,6 +364,17 @@ jobs:
                   };
                 });
                 console.log('About chronology and concrete proof',width,aboutProof);
+                const aboutType=await page.evaluate(()=>({
+                  h1:parseFloat(getComputedStyle(document.querySelector('.about-personal-copy h1')).fontSize),
+                  h2:parseFloat(getComputedStyle(document.querySelector('.about-story-intro h2')).fontSize),
+                  lead:parseFloat(getComputedStyle(document.querySelector('.about-personal-lead')).fontSize),
+                  leadFamily:getComputedStyle(document.querySelector('.about-personal-lead')).fontFamily,
+                  skills:[...document.querySelectorAll('.about-skill-grid h3')].map(e=>e.textContent.trim())
+                }));
+                assert.ok(Math.abs(aboutType.h1-homepageTypography.h1)<.2,'About H1 matches homepage');
+                assert.ok(Math.abs(aboutType.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
+                assert.ok(Math.abs(aboutType.lead-homepageTypography.lead)<.2 && aboutType.leadFamily===homepageTypography.leadFamily,'About lead matches homepage font');
+                assert.deepEqual(aboutType.skills,['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM','Strategic Leadership']);
                 assert.equal(aboutProof.heading,'The story so far.');
                 assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
                 assert.equal(aboutProof.paragraphCount,5);
@@ -370,6 +388,24 @@ jobs:
                 assert.ok(Math.abs(aboutProof.fontSize-(width<=760?17:18))<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
+                await page.goto('https://augustkring.github.io/humamap-preview/augustkring/perspectives/',{waitUntil:'networkidle',timeout:45000});
+                await page.evaluate(() => document.fonts.ready);
+                const perspectivesType=await page.evaluate(()=>({
+                  h1:parseFloat(getComputedStyle(document.querySelector('.perspectives-hero h1')).fontSize),
+                  h2:parseFloat(getComputedStyle(document.querySelector('.perspectives-latest-label')).fontSize),
+                  lead:parseFloat(getComputedStyle(document.querySelector('.perspectives-hero > p')).fontSize),
+                  intro:document.querySelector('.perspectives-hero > p').textContent.trim(),
+                  hasConsentNotice:!!document.querySelector('#newsletter-consent'),
+                  email:document.querySelector('.perspectives-newsletter-form input[name="email"]')?.name,
+                  privacy:!!document.querySelector('.home-footer a[href="privacy/"]'),
+                  overflow:document.documentElement.scrollWidth>innerWidth+1
+                }));
+                assert.ok(Math.abs(perspectivesType.h1-homepageTypography.h1)<.2,'Perspectives H1 matches homepage');
+                assert.ok(Math.abs(perspectivesType.h2-homepageTypography.h2)<.2,'Perspectives H2 matches homepage');
+                assert.ok(Math.abs(perspectivesType.lead-homepageTypography.lead)<.2,'Perspectives lead matches homepage');
+                assert.equal(perspectivesType.intro,'Ideas, observations and questions I write down to understand better, and share when they might be useful to others.');
+                assert.ok(!perspectivesType.hasConsentNotice && perspectivesType.email==='email' && perspectivesType.privacy && !perspectivesType.overflow,'Form accessible and footer privacy preserved');
+                if(width===390||width===1440) await page.locator('.perspectives-hero').screenshot({path:`/tmp/ak-browser-check/perspectives-page-${width}.png`});
                 await page.close();
               }
             } finally {await browser.close();}
@@ -391,7 +427,7 @@ jobs:
             { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 16 },
             { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 16 },
             { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 17 },
-            { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 18, mobile: 17 },
+            { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
             { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 17 },
             { path: 'perspectives/', selector: '.newsletter-consent', desktop: 14, mobile: 14 },
             { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
@@ -465,5 +501,6 @@ jobs:
             /tmp/ak-browser-check/focus-heading-*.png
             /tmp/ak-browser-check/typography-*.png
             /tmp/ak-browser-check/about-story-*.png
+            /tmp/ak-browser-check/perspectives-page-*.png
           if-no-files-found: warn
           retention-days: 7

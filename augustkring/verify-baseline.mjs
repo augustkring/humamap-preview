@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"249509e8","footer":"3176d89c","tokens":"4e11c49d","contact":"c102b368"};
+const approved={"main":"249509e8","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -28,7 +28,8 @@ assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Approv
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- assert.ok(page.includes('styles.css?v=20261010-design-v1'),'Shared stylesheet drift: '+path);
+ assert.ok(page.includes('styles.css?v=20261011-unified-v1'),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
+ assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
 }
-console.log('PASS: locked homepage, shared design defaults and metadata policy');
+console.log('PASS: protected homepage, unified footers, shared fonts and preview metadata');

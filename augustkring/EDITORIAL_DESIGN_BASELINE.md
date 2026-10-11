@@ -11,3 +11,5 @@ Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 **Preview metadata policy:** intentionally `noindex,nofollow`. Production canonicals and social imagery still target augustkring.com, currently a separate Danish website. Check social portrait asset and canonical/OG URLs before production-domain cutover. Newsletter uses `/api/subscribe`, which is not verified as working on static GitHub Pages.
 
 **Update policy:** Any future homepage change needs explicit approval plus reviewed updates to the guard values. Digest is a regression sentinel, not security.
+
+**Approved change 2026-10-11:** Footer wordmark removed site-wide; unified footer keeps links, copyright and Privacy. Original six About skills headings AND matching descriptions restored verbatim. Original Perspectives introduction restored verbatim. Long subscription notice removed; privacy remains linked in footer. Shared editorial H1/H2/lead typography applies to home, About and Perspectives at desktop and mobile sizes. Homepage body (including The shift I see) unchanged; proposed new Where I add value copy not published.
