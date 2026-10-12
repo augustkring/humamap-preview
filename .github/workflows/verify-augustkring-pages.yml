@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261011-unified-v1"
+          expected="styles.css?v=20261012-perspectives-centred-v1"
           expected_copy="I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
@@ -398,13 +398,35 @@ jobs:
                   hasConsentNotice:!!document.querySelector('#newsletter-consent'),
                   email:document.querySelector('.perspectives-newsletter-form input[name="email"]')?.name,
                   privacy:!!document.querySelector('.home-footer a[href="privacy/"]'),
-                  overflow:document.documentElement.scrollWidth>innerWidth+1
+                  overflow:document.documentElement.scrollWidth>innerWidth+1,
+                  heroCentred:(() => {
+                    const r=document.querySelector('.perspectives-hero').getBoundingClientRect();
+                    const m=document.querySelector('.home-main').getBoundingClientRect();
+                    return getComputedStyle(document.querySelector('.perspectives-hero')).textAlign==='center' &&
+                      Math.abs((r.left+r.right)/2-(m.left+m.right)/2)<1.5;
+                  })(),
+                  introCentred:(() => {
+                    const r=document.querySelector('.perspectives-hero > p').getBoundingClientRect();
+                    const m=document.querySelector('.perspectives-hero').getBoundingClientRect();
+                    return Math.abs((r.left+r.right)/2-(m.left+m.right)/2)<1.5;
+                  })(),
+                  formCentred:(() => {
+                    const r=document.querySelector('.perspectives-newsletter-form').getBoundingClientRect();
+                    const m=document.querySelector('.perspectives-hero').getBoundingClientRect();
+                    return Math.abs((r.left+r.right)/2-(m.left+m.right)/2)<1.5;
+                  })(),
+                  libraryCentred:(() => {
+                    const r=document.querySelector('.perspectives-library').getBoundingClientRect();
+                    const m=document.querySelector('.home-main').getBoundingClientRect();
+                    return Math.abs((r.left+r.right)/2-(m.left+m.right)/2)<1.5;
+                  })()
                 }));
                 assert.ok(Math.abs(perspectivesType.h1-homepageTypography.h1)<.2,'Perspectives H1 matches homepage');
                 assert.ok(Math.abs(perspectivesType.h2-homepageTypography.h2)<.2,'Perspectives H2 matches homepage');
                 assert.ok(Math.abs(perspectivesType.lead-homepageTypography.lead)<.2,'Perspectives lead matches homepage');
                 assert.equal(perspectivesType.intro,'Ideas, observations and questions I write down to understand better, and share when they might be useful to others.');
                 assert.ok(!perspectivesType.hasConsentNotice && perspectivesType.email==='email' && perspectivesType.privacy && !perspectivesType.overflow,'Form accessible and footer privacy preserved');
+                assert.ok(perspectivesType.heroCentred && perspectivesType.introCentred && perspectivesType.formCentred && perspectivesType.libraryCentred,'Perspectives stays centred at every viewport');
                 if(width===390||width===1440) await page.locator('.perspectives-hero').screenshot({path:`/tmp/ak-browser-check/perspectives-page-${width}.png`});
                 await page.close();
               }

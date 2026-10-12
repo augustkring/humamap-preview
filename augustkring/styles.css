@@ -736,10 +736,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 .perspectives-hero {
-  max-width: 760px;
-  margin-inline: 0;
+  max-width: 900px;
+  margin-inline: auto;
   padding: clamp(50px, 5vw, 66px) 0 clamp(68px, 7vw, 92px);
-  text-align: left;
+  text-align: center;
 }
 .perspectives-hero h1 {
   margin: 0;
@@ -753,7 +753,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .perspectives-hero > p {
   max-width: 620px;
-  margin: 22px 0 0;
+  margin: 22px auto 0;
   color: var(--copy);
   font-size: var(--editorial-lead-size);
   line-height: 1.55;
@@ -761,7 +761,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .perspectives-newsletter-form {
   width: min(100%, 520px);
   min-height: 52px;
-  margin: 30px 0 0;
+  margin: 30px auto 0;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -797,7 +797,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .perspectives-newsletter-form button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .perspectives-newsletter-form button:disabled { cursor: wait; opacity: .66; }
 .newsletter-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
-.newsletter-status { min-height: 18px; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; text-align: left; }
+.newsletter-status { min-height: 18px; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; text-align: center; }
 .newsletter-status.is-error { color: #9d2f2a; }
 
 .legal-content a {
@@ -852,7 +852,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .unsubscribe-status { text-align: left; }
 
-.perspectives-library { width: min(100%, 840px); margin-inline: 0; padding: 0 0 clamp(96px, 10vw, 138px); }
+.perspectives-library { width: min(100%, 840px); margin-inline: auto; padding: 0 0 clamp(96px, 10vw, 138px); }
 .perspectives-latest-label {
   margin: 0 0 24px;
   color: var(--ink);
