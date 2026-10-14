@@ -1215,6 +1215,18 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   font-weight: 400;
   line-height: 1.55;
 }
+/* Home + About section subtitles share one readable measure.
+   The homepage hero description intentionally keeps its approved full-column width. */
+.home-main .thread-lead > p,
+.home-main .perspective-lead > p,
+.home-main .values-lead > p,
+.home-main .about-home-lead > p,
+.home-main .about-principles-intro > p,
+.home-main .about-story-intro > p,
+.home-main .about-personal-lead {
+  max-width: min(100%, 390px);
+}
+
 .about-story-content { max-width: 620px; }
 .about-story-content p a {
   color: var(--ink);

@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected="styles.css?v=20261012-perspectives-centred-v1"
+          expected="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -168,6 +168,36 @@ jobs:
                 });
                 console.log('Editorial polish', width, editorial);
                 assert.equal(editorial.opener,'I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction.');
+                const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.thread-lead > p, .perspective-lead > p, .values-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
+                  text:el.textContent.trim(),
+                  width:el.getBoundingClientRect().width
+                })));
+                assert.equal(homeSubtitleWidths.length,4,'All four homepage section subtitles are present');
+                for(const entry of homeSubtitleWidths) assert.ok(entry.width<=390.5,'Homepage subtitle must stay within shared 390px measure: '+entry.text);
+                if(width===1440){
+                  const referenceBreak=await page.evaluate(()=>{
+                    const p=document.querySelector('.thread-lead > p');
+                    const node=p.firstChild;
+                    const text=node.textContent;
+                    const phrase='thinking and a clear';
+                    const start=text.indexOf(phrase);
+                    if(start<0)throw new Error('Approved subtitle changed');
+                    const topAt=(i)=>{
+                      const range=document.createRange();
+                      range.setStart(node,i);
+                      range.setEnd(node,i+1);
+                      const top=range.getBoundingClientRect().top;
+                      range.detach?.();
+                      return top;
+                    };
+                    const and=text.indexOf('and a clear',start);
+                    return {first:topAt(0),thinking:topAt(start),andD:topAt(and+2),followingA:topAt(and+4)};
+                  });
+                  console.log('Subtitle reference wrap',referenceBreak);
+                  assert.ok(Math.abs(referenceBreak.thinking-referenceBreak.andD)<2,'Second line ends at and');
+                  assert.ok(referenceBreak.followingA>referenceBreak.andD+10,'a clear direction must begin on third line');
+                  assert.ok(referenceBreak.andD>referenceBreak.first+10,'and must not wrap to first line');
+                }
                 assert.equal(editorial.valueCopy,"I combine creative thinking with strategic judgement and commercial understanding. I think holistically, looking for ways people, planet and profit can reinforce one another.");
                 assert.equal(editorial.leadershipCopy,"I can give ambitious ideas direction and inspire others to make them their own. I'm equally capable of going deep into the details and building things myself.");
                 assert.equal(editorial.agilityCopy,"I'm quick to adapt when new perspectives or technologies open up better possibilities, even when that means changing course radically. AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities.");
@@ -377,6 +407,12 @@ jobs:
                 assert.ok(Math.abs(aboutType.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
                 assert.ok(Math.abs(aboutType.lead-homepageTypography.lead)<.2 && aboutType.leadFamily===homepageTypography.leadFamily,'About lead matches homepage font');
                 assert.deepEqual(aboutType.skills,['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM','Strategic Leadership']);
+                const aboutSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.about-personal-lead, .about-story-intro > p, .about-home-lead > p, .about-principles-intro > p')].map(el=>({
+                  text:el.textContent.trim(),
+                  width:el.getBoundingClientRect().width
+                })));
+                assert.ok(aboutSubtitleWidths.length>=6,'About subtitles should all be included');
+                for(const entry of aboutSubtitleWidths) assert.ok(entry.width<=390.5,'About subtitle must stay within shared 390px measure: '+entry.text);
                 assert.equal(aboutProof.heading,'The story so far.');
                 assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
                 assert.equal(aboutProof.paragraphCount,5);

@@ -28,12 +28,14 @@ const thread=part(html,'<section id="thread"','</section>');
 for(const sentence of ["I combine creative thinking with strategic judgement and commercial understanding. I think holistically, looking for ways people, planet and profit can reinforce one another.","I can give ambitious ideas direction and inspire others to make them their own. I'm equally capable of going deep into the details and building things myself.","I'm quick to adapt when new perspectives or technologies open up better possibilities, even when that means changing course radically. AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities."]) assert.ok(thread.includes(sentence),'Approved Where I add value text drift: '+sentence);
 assert.equal((thread.match(/<p>/g)||[]).length,4,'Approved Where I add value paragraph count drift');
 assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Approved two-group close missing');
+assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, 390px);\n}"),'Shared 390px subtitle measure missing');
+assert.ok(css.includes('.hero-copy > .hero-focus {\n  width: 100%;\n  max-width: none;'),'Approved full-column homepage hero description missing');
 assert.ok(css.includes('max-width: 900px;\n  margin-inline: auto;\n  padding: clamp(50px, 5vw, 66px) 0 clamp(68px, 7vw, 92px);\n  text-align: center;'),'Perspectives hero must stay centred');
 assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-inline: auto;'),'Perspectives article column must stay centred');
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- assert.ok(page.includes('styles.css?v=20261012-perspectives-centred-v1'),'Shared stylesheet drift: '+path);
+ assert.ok(page.includes('styles.css?v=20261014-subtitle-width-v1'),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
 }
