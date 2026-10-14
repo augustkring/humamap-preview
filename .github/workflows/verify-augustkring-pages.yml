@@ -35,12 +35,12 @@ jobs:
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected="styles.css?v=20261012-perspectives-centred-v1"
-          expected_copy="I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction."
+          expected_copy="AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities."
           for attempt in $(seq 1 24); do
-            status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "$base" || true)"
+            status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
             if [ "$status" = "200" ] && grep -Fq "$expected" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve." /tmp/augustkring.html && grep -Fq "taking responsibility for daily operations and a team of around ten." /tmp/augustkring.html; then
-              echo "Approved About, profile copy and stylesheet version are published."
+              echo "Approved homepage copy, About story and stylesheet are published."
               break
             fi
             if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
