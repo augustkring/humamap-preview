@@ -48,7 +48,7 @@ jobs:
           done
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
-          grep -Fq 'My AI-native perspective broadens what I consider possible' /tmp/augustkring.html
+          grep -Fq 'AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities.' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
@@ -152,8 +152,9 @@ jobs:
                   const cardTitle = document.querySelector('.perspective-link-title');
                   return {
                     opener: document.querySelector('.thread-lead p').textContent.trim(),
-                    strategicCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
-                    marketCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    valueCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
+                    leadershipCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    agilityCopy: document.querySelector('.thread-copy p:nth-child(3)').textContent.trim(),
                     workHeading: document.querySelector('#work-title').textContent.trim(),
                     storyHeading: document.querySelector('#about-title').textContent.trim(),
                     storyIntro: document.querySelector('.values-lead > p').textContent.trim(),
@@ -167,8 +168,9 @@ jobs:
                 });
                 console.log('Editorial polish', width, editorial);
                 assert.equal(editorial.opener,'I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction.');
-                assert.ok(editorial.strategicCopy.includes('I see connections between people, organisations, markets and technology'));
-                assert.ok(editorial.marketCopy.includes('strategic judgement and commercial understanding'));
+                assert.equal(editorial.valueCopy,"I combine creative thinking with strategic judgement and commercial understanding. I think holistically, looking for ways people, planet and profit can reinforce one another.");
+                assert.equal(editorial.leadershipCopy,"I can give ambitious ideas direction and inspire others to make them their own. I'm equally capable of going deep into the details and building things myself.");
+                assert.equal(editorial.agilityCopy,"I'm quick to adapt when new perspectives or technologies open up better possibilities, even when that means changing course radically. AI is central to how I work, expanding what I can build myself and how quickly I can act on new possibilities.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.storyHeading,'My story');
                 assert.equal(editorial.storyIntro,"Ever since primary school, I've been curious about how technology advances, people grow and businesses evolve.");
