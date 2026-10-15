@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected="styles.css?v=20261014-subtitle-width-v1"
-          expected_copy="AI is key to how I work, expanding what I can take on and helping me move faster."
+          expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
@@ -49,7 +49,7 @@ jobs:
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
           grep -Fq "But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong." /tmp/augustkring.html
-          grep -Fq 'AI is key to how I work, expanding what I can take on and helping me move faster.' /tmp/augustkring.html
+          grep -Fq 'AI is at the heart of everything I do.' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
@@ -201,7 +201,7 @@ jobs:
                 }
                 assert.equal(editorial.valueCopy,"I combine creative thinking with strategic judgement and commercial understanding. I think holistically, looking for ways people, planet and profit can reinforce one another.");
                 assert.equal(editorial.leadershipCopy,"I can give ambitious ideas direction, bring people together and inspire them to work towards a shared goal. I'm equally capable of going deep into the details and building things myself.");
-                assert.equal(editorial.agilityCopy,"I'm quick to adapt and willing to change course radically when new perspectives or technologies open up better opportunities. AI is key to how I work, expanding what I can take on and helping me move faster.");
+                assert.equal(editorial.agilityCopy,"I'm quick to adapt and willing to change course radically when new perspectives or technologies open up better opportunities. AI is at the heart of everything I do.");
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.storyHeading,'My story');
