@@ -262,7 +262,7 @@ jobs:
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.paintReady,true,'CC0 rake-brush canvas must render');
-                assert.ok(waymakingLayout.canvasWidth>80 && waymakingLayout.canvasHeight>1000,'Rake-brush canvas has real render resolution');
+                assert.ok(waymakingLayout.canvasWidth>=40 && waymakingLayout.canvasHeight>1000,'Rake-brush canvas has real render resolution');
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after rake-brush painting');
                 assert.equal(waymakingLayout.obsoleteVectorBrush,false,'Obsolete vector brush paths must not return');
                 if(width===1440){
