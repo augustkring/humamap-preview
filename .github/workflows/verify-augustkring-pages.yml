@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-painted-road-v12"
+          expected_home="styles.css?v=20261019-painted-road-v13"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v12' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v13' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -78,10 +78,10 @@ jobs:
           grep -Fq 'width: clamp(88px, 9vw, 100px);' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          grep -Fq 'opacity: .16;' /tmp/augustkring.css
-          grep -Fq 'opacity: .10;' /tmp/augustkring.css
+          grep -Fq 'opacity: .045;' /tmp/augustkring.css
+          grep -Fq 'opacity: .20;' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-mark' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v12" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v13" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js
@@ -89,7 +89,8 @@ jobs:
           grep -Fq "splitSubpaths" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Two confident, continuous brush bands define the road" /tmp/augustkring-waymaking-brush.js
           grep -Fq "second full-length dry-brush layer adds edge character" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "BIOPIC, leftRoad, 2.55" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "BIOPIC, leftRoad, 2.35" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "GRINDHOUSE, leftRoad, 2.62" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "waymaking-painted-option" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "waymaking-painted-road--wash" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "cdn.jsdelivr.net/npm/svg-brush" /tmp/augustkring-waymaking-brush.js

@@ -105,11 +105,11 @@
   // Two confident, continuous brush bands define the road.
   // A second full-length dry-brush layer adds edge character without visible
   // fragment joins. The negative space remains the road surface.
-  deform(BIOPIC, leftRoad, 2.55, 'waymaking-painted-edge waymaking-painted-edge--body');
-  deform(BIOPIC, rightRoad, 2.35, 'waymaking-painted-edge waymaking-painted-edge--body');
+  deform(BIOPIC, leftRoad, 2.35, 'waymaking-painted-edge waymaking-painted-edge--body');
+  deform(BIOPIC, rightRoad, 2.18, 'waymaking-painted-edge waymaking-painted-edge--body');
 
-  deform(GRINDHOUSE, leftRoad, 1.05, 'waymaking-painted-edge waymaking-painted-edge--texture');
-  deform(GRINDHOUSE, rightRoad, 0.98, 'waymaking-painted-edge waymaking-painted-edge--texture');
+  deform(GRINDHOUSE, leftRoad, 2.62, 'waymaking-painted-edge waymaking-painted-edge--texture');
+  deform(GRINDHOUSE, rightRoad, 2.48, 'waymaking-painted-edge waymaking-painted-edge--texture');
 
   const centrePath = makePath(centre);
   const centreLength = centrePath.getTotalLength();
