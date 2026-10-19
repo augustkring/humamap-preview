@@ -510,26 +510,21 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
   overflow: visible;
 }
-.waymaking-painted-road {
+.waymaking-painted-edge {
   mix-blend-mode: multiply;
 }
-.waymaking-painted-road--wash {
-  fill: var(--muted);
-  opacity: .08;
-}
-.waymaking-painted-road--texture {
+.waymaking-painted-edge--body {
   fill: var(--ink);
-  opacity: .15;
+  opacity: .085;
 }
-.waymaking-painted-option {
+.waymaking-painted-edge--texture {
   fill: var(--muted);
-  opacity: .035;
-  mix-blend-mode: multiply;
+  opacity: .22;
 }
 .waymaking-painted-mark {
-  fill: var(--page);
-  opacity: .94;
-  mix-blend-mode: normal;
+  fill: var(--muted);
+  opacity: .18;
+  mix-blend-mode: multiply;
 }
 .waymaking-road-fallback {
   fill: none;

@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-painted-road-v10"
+          expected_home="styles.css?v=20261019-painted-road-v11"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v10' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v11' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -76,22 +76,22 @@ jobs:
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           grep -Fq 'width: clamp(88px, 9vw, 100px);' /tmp/augustkring.css
-          grep -Fq '.waymaking-painted-road--wash' /tmp/augustkring.css
-          grep -Fq '.waymaking-painted-road--texture' /tmp/augustkring.css
-          grep -Fq 'opacity: .08;' /tmp/augustkring.css
-          grep -Fq 'opacity: .15;' /tmp/augustkring.css
-          grep -Fq 'fill: var(--page);' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v10" -o /tmp/augustkring-waymaking-brush.js
+          grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
+          grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
+          grep -Fq 'opacity: .085;' /tmp/augustkring.css
+          grep -Fq 'opacity: .22;' /tmp/augustkring.css
+          grep -Fq '.waymaking-painted-mark' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v11" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const BLOCKBUSTER" /tmp/augustkring-waymaking-brush.js
           grep -Fq "splitSubpaths" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "A single pale painted body reads as a road rather than two rails" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "BIOPIC, road, 4.45" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "textureScales = [3.25" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "Creative thinking opens the field" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "waymaking-painted-option" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Two independent brush bands define the road" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Short dry-brush fragments add material without creating visible joins" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "textureScales = [1.18" /tmp/augustkring-waymaking-brush.js
+          ! grep -Fq "waymaking-painted-option" /tmp/augustkring-waymaking-brush.js
+          ! grep -Fq "waymaking-painted-road--wash" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "cdn.jsdelivr.net/npm/svg-brush" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -254,8 +254,8 @@ jobs:
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
                     painted:svg.classList.contains('is-painted'),
-                    roadLayers:svg.querySelectorAll('.waymaking-painted-road').length,
-                    options:svg.querySelectorAll('.waymaking-painted-option').length,
+                    edgeBodies:svg.querySelectorAll('.waymaking-painted-edge--body').length,
+                    edgeTextures:svg.querySelectorAll('.waymaking-painted-edge--texture').length,
                     marks:svg.querySelectorAll('.waymaking-painted-mark').length,
                     fallbackHidden:svg.querySelector('[data-waymaking-fallback]')?.hasAttribute('hidden') ?? false,
                     overflow:document.documentElement.scrollWidth>innerWidth+1
@@ -265,9 +265,9 @@ jobs:
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.painted,true,'Open-source Figma brush renderer must complete');
-                assert.equal(waymakingLayout.roadLayers,7,'Waymaking road uses one wash plus six dry-brush texture overlays');
-                assert.equal(waymakingLayout.options,2,'Creative thinking keeps two faint alternative brush paths');
-                assert.equal(waymakingLayout.marks,9,'Waymaking road has nine Blockbuster centre marks');
+                assert.equal(waymakingLayout.edgeBodies,2,'Waymaking road keeps two continuous painted edge bands');
+                assert.equal(waymakingLayout.edgeTextures,16,'Waymaking road keeps eight local dry-brush fragments per edge');
+                assert.equal(waymakingLayout.marks,9,'Waymaking road has nine restrained Blockbuster centre marks');
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after painted road renders');
                 if(width===1440){
                   assert.ok(waymakingLayout.road.width<=101,'Desktop painted road remains visually secondary');
