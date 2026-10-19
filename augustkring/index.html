@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261019-freehand-v2">
+  <link rel="stylesheet" href="styles.css?v=20261019-static-road-v1">
 
   <script type="application/ld+json">
   {
@@ -195,11 +195,15 @@
 
         <div class="waymaking-beats">
           <div class="waymaking-road-wrap" aria-hidden="true">
-            <svg class="waymaking-road" data-waymaking-road viewBox="0 0 360 1280" preserveAspectRatio="none" focusable="false">
-              <g class="waymaking-road-fallback" data-waymaking-road-fallback>
-                <path class="waymaking-road-fallback-edge" d="M138 0 C70 140 223 244 122 360 C40 468 230 570 132 690 C44 804 226 915 116 1038 C54 1118 192 1208 135 1280" />
-                <path class="waymaking-road-fallback-edge" d="M222 0 C154 140 307 244 206 360 C124 468 314 570 216 690 C128 804 310 915 200 1038 C138 1118 276 1208 219 1280" />
-                <path class="waymaking-road-fallback-centre" d="M180 0 C112 140 265 244 164 360 C82 468 272 570 174 690 C86 804 268 915 158 1038 C96 1118 234 1208 177 1280" />
+            <svg class="waymaking-road" viewBox="0 0 100 1280" preserveAspectRatio="none" focusable="false">
+              <g class="waymaking-road-sketch">
+                <path class="waymaking-road-edge waymaking-road-edge--left" d="M28 0 C23 92 42 182 27 286 C13 386 42 476 27 586 C15 684 43 779 29 892 C18 990 41 1078 32 1180 C28 1225 25 1252 25 1280" />
+                <path class="waymaking-road-edge waymaking-road-edge--left-echo" d="M30 0 C25 94 44 180 29 288 C15 388 44 474 29 588 C17 682 45 782 31 894 C20 992 43 1080 34 1182 C30 1227 27 1253 27 1280" />
+
+                <path class="waymaking-road-edge waymaking-road-edge--right" d="M72 0 C67 92 86 182 71 286 C57 386 86 476 71 586 C59 684 87 779 73 892 C62 990 85 1078 76 1180 C72 1225 69 1252 69 1280" />
+                <path class="waymaking-road-edge waymaking-road-edge--right-echo" d="M70 0 C65 94 84 180 69 288 C55 388 84 474 69 588 C57 682 85 782 71 894 C60 992 83 1080 74 1182 C70 1227 67 1253 67 1280" />
+
+                <path class="waymaking-road-centre" d="M50 12 C45 98 64 184 49 286 C35 386 64 477 49 586 C37 685 65 780 51 893 C40 991 63 1079 54 1179 C50 1224 47 1252 47 1270" />
               </g>
             </svg>
           </div>
@@ -378,7 +382,6 @@
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
-  <script type="module" src="waymaking-road.js?v=20261019-freehand-v2"></script>
   <script src="work-carousel.js" defer></script>
   <script src="mobile-nav.js?v=20261009-input-focus-v4" defer></script>
 </body>
