@@ -7,6 +7,8 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
+      - "augustkring/verify-baseline.mjs"
+      - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
       - "augustkring/about/index.html"
       - "augustkring/perspectives/index.html"
