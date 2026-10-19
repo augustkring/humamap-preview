@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-figma-v1' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-figma-v2' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -78,10 +78,12 @@ jobs:
           grep -Fq 'width: clamp(76px, 8vw, 88px);' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-edge' /tmp/augustkring.css
           grep -Fq 'opacity: .30;' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v1" -o /tmp/augustkring-waymaking-brush.js
-          grep -Fq "svg-brush@0.1.5/+esm" /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v2" -o /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Grindhouse" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Blockbuster" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "splitSubpaths" /tmp/augustkring-waymaking-brush.js
+          ! grep -Fq "cdn.jsdelivr.net/npm/svg-brush" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
