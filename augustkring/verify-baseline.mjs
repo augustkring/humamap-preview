@@ -34,7 +34,7 @@ assert.equal((threadSummary.match(/<p>/g)||[]).length,4,'Approved Where I add va
 assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking narrative missing');
 assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Waymaker definition missing');
 assert.ok(thread.includes('waymaking-road-surface'),'Waymaking road surface missing');
-assert.ok(thread.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
+assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(css.includes('stroke-width: 68px;'),'Waymaking road must remain visually legible as a road');
