@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-painted-road-v8"
+          expected_home="styles.css?v=20261019-painted-road-v9"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v8' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v9' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -78,10 +78,10 @@ jobs:
           grep -Fq 'width: clamp(88px, 9vw, 100px);' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-road--wash' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-road--texture' /tmp/augustkring.css
-          grep -Fq 'opacity: .13;' /tmp/augustkring.css
-          grep -Fq 'opacity: .055;' /tmp/augustkring.css
+          grep -Fq 'opacity: .11;' /tmp/augustkring.css
+          grep -Fq 'opacity: .085;' /tmp/augustkring.css
           grep -Fq 'fill: var(--page);' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v8" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v9" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js

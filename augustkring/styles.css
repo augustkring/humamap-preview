@@ -515,11 +515,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-painted-road--wash {
   fill: var(--muted);
-  opacity: .13;
+  opacity: .11;
 }
 .waymaking-painted-road--texture {
   fill: var(--ink);
-  opacity: .055;
+  opacity: .085;
 }
 .waymaking-painted-mark {
   fill: var(--page);
