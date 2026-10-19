@@ -37,7 +37,7 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(thread.includes('data-waymaking-brush-road'),'Figma brush road target missing');
-assert.ok(html.includes('waymaking-brush.js?v=20261019-figma-brush-v5'),'Figma brush renderer missing');
+assert.ok(html.includes('waymaking-brush.js?v=20261019-figma-v5'),'Figma brush renderer missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
