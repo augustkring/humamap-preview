@@ -61,7 +61,7 @@ jobs:
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-road' /tmp/augustkring.html
           grep -Fq 'https://unpkg.com/roughjs@4.6.6/bundled/rough.js' /tmp/augustkring.html
-          grep -Fq 'waymaking-road.js?v=20261019-rough-v1' /tmp/augustkring.html
+          grep -Fq 'waymaking-road.js?v=20261019-rough-v2' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -76,9 +76,12 @@ jobs:
           grep -Fq '.waymaking-road-fallback-edge' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-rough-v1" -o /tmp/augustkring-waymaking-road.js
+          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-rough-v2" -o /tmp/augustkring-waymaking-road.js
           grep -Fq 'rough.svg(svg)' /tmp/augustkring-waymaking-road.js
           grep -Fq 'strokeLineDash' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'roughness: 2.65' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'leftEdgePath' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'rightEdgePath' /tmp/augustkring-waymaking-road.js
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css

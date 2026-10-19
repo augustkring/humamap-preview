@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"35322be1","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"f9c999c7","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -35,7 +35,7 @@ assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking 
 assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Waymaker definition missing');
 assert.ok(thread.includes('data-waymaking-road'),'Waymaking Rough.js SVG target missing');
 assert.ok(html.includes('https://unpkg.com/roughjs@4.6.6/bundled/rough.js'),'Pinned Rough.js dependency missing');
-assert.ok(html.includes('waymaking-road.js?v=20261019-rough-v1'),'Local Waymaking road renderer missing');
+assert.ok(html.includes('waymaking-road.js?v=20261019-rough-v2'),'Local Waymaking road renderer missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');

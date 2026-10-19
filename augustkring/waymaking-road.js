@@ -11,6 +11,8 @@
 
   const rc = window.rough.svg(svg);
   const fallback = svg.querySelector('[data-waymaking-road-fallback]');
+  const leftEdgePath = 'M137 0 C67 136 223 247 121 360 C39 470 230 568 130 690 C44 806 226 914 114 1038 C52 1118 190 1210 133 1280';
+  const rightEdgePath = 'M223 0 C155 144 309 240 207 360 C126 465 315 575 218 690 C130 800 311 919 201 1038 C139 1116 279 1204 220 1280';
   const centrePath = 'M180 0 C112 140 265 244 164 360 C82 468 272 570 174 690 C86 804 268 915 158 1038 C96 1118 234 1208 177 1280';
   const edgeColour = '#586a7d';
   const centreColour = '#748397';
@@ -32,10 +34,10 @@
 
   const edgeOptions = seed => ({
     stroke: edgeColour,
-    strokeWidth: 3,
-    roughness: 1.85,
-    bowing: 1.35,
-    maxRandomnessOffset: 2.2,
+    strokeWidth: 3.4,
+    roughness: 2.65,
+    bowing: 2.15,
+    maxRandomnessOffset: 3.6,
     preserveVertices: true,
     seed
   });
@@ -43,16 +45,14 @@
   // Two independently generated edges make the road read as a drawing,
   // rather than a single styled line or a filled graphic shape.
   decorate(
-    rc.path(centrePath, edgeOptions(41)),
+    rc.path(leftEdgePath, edgeOptions(41)),
     'waymaking-road-edge waymaking-road-edge--left',
-    0.82,
-    'translate(-42 0)'
+    0.74
   );
   decorate(
-    rc.path(centrePath, edgeOptions(67)),
+    rc.path(rightEdgePath, edgeOptions(67)),
     'waymaking-road-edge waymaking-road-edge--right',
-    0.82,
-    'translate(42 0)'
+    0.74
   );
 
   // Rough.js supports native dash arrays, so the centre markings inherit
@@ -60,18 +60,18 @@
   decorate(
     rc.path(centrePath, {
       stroke: centreColour,
-      strokeWidth: 2,
-      roughness: 1.2,
-      bowing: 0.9,
-      maxRandomnessOffset: 1.45,
+      strokeWidth: 2.1,
+      roughness: 1.75,
+      bowing: 1.2,
+      maxRandomnessOffset: 2,
       preserveVertices: true,
-      disableMultiStroke: true,
+      disableMultiStroke: false,
       strokeLineDash: [16, 22, 9, 18, 14, 24],
       strokeLineDashOffset: 5,
       seed: 83
     }),
     'waymaking-road-centre',
-    0.72
+    0.6
   );
 
   if (fallback) fallback.setAttribute('hidden', '');
