@@ -34,8 +34,8 @@ assert.equal((threadSummary.match(/<p>/g)||[]).length,4,'Approved Where I add va
 assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking narrative missing');
 assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Waymaker definition missing');
 assert.ok(thread.includes('data-waymaking-road'),'Waymaking Rough.js SVG target missing');
-assert.ok(html.includes('https://unpkg.com/roughjs@4.6.6/bundled/rough.js'),'Pinned Rough.js dependency missing');
-assert.ok(html.includes('waymaking-road.js?v=20261019-rough-v2'),'Local Waymaking road renderer missing');
+assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
+assert.ok(html.includes('waymaking-road.js?v=20261019-freehand-v1'),'Perfect-freehand Waymaking renderer missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');

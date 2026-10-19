@@ -60,8 +60,8 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-road' /tmp/augustkring.html
-          grep -Fq 'https://unpkg.com/roughjs@4.6.6/bundled/rough.js' /tmp/augustkring.html
-          grep -Fq 'waymaking-road.js?v=20261019-rough-v2' /tmp/augustkring.html
+          ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
+          grep -Fq 'type="module" src="waymaking-road.js?v=20261019-freehand-v1"' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -76,12 +76,13 @@ jobs:
           grep -Fq '.waymaking-road-fallback-edge' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-rough-v2" -o /tmp/augustkring-waymaking-road.js
-          grep -Fq 'rough.svg(svg)' /tmp/augustkring-waymaking-road.js
-          grep -Fq 'strokeLineDash' /tmp/augustkring-waymaking-road.js
-          grep -Fq 'roughness: 2.65' /tmp/augustkring-waymaking-road.js
-          grep -Fq 'leftEdgePath' /tmp/augustkring-waymaking-road.js
-          grep -Fq 'rightEdgePath' /tmp/augustkring-waymaking-road.js
+          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-freehand-v1" -o /tmp/augustkring-waymaking-road.js
+          grep -Fq "perfect-freehand@1.2.3/dist/esm/index.mjs" /tmp/augustkring-waymaking-road.js
+          grep -Fq 'getStroke' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'size: 14' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'simulatePressure: false' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'leftEdge' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'rightEdge' /tmp/augustkring-waymaking-road.js
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
@@ -241,11 +242,11 @@ jobs:
                   return {
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
-                    roughDrawn:svg.classList.contains('is-rough'),
+                    freehandDrawn:svg.classList.contains('is-freehand'),
                     fallbackHidden:fallback.hasAttribute('hidden'),
                     edgeGroups:svg.querySelectorAll('.waymaking-road-edge').length,
                     centreGroups:svg.querySelectorAll('.waymaking-road-centre').length,
-                    roughPathCount:svg.querySelectorAll('.waymaking-road-edge path, .waymaking-road-centre path').length,
+                    freehandPathCount:svg.querySelectorAll('.waymaking-road-edge, .waymaking-road-centre').length,
                     darkSurface:!!svg.querySelector('.waymaking-road-surface, .waymaking-road-underlay'),
                     overflow:document.documentElement.scrollWidth>innerWidth+1
                   };
@@ -253,11 +254,11 @@ jobs:
                 const heights=waymakingLayout.blocks.map(x=>x.height);
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
-                assert.equal(waymakingLayout.roughDrawn,true,'Rough.js must render the hand-drawn road');
-                assert.equal(waymakingLayout.fallbackHidden,true,'Static fallback hides after Rough.js renders');
-                assert.equal(waymakingLayout.edgeGroups,2,'Waymaking road has two hand-drawn edges');
-                assert.equal(waymakingLayout.centreGroups,1,'Waymaking road has one hand-drawn centre line');
-                assert.ok(waymakingLayout.roughPathCount>=3,'Rough.js generated visible SVG paths');
+                assert.equal(waymakingLayout.freehandDrawn,true,'perfect-freehand must render the marker road');
+                assert.equal(waymakingLayout.fallbackHidden,true,'Static fallback hides after freehand rendering');
+                assert.equal(waymakingLayout.edgeGroups,2,'Waymaking road has two freehand marker edges');
+                assert.ok(waymakingLayout.centreGroups>=10,'Waymaking road has hand-drawn centre markings');
+                assert.ok(waymakingLayout.freehandPathCount>=12,'perfect-freehand generated visible SVG paths');
                 assert.equal(waymakingLayout.darkSurface,false,'No dark filled road treatment');
                 if(width===1440){
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left Waymaking copy stays clear of road');
