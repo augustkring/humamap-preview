@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-figma-brush-v6' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-figma-v6' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -80,7 +80,7 @@ jobs:
           grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
           grep -Fq 'opacity: .075;' /tmp/augustkring.css
           grep -Fq 'opacity: .16;' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-brush-v6" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v6" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js
