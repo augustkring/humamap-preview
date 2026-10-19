@@ -61,3 +61,6 @@ Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 
 
 **Approved change 2026-10-19 (layered Figma brush pass):** Close inspection of the browser render showed that a single stretched brush still read too uniformly. Each road edge is now composed from two different Figma Draw stretch-brush geometries vendored from the MIT-licensed `svg-brush` project: `Biopic` provides the organic painted body and `Grindhouse` adds a slightly offset dry-brush texture. The layers use different colour/opacity roles from the existing site palette, while the overall road corridor remains unchanged. Centre markings remain `Blockbuster`. This is intended to create material depth and hand-painted variation without increasing the road's visual footprint.
+
+
+**Approved change 2026-10-19 (large-footprint / low-density brush pass):** Browser review showed that even the layered Biopic + Grindhouse system still collapsed into thin strokes at normal viewing size. The physical brush geometry is now substantially wider while its opacity is reduced, so edge fibres and material variation survive rasterisation without increasing overall visual salience. The road corridor remains 76–88px on desktop and 44–48px on mobile; only the brush footprint inside that corridor changes. Centre marks use the same principle at a smaller scale.

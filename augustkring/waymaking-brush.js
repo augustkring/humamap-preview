@@ -95,10 +95,10 @@
   // Painted body + dry brush edge. Two different source brushes and slightly
   // different backbones create a layered analogue stroke rather than a
   // digitally perfect vector line.
-  deform(BIOPIC, leftRoad, 0.82, 'waymaking-painted-edge waymaking-painted-edge--body');
-  deform(BIOPIC, rightRoad, 0.82, 'waymaking-painted-edge waymaking-painted-edge--body');
-  deform(GRINDHOUSE, leftTexture, 0.56, 'waymaking-painted-edge waymaking-painted-edge--texture');
-  deform(GRINDHOUSE, rightTexture, 0.56, 'waymaking-painted-edge waymaking-painted-edge--texture');
+  deform(BIOPIC, leftRoad, 1.80, 'waymaking-painted-edge waymaking-painted-edge--body');
+  deform(BIOPIC, rightRoad, 1.80, 'waymaking-painted-edge waymaking-painted-edge--body');
+  deform(GRINDHOUSE, leftTexture, 1.05, 'waymaking-painted-edge waymaking-painted-edge--texture');
+  deform(GRINDHOUSE, rightTexture, 1.05, 'waymaking-painted-edge waymaking-painted-edge--texture');
 
   const centre = 'M50 0 C49 110 38 185 43 285 C48 395 64 458 56 580 C48 700 38 790 43 905 C48 1030 62 1120 54 1280';
   const centrePath = makePath(centre);
@@ -110,7 +110,7 @@
     const pm = centrePath.getPointAtLength(((a+b)/2) * centreLength);
     const p1 = centrePath.getPointAtLength(b * centreLength);
     const d = 'M' + p0.x + ' ' + p0.y + ' Q' + pm.x + ' ' + pm.y + ' ' + p1.x + ' ' + p1.y;
-    deform(BLOCKBUSTER, d, 0.18, 'waymaking-painted-mark');
+    deform(BLOCKBUSTER, d, 0.30, 'waymaking-painted-mark');
   }
   centrePath.remove();
   scratch.remove();
