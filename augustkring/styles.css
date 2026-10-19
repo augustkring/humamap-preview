@@ -1165,14 +1165,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 
 .about-principles-band {
-  margin: clamp(18px, 2vw, 28px) 0;
-  padding: clamp(48px, 5.5vw, 70px);
+  margin: 0;
+  padding: var(--about-section-space) 0;
   display: grid;
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-  gap: clamp(46px, 6vw, 82px);
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  gap: clamp(54px, 7vw, 92px);
   align-items: start;
-  border-radius: 4px;
-  background: var(--surface);
 }
 .about-principles-grid {
   display: grid;
@@ -1555,7 +1553,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .about-skill-grid,
   .about-principles-grid { grid-template-columns: 1fr; gap: 24px; }
   .about-principle-primary { grid-column: auto; max-width: none; }
-  .about-principles-band { margin-block: 0; padding: 46px 28px; }
+  .about-principles-band { margin-block: 0; padding: var(--section-space-mobile) 0; }
   .about-personality { padding-top: 58px; padding-bottom: 58px; }
   .about-story-bottom { padding-top: 14px; gap: 28px; }
   .about-story-intro > p { font-size: var(--editorial-lead-size); }
