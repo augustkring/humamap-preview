@@ -76,8 +76,10 @@ jobs:
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           grep -Fq 'width: clamp(76px, 8vw, 88px);' /tmp/augustkring.css
-          grep -Fq '.waymaking-painted-edge' /tmp/augustkring.css
-          grep -Fq 'opacity: .24;' /tmp/augustkring.css
+          grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
+          grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
+          grep -Fq 'opacity: .11;' /tmp/augustkring.css
+          grep -Fq 'opacity: .13;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v4" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
