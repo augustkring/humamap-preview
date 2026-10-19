@@ -83,8 +83,8 @@ jobs:
           curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v4" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "Figma Grindhouse" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "Figma Blockbuster" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "const BLOCKBUSTER" /tmp/augustkring-waymaking-brush.js
           grep -Fq "splitSubpaths" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "cdn.jsdelivr.net/npm/svg-brush" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
