@@ -262,11 +262,11 @@ jobs:
                   const invite=document.querySelector('.homepage-contact-invite').getBoundingClientRect();
                   const signature=document.querySelector('.homepage-contact-signoff').getBoundingClientRect();
                   return {sideBySide:signature.left>invite.right-1,stacked:signature.top>=invite.bottom-1,
-                    spacing:parseFloat(getComputedStyle(document.querySelector('.values-section')).paddingBottom)};
+                    spacing:parseFloat(getComputedStyle(document.querySelector('.perspective-section')).paddingBottom)};
                 });
                 if(width>760) assert.ok(contact.sideBySide,'Approved desktop two-group contact');
                 else assert.ok(contact.stacked,'Approved mobile contact stacking');
-                assert.ok(contact.spacing>=57,'Approved story rhythm');
+                assert.ok(contact.spacing>=57,'Approved closing rhythm');
                 await page.locator('.homepage-contact').screenshot({path:`/tmp/ak-browser-check/contact-${width}.png`});
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
 
