@@ -500,7 +500,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 50%;
-  width: clamp(76px, 8vw, 88px);
+  width: clamp(88px, 9vw, 100px);
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -510,21 +510,21 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
   overflow: visible;
 }
-.waymaking-painted-edge {
+.waymaking-painted-road {
   mix-blend-mode: multiply;
 }
-.waymaking-painted-edge--body {
-  fill: var(--ink);
-  opacity: .11;
-}
-.waymaking-painted-edge--texture {
+.waymaking-painted-road--wash {
   fill: var(--muted);
-  opacity: .22;
+  opacity: .13;
+}
+.waymaking-painted-road--texture {
+  fill: var(--ink);
+  opacity: .055;
 }
 .waymaking-painted-mark {
-  fill: var(--muted);
-  opacity: .18;
-  mix-blend-mode: multiply;
+  fill: var(--page);
+  opacity: .92;
+  mix-blend-mode: normal;
 }
 .waymaking-road-fallback {
   fill: none;
@@ -543,7 +543,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   z-index: 1;
   min-height: clamp(252px, 24vw, 300px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(76px, 8vw, 88px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) clamp(88px, 9vw, 100px) minmax(0, 1fr);
   column-gap: clamp(38px, 4.7vw, 58px);
   align-items: center;
 }
@@ -1682,7 +1682,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-wrap {
     inset: 0 auto 0 -5px;
-    width: 48px;
+    width: 54px;
     transform: none;
   }
   .waymaking-beat {
@@ -1713,7 +1713,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-wrap {
     left: -8px;
-    width: 44px;
+    width: 50px;
   }
   .waymaking-copy h4 {
     font-size: 24px;

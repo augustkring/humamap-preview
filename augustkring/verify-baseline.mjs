@@ -37,14 +37,14 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(thread.includes('data-waymaking-brush-road'),'Figma brush road target missing');
-assert.ok(html.includes('waymaking-brush.js?v=20261019-figma-v7'),'Figma brush renderer missing');
+assert.ok(html.includes('waymaking-brush.js?v=20261019-painted-road-v8'),'Figma brush renderer missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
-assert.ok(css.includes('width: clamp(76px, 8vw, 88px);'),'Waymaking road must remain visually secondary');
-assert.ok(css.includes('.waymaking-painted-edge'),'Figma brush edge style missing');
-assert.ok(css.includes('.waymaking-painted-edge--body'),'Waymaking painted body missing');
-assert.ok(css.includes('.waymaking-painted-edge--texture'),'Waymaking dry-brush texture missing');
+assert.ok(css.includes('width: clamp(88px, 9vw, 100px);'),'Waymaking painted road corridor drift');
+assert.ok(css.includes('.waymaking-painted-road--wash'),'Waymaking painted road wash missing');
+assert.ok(css.includes('.waymaking-painted-road--texture'),'Waymaking dry-brush road texture missing');
+assert.ok(css.includes('fill: var(--page);'),'Waymaking negative centre markings missing');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
 assert.ok(!css.includes('.waymaking-road-underlay'),'Dark road underlay treatment must not return');
 assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Approved two-group close missing');
@@ -55,7 +55,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261019-figma-brush-v7':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261019-painted-road-v8':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
