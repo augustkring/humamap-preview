@@ -511,9 +511,15 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   overflow: visible;
 }
 .waymaking-painted-edge {
-  fill: var(--muted);
-  opacity: .24;
   mix-blend-mode: multiply;
+}
+.waymaking-painted-edge--body {
+  fill: var(--ink);
+  opacity: .11;
+}
+.waymaking-painted-edge--texture {
+  fill: var(--muted);
+  opacity: .13;
 }
 .waymaking-painted-mark {
   fill: var(--muted);

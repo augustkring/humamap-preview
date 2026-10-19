@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-figma-brush-v3"
+          expected_home="styles.css?v=20261019-figma-brush-v4"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-figma-v3' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-figma-v4' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -78,8 +78,9 @@ jobs:
           grep -Fq 'width: clamp(76px, 8vw, 88px);' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-edge' /tmp/augustkring.css
           grep -Fq 'opacity: .24;' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v3" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-figma-v4" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Grindhouse" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Blockbuster" /tmp/augustkring-waymaking-brush.js
           grep -Fq "splitSubpaths" /tmp/augustkring-waymaking-brush.js
@@ -255,7 +256,7 @@ jobs:
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.painted,true,'Open-source Figma brush renderer must complete');
-                assert.equal(waymakingLayout.edges,2,'Waymaking road has two Grindhouse brush edges');
+                assert.equal(waymakingLayout.edges,4,'Waymaking road has two layered brush paths per edge');
                 assert.equal(waymakingLayout.marks,9,'Waymaking road has nine Blockbuster centre marks');
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after painted road renders');
                 if(width===1440){
