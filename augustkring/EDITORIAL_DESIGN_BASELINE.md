@@ -2,7 +2,7 @@
 
 Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 
-**Frozen homepage:** hero, Where I add value, The shift I see (verbatim lock), My current focus, My story, Let’s connect, and footer. The source body/foot is digest-locked to prevent unnoticed edits.
+**Protected homepage:** hero, the verbatim Where I add value summary, the Waymaking narrative, My current focus, The shift I see, Let’s connect, and footer. The homepage story is digest-locked to prevent unnoticed edits.
 
 **Design defaults:** shared `styles.css` in Outfit/Figtree, white background, navy typography, restrained red accent, 1080px content width and responsive gutters. Story-section rhythm: desktop clamp(72px,6.8vw,92px), mobile 58px. Contact: full-width two-group desktop composition (invitation and links together; handwritten signature beside), stacked below 760px. No third isolated column, centred text island, extra cards or decorative gradients.
 
@@ -25,3 +25,6 @@ Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 **Approved change 2026-10-15:** Replaced one paragraph in the locked `The shift I see` section with the user-approved argument about AI amplifying the value of what companies get right and the cost of what they get wrong. The final line has no em dash, following the explicit editorial preference. All other homepage copy, including Where I add value, CSS, layout, and metadata is unchanged. Guard and CI checks were updated for the exact new text.
 
 **Approved change 2026-10-15 (AI statement):** Replaced only the concluding AI sentence of the third `Where I add value` body paragraph with `AI is at the heart of everything I do.` The preceding adaptability sentence, all other copy, HTML structure, CSS, and layout remain unchanged. Homepage checksum, exact copy guard, and deployed HTML/browser checks updated for this approved editorial change.
+
+
+**Approved change 2026-10-19 (Waymaking homepage narrative):** User explicitly approved implementing Waymaking as the homepage's main explanatory story. The existing hero and approved `Where I add value` wording remain unchanged. A new editorial Waymaking continuation now explains creative thinking, strategic judgement, commercial understanding, building and the responsibility underlying those choices, using one restrained hand-drawn road as a narrative visual rather than cards or animation. `My current focus` follows the Waymaking resolution as the practical output layer; the existing `The shift I see` section follows current focus and retains its approved wording; the homepage `My story` section is removed so the full personal chronology remains on About. The Waymaking venture card is renamed `Waymaking Ventures`. The homepage stylesheet URL was cache-busted; subpage copy was not changed.
