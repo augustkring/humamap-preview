@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-waymaking-home-v2"
+          expected_home="styles.css?v=20261019-waymaking-home-v3"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -70,7 +70,7 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'stroke-width: 68px;' /tmp/augustkring.css
+          grep -Fq 'stroke-width: 72px;' /tmp/augustkring.css
           grep -Fq 'stroke-dasharray: 18 24 12 20 22 26 14 23;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
