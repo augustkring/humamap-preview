@@ -504,35 +504,28 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   transform: translateX(-50%);
   pointer-events: none;
 }
-.waymaking-road {
+.waymaking-road-canvas,
+.waymaking-road-fallback-svg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+.waymaking-road-canvas {
+  opacity: .92;
+  mix-blend-mode: multiply;
+}
+.waymaking-road-fallback-svg {
   overflow: visible;
-}
-.waymaking-painted-edge {
-  mix-blend-mode: multiply;
-}
-.waymaking-painted-edge--body {
-  fill: var(--ink);
-  opacity: .045;
-}
-.waymaking-painted-edge--texture {
-  fill: var(--ink);
-  opacity: .20;
-}
-.waymaking-painted-mark {
-  fill: var(--muted);
-  opacity: .20;
-  mix-blend-mode: multiply;
 }
 .waymaking-road-fallback {
   fill: none;
   stroke: var(--muted);
-  stroke-width: 3px;
+  stroke-width: 2.2px;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: .18;
+  opacity: .10;
   vector-effect: non-scaling-stroke;
 }
 [data-waymaking-fallback][hidden] {
