@@ -515,15 +515,15 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-painted-edge--body {
   fill: var(--ink);
-  opacity: .085;
+  opacity: .16;
 }
 .waymaking-painted-edge--texture {
   fill: var(--muted);
-  opacity: .22;
+  opacity: .10;
 }
 .waymaking-painted-mark {
   fill: var(--muted);
-  opacity: .18;
+  opacity: .20;
   mix-blend-mode: multiply;
 }
 .waymaking-road-fallback {
