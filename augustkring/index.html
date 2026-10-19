@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261019-waymaking-home-v3">
+  <link rel="stylesheet" href="styles.css?v=20261019-waymaking-rough-v1">
 
   <script type="application/ld+json">
   {
@@ -190,35 +190,16 @@
       <section class="waymaking-narrative" aria-labelledby="waymaking-title">
         <header class="waymaking-intro">
           <h3 id="waymaking-title">Waymaking</h3>
-          <p>In practice, these things overlap. I think of the way they come together as Waymaking.</p>
+          <p>In practice, these things overlap. I call the way they come together Waymaking.</p>
         </header>
 
         <div class="waymaking-beats">
           <div class="waymaking-road-wrap" aria-hidden="true">
-            <svg class="waymaking-road" viewBox="0 0 360 1280" preserveAspectRatio="none" focusable="false">
-              <defs>
-                <filter id="waymaking-marker-rough" x="-30%" y="-8%" width="160%" height="116%" color-interpolation-filters="sRGB">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.012 0.05" numOctaves="2" seed="17" result="road-noise" />
-                  <feDisplacementMap in="SourceGraphic" in2="road-noise" scale="5.5" xChannelSelector="R" yChannelSelector="B" />
-                </filter>
-              </defs>
-
-              <g class="waymaking-road-possibilities" filter="url(#waymaking-marker-rough)">
-                <path class="waymaking-road-branch-surface" d="M176 154 C137 173 108 207 91 254 C83 277 80 298 80 318" />
-                <path class="waymaking-road-branch-surface" d="M183 154 C223 174 251 207 270 253 C278 274 282 294 283 314" />
-                <path class="waymaking-road-branch-centre" d="M177 154 C126 170 82 212 48 280 C34 309 25 337 18 366" />
-                <path class="waymaking-road-branch-centre" d="M181 154 C236 174 282 216 326 276 C341 297 350 319 356 342" />
-              </g>
-
-              <g class="waymaking-road-river">
-                <path d="M18 861 C78 842 116 883 168 864 C228 842 264 881 342 854" />
-                <path d="M8 884 C70 865 111 902 166 887 C227 868 281 902 352 875" />
-              </g>
-
-              <g class="waymaking-road-main" filter="url(#waymaking-marker-rough)">
-                <path class="waymaking-road-underlay" d="M180 0 C84 114 284 208 164 330 C70 428 286 520 176 648 C80 756 276 852 160 978 C84 1076 242 1162 177 1280" />
-                <path class="waymaking-road-surface" d="M180 0 C84 114 284 208 164 330 C70 428 286 520 176 648 C80 756 276 852 160 978 C84 1076 242 1162 177 1280" />
-                <path class="waymaking-road-centre" d="M180 0 C84 114 284 208 164 330 C70 428 286 520 176 648 C80 756 276 852 160 978 C84 1076 242 1162 177 1280" />
+            <svg class="waymaking-road" data-waymaking-road viewBox="0 0 360 1280" preserveAspectRatio="none" focusable="false">
+              <g class="waymaking-road-fallback" data-waymaking-road-fallback>
+                <path class="waymaking-road-fallback-edge" d="M138 0 C70 140 223 244 122 360 C40 468 230 570 132 690 C44 804 226 915 116 1038 C54 1118 192 1208 135 1280" />
+                <path class="waymaking-road-fallback-edge" d="M222 0 C154 140 307 244 206 360 C124 468 314 570 216 690 C128 804 310 915 200 1038 C138 1118 276 1208 219 1280" />
+                <path class="waymaking-road-fallback-centre" d="M180 0 C112 140 265 244 164 360 C82 468 272 570 174 690 C86 804 268 915 158 1038 C96 1118 234 1208 177 1280" />
               </g>
             </svg>
           </div>
@@ -226,8 +207,8 @@
           <div class="waymaking-beat waymaking-beat--left">
             <div class="waymaking-copy">
               <h4>Creative thinking</h4>
-              <p>I like opening a problem up before narrowing it down. I question the assumptions behind the obvious answer, connect things that do not normally sit together and look at what new technology, changing needs or a different perspective makes possible.</p>
-              <p>The aim is not novelty for its own sake. It is to find better options that were easy to miss before.</p>
+              <p>I like opening a problem up before narrowing it down. I question the obvious answer, connect things that do not normally sit together and look at what new technology, changing needs or a different perspective makes possible.</p>
+              <p>The aim is not novelty. It is to find better options that were easy to miss before.</p>
             </div>
           </div>
 
@@ -263,28 +244,6 @@
           <p>You do not need to know the whole route in advance, and you do not need to build every part yourself. What matters is not how much of the road you build. It is what the road makes possible, and whether others can use it, improve it and take it further.</p>
         </div>
 
-        <div class="waymaking-outcome-road" aria-hidden="true">
-          <svg viewBox="0 0 720 180" preserveAspectRatio="none" focusable="false">
-            <defs>
-              <filter id="waymaking-fork-rough" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
-                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.05" numOctaves="2" seed="23" result="fork-noise" />
-                <feDisplacementMap in="SourceGraphic" in2="fork-noise" scale="3.4" xChannelSelector="R" yChannelSelector="B" />
-              </filter>
-            </defs>
-            <g filter="url(#waymaking-fork-rough)">
-              <path class="waymaking-fork-stem-surface" d="M360 0 C359 42 359 55 360 72" />
-              <path class="waymaking-fork-stem-centre" d="M360 0 C359 42 359 55 360 72" />
-              <path class="waymaking-fork-road-surface waymaking-fork-road--outer" d="M360 70 C310 91 225 119 92 180" />
-              <path class="waymaking-fork-road-surface" d="M360 70 C338 104 316 136 278 180" />
-              <path class="waymaking-fork-road-surface" d="M360 70 C382 104 404 136 442 180" />
-              <path class="waymaking-fork-road-surface waymaking-fork-road--outer" d="M360 70 C410 91 495 119 628 180" />
-              <path class="waymaking-fork-road-centre waymaking-fork-road--outer" d="M360 70 C310 91 225 119 92 180" />
-              <path class="waymaking-fork-road-centre" d="M360 70 C338 104 316 136 278 180" />
-              <path class="waymaking-fork-road-centre" d="M360 70 C382 104 404 136 442 180" />
-              <path class="waymaking-fork-road-centre waymaking-fork-road--outer" d="M360 70 C410 91 495 119 628 180" />
-            </g>
-          </svg>
-        </div>
       </section>
 
     <section id="work" class="story-section work-section work-section--waymaking-output" aria-labelledby="work-title" data-work-carousel>
@@ -419,6 +378,8 @@
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
+  <script src="https://unpkg.com/roughjs@4.6.6/bundled/rough.js" defer></script>
+  <script src="waymaking-road.js?v=20261019-rough-v1" defer></script>
   <script src="work-carousel.js" defer></script>
   <script src="mobile-nav.js?v=20261009-input-focus-v4" defer></script>
 </body>

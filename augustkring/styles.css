@@ -464,7 +464,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   color: var(--copy);
 }
 
-/* Waymaking: one continuous editorial story carried by a hand-drawn road. */
+/* Waymaking: Rough.js draws the road; CSS only composes the editorial layout. */
 .waymaking-narrative {
   position: relative;
   margin-top: clamp(108px, 10vw, 148px);
@@ -472,7 +472,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-intro {
   width: min(100%, 660px);
-  margin: 0 auto clamp(68px, 6.5vw, 90px);
+  margin: 0 auto clamp(70px, 6.7vw, 92px);
   text-align: center;
 }
 .waymaking-intro h3,
@@ -500,67 +500,44 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 50%;
-  width: clamp(310px, 31vw, 360px);
+  width: clamp(205px, 21vw, 235px);
   transform: translateX(-50%);
   pointer-events: none;
 }
 .waymaking-road {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
-.waymaking-road-underlay,
-.waymaking-road-surface,
-.waymaking-road-centre,
-.waymaking-road-branch-surface,
-.waymaking-road-branch-centre,
-.waymaking-road-river path,
-.waymaking-fork-stem-surface,
-.waymaking-fork-stem-centre,
-.waymaking-fork-road-surface,
-.waymaking-fork-road-centre {
+.waymaking-road-fallback-edge,
+.waymaking-road-fallback-centre {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.waymaking-road-underlay {
-  stroke: var(--ink);
-  stroke-width: 78px;
-  opacity: .12;
-}
-.waymaking-road-surface {
-  stroke: var(--ink);
-  stroke-width: 72px;
-}
-.waymaking-road-centre {
-  stroke: var(--page);
-  stroke-width: 4.8px;
-  stroke-dasharray: 18 24 12 20 22 26 14 23;
-}
-.waymaking-road-branch-surface {
-  stroke: var(--ink);
-  stroke-width: 22px;
-  opacity: .18;
-}
-.waymaking-road-branch-centre {
-  stroke: var(--page);
-  stroke-width: 2px;
-  stroke-dasharray: 8 13 12 15 7 11;
-  opacity: .62;
-}
-.waymaking-road-river path {
+.waymaking-road-fallback-edge {
   stroke: var(--muted);
-  stroke-width: 2px;
-  opacity: .22;
+  stroke-width: 2.2px;
+  opacity: .42;
+}
+.waymaking-road-fallback-centre {
+  stroke: var(--muted);
+  stroke-width: 1.4px;
+  stroke-dasharray: 14 22 8 18 13 24;
+  opacity: .34;
+}
+.waymaking-road-fallback[hidden] {
+  display: none;
 }
 .waymaking-beat {
   position: relative;
   z-index: 1;
-  min-height: clamp(255px, 24vw, 305px);
+  min-height: clamp(252px, 24vw, 300px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(250px, 28vw, 310px) minmax(0, 1fr);
-  column-gap: clamp(22px, 3vw, 42px);
+  grid-template-columns: minmax(0, 1fr) clamp(190px, 20vw, 220px) minmax(0, 1fr);
+  column-gap: clamp(24px, 3vw, 42px);
   align-items: center;
 }
 .waymaking-beat--left .waymaking-copy {
@@ -596,7 +573,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: relative;
   z-index: 1;
   width: min(100%, 690px);
-  margin: clamp(88px, 8.5vw, 116px) auto 0;
+  margin: clamp(84px, 8vw, 110px) auto 0;
   padding-top: clamp(34px, 4vw, 48px);
   text-align: center;
 }
@@ -631,43 +608,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   max-width: 620px;
   margin: clamp(44px, 5vw, 60px) auto 22px;
 }
-.waymaking-outcome-road {
-  width: min(100%, 720px);
-  height: clamp(122px, 13vw, 160px);
-  margin: clamp(50px, 5vw, 68px) auto -4px;
-  pointer-events: none;
-}
-.waymaking-outcome-road svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.waymaking-fork-stem-surface {
-  stroke: var(--ink);
-  stroke-width: 42px;
-}
-.waymaking-fork-stem-centre {
-  stroke: var(--page);
-  stroke-width: 3.4px;
-  stroke-dasharray: 11 17 8 14 13 19;
-}
-.waymaking-fork-road-surface {
-  stroke: var(--ink);
-  stroke-width: 24px;
-  opacity: .34;
-}
-.waymaking-fork-road-centre {
-  stroke: var(--page);
-  stroke-width: 2px;
-  stroke-dasharray: 7 12 10 14 6 11;
-  opacity: .8;
-}
-.waymaking-fork-road--outer {
-  opacity: .22;
-}
 .work-section--waymaking-output {
-  padding-top: clamp(26px, 3vw, 44px);
+  padding-top: clamp(64px, 6.5vw, 88px);
 }
 .waymaking-logo {
   gap: 10px;
@@ -1729,32 +1671,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     margin-right: 0;
   }
   .waymaking-beats {
-    padding-left: 98px;
+    padding-left: 94px;
   }
   .waymaking-road-wrap {
-    inset: 0 auto 0 0;
-    width: 110px;
+    inset: 0 auto 0 -8px;
+    width: 112px;
     transform: none;
-  }
-  .waymaking-road-underlay {
-    stroke-width: 41px;
-  }
-  .waymaking-road-surface {
-    stroke-width: 33px;
-  }
-  .waymaking-road-centre {
-    stroke-width: 2.4px;
-    stroke-dasharray: 11 14;
-  }
-  .waymaking-road-branch-surface {
-    stroke-width: 13px;
-  }
-  .waymaking-road-branch-centre {
-    stroke-width: 1.5px;
-    stroke-dasharray: 6 9;
-  }
-  .waymaking-road-river path {
-    stroke-width: 1.5px;
   }
   .waymaking-beat {
     min-height: 0;
@@ -1777,51 +1699,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     margin-left: 0;
     margin-right: 0;
   }
-  .waymaking-outcome-road {
-    width: min(100%, 560px);
-    height: 112px;
-    margin-left: 0;
-    margin-right: auto;
-  }
-  .waymaking-fork-stem-surface {
-    stroke-width: 30px;
-  }
-  .waymaking-fork-stem-centre {
-    stroke-width: 2.4px;
-  }
-  .waymaking-fork-road-surface {
-    stroke-width: 17px;
-  }
-  .waymaking-fork-road-centre {
-    stroke-width: 1.6px;
-  }
 }
 @media (max-width: 600px) {
   .waymaking-beats {
-    padding-left: 70px;
+    padding-left: 76px;
   }
   .waymaking-road-wrap {
-    left: -10px;
-    width: 92px;
-  }
-  .waymaking-road-underlay {
-    stroke-width: 35px;
-  }
-  .waymaking-road-surface {
-    stroke-width: 28px;
-  }
-  .waymaking-road-centre {
-    stroke-width: 2px;
-    stroke-dasharray: 9 12;
+    left: -12px;
+    width: 98px;
   }
   .waymaking-copy h4 {
     font-size: 25px;
   }
-  .waymaking-outcome-road {
-    display: none;
-  }
   .work-section--waymaking-output {
-    padding-top: 44px;
+    padding-top: 54px;
   }
   .work-heading {
     align-items: flex-start;

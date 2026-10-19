@@ -7,6 +7,7 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
+      - "augustkring/waymaking-road.js"
       - "augustkring/verify-baseline.mjs"
       - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
@@ -36,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-waymaking-home-v3"
+          expected_home="styles.css?v=20261019-waymaking-rough-v1"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -58,7 +59,9 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
-          grep -Fq 'class="waymaking-road-surface"' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-road' /tmp/augustkring.html
+          grep -Fq 'https://unpkg.com/roughjs@4.6.6/bundled/rough.js' /tmp/augustkring.html
+          grep -Fq 'waymaking-road.js?v=20261019-rough-v1' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -70,8 +73,12 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'stroke-width: 72px;' /tmp/augustkring.css
-          grep -Fq 'stroke-dasharray: 18 24 12 20 22 26 14 23;' /tmp/augustkring.css
+          grep -Fq '.waymaking-road-fallback-edge' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-rough-v1" -o /tmp/augustkring-waymaking-road.js
+          grep -Fq 'rough.svg(svg)' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'strokeLineDash' /tmp/augustkring-waymaking-road.js
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
@@ -222,21 +229,37 @@ jobs:
                 assert.equal(editorial.hasHomepageStory,false);
                 const waymakingLayout = await page.evaluate(() => {
                   const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
+                  const svg=document.querySelector('[data-waymaking-road]');
+                  const fallback=document.querySelector('[data-waymaking-road-fallback]');
                   const blocks=[...document.querySelectorAll('.waymaking-copy')].map(el=>{
                     const r=el.getBoundingClientRect();
                     return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height};
                   });
-                  const fork=getComputedStyle(document.querySelector('.waymaking-outcome-road'));
-                  return {road:{left:road.left,right:road.right,width:road.width,height:road.height},blocks,forkDisplay:fork.display,overflow:document.documentElement.scrollWidth>innerWidth+1};
+                  return {
+                    road:{left:road.left,right:road.right,width:road.width,height:road.height},
+                    blocks,
+                    roughDrawn:svg.classList.contains('is-rough'),
+                    fallbackHidden:fallback.hasAttribute('hidden'),
+                    edgeGroups:svg.querySelectorAll('.waymaking-road-edge').length,
+                    centreGroups:svg.querySelectorAll('.waymaking-road-centre').length,
+                    roughPathCount:svg.querySelectorAll('.waymaking-road-edge path, .waymaking-road-centre path').length,
+                    darkSurface:!!svg.querySelector('.waymaking-road-surface, .waymaking-road-underlay'),
+                    overflow:document.documentElement.scrollWidth>innerWidth+1
+                  };
                 });
                 const heights=waymakingLayout.blocks.map(x=>x.height);
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
+                assert.equal(waymakingLayout.roughDrawn,true,'Rough.js must render the hand-drawn road');
+                assert.equal(waymakingLayout.fallbackHidden,true,'Static fallback hides after Rough.js renders');
+                assert.equal(waymakingLayout.edgeGroups,2,'Waymaking road has two hand-drawn edges');
+                assert.equal(waymakingLayout.centreGroups,1,'Waymaking road has one hand-drawn centre line');
+                assert.ok(waymakingLayout.roughPathCount>=3,'Rough.js generated visible SVG paths');
+                assert.equal(waymakingLayout.darkSurface,false,'No dark filled road treatment');
                 if(width===1440){
-                  assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 4,'Left Waymaking copy stays clear of road');
-                  assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 4,'Right Waymaking copy stays clear of road');
+                  assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left Waymaking copy stays clear of road');
+                  assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 10,'Right Waymaking copy stays clear of road');
                 }
-                if(width===390) assert.equal(waymakingLayout.forkDisplay,'none','Four-way venture fork stays off narrow mobile');
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
