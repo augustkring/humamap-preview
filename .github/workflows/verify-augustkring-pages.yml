@@ -448,7 +448,7 @@ jobs:
                 assert.equal(aboutProof.heading,'The story so far.');
                 assert.equal(aboutProof.paragraphCount,8);
                 assert.ok(aboutProof.earlyRoots && aboutProof.earlyResponsibility && aboutProof.burnout && aboutProof.recovery && aboutProof.aiShift && aboutProof.subsequentWork && aboutProof.currentWork);
-                assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
+                assert.ok(aboutProof.skillsTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop > aboutProof.skillsTop,'Current About order keeps skills before story');
                 assert.deepEqual(aboutProof.externalLinks,[]);
                 assert.equal(aboutProof.ctaMetrics.text,'View my LinkedIn profile');
                 assert.ok(aboutProof.ctaMetrics.height <= aboutProof.ctaMetrics.fontSize*1.5,
