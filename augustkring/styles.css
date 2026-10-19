@@ -510,34 +510,25 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
   overflow: visible;
 }
-.waymaking-road-brush-edge,
-.waymaking-road-bristles path,
-.waymaking-road-brush-echo path,
-.waymaking-road-markings path {
+.waymaking-painted-edge {
+  fill: var(--muted);
+  opacity: .30;
+}
+.waymaking-painted-mark {
+  fill: var(--muted);
+  opacity: .22;
+}
+.waymaking-road-fallback {
   fill: none;
+  stroke: var(--muted);
+  stroke-width: 3px;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: .18;
   vector-effect: non-scaling-stroke;
 }
-.waymaking-road-brush-edge {
-  stroke: var(--muted);
-  stroke-width: 4.2px;
-  opacity: .23;
-}
-.waymaking-road-bristles path {
-  stroke: var(--muted);
-  stroke-width: .9px;
-  opacity: .13;
-}
-.waymaking-road-brush-echo path {
-  stroke: var(--muted);
-  stroke-width: 1.25px;
-  opacity: .09;
-}
-.waymaking-road-markings path {
-  stroke: var(--muted);
-  stroke-width: 2px;
-  opacity: .22;
+[data-waymaking-fallback][hidden] {
+  display: none;
 }
 .waymaking-beat {
   position: relative;
@@ -1685,22 +1676,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     inset: 0 auto 0 -5px;
     width: 48px;
     transform: none;
-  }
-  .waymaking-road-brush-edge {
-    stroke-width: 3.5px;
-    opacity: .20;
-  }
-  .waymaking-road-bristles path {
-    stroke-width: .8px;
-    opacity: .11;
-  }
-  .waymaking-road-brush-echo path {
-    stroke-width: 1px;
-    opacity: .08;
-  }
-  .waymaking-road-markings path {
-    stroke-width: 1.7px;
-    opacity: .19;
   }
   .waymaking-beat {
     min-height: 0;

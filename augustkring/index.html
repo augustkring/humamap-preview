@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261019-brush-road-v1">
+  <link rel="stylesheet" href="styles.css?v=20261019-figma-brush-v1">
 
   <script type="application/ld+json">
   {
@@ -195,51 +195,10 @@
 
         <div class="waymaking-beats">
           <div class="waymaking-road-wrap" aria-hidden="true">
-            <svg class="waymaking-road" viewBox="0 0 96 1280" preserveAspectRatio="none" focusable="false">
-              <defs>
-                <filter id="waymaking-brush-wobble" x="-25%" y="-2%" width="150%" height="104%" color-interpolation-filters="sRGB">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.014 0.052" numOctaves="2" seed="29" result="brush-noise" />
-                  <feDisplacementMap in="SourceGraphic" in2="brush-noise" scale="1.7" xChannelSelector="R" yChannelSelector="B" />
-                </filter>
-                <path id="waymaking-left-edge" d="M28 0 C18 150 44 257 26 392 C10 525 46 645 28 790 C14 930 43 1040 27 1280" />
-                <path id="waymaking-right-edge" d="M68 0 C58 155 82 248 65 394 C49 528 84 642 68 793 C55 930 80 1042 66 1280" />
-              </defs>
-
-              <g class="waymaking-road-ink" filter="url(#waymaking-brush-wobble)">
-                <use href="#waymaking-left-edge" class="waymaking-road-brush-edge" />
-                <use href="#waymaking-right-edge" class="waymaking-road-brush-edge" />
-              </g>
-
-              <g class="waymaking-road-bristles">
-                <path d="M24 62 C21 93 20 112 19 137" />
-                <path d="M20 185 C22 209 25 228 27 246" />
-                <path d="M18 470 C15 491 15 510 16 529" />
-                <path d="M22 716 C19 739 18 757 18 776" />
-                <path d="M18 957 C17 979 18 996 20 1013" />
-                <path d="M23 1180 C21 1204 20 1222 20 1240" />
-
-                <path d="M72 72 C75 96 76 117 76 139" />
-                <path d="M77 326 C80 349 79 369 77 389" />
-                <path d="M77 566 C80 589 79 608 77 627" />
-                <path d="M76 834 C79 855 78 875 76 894" />
-                <path d="M75 1085 C78 1107 77 1127 75 1146" />
-              </g>
-
-              <g class="waymaking-road-brush-echo">
-                <path d="M30 3 C20 149 46 258 28 393 C12 526 48 646 30 792 C16 931 45 1041 29 1277" />
-                <path d="M66 4 C56 156 80 247 63 395 C47 529 82 641 66 795 C53 931 78 1041 64 1277" />
-              </g>
-
-              <g class="waymaking-road-markings">
-                <path d="M48 66 C47 83 47 96 46 108" />
-                <path d="M48 195 C49 209 48 223 47 236" />
-                <path d="M45 331 C43 346 42 359 42 371" />
-                <path d="M47 472 C48 486 48 500 47 513" />
-                <path d="M48 612 C49 626 48 639 47 652" />
-                <path d="M47 756 C45 770 44 784 44 797" />
-                <path d="M47 899 C47 914 47 928 47 941" />
-                <path d="M48 1040 C49 1054 48 1068 47 1081" />
-                <path d="M47 1180 C46 1195 46 1209 46 1222" />
+            <svg class="waymaking-road" data-waymaking-brush-road viewBox="0 0 100 1280" preserveAspectRatio="none" focusable="false">
+              <g data-waymaking-fallback>
+                <path class="waymaking-road-fallback" d="M30 0 C27 110 34 235 25 365 C30 505 36 640 27 775 C31 920 35 1060 30 1280" />
+                <path class="waymaking-road-fallback" d="M70 0 C67 112 74 233 65 368 C70 502 76 643 67 772 C71 923 75 1057 70 1280" />
               </g>
             </svg>
           </div>
@@ -418,6 +377,7 @@
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
+  <script type="module" src="waymaking-brush.js?v=20261019-figma-v1"></script>
   <script src="work-carousel.js" defer></script>
   <script src="mobile-nav.js?v=20261009-input-focus-v4" defer></script>
 </body>
