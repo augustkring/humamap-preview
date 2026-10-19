@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-painted-road-v9"
+          expected_home="styles.css?v=20261019-painted-road-v10"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,7 +60,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-brush-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v9' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261019-painted-road-v10' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -78,10 +78,10 @@ jobs:
           grep -Fq 'width: clamp(88px, 9vw, 100px);' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-road--wash' /tmp/augustkring.css
           grep -Fq '.waymaking-painted-road--texture' /tmp/augustkring.css
-          grep -Fq 'opacity: .11;' /tmp/augustkring.css
-          grep -Fq 'opacity: .085;' /tmp/augustkring.css
+          grep -Fq 'opacity: .08;' /tmp/augustkring.css
+          grep -Fq 'opacity: .15;' /tmp/augustkring.css
           grep -Fq 'fill: var(--page);' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v9" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-painted-road-v10" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "Citizen-Codex/svg-brush" /tmp/augustkring-waymaking-brush.js
           grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           grep -Fq "const GRINDHOUSE" /tmp/augustkring-waymaking-brush.js
@@ -90,6 +90,8 @@ jobs:
           grep -Fq "A single pale painted body reads as a road rather than two rails" /tmp/augustkring-waymaking-brush.js
           grep -Fq "BIOPIC, road, 4.45" /tmp/augustkring-waymaking-brush.js
           grep -Fq "textureScales = [3.25" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Creative thinking opens the field" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "waymaking-painted-option" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "cdn.jsdelivr.net/npm/svg-brush" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -253,6 +255,7 @@ jobs:
                     blocks,
                     painted:svg.classList.contains('is-painted'),
                     roadLayers:svg.querySelectorAll('.waymaking-painted-road').length,
+                    options:svg.querySelectorAll('.waymaking-painted-option').length,
                     marks:svg.querySelectorAll('.waymaking-painted-mark').length,
                     fallbackHidden:svg.querySelector('[data-waymaking-fallback]')?.hasAttribute('hidden') ?? false,
                     overflow:document.documentElement.scrollWidth>innerWidth+1
@@ -263,6 +266,7 @@ jobs:
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.painted,true,'Open-source Figma brush renderer must complete');
                 assert.equal(waymakingLayout.roadLayers,7,'Waymaking road uses one wash plus six dry-brush texture overlays');
+                assert.equal(waymakingLayout.options,2,'Creative thinking keeps two faint alternative brush paths');
                 assert.equal(waymakingLayout.marks,9,'Waymaking road has nine Blockbuster centre marks');
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after painted road renders');
                 if(width===1440){

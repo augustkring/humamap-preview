@@ -105,6 +105,13 @@
   // The body stays light; short Grindhouse overlays carry the dry-brush material.
   deform(BIOPIC, road, 4.45, 'waymaking-painted-road waymaking-painted-road--wash');
 
+  // Creative thinking opens the field before strategic judgement narrows it.
+  // These ghost paths are intentionally much lighter than the chosen road.
+  const optionLeft = 'M49 18 C38 72 19 132 22 205 C24 258 34 304 40 340';
+  const optionRight = 'M51 18 C64 74 83 130 79 205 C76 258 67 302 59 340';
+  deform(GRINDHOUSE, optionLeft, 1.75, 'waymaking-painted-option');
+  deform(GRINDHOUSE, optionRight, 1.65, 'waymaking-painted-option');
+
   const textureRanges = [
     [0.02, 0.17, 1.0],
     [0.18, 0.34, -1.2],

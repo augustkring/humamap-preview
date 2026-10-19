@@ -76,3 +76,6 @@ Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 
 
 **Approved change 2026-10-19 (painted-road S-curve/material pass):** Browser QA of the first single-body painted road confirmed the metaphor now reads as a road rather than rails. A follow-up art-direction pass makes the road visibly wind through the narrative with slower, larger S-curves while keeping the same narrow layout footprint. The pale wash is reduced from 0.13 to 0.11 opacity and the dry Grindhouse texture is raised from 0.055 to 0.085 so material texture, rather than overall darkness, carries the hand-painted character. No homepage copy changed in this pass.
+
+
+**Approved change 2026-10-19 (painted-road material + possibility pass):** The road now keeps the wider S-curve but shifts emphasis from pale wash to dry-brush material: wash opacity is reduced to 0.08 and Grindhouse texture increased to 0.15. Two extremely faint Grindhouse option paths briefly diverge around the Creative thinking stage and merge before Strategic judgement, making the illustration explain the narrative rather than merely decorate it. The alternatives remain at 0.035 opacity so they do not compete with copy. No homepage copy changed in this pass.
