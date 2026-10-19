@@ -500,7 +500,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 50%;
-  width: clamp(205px, 21vw, 235px);
+  width: clamp(235px, 23vw, 260px);
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -536,7 +536,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   z-index: 1;
   min-height: clamp(252px, 24vw, 300px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(190px, 20vw, 220px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 22vw, 250px) minmax(0, 1fr);
   column-gap: clamp(24px, 3vw, 42px);
   align-items: center;
 }
@@ -1671,11 +1671,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     margin-right: 0;
   }
   .waymaking-beats {
-    padding-left: 94px;
+    padding-left: 108px;
   }
   .waymaking-road-wrap {
     inset: 0 auto 0 -8px;
-    width: 112px;
+    width: 132px;
     transform: none;
   }
   .waymaking-beat {
@@ -1702,11 +1702,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 @media (max-width: 600px) {
   .waymaking-beats {
-    padding-left: 76px;
+    padding-left: 94px;
   }
   .waymaking-road-wrap {
-    left: -12px;
-    width: 98px;
+    left: -18px;
+    width: 126px;
   }
   .waymaking-copy h4 {
     font-size: 25px;

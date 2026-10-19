@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-waymaking-rough-v1"
+          expected_home="styles.css?v=20261019-freehand-v2"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -61,7 +61,7 @@ jobs:
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-road' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
-          grep -Fq 'type="module" src="waymaking-road.js?v=20261019-freehand-v1"' /tmp/augustkring.html
+          grep -Fq 'type="module" src="waymaking-road.js?v=20261019-freehand-v2"' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -76,10 +76,10 @@ jobs:
           grep -Fq '.waymaking-road-fallback-edge' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-freehand-v1" -o /tmp/augustkring-waymaking-road.js
+          curl -fsSL --max-time 20 "${base}waymaking-road.js?v=20261019-freehand-v2" -o /tmp/augustkring-waymaking-road.js
           grep -Fq "perfect-freehand@1.2.3/dist/esm/index.mjs" /tmp/augustkring-waymaking-road.js
           grep -Fq 'getStroke' /tmp/augustkring-waymaking-road.js
-          grep -Fq 'size: 14' /tmp/augustkring-waymaking-road.js
+          grep -Fq 'size: 22' /tmp/augustkring-waymaking-road.js
           grep -Fq 'simulatePressure: false' /tmp/augustkring-waymaking-road.js
           grep -Fq 'leftEdge' /tmp/augustkring-waymaking-road.js
           grep -Fq 'rightEdge' /tmp/augustkring-waymaking-road.js

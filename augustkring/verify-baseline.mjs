@@ -35,7 +35,7 @@ assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking 
 assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Waymaker definition missing');
 assert.ok(thread.includes('data-waymaking-road'),'Waymaking Rough.js SVG target missing');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
-assert.ok(html.includes('waymaking-road.js?v=20261019-freehand-v1'),'Perfect-freehand Waymaking renderer missing');
+assert.ok(html.includes('waymaking-road.js?v=20261019-freehand-v2'),'Perfect-freehand Waymaking renderer missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
@@ -50,7 +50,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261019-waymaking-rough-v1':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261019-freehand-v2':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

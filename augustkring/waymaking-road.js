@@ -53,39 +53,42 @@ if (svg) {
   // Separate point sets are intentional: the two edges should feel drawn
   // independently, not like one mathematically offset curve.
   const leftEdge = [
-    [137, 0, .56], [118, 72, .66], [96, 160, .48], [116, 242, .72],
-    [121, 360, .57], [83, 452, .69], [112, 536, .47], [130, 690, .73],
-    [92, 796, .53], [120, 892, .68], [114, 1038, .51], [100, 1112, .74],
-    [148, 1202, .49], [133, 1280, .61]
+    [104, 0, .54], [98, 76, .72], [112, 150, .43], [84, 224, .78],
+    [76, 310, .51], [108, 386, .74], [122, 466, .45], [91, 546, .80],
+    [78, 628, .49], [111, 706, .76], [126, 786, .44], [94, 868, .79],
+    [80, 950, .50], [109, 1028, .75], [123, 1107, .46], [101, 1187, .77],
+    [108, 1280, .55]
   ];
 
   const rightEdge = [
-    [223, 0, .63], [204, 78, .47], [184, 166, .71], [207, 250, .54],
-    [207, 360, .65], [169, 450, .48], [202, 548, .74], [218, 690, .58],
-    [176, 798, .70], [204, 900, .50], [201, 1038, .68], [184, 1118, .54],
-    [232, 1200, .72], [220, 1280, .56]
+    [256, 0, .66], [248, 82, .45], [266, 156, .79], [232, 228, .52],
+    [224, 314, .73], [258, 390, .47], [272, 470, .81], [240, 550, .50],
+    [228, 632, .74], [262, 710, .46], [276, 790, .79], [244, 872, .49],
+    [231, 954, .76], [260, 1032, .44], [273, 1111, .80], [251, 1191, .48],
+    [258, 1280, .67]
   ];
 
   const centre = [
-    [180, 0, .55], [160, 74, .62], [140, 160, .50], [162, 248, .66],
-    [164, 360, .54], [126, 452, .64], [156, 542, .48], [174, 690, .67],
-    [134, 798, .52], [162, 896, .65], [158, 1038, .50], [142, 1116, .68],
-    [190, 1200, .51], [177, 1280, .61]
+    [180, 0, .55], [173, 79, .62], [190, 153, .47], [158, 226, .70],
+    [150, 312, .52], [183, 388, .68], [197, 468, .46], [165, 548, .72],
+    [152, 630, .49], [186, 708, .69], [201, 788, .45], [169, 870, .71],
+    [155, 952, .50], [184, 1030, .69], [198, 1109, .47], [176, 1189, .70],
+    [183, 1280, .57]
   ];
 
   const edgeOptions = {
-    size: 14,
-    thinning: .32,
-    smoothing: .55,
-    streamline: .22,
+    size: 22,
+    thinning: .42,
+    smoothing: .28,
+    streamline: .10,
     simulatePressure: false,
     last: true,
     start: { cap: true, taper: 0 },
     end: { cap: true, taper: 0 }
   };
 
-  addStroke(leftEdge, edgeOptions, 'waymaking-road-edge waymaking-road-edge--left', '#53667a', .66);
-  addStroke(rightEdge, edgeOptions, 'waymaking-road-edge waymaking-road-edge--right', '#53667a', .66);
+  addStroke(leftEdge, edgeOptions, 'waymaking-road-edge waymaking-road-edge--left', '#5f7184', .60);
+  addStroke(rightEdge, edgeOptions, 'waymaking-road-edge waymaking-road-edge--right', '#5f7184', .60);
 
   // The centre markings are individual marker strokes rather than a CSS
   // dash pattern, so their length, angle and pressure vary naturally.
@@ -125,18 +128,18 @@ if (svg) {
     addStroke(
       [p1, [(p1[0] + p2[0]) / 2 + (index % 2 ? 1.8 : -1.4), (p1[1] + p2[1]) / 2, .55], p2],
       {
-        size: 6.2,
+        size: 7.4,
         thinning: .24,
-        smoothing: .45,
-        streamline: .18,
+        smoothing: .32,
+        streamline: .10,
         simulatePressure: false,
         last: true,
         start: { cap: true, taper: 0 },
         end: { cap: true, taper: 0 }
       },
       'waymaking-road-centre',
-      '#7b8b9d',
-      .56
+      '#8795a5',
+      .52
     );
   });
 
