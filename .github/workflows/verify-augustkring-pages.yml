@@ -384,13 +384,14 @@ jobs:
                   const style=getComputedStyle(paragraphs[0]);
                   return {
                     heading:document.querySelector('#story-title')?.textContent.trim(),
-                    subtitle:document.querySelector('.about-story-intro > p')?.textContent.trim(),
                     paragraphCount:paragraphs.length,
-                    curiosity:paragraphs[0]?.textContent.includes('primary school'),
-                    earlyResponsibility:paragraphs[1]?.textContent.includes('team of around ten'),
-                    burnout:paragraphs[2]?.textContent.includes('burnout'),
-                    subsequentWork:paragraphs[3]?.textContent.includes('KRING'),
-                    currentWork:paragraphs[4]?.textContent.includes('Blentera'),
+                    earlyRoots:paragraphs[0]?.textContent.includes('entrepreneurial family') && paragraphs[0]?.textContent.includes('early teens'),
+                    earlyResponsibility:paragraphs[1]?.textContent.includes('At 18') && paragraphs[2]?.textContent.includes('lean startup environment'),
+                    burnout:paragraphs[3]?.textContent.includes('burnt out'),
+                    recovery:paragraphs[4]?.textContent.includes('human-centred'),
+                    aiShift:paragraphs[5]?.textContent.includes('generative AI'),
+                    subsequentWork:paragraphs[6]?.textContent.includes('KRING'),
+                    currentWork:paragraphs[7]?.textContent.includes("building ventures again"),
                     storyTop:story?.getBoundingClientRect().top + scrollY,
                     skillsTop:skills?.getBoundingClientRect().top + scrollY,
                     heroBottom:hero?.getBoundingClientRect().bottom + scrollY,
@@ -416,19 +417,17 @@ jobs:
                 assert.ok(Math.abs(aboutType.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
                 assert.ok(Math.abs(aboutType.lead-homepageTypography.lead)<.2 && aboutType.leadFamily===homepageTypography.leadFamily,'About lead matches homepage font');
                 assert.deepEqual(aboutType.skills,['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM','Strategic Leadership']);
-                const aboutSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.about-personal-lead, .about-story-intro > p, .about-home-lead > p, .about-principles-intro > p')].map(el=>({
+                const aboutSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.about-personal-lead, .about-home-lead > p, .about-principles-intro > p')].map(el=>({
                   text:el.textContent.trim(),
                   width:el.getBoundingClientRect().width
                 })));
-                assert.ok(aboutSubtitleWidths.length>=6,'About subtitles should all be included');
+                assert.ok(aboutSubtitleWidths.length>=4,'About subtitles should all be included');
                 for(const entry of aboutSubtitleWidths) assert.ok(entry.width<=390.5,'About subtitle must stay within shared 390px measure: '+entry.text);
                 assert.equal(aboutProof.heading,'The story so far.');
-                assert.equal(aboutProof.subtitle,'From running a business to building new ones.');
-                assert.equal(aboutProof.paragraphCount,5);
-                assert.ok(aboutProof.curiosity && aboutProof.earlyResponsibility && aboutProof.burnout && aboutProof.subsequentWork && aboutProof.currentWork);
+                assert.equal(aboutProof.paragraphCount,8);
+                assert.ok(aboutProof.earlyRoots && aboutProof.earlyResponsibility && aboutProof.burnout && aboutProof.recovery && aboutProof.aiShift && aboutProof.subsequentWork && aboutProof.currentWork);
                 assert.ok(aboutProof.storyTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop < aboutProof.skillsTop);
-                assert.deepEqual(aboutProof.externalLinks.map(x=>x.text),['Blentera','August Works','HumaMap']);
-                assert.ok(aboutProof.externalLinks.every(x=>x.href.startsWith('https://')));
+                assert.deepEqual(aboutProof.externalLinks,[]);
                 assert.equal(aboutProof.ctaMetrics.text,'View my LinkedIn profile');
                 assert.ok(aboutProof.ctaMetrics.height <= aboutProof.ctaMetrics.fontSize*1.5,
                   'LinkedIn link stays on one rendered line without shrinking or clipping');
