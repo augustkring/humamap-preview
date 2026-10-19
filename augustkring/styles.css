@@ -512,11 +512,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-painted-edge {
   fill: var(--muted);
-  opacity: .30;
+  opacity: .24;
+  mix-blend-mode: multiply;
 }
 .waymaking-painted-mark {
   fill: var(--muted);
-  opacity: .22;
+  opacity: .17;
+  mix-blend-mode: multiply;
 }
 .waymaking-road-fallback {
   fill: none;
