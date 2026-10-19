@@ -33,7 +33,6 @@ for(const sentence of ["I combine creative thinking with strategic judgement and
 assert.equal((threadSummary.match(/<p>/g)||[]).length,4,'Approved Where I add value paragraph count drift');
 assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking narrative missing');
 assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Waymaker definition missing');
-assert.ok(thread.includes('data-waymaking-road'),'Waymaking Rough.js SVG target missing');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
