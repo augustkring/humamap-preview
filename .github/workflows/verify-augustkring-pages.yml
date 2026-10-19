@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-static-road-v1"
+          expected_home="styles.css?v=20261019-brush-road-v1"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -61,8 +61,10 @@ jobs:
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
-          grep -Fq 'class="waymaking-road-edge waymaking-road-edge--left-echo"' /tmp/augustkring.html
-          grep -Fq 'class="waymaking-road-centre"' /tmp/augustkring.html
+          grep -Fq 'id="waymaking-brush-wobble"' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-road-brush-edge"' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-road-bristles"' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-road-markings"' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -74,9 +76,9 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(92px, 9.5vw, 104px);' /tmp/augustkring.css
-          grep -Fq 'stroke-width: 2.4px;' /tmp/augustkring.css
-          grep -Fq 'opacity: .36;' /tmp/augustkring.css
+          grep -Fq 'width: clamp(76px, 8vw, 88px);' /tmp/augustkring.css
+          grep -Fq 'stroke-width: 4.2px;' /tmp/augustkring.css
+          grep -Fq 'opacity: .23;' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
@@ -237,8 +239,9 @@ jobs:
                   return {
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
-                    edgeCount:svg.querySelectorAll('.waymaking-road-edge').length,
-                    centreCount:svg.querySelectorAll('.waymaking-road-centre').length,
+                    edgeCount:svg.querySelectorAll('.waymaking-road-brush-edge').length,
+                    bristleCount:svg.querySelectorAll('.waymaking-road-bristles path').length,
+                    markingCount:svg.querySelectorAll('.waymaking-road-markings path').length,
                     noRuntime:!document.querySelector('script[src*="waymaking-road.js"]'),
                     noDarkSurface:!svg.querySelector('.waymaking-road-surface, .waymaking-road-underlay'),
                     overflow:document.documentElement.scrollWidth>innerWidth+1
@@ -247,16 +250,17 @@ jobs:
                 const heights=waymakingLayout.blocks.map(x=>x.height);
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
-                assert.equal(waymakingLayout.edgeCount,4,'Static road keeps two primary and two echo edges');
-                assert.equal(waymakingLayout.centreCount,1,'Static road keeps one centre-line path');
+                assert.equal(waymakingLayout.edgeCount,2,'Brush road keeps two primary painted edges');
+                assert.ok(waymakingLayout.bristleCount>=10,'Brush road keeps enough bristle texture');
+                assert.equal(waymakingLayout.markingCount,9,'Brush road keeps nine irregular centre markings');
                 assert.equal(waymakingLayout.noRuntime,true,'Waymaking road remains dependency-free');
                 assert.equal(waymakingLayout.noDarkSurface,true,'No dark filled road treatment');
                 if(width===1440){
-                  assert.ok(waymakingLayout.road.width<=105,'Desktop road remains visually secondary');
+                  assert.ok(waymakingLayout.road.width<=89,'Desktop road remains visually secondary');
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 8,'Left Waymaking copy stays clear of road');
                   assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 8,'Right Waymaking copy stays clear of road');
                 }
-                if(width===390) assert.ok(waymakingLayout.road.width<=60,'Mobile road remains visually secondary');
+                if(width===390) assert.ok(waymakingLayout.road.width<=45,'Mobile road remains visually secondary');
                 if(width===1440){
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left Waymaking copy stays clear of road');
                   assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 10,'Right Waymaking copy stays clear of road');
