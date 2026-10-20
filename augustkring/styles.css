@@ -1725,13 +1725,15 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
+  /* A descendant explicitly declares visibility:visible once the brush is
+     complete. Hiding by visibility alone failed in real Chrome screenshots.
+     Fully remove the portaled layer from painting outside these chapters. */
+  display: none;
   visibility: hidden;
-  /* visibility:hidden alone is insufficient: the completed child picture
-     declares visibility:visible. Ancestor opacity MUST be zero off-stage so
-     children cannot paint outside the five Waymaking chapters. */
   opacity: 0;
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  display: block;
   visibility: visible;
   opacity: var(--waymaking-handoff-opacity, 1);
 }
