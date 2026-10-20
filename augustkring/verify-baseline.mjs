@@ -85,7 +85,7 @@ assert.ok(css.includes('.home-main,\n.home-footer {\n  position: relative;\n  z-
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('document.body.appendChild(road)'),'Painting must be portaled outside scrolling/overflow containers');
 assert.ok(scrollController.includes("document.body.dataset.waymakingRoadActive = 'true'"),'Body road activation missing');
-assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes('firstHeading.getBoundingClientRect().top <= startLine()'),'Creative Thinking start controller missing');
+assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes('const startReached = titleTop <= startLine()'),'Creative Thinking start controller missing');
 assert.ok(scrollController.includes('const PIN_TOP = 16;') && scrollController.includes('const startLine = () => Math.min(window.innerHeight * 0.38, 360);'),'Road must enter alongside Creative Thinking and pin at viewport top');
 assert.ok(scrollController.includes('const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);'),'Road must scroll UP to the pinned top, never teleport to the viewport center');
 assert.ok(css.includes('top: var(--waymaking-viewport-top, 16px);'),'Fixed road CSS must use true top pin coordinate, never center-of-viewport');
