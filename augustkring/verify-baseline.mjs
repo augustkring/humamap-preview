@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"5b495388","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"77bb9261","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -60,7 +60,10 @@ for(const name of ['waymaking-ink-road-brush.png','waymaking-ink-road-brush-mobi
 }
 const editorialInk=readFileSync(join(root,'assets/waymaking-editorial-ink.avif'));
 assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('ascii')==='ftypavif','Approved ink AVIF missing or corrupt');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-v4a'),'Scroll story enhancement missing');
+const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'));
+assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
+assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-v4b'),'Scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.ok(thread.includes('stroke-width="420"') && thread.includes('waymaking-brush-edge'),'Organic brush stroke filter and sufficient mask width missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
