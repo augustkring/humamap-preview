@@ -93,6 +93,9 @@ assert.ok(scrollController.includes("const withinStory = startReached && conclus
 assert.ok(scrollController.includes("road.style.setProperty('--waymaking-handoff-opacity'"),'Road must finish motionlessly in the empty handoff before signoff');
 assert.ok(!scrollController.includes("through the ENTIRE rest of the page") && !scrollController.includes("all subsequent sections"),'Page-wide road rendering must not return');
 assert.ok(css.includes('opacity: var(--waymaking-handoff-opacity, 1);'),'Scoped road must fade without moving at its end');
+assert.ok(css.includes('display: none;\n  visibility: hidden;\n  opacity: 0;'),'Offstage road must not render even if children force visibility:visible');
+assert.ok(css.includes('display: block;\n  visibility: visible;\n  opacity: var(--waymaking-handoff-opacity, 1);'),'The viewport road may display only while story is active');
+
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(scrollController.includes("word.className = 'waymaking-heading-word'"),'Heading words must not inherit Venture logo typography');
 assert.ok(css.includes('.waymaking-copy .waymaking-heading-word') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand wordmark namespaces must be distinct');
