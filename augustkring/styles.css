@@ -597,6 +597,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .waymaking-narrative[data-waymaking-painted="true"] .waymaking-paint-art {
     display: block;
   }
+  .waymaking-narrative[data-waymaking-complete="true"] .waymaking-paint-art {
+    display: none;
+  }
+  .waymaking-narrative[data-waymaking-complete="true"] .waymaking-road-art {
+    visibility: visible;
+  }
   .waymaking-narrative[data-waymaking-painted="true"] .waymaking-copy h4 {
     color: #5b6e80;
     transition: color .33s ease;
