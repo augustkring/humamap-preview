@@ -49,6 +49,12 @@ jobs:
                 docOverflow:document.documentElement.scrollWidth>innerWidth+1,
                 story:rect($('.waymaking-scene')),
                 road:rect($('.waymaking-road-wrap')),
+                roadPosition:getComputedStyle($('.waymaking-road-wrap')).position,
+                roadVisibility:getComputedStyle($('.waymaking-road-wrap')).visibility,
+                roadOpacity:parseFloat(getComputedStyle($('.waymaking-road-wrap')).opacity),
+                pinned:$('.waymaking-narrative').dataset.waymakingPinned,
+                ready:$('.waymaking-narrative').dataset.waymakingReady,
+                narrative:rect($('.waymaking-narrative')),
                 artOpacity:parseFloat(getComputedStyle($('.waymaking-paint-art')).opacity),
                 staticOpacity:parseFloat(getComputedStyle($('.waymaking-road-art')).opacity),
                 brushVisible:getComputedStyle($('.waymaking-paint-art')).display,
@@ -94,6 +100,9 @@ jobs:
                 assert.ok(first.road.width>190,'The winding road must not become a narrow drawn line');
                 assert.ok(Math.abs(first.road.center-first.story.center)<3,'Ink road must be centered');
                 assert.equal(first.painted,'true','Scroll-driven brush should work on all widths');
+                assert.equal(first.ready,'true','JS viewport-pin enhancement must initialize');
+                assert.equal(first.pinned,'true','Artwork must stay pinned while the first chapter is visible');
+                assert.equal(first.roadPosition,'fixed','The road must be position:fixed, not sticky');
                 assert.ok(first.firstLetters.every(x=>x>8),'Visual heading glyph animation is missing');
                 if(width<=900){
                   const inactiveBody=await beats.last().locator('p').evaluate(el=>getComputedStyle(el).color);
@@ -124,7 +133,12 @@ jobs:
                 for(let i=1;i<recorded.length;i++)
                   assert.ok(recorded[i].offset<=recorded[i-1].offset+2,'Paint offset must advance continuously even if user scrolls little');
                 assert.ok(recorded[0].offset-recorded.at(-1).offset>850,'Painting must progress through the full illustration');
-                const roadHeights=recorded.slice(2,-2).map(s=>s.road.top);
+                for(const state of recorded){
+                  assert.equal(state.pinned,'true','Art pin must span ALL chapter centers: '+width);
+                  assert.equal(state.roadPosition,'fixed','The road may never become sticky during the five chapters');
+                  assert.equal(state.roadVisibility,'visible','Fixed road should be visible during the chapters');
+                }
+                const roadHeights=recorded.map(s=>s.road.top);
                 const min=Math.min(...roadHeights), max=Math.max(...roadHeights);
                 assert.ok(max-min<3,'Road must be viewport-anchored while chapters move: '+width+' delta '+(max-min));
                 if(width>=901){
@@ -137,6 +151,49 @@ jobs:
                 }else{
                   assert.ok(first.artOpacity>=.19&&first.artOpacity<=.30,'Mobile painting should be visible but not dominate the text');
                 }
+
+                // Important regression: the old sticky art slid out of view once
+                // its containing block ended. Verify the complete Waymaking section,
+                // including the sign-off and both enter/exit boundaries.
+                const narrativeBounds=await page.evaluate(()=>{
+                  const r=document.querySelector('.waymaking-narrative').getBoundingClientRect();
+                  return {top:scrollY+r.top,bottom:scrollY+r.bottom,height:innerHeight};
+                });
+                const enterAt=narrativeBounds.top-narrativeBounds.height*.80;
+                const exitAt=narrativeBounds.bottom-narrativeBounds.height*.37;
+                const sampleScroll=async y=>{
+                  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+                  await page.waitForTimeout(100);
+                  return snapshot(page);
+                };
+                const entering=await sampleScroll(enterAt);
+                const ending=await sampleScroll(exitAt);
+                assert.equal(entering.pinned,'true','Art must pin as the Waymaking story enters');
+                assert.equal(ending.pinned,'true','Art must stay pinned through the closing signoff');
+                assert.equal(entering.roadPosition,'fixed');
+                assert.equal(ending.roadPosition,'fixed');
+                assert.ok(Math.abs(entering.road.top-ending.road.top)<1,
+                  'Artwork must NOT move or slide when approaching the section end: '+width);
+                assert.ok(Math.abs(entering.road.left-ending.road.left)<1,
+                  'Artwork must remain horizontally fixed for the entire story: '+width);
+                assert.ok(entering.roadOpacity>0&&entering.roadOpacity<1,
+                  'Enter softly without moving the painting');
+                assert.ok(ending.roadOpacity>0&&ending.roadOpacity<1,
+                  'Leave softly without moving the painting');
+                await page.screenshot({path:'artifacts/pinned-ending-'+width+'.png'});
+                const outAfter=await sampleScroll(narrativeBounds.bottom-narrativeBounds.height*.07);
+                assert.equal(outAfter.pinned,undefined,'Art should unpin only after fading out');
+                assert.equal(outAfter.roadVisibility,'hidden',
+                  'Never show the road sliding away when it leaves the story');
+                await page.screenshot({path:'artifacts/after-waymaking-'+width+'.png'});
+                const inBefore=await sampleScroll(narrativeBounds.top-narrativeBounds.height*.97);
+                assert.equal(inBefore.pinned,undefined,'Art must not float over content before Waymaking');
+                assert.equal(inBefore.roadVisibility,'hidden');
+                console.log('PIN '+width,JSON.stringify({
+                  entryTop:entering.road.top,signoffTop:ending.road.top,
+                  entryOpacity:entering.roadOpacity,signoffOpacity:ending.roadOpacity,
+                  hiddenAfter:outAfter.roadVisibility
+                }));
 
                 // In-between stages must contain a genuine range of heading colors,
                 // not instantly swap all the characters at one breakpoint.
@@ -159,6 +216,8 @@ jobs:
               await reduced.goto(pageURL,{waitUntil:'networkidle'});
               await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
               assert.equal(await reduced.locator('.waymaking-narrative').getAttribute('data-waymaking-painted'),null,'Reduced motion disables staged painting');
+              assert.equal(await reduced.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),'true','Reduced motion still anchors the full static painting');
+              assert.equal(await reduced.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).position),'fixed');
               assert.equal(await reduced.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible','Reduced motion shows full approved image');
               assert.equal(await reduced.locator('.waymaking-beat h3').first().evaluate(el=>el.querySelectorAll('.waymaking-letter').length),0,'Reduced motion keeps original text');
               await reduced.close();
