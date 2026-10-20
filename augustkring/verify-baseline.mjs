@@ -82,6 +82,8 @@ assert.ok(css.includes('position: fixed;') && css.includes('visibility: hidden;'
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes("story.dataset.waymakingPinned = 'true'"),'Viewport pin controller missing');
 assert.ok(scrollController.includes('const fadeOut = clamp('),'Pinned road must fade before release');
+assert.ok(scrollController.includes("const conclusionTop = story.querySelector('.waymaking-resolution')"),'Fade must be tied to the actual closing element');
+assert.ok(css.includes('margin: clamp(180px, 22svh, 215px) auto 0;'),'Waymaking needs an intentional paint-to-signoff handoff gap');
 
 assert.ok(!css.slice(css.indexOf('/* Waymaking V5:'),css.indexOf('.work-section--waymaking-output {')).includes('border-top:'),'Waymaking top/bottom separators must not return');
 assert.ok(css.includes('linear-gradient(to right, transparent 0%'),'Mobile ink background fade missing');
