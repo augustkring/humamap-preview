@@ -362,6 +362,8 @@ jobs:
                 await page.waitForTimeout(120);
                 assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).visibility),'hidden',
                   'Waymaking road MUST end before the centered Waymaker statement');
+                assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>parseFloat(getComputedStyle(el).opacity)),0,
+                  'Child image cannot override hidden parent: page-wide ink must be opacity zero');
                 assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),null);
                 assert.equal(await page.locator('body').getAttribute('data-waymaking-road-active'),null);
                 for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
@@ -369,11 +371,13 @@ jobs:
                   await page.waitForTimeout(110);
                   const state=await page.locator('.waymaking-road-wrap').evaluate(el=>({
                     visible:getComputedStyle(el).visibility,
+                    alpha:parseFloat(getComputedStyle(el).opacity),
                     active:document.body.dataset.waymakingRoadActive,
                     overflow:document.documentElement.scrollWidth>innerWidth+1,
                     paperMat:getComputedStyle(document.querySelector('.perspective-copy'),'::before').content
                   }));
                   assert.equal(state.visible,'hidden','Road must not appear behind '+selector);
+                  assert.equal(state.alpha,0,'Road still visible despite CSS visibility:hidden at '+selector);
                   assert.equal(state.active,undefined,'Waymaking scope leaked into '+selector);
                   assert.equal(state.paperMat,'none','Old white masking patch returned');
                   assert.equal(state.overflow,false);
