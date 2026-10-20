@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"0bc78eba","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"891c9a97","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -43,7 +43,7 @@ assert.ok(thread.includes('For me, that is what it means to be a waymaker.'),'Wa
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
-assert.ok(thread.includes('assets/waymaking-ink-road.svg') && thread.includes('assets/waymaking-ink-road-mobile.svg'),'Static desktop/mobile ink art missing');
+assert.ok(thread.includes('assets/waymaking-ink-road-brush.png') && thread.includes('assets/waymaking-ink-road-brush-mobile.png'),'Baked desktop/mobile ink art missing');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must be retired');
 for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
@@ -54,11 +54,12 @@ for(const label of ['Creative Thinking','Commercial Understanding','Strategic Ju
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
 }
-for(const name of ['waymaking-ink-road.svg','waymaking-ink-road-mobile.svg']){
- const art=readFileSync(join(root,'assets',name),'utf8');
- assert.ok(art.startsWith('<svg') && art.includes('viewBox=') && art.includes('Original authored ink-road'),'Static ink SVG missing/invalid: '+name);
- assert.ok(!/<script|<foreignObject|<image\b|onload=|javascript:/i.test(art),'Unsafe artwork SVG: '+name);
+for(const name of ['waymaking-ink-road-brush.png','waymaking-ink-road-brush-mobile.png']){
+ const art=readFileSync(join(root,'assets',name));
+ assert.ok(art.length>100000 && art[0]===0x89 && art[1]===0x50 && art[2]===0x4e && art[3]===0x47,'High-resolution ink PNG missing or invalid: '+name);
 }
+const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
+assert.ok(license.includes('MIT License') && license.includes('Copyright (c) 2026 nomagicln'),'MIT artwork source attribution missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
@@ -77,7 +78,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-ink-v1':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-brush-v2':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
