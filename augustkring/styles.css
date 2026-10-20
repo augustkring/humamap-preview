@@ -1729,8 +1729,8 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   visibility: visible;
 }
 /* Keep all foreground copy, cards and navigation above the persistent road. */
-body:has(> .waymaking-road-wrap[data-waymaking-viewport="true"]) .home-main,
-body:has(> .waymaking-road-wrap[data-waymaking-viewport="true"]) .home-footer {
+.home-main,
+.home-footer {
   position: relative;
   z-index: 1;
 }
