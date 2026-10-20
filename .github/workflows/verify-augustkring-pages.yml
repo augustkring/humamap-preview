@@ -44,13 +44,14 @@ jobs:
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected_home="styles.css?v=20261020-waymaking-viewport-v6"
+          expected_road_js="waymaking-scroll.js?v=20261020-start-creative-v7"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
-              echo "Approved Waymaking homepage and stylesheet are published."
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
+              echo "Approved Waymaking homepage, stylesheet and script are published."
               break
             fi
             if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
