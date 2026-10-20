@@ -565,7 +565,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-resolution {
   width: min(100%, 840px);
-  margin: 0 auto;
+  /* Give the fixed ink space to finish and disappear before the conclusion. */
+  margin: clamp(180px, 22svh, 215px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
@@ -1708,6 +1709,40 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
+/* Viewport-pinned painting: the artwork has one physical screen position.
+   Sticky remains only as the progressive-enhancement/no-JS fallback. */
+.waymaking-narrative[data-waymaking-ready="true"] .waymaking-road-wrap {
+  visibility: hidden;
+  opacity: 0;
+}
+.waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+  position: fixed;
+  top: calc((100svh - min(72svh, 700px)) / 2);
+  left: 50%;
+  width: min(33.5vw, 390px);
+  height: min(72svh, 700px);
+  margin: 0;
+  transform: translateX(-50%);
+  visibility: visible;
+  opacity: var(--waymaking-pin-opacity, 1);
+  pointer-events: none;
+  will-change: opacity;
+}
+@media (max-width: 900px) {
+  .waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+    top: calc((100svh - min(68svh, 560px)) / 2);
+    width: min(calc(100vw - 28px), 360px);
+    height: min(68svh, 560px);
+  }
+}
+@media (max-width: 600px) {
+  .waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+    top: calc((100svh - min(68svh, 540px)) / 2);
+    width: min(calc(100vw - 28px), 330px);
+    height: min(68svh, 540px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
