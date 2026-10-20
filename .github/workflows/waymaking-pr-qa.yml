@@ -38,79 +38,109 @@ jobs:
           const assert=require('node:assert/strict');
           const {chromium}=require('playwright-core');
           const widths=[320,390,768,1440];
-          const expected=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose'];
+          const names=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
           (async()=>{
             const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
-            try {
+            try{
               for(const width of widths){
-                const page=await browser.newPage({viewport:{width,height:900}});
+                const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
                 await page.goto('http://127.0.0.1:8765/humamap-preview/augustkring/',{waitUntil:'networkidle'});
                 await page.evaluate(()=>document.fonts.ready);
-                await page.locator('.waymaking-intro').scrollIntoViewIfNeeded();
-                await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
+                const art=page.locator('.waymaking-road-art img');
+                await art.evaluate(img=>img.decode());
+                await page.locator('.waymaking-beat').first().scrollIntoViewIfNeeded();
+                await page.waitForTimeout(170);
                 const audit=await page.evaluate(()=>{
                   const $=s=>document.querySelector(s);
-                  const box=el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}};
+                  const rect=x=>{const r=x.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,width:r.width,height:r.height}};
+                  const beatNames=[...document.querySelectorAll('.waymaking-beat h4')].map(x=>x.textContent.trim());
+                  const sizes=[...document.querySelectorAll('.waymaking-beat h4')].map(x=>parseFloat(getComputedStyle(x).fontSize));
                   return {
-                    overflow:document.documentElement.scrollWidth>window.innerWidth+1,
-                    columns:getComputedStyle($('.waymaking-scene')).gridTemplateColumns,
-                    copy:box($('.waymaking-copy-column')),
-                    art:box($('.waymaking-road-wrap')),
-                    imgWidth:$('.waymaking-road-art img').naturalWidth,
-                    imgSrc:$('.waymaking-road-art img').currentSrc,
-                    beatNames:[...document.querySelectorAll('.waymaking-beat h4')].map(el=>el.textContent.trim()),
-                    headingSizes:[...document.querySelectorAll('.waymaking-beat h4')].map(el=>parseFloat(getComputedStyle(el).fontSize)),
-                    signoff:$('.waymaking-resolution').textContent.trim(),
-                    noScrollTrap:!document.body.style.overflow&&!document.documentElement.style.overflow,
-                    intro:$('.thread-copy').textContent.trim(),
-                    hasCanvas:!!document.querySelector('[data-waymaking-ink-road]'),
+                    overflow:document.documentElement.scrollWidth>innerWidth+1,
+                    beatNames,sizes,
+                    road:rect($('.waymaking-road-wrap')),
+                    artSpace:rect($('.waymaking-artspace')),
+                    artOpacity:getComputedStyle($('.waymaking-road-art')).opacity,
+                    artVisibility:getComputedStyle($('.waymaking-road-art')).visibility,
+                    maskSvgDisplay:getComputedStyle($('.waymaking-paint-art')).display,
+                    pathOffset:Number($('[data-waymaking-paint-path]').getAttribute('stroke-dashoffset')),
+                    maskedSrc:$('.waymaking-paint-art image').getAttribute('href'),
+                    roadPosition:getComputedStyle($('.waymaking-road-wrap')).position,
+                    storyTopBorder:getComputedStyle($('.waymaking-narrative')).borderTopWidth,
+                    storyBottomBorder:getComputedStyle($('.waymaking-resolution')).borderTopWidth,
+                    active:!!$('.waymaking-narrative[data-waymaking-painted="true"]'),
+                    chapterColors:[...document.querySelectorAll('.waymaking-beat h4')].map(x=>getComputedStyle(x).color),
+                    headline:$('.waymaking-resolution').textContent.trim(),
+                    copy:$('.thread-copy').textContent.trim(),
+                    imageSrc:$('.waymaking-road-art img').currentSrc,
+                    hasScrollLock:!!document.body.style.overflow||!!document.documentElement.style.overflow
                   };
                 });
                 assert.equal(audit.overflow,false,'Horizontal overflow at '+width);
-                assert.equal(audit.imgWidth,720,'Approved original image not decoded');
-                assert.ok(audit.imgSrc.endsWith('waymaking-editorial-ink.avif'),'Original ink image not loaded');
-                assert.deepEqual(audit.beatNames,expected,'Waymaking narrative order differs');
-                assert.ok(audit.headingSizes.every(v=>Math.abs(v-audit.headingSizes[0])<.2),'Purpose must share heading size');
-                assert.ok(audit.signoff.includes("For me, that's what it means to be a waymaker."));
-                assert.ok(audit.intro.includes('build towards a positive future, together with bold people'));
-                assert.ok(audit.noScrollTrap);
-                assert.equal(audit.hasCanvas,false);
-                if(width>=901) {
-                  assert.ok(audit.art.width>300,'Artwork too small at desktop');
-                  assert.ok(audit.copy.x+audit.copy.width<=audit.art.x+10,'Story copy overlaps artwork');
-                  const first=page.locator('.waymaking-beat').first();
-                  const last=page.locator('.waymaking-beat').last();
-                  await first.scrollIntoViewIfNeeded();
-                  await page.waitForTimeout(100);
-                  const start=await page.locator('.waymaking-road-art img').evaluate(el=>el.style.clipPath);
-                  await page.screenshot({path:'artifacts/stage-first-'+width+'.png'});
-                  await last.scrollIntoViewIfNeeded();
-                  await page.waitForTimeout(100);
-                  const finish=await page.locator('.waymaking-road-art img').evaluate(el=>el.style.clipPath);
-                  const pct=str=>Number(str.match(/([\d.]+)%/)?.[1]);
-                  assert.ok(Number.isFinite(pct(start))&&Number.isFinite(pct(finish))&&pct(finish)<pct(start),'Scroll must progressively reveal ink');
-                  assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-active'),'true');
-                  await page.screenshot({path:'artifacts/stage-last-'+width+'.png'});
-                } else {
-                  assert.ok(audit.art.width<=420,'Mobile artwork must stay within viewport');
-                  assert.ok(audit.art.height<=470,'Mobile artwork must not dominate entire page');
-                  assert.equal(await page.locator('.waymaking-road-art img').evaluate(el=>el.style.clipPath),'','Mobile should have static artwork');
+                assert.deepEqual(audit.beatNames,names,'Waymaking chapter titles/order wrong');
+                assert.ok(audit.sizes.every(v=>Math.abs(v-audit.sizes[0])<.2),'Purpose Driven size must match other chapter titles');
+                assert.equal(audit.storyTopBorder,'0px','Remove introductory separator');
+                assert.equal(audit.storyBottomBorder,'0px','Remove closing separator');
+                assert.ok(audit.headline.includes("For me, that's what it means to be a waymaker."));
+                assert.ok(audit.copy.includes('build towards a positive future, together with bold people'));
+                assert.ok(audit.imageSrc.endsWith('waymaking-editorial-ink.avif'));
+                assert.ok(audit.maskedSrc.endsWith('waymaking-editorial-ink.avif'));
+                assert.equal(audit.hasScrollLock,false,'Never lock document scrolling');
+                if(width>=901){
+                  assert.equal(audit.roadPosition,'sticky','Desktop art must stay sticky');
+                  assert.equal(audit.active,true,'Desktop painter should initialize');
+                  assert.notEqual(audit.maskSvgDisplay,'none','Curved path SVG mask must be visible');
+                  assert.equal(audit.artVisibility,'hidden','Static picture should not overlap painted SVG');
+                  assert.ok(audit.road.width>=300,'Approved art must not shrink to thin lines');
+                  assert.ok(audit.pathOffset>=0&&audit.pathOffset<=1000,'Stroke path progress out of range');
+                  const first=audit.pathOffset;
+                  await page.locator('.waymaking-road-wrap').screenshot({path:'artifacts/paint-first-'+width+'.png'});
+                  await page.screenshot({path:'artifacts/reading-first-'+width+'.png'});
+                  await page.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
+                  await page.waitForTimeout(250);
+                  await page.locator('.waymaking-road-wrap').screenshot({path:'artifacts/paint-middle-'+width+'.png'});
+                  await page.locator('.waymaking-beat').last().scrollIntoViewIfNeeded();
+                  await page.waitForTimeout(250);
+                  const last=await page.locator('[data-waymaking-paint-path]').getAttribute('stroke-dashoffset');
+                  assert.ok(Number(last)<first-250,'Artwork must paint progressively along curve');
+                  assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-complete'),'true','The final painting should display the untouched original');
+                  assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible','The original artwork must be visible when brush completes');
+                  const focus=await page.locator('.waymaking-beat').last().evaluate(el=>getComputedStyle(el.querySelector('h4')).color);
+                  const off=await page.locator('.waymaking-beat').first().evaluate(el=>getComputedStyle(el.querySelector('h4')).color);
+                  assert.notEqual(focus,off,'Active chapter must become darker');
+                  await page.locator('.waymaking-road-wrap').screenshot({path:'artifacts/paint-last-'+width+'.png'});
+                  await page.screenshot({path:'artifacts/reading-last-'+width+'.png'});
+                  console.log('PAINT '+width+'px',JSON.stringify({first,last,focus,off}));
+                }else{
+                  assert.equal(audit.roadPosition,'sticky','Mobile painting must remain behind scrolling copy');
+                  assert.equal(audit.maskSvgDisplay,'none','Mobile should show full painting without reveal animation');
+                  assert.equal(audit.artVisibility,'visible','Mobile background painting must remain visible');
+                  assert.ok(Number(audit.artOpacity)<=.16,'Mobile background ink should not impair reading contrast');
+                  assert.ok(audit.road.width<=width,'Mobile art must fit viewport');
+                  await page.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
+                  await page.waitForTimeout(150);
+                  const artTop=await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top);
+                  console.log('BACKGROUND POSITION',width,artTop);
+                  assert.ok(artTop<900&&artTop+audit.road.height>0,'Mobile background should overlap the viewport while reading');
+                  await page.screenshot({path:'artifacts/mobile-middle-'+width+'.png'});
+                  console.log('MOBILE '+width+'px',JSON.stringify({artTop,artOpacity:audit.artOpacity,road:audit.road}));
                 }
                 await page.locator('.waymaking-narrative').screenshot({path:'artifacts/waymaking-'+width+'.png'});
                 await page.screenshot({path:'artifacts/home-'+width+'.png',fullPage:true});
-                console.log('PASS '+width+'px',JSON.stringify(audit));
+                console.log('PASS '+width+'px');
                 await page.close();
               }
-              const reducedPage=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
-              await reducedPage.goto('http://127.0.0.1:8765/humamap-preview/augustkring/',{waitUntil:'networkidle'});
-              await reducedPage.locator('.waymaking-beat').nth(3).scrollIntoViewIfNeeded();
-              await reducedPage.waitForTimeout(100);
-              assert.equal(await reducedPage.locator('.waymaking-road-art img').evaluate(el=>el.style.clipPath),'','Reduced-motion illustration must be fully visible');
-              assert.equal(await reducedPage.locator('.waymaking-narrative').getAttribute('data-waymaking-active'),null,'Reduced-motion content must not fade');
-              console.log('PASS reduced-motion');
-              await reducedPage.close();
-            } finally {await browser.close();}
-          })().catch(err=>{console.error(err);process.exitCode=1});
+              const reduced=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+              await reduced.goto('http://127.0.0.1:8765/humamap-preview/augustkring/',{waitUntil:'networkidle'});
+              await reduced.locator('.waymaking-beat').nth(3).scrollIntoViewIfNeeded();
+              await reduced.waitForTimeout(100);
+              assert.equal(await reduced.locator('.waymaking-narrative').getAttribute('data-waymaking-painted'),null,'Reduced motion disables paint');
+              assert.equal(await reduced.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible','Reduced motion shows original image');
+              assert.equal(await reduced.locator('.waymaking-paint-art').evaluate(el=>getComputedStyle(el).display),'none','Reduced motion hides animated mask');
+              await reduced.close();
+              console.log('PASS reduced motion');
+            }finally{await browser.close();}
+          })().catch(error=>{console.error(error);process.exitCode=1});
           NODE
       - name: Upload desktop and mobile review screenshots
         if: always()

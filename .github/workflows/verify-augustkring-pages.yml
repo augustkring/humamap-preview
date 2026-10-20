@@ -10,6 +10,7 @@ on:
       - "augustkring/assets/waymaking-ink-road-brush.png"
       - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
       - "augustkring/assets/waymaking-editorial-ink.avif"
+      - "augustkring/assets/waymaking-editorial-ink.webp"
       - "augustkring/waymaking-scroll.js"
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
@@ -42,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-waymaking-editorial-v3"
+          expected_home="styles.css?v=20261020-waymaking-painted-v4a"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -64,9 +65,11 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-ink-road-brush.png' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261020-v3' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261020-v4b' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
+          grep -Fq 'Purpose Driven</h4>' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
@@ -86,6 +89,7 @@ jobs:
           grep -Fq 'position: sticky;' /tmp/augustkring.css
           grep -Fq '.waymaking-road-art' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
+          grep -Fq '.waymaking-paint-art' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
           for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
@@ -96,7 +100,10 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.avif" -o /tmp/waymaking-editorial-ink.avif
           test "$(xxd -p -s 4 -l 8 /tmp/waymaking-editorial-ink.avif)" = "6674797061766966"
           test "$(wc -c < /tmp/waymaking-editorial-ink.avif)" -gt 4000
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-v3" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
+          test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
+          test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-v4b" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -226,7 +233,7 @@ jobs:
                 }
                 assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
                 assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future, together with bold people, create things that matter and leave the world a little better than I found it.");
-                assert.equal(editorial.purposeTitle,'Purpose');
+                assert.equal(editorial.purposeTitle,'Purpose Driven');
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.waymakingTitle,'Waymaking');
@@ -268,7 +275,7 @@ jobs:
                   for(const block of waymakingLayout.blocks) assert.ok(block.right<waymakingLayout.road.left+12,'Editorial copy must not overlap artwork');
                 }
                 if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
-                if(width===320||width===390) assert.ok(waymakingLayout.road.height<=470,'Mobile painting must not dominate full scroll');
+                if(width<=900) assert.ok(waymakingLayout.road.height<=600,'Mobile sticky background should remain proportionate');
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
