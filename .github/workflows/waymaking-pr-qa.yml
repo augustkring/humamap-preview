@@ -72,7 +72,7 @@ jobs:
                 assert.ok(result.summary.includes('build towards a positive future, together with bold people'));
                 assert.ok(result.introText.includes('early stages'));
                 assert.ok(result.road.height>650);
-                assert.ok(result.inkSrc.endsWith(width<=900?'waymaking-ink-road-mobile.svg':'waymaking-ink-road.svg'),'Wrong responsive illustration at '+width);
+                assert.ok(result.inkSrc.endsWith(width<=900?'waymaking-ink-road-brush-mobile.png':'waymaking-ink-road-brush.png'),'Wrong responsive illustration at '+width);
                 if(width>900){
                   assert.ok(result.beats[0].right<result.road.left+10,'Desktop left beat overlaps road');
                   assert.ok(result.beats[1].left>result.road.right-10,'Desktop right beat overlaps road');
