@@ -49,6 +49,8 @@ jobs:
                 docOverflow:document.documentElement.scrollWidth>innerWidth+1,
                 story:rect($('.waymaking-scene')),
                 road:rect($('.waymaking-road-wrap')),
+                firstTitle:rect(document.querySelector('.waymaking-beat h3')),
+                pinnedAnchor:Number.parseFloat(getComputedStyle($('.waymaking-road-wrap')).top),
                 roadPosition:getComputedStyle($('.waymaking-road-wrap')).position,
                 roadVisibility:getComputedStyle($('.waymaking-road-wrap')).visibility,
                 roadOpacity:parseFloat(getComputedStyle($('.waymaking-road-wrap')).opacity),
@@ -85,9 +87,33 @@ jobs:
                 await page.evaluate(()=>document.fonts.ready);
                 await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
                 const beats=page.locator('.waymaking-beat');
-                await beats.first().scrollIntoViewIfNeeded();
-                await wait();
+                // Position the first heading exactly at the ink's fixed
+                // screen anchor. Inspect the preceding position first to
+                // prove that Where I add value cannot reveal the road.
+                const activateAt=await page.evaluate(()=>{
+                  const heading=document.querySelector('.waymaking-beat h3');
+                  const road=document.querySelector('.waymaking-road-wrap');
+                  const anchoredTop=Number.parseFloat(getComputedStyle(road).top);
+                  return scrollY+heading.getBoundingClientRect().top-(anchoredTop+16);
+                });
+                const scrollToAnchor=async y=>{
+                  await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+                  await page.waitForTimeout(120);
+                };
+                await scrollToAnchor(Math.max(0,activateAt-180));
+                const beforeTitle=await snapshot(page);
+                assert.equal(beforeTitle.pinned,undefined,
+                  'Road must stay HIDDEN before Creative Thinking, including Where I add value');
+                assert.equal(beforeTitle.roadVisibility,'hidden',
+                  'Ink should not appear before the first heading reaches its anchor');
+                await page.screenshot({path:'artifacts/before-creative-'+width+'.png'});
+                await scrollToAnchor(activateAt+12);
                 const first=await snapshot(page);
+                assert.ok(Math.abs(first.firstTitle.top-first.road.top)<25,
+                  'Road top must align with Creative Thinking title at first reveal');
+                assert.ok(first.roadOpacity>0&&first.roadOpacity<.6,
+                  'Ink must start as a small gentle reveal alongside the heading');
+                await page.screenshot({path:'artifacts/creative-start-'+width+'.png'});
                 assert.equal(first.docOverflow,false,'Horizontal page overflow at '+width);
                 assert.equal(first.scrollLocked,false,'Do not trap scrolling');
                 assert.equal(first.sectionTitleVisible,false,'Remove redundant The way I work and Waymaking heading');
@@ -114,13 +140,14 @@ jobs:
                   const beats=[...document.querySelectorAll('.waymaking-beat')];
                   return beats.map(b=>{const r=b.getBoundingClientRect();return scrollY+r.top+r.height/2-innerHeight*.51;});
                 });
+                const paintFinish=await page.evaluate(()=>{
+                  const title=[...document.querySelectorAll('.waymaking-beat h3')].at(-1);
+                  return scrollY+title.getBoundingClientRect().top-innerHeight*.51;
+                });
                 // Scroll by actual chapter centers, never synthetic section indices.
                 let recorded=[];
                 for(let step=0;step<=12;step++){
-                  const p=step/12*(byScreenCenter.length-1);
-                  const lo=Math.min(byScreenCenter.length-2,Math.floor(p));
-                  const local=p-lo;
-                  const y=byScreenCenter[lo]+(byScreenCenter[lo+1]-byScreenCenter[lo])*local;
+                  const y=(activateAt+75) + (paintFinish-activateAt-75)*step/12;
                   await page.evaluate(y=>window.scrollTo(0,y),y);
                   await page.waitForTimeout(80);
                   const state=await snapshot(page);
@@ -161,7 +188,7 @@ jobs:
                   return {top:scrollY+r.top,bottom:scrollY+r.bottom,
                     conclusionTop:scrollY+conclusion.top,height:innerHeight};
                 });
-                const enterAt=narrativeBounds.top-narrativeBounds.height*.66;
+                const enterAt=activateAt+20;
                 const exitAt=narrativeBounds.conclusionTop-narrativeBounds.height*.84;
                 const sampleScroll=async y=>{
                   await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
@@ -170,7 +197,7 @@ jobs:
                 };
                 const entering=await sampleScroll(enterAt);
                 const ending=await sampleScroll(exitAt);
-                assert.equal(entering.pinned,'true','Art must pin as the Waymaking story enters');
+                assert.equal(entering.pinned,'true','Art must pin only when Creative Thinking reaches the fixed viewport line');
                 assert.equal(ending.pinned,'true','Art must stay pinned through the final fade after the fifth chapter');
                 assert.equal(entering.roadPosition,'fixed');
                 assert.equal(ending.roadPosition,'fixed');
@@ -192,9 +219,10 @@ jobs:
                 assert.equal(outAfter.roadVisibility,'hidden',
                   'Never show the road sliding away when it leaves the story');
                 await page.screenshot({path:'artifacts/after-waymaking-'+width+'.png'});
-                const inBefore=await sampleScroll(narrativeBounds.top-narrativeBounds.height*.85);
+                const inBefore=await sampleScroll(Math.max(0,activateAt-120));
                 assert.equal(inBefore.pinned,undefined,'Art must not float over content before Waymaking');
                 assert.equal(inBefore.roadVisibility,'hidden');
+                console.log('CREATIVE_START '+width,JSON.stringify({activateAt,firstHeadingTop:first.firstTitle.top,fixedRoadTop:first.road.top,opacity:first.roadOpacity}));
                 console.log('PIN '+width,JSON.stringify({
                   entryTop:entering.road.top,fadeTop:ending.road.top,
                   entryOpacity:entering.roadOpacity,fadeOpacity:ending.roadOpacity,

@@ -63,7 +63,7 @@ assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('asci
 const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'));
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-viewport-v6'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-start-creative-v7'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -82,6 +82,9 @@ assert.ok(css.includes('position: fixed;') && css.includes('visibility: hidden;'
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes("story.dataset.waymakingPinned = 'true'"),'Viewport pin controller missing');
 assert.ok(scrollController.includes('const fadeOut = clamp('),'Pinned road must fade before release');
+assert.ok(scrollController.includes('const titleTop = firstHeading.getBoundingClientRect().top'),'Ink cannot start before Creative Thinking');
+assert.ok(scrollController.includes('const openingLine = startLine()'),'Road must align with first heading at its viewport-fixed top');
+assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Brush progress must start at same Creative Thinking alignment');
 assert.ok(scrollController.includes("const conclusionTop = story.querySelector('.waymaking-resolution')"),'Fade must be tied to the actual closing element');
 assert.ok(css.includes('margin: clamp(180px, 22svh, 215px) auto 0;'),'Waymaking needs an intentional paint-to-signoff handoff gap');
 

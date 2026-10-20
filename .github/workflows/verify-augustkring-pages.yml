@@ -68,7 +68,7 @@ jobs:
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261020-viewport-v6' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261020-start-creative-v7' /tmp/augustkring.html
           grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-feather="7"' /tmp/augustkring.html
@@ -109,7 +109,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-viewport-v6" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-start-creative-v7" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const updatePin = () =>' /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
@@ -288,9 +288,46 @@ jobs:
                 }
                 if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
                 if(width<=900) assert.ok(waymakingLayout.road.height<=600,'Mobile sticky background should remain proportionate');
+                // The painting MUST be absent during Where I add value.
+                // It may appear only when Creative Thinking reaches the fixed
+                // painting top, which is 16px above the heading on every width.
+                const startAt=await page.evaluate(()=>{
+                  const title=document.querySelector('.waymaking-beat h3');
+                  const road=document.querySelector('.waymaking-road-wrap');
+                  const pinTop=parseFloat(getComputedStyle(road).top);
+                  return scrollY + title.getBoundingClientRect().top - (pinTop + 16);
+                });
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),Math.max(0,startAt-160));
+                await page.waitForTimeout(140);
+                assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),null,
+                  'Ink must not appear before Creative Thinking, including Where I add value');
+                assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).visibility),'hidden',
+                  'Ink must be hidden before first heading aligns');
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),startAt+12);
+                await page.waitForTimeout(140);
+                const creativeEntrance=await page.evaluate(()=>{
+                  const art=document.querySelector('.waymaking-road-wrap');
+                  const title=document.querySelector('.waymaking-beat h3');
+                  return {
+                    artTop:art.getBoundingClientRect().top,
+                    titleTop:title.getBoundingClientRect().top,
+                    position:getComputedStyle(art).position,
+                    opacity:Number(getComputedStyle(art).opacity)
+                  };
+                });
+                assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),'true',
+                  'Ink must start exactly at Creative Thinking');
+                assert.equal(creativeEntrance.position,'fixed','Art must be fixed from its first visible frame');
+                assert.ok(Math.abs(creativeEntrance.titleTop-creativeEntrance.artTop)<25,
+                  'First brush and Creative Thinking must begin at the same screen height');
+                assert.ok(creativeEntrance.opacity>0&&creativeEntrance.opacity<.6,'Ink must appear gradually at its aligned start');
+                if(width===320||width===390||width===1440){
+                  await page.screenshot({path:`/tmp/ak-browser-check/creative-start-${width}.png`});
+                }
+                console.log('Published Creative Thinking ink entrance',width,creativeEntrance);
                 // A genuine viewport pin must hold through the fifth chapter,
                 // then fade away BEFORE the closing Waymaker statement and work.
-                await page.locator('.waymaking-beat').first().scrollIntoViewIfNeeded();
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),startAt+80);
                 await page.waitForTimeout(110);
                 const pinBeginning=await page.locator('.waymaking-road-wrap').evaluate(el=>({
                   top:el.getBoundingClientRect().top,
@@ -669,6 +706,7 @@ jobs:
             /tmp/ak-browser-check/perspectives-*.png
             /tmp/ak-browser-check/focus-heading-*.png
             /tmp/ak-browser-check/waymaking-*.png
+            /tmp/ak-browser-check/creative-start-*.png
             /tmp/ak-browser-check/typography-*.png
             /tmp/ak-browser-check/about-story-*.png
             /tmp/ak-browser-check/perspectives-page-*.png
