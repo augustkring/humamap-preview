@@ -7,7 +7,8 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
-      - "augustkring/waymaking-brush.js"
+      - "augustkring/assets/waymaking-ink-road-brush.png"
+      - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
@@ -39,13 +40,13 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-dry-ink-v1"
+          expected_home="styles.css?v=20261020-waymaking-brush-v2"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
-          expected_copy="AI is at the heart of everything I do."
+          expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that is what it means to be a Waymaker." /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that is what it means to be a waymaker." /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
               echo "Approved Waymaking homepage and stylesheet are published."
               break
             fi
@@ -55,19 +56,20 @@ jobs:
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
           grep -Fq "But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong." /tmp/augustkring.html
-          grep -Fq 'AI is at the heart of everything I do.' /tmp/augustkring.html
+          grep -Fq 'build towards a positive future, together with bold people' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-ink-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261020-dry-ink-v6' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-ink-road-brush.png' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-ink-road-brush-mobile.png' /tmp/augustkring.html
+          ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
-          grep -Fq 'For me, that is what it means to be a Waymaker.' /tmp/augustkring.html
+          grep -Fq 'For me, that is what it means to be a waymaker.' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
@@ -78,30 +80,15 @@ jobs:
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           grep -Fq 'width: clamp(132px, 13.5vw, 148px);' /tmp/augustkring.css
-          grep -Fq '.waymaking-road-canvas' /tmp/augustkring.css
-          grep -Fq '.waymaking-road-fallback-svg' /tmp/augustkring.css
+          grep -Fq '.waymaking-road-art' /tmp/augustkring.css
+          grep -Fq '.waymaking-purpose' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-dry-ink-v6" -o /tmp/augustkring-waymaking-brush.js
-          grep -Fq "nomagicln/gomoko-must-win" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "assets/waymaking-dry-brush.png?v=20261020-ink-v1" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "prepareBrush" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "sampleBrush" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "paintWarpedStroke" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "opacity: 0.39" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "v6-ink-marks" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "v6-ink-marks" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "continuous-dry-ink" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "v6-ink-marks" /tmp/augustkring-waymaking-brush.js
-          ! grep -Fq "A restrained pigment ghost" /tmp/augustkring-waymaking-brush.js
-          ! grep -Fq "3_rake.png" /tmp/augustkring-waymaking-brush.js
-          ! grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
-          curl -fsSL --max-time 20 "${base}assets/waymaking-dry-brush.png?v=20261020-ink-v1" -o /tmp/waymaking-dry-brush.png
-          test "$(xxd -p -l 8 /tmp/waymaking-dry-brush.png)" = "89504e470d0a1a0a"
-          test "$(wc -c < /tmp/waymaking-dry-brush.png)" -gt 100000
-          curl -fsSL --max-time 20 "${base}assets/waymaking-dry-brush-LICENSE.txt" -o /tmp/waymaking-dry-brush-license.txt
-          grep -Fq "Copyright (c) 2026 nomagicln" /tmp/waymaking-dry-brush-license.txt
-          grep -Fq "MIT License" /tmp/waymaking-dry-brush-license.txt
+          for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
+            curl -fsSL --max-time 20 "${base}assets/${art}" -o "/tmp/${art}"
+            test "$(xxd -p -l 8 "/tmp/${art}")" = "89504e470d0a1a0a"
+            test "$(wc -c < "/tmp/${art}")" -gt 100000
+          done
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
@@ -149,7 +136,7 @@ jobs:
           (async () => {
             const browser = await chromium.launch({executablePath:process.env.CHROME_BIN, headless:true, args:['--no-sandbox']});
             try {
-              for (const width of [390, 768, 1440]) {
+              for (const width of [320, 390, 768, 1440]) {
                 const page = await browser.newPage({viewport:{width,height:900}});
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/', {waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
@@ -196,9 +183,9 @@ jobs:
                   const cardTitle = document.querySelector('.perspective-link-title');
                   return {
                     opener: document.querySelector('.thread-lead p').textContent.trim(),
-                    valueCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
-                    leadershipCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
-                    agilityCopy: document.querySelector('.thread-copy p:nth-child(3)').textContent.trim(),
+                    visionCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
+                    purposeCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    purposeTitle: document.querySelector('.waymaking-purpose h4').textContent.trim(),
                     workHeading: document.querySelector('#work-title').textContent.trim(),
                     waymakingTitle: document.querySelector('#waymaking-title').textContent.trim(),
                     waymakerDefinition: document.querySelector('.waymaking-resolution h3').textContent.trim(),
@@ -212,50 +199,35 @@ jobs:
                   };
                 });
                 console.log('Editorial polish', width, editorial);
-                assert.equal(editorial.opener,'I do my best work in the early stages, when a complex challenge calls for fresh thinking and a clear direction.');
+                assert.equal(editorial.opener,'I do my best work in the early stages, when a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.');
                 const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.thread-lead > p, .perspective-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
                   text:el.textContent.trim(),
                   width:el.getBoundingClientRect().width
                 })));
                 assert.equal(homeSubtitleWidths.length,3,'All three homepage section subtitles are present');
                 for(const entry of homeSubtitleWidths) assert.ok(entry.width<=390.5,'Homepage subtitle must stay within shared 390px measure: '+entry.text);
-                if(width===1440){
-                  const referenceBreak=await page.evaluate(()=>{
-                    const p=document.querySelector('.thread-lead > p');
-                    const node=p.firstChild;
-                    const text=node.textContent;
-                    const phrase='thinking and a clear';
-                    const start=text.indexOf(phrase);
-                    if(start<0)throw new Error('Approved subtitle changed');
-                    const topAt=(i)=>{
-                      const range=document.createRange();
-                      range.setStart(node,i);
-                      range.setEnd(node,i+1);
-                      const top=range.getBoundingClientRect().top;
-                      range.detach?.();
-                      return top;
-                    };
-                    const and=text.indexOf('and a clear',start);
-                    return {first:topAt(0),thinking:topAt(start),andD:topAt(and+2),followingA:topAt(and+4)};
-                  });
-                  console.log('Subtitle reference wrap',referenceBreak);
-                  assert.ok(Math.abs(referenceBreak.thinking-referenceBreak.andD)<2,'Second line ends at and');
-                  assert.ok(referenceBreak.followingA>referenceBreak.andD+10,'a clear direction must begin on third line');
-                  assert.ok(referenceBreak.andD>referenceBreak.first+10,'and must not wrap to first line');
+                if(width===1440) {
+                  const subtitle = await page.locator('.thread-lead > p').evaluate(el => ({
+                    width: el.getBoundingClientRect().width,
+                    height: el.getBoundingClientRect().height,
+                    lineHeight: parseFloat(getComputedStyle(el).lineHeight)
+                  }));
+                  assert.ok(subtitle.height > subtitle.lineHeight * 2, 'Holistic introduction must remain readable as a paragraph');
                 }
-                assert.equal(editorial.valueCopy,"I combine creative thinking with strategic judgement and commercial understanding. I think holistically, looking for ways people, planet and profit can reinforce one another.");
-                assert.equal(editorial.leadershipCopy,"I can give ambitious ideas direction, bring people together and inspire them to work towards a shared goal. I'm equally capable of going deep into the details and building things myself.");
-                assert.equal(editorial.agilityCopy,"AI is at the heart of everything I do. I'm quick to adapt and willing to change course radically when new perspectives or technologies open up better opportunities.");
+                assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
+                assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future, together with bold people, create things that matter and leave the world a little better than I found it.");
+                assert.equal(editorial.purposeTitle,'Purpose');
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.waymakingTitle,'Waymaking');
-                assert.equal(editorial.waymakerDefinition,'For me, that is what it means to be a Waymaker.');
+                assert.equal(editorial.waymakerDefinition,'For me, that is what it means to be a waymaker.');
                 assert.equal(editorial.waymakingBeatCount,4);
                 assert.equal(editorial.hasHomepageStory,false);
+                await page.locator('.waymaking-narrative').scrollIntoViewIfNeeded();
+                await page.locator('.waymaking-road-art img').evaluate(img => img.decode());
                 const waymakingLayout = await page.evaluate(() => {
                   const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
-                  const canvas=document.querySelector('[data-waymaking-ink-road]');
-                  const fallback=document.querySelector('[data-waymaking-fallback]');
+                  const art=document.querySelector('.waymaking-road-art img');
                   const blocks=[...document.querySelectorAll('.waymaking-copy')].map(el=>{
                     const r=el.getBoundingClientRect();
                     return {left:r.left,right:r.right,height:r.height};
@@ -263,37 +235,38 @@ jobs:
                   return {
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
-                    paintReady:canvas.dataset.paintReady==='true',
-                    brushMaterial:canvas.dataset.brushMaterial,
-                    brushVersion:canvas.dataset.brushVersion,
-                    canvasWidth:canvas.width,
-                    canvasHeight:canvas.height,
-                    fallbackHidden:fallback?.hasAttribute('hidden') ?? false,
-                    obsoleteVectorBrush:!!document.querySelector('.waymaking-painted-edge--body,.waymaking-painted-edge--texture'),
+                    imageComplete:art.complete,
+                    imageWidth:art.naturalWidth,
+                    artUrl:art.currentSrc,
+                    hasMobileArt:!!document.querySelector('.waymaking-road-art source[media="(max-width: 900px)"]'),
+                    purposeVisible:!!document.querySelector('.waymaking-purpose'),
+                    obsoleteCanvas:!!document.querySelector('.waymaking-road-canvas, [data-waymaking-ink-road]'),
                     overflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
                 const heights=waymakingLayout.blocks.map(x=>x.height);
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
-                assert.equal(waymakingLayout.paintReady,true,'MIT dry-brush canvas must render');
-                assert.equal(waymakingLayout.brushMaterial,'continuous-dry-ink','Road must use continuous dry-ink texture mapping');
-                assert.equal(waymakingLayout.brushVersion,'v6-ink-marks','Road must preserve wide-slice dry-brush rendering');
-                assert.ok(waymakingLayout.canvasWidth>=40 && waymakingLayout.canvasHeight>1000,'Dry-brush canvas has real render resolution');
-                assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after dry-brush painting');
-                assert.equal(waymakingLayout.obsoleteVectorBrush,false,'Obsolete vector brush paths must not return');
+                assert.equal(waymakingLayout.imageComplete,true,'Authored ink artwork loaded');
+                assert.ok(waymakingLayout.imageWidth>=126,'Ink artwork has real intrinsic size');
+                assert.equal(waymakingLayout.hasMobileArt,true,'Mobile art direction missing');
+                assert.equal(waymakingLayout.purposeVisible,true,'Purpose section missing');
+                assert.equal(waymakingLayout.obsoleteCanvas,false,'Canvas road must not return');
+                assert.ok(waymakingLayout.road.height>700,'Ink road should span the narrative');
+                if(width<=900) assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush-mobile.png'),'Mobile artwork not selected');
+                else assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush.png'),'Desktop artwork not selected');
                 if(width===1440){
                   assert.ok(waymakingLayout.road.width<=149,'Desktop painted road corridor stays within art-directed width');
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left copy stays clear of road');
                   assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 10,'Right copy stays clear of road');
                 }
-                if(width===390) assert.ok(waymakingLayout.road.width<=63,'Mobile painted road corridor stays within art-directed width');
+                if(width===390||width===320) assert.ok(waymakingLayout.road.width<=75,'Mobile painted road corridor stays within art-directed width');
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
                 assert.ok(editorial.cardTitleSize >= 20.9 && editorial.cardTitleSize <= 26.1,'Perspective titles approximately 2px smaller');
                 assert.equal(editorial.bodyOverflow,false);
-                if(width===390||width===1440) await page.locator('.waymaking-narrative').screenshot({path:`/tmp/ak-browser-check/waymaking-${width}.png`});
+                if(width===320||width===390||width===1440) await page.locator('.waymaking-narrative').screenshot({path:`/tmp/ak-browser-check/waymaking-${width}.png`});
                 await page.locator('.perspective-section').screenshot({path:`/tmp/ak-browser-check/perspectives-${width}.png`});
                 await page.locator('.work-heading').screenshot({path:`/tmp/ak-browser-check/focus-heading-${width}.png`});
                 await page.locator('.personal-signoff .signoff-signature').scrollIntoViewIfNeeded();

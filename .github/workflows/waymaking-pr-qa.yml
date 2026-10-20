@@ -1,0 +1,98 @@
+name: Waymaking PR browser QA
+
+on:
+  pull_request:
+    paths:
+      - "augustkring/**"
+      - ".github/workflows/waymaking-pr-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+      - name: Verify protected sections and approved text
+        run: node augustkring/verify-baseline.mjs
+      - name: Check real Chrome rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ak-local/humamap-preview artifacts
+          cp -R augustkring /tmp/ak-local/humamap-preview/augustkring
+          python3 -m http.server 8765 --directory /tmp/ak-local >/tmp/ak-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8765/humamap-preview/augustkring/ >/dev/null; then break; fi
+            sleep 1
+          done
+          npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0
+          chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$chrome"
+          CHROME_BIN="$chrome" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {chromium}=require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
+            try {
+              for(const width of [320,390,768,1440]){
+                const page=await browser.newPage({viewport:{width,height:900}});
+                await page.goto('http://127.0.0.1:8765/humamap-preview/augustkring/',{waitUntil:'networkidle'});
+                await page.evaluate(()=>document.fonts.ready);
+                await page.locator('.waymaking-narrative').scrollIntoViewIfNeeded();
+                const img=page.locator('.waymaking-road-art img');
+                await img.evaluate(el=>el.decode());
+                const result=await page.evaluate(()=>{
+                  const q=s=>document.querySelector(s);
+                  const bounds=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width,height:r.height}};
+                  return {
+                    overflow:document.documentElement.scrollWidth>innerWidth+1,
+                    road:bounds(q('.waymaking-road-wrap')),
+                    beats:[...document.querySelectorAll('.waymaking-copy')].map(bounds),
+                    purpose:bounds(q('.waymaking-purpose-copy')),
+                    inkLoaded:q('.waymaking-road-art img').complete&&q('.waymaking-road-art img').naturalWidth>0,
+                    inkSrc:q('.waymaking-road-art img').currentSrc,
+                    order:[...document.querySelectorAll('.waymaking-beat h4,.waymaking-purpose h4')].map(x=>x.textContent.trim()),
+                    definition:q('.waymaking-resolution h3').textContent.trim(),
+                    canvasPresent:!!q('canvas[data-waymaking-ink-road]'),
+                    introText:q('.thread-lead p').textContent.trim(),
+                    summary:q('.thread-copy').textContent.trim()
+                  };
+                });
+                assert.equal(result.overflow,false,'Horizontal overflow at '+width);
+                assert.equal(result.inkLoaded,true,'Static SVG did not load at '+width);
+                assert.equal(result.canvasPresent,false,'Old Canvas renderer returned');
+                assert.deepEqual(result.order,['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose']);
+                assert.equal(result.definition,'For me, that is what it means to be a waymaker.');
+                assert.ok(result.summary.includes('build towards a positive future, together with bold people'));
+                assert.ok(result.introText.includes('early stages'));
+                assert.ok(result.road.height>650);
+                assert.ok(result.inkSrc.endsWith(width<=900?'waymaking-ink-road-brush-mobile.png':'waymaking-ink-road-brush.png'),'Wrong responsive illustration at '+width);
+                if(width>900){
+                  assert.ok(result.beats[0].right<result.road.left+10,'Desktop left beat overlaps road');
+                  assert.ok(result.beats[1].left>result.road.right-10,'Desktop right beat overlaps road');
+                }else{
+                  for(const item of result.beats)assert.ok(item.left>=result.road.right-5,'Mobile text overlaps road');
+                }
+                await page.locator('.waymaking-narrative').screenshot({path:'artifacts/waymaking-'+width+'.png'});
+                await page.screenshot({path:'artifacts/home-'+width+'.png',fullPage:true});
+                console.log('PASS '+width+'px',JSON.stringify({road:result.road,art:result.inkSrc,overflow:result.overflow}));
+                await page.close();
+              }
+            }finally{await browser.close();}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
+      - name: Include source brush for material QA
+        run: cp augustkring/assets/waymaking-dry-brush.png artifacts/source-dry-brush.png
+      - name: Upload desktop and mobile review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: waymaking-pr-screenshots
+          path: artifacts/
+          if-no-files-found: warn
