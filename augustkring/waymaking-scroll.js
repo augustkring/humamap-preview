@@ -1,6 +1,6 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * A viewport pin holds the ink artwork completely still. Scroll only changes
+ * The ink starts alongside Creative Thinking and stays viewport-fixed. Scroll only changes
  * paint progress and readable color emphasis, never document position.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
@@ -11,8 +11,21 @@
   const brush = scene?.querySelector('[data-waymaking-paint-path]');
   const picture = scene?.querySelector('.waymaking-road-art img');
   const featherPaths = scene ? [...scene.querySelectorAll('[data-waymaking-feather]')] : [];
+  const road = scene?.querySelector('.waymaking-road-wrap');
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
-  if (!story || !scene || !brush || !picture || beats.length !== 5 || featherPaths.length !== 7) return;
+  const firstHeading = beats[0]?.querySelector('h3');
+  const lastHeading = beats[beats.length - 1]?.querySelector('h3');
+  if (!story || !scene || !road || !brush || !picture || !firstHeading ||
+      !lastHeading || beats.length !== 5 || featherPaths.length !== 7) return;
+
+  // Use the SAME CSS-derived viewport position on desktop and mobile.
+  // The painting begins 16px above Creative Thinking when its title reaches
+  // this line, not when the preceding Where I add value section is visible.
+  const pinTop = () => {
+    const top = Number.parseFloat(getComputedStyle(road).top);
+    return Number.isFinite(top) ? top : window.innerHeight * 0.14;
+  };
+  const startLine = () => pinTop() + 16;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
@@ -88,43 +101,30 @@
     return Math.min(entering, leaving);
   };
 
-  // A sticky child is bounded by its containing block and eventually slides
-  // away. Pin the existing ink image to the viewport instead, for the whole
-  // Waymaking narrative including its concluding statement. Fade it out before
-  // unpinning, so the user never sees the road move with the document.
+  // Only Creative Thinking may activate the painting. Once activated,
+  // CSS fixes its screen position until the section's closing fade completes.
   const updatePin = () => {
-    const rect = story.getBoundingClientRect();
     const height = window.innerHeight;
-    // Entrance is delayed until the story actually owns the screen, keeping
-    // the preceding Where I add value copy free of decorative ink.
-    const entranceStart = height * 0.78;
-    const entranceEnd = height * 0.51;
-    // Release the ink while crossing the intentional pause after the last
-    // chapter, BEFORE the centered Waymaker line enters the picture area.
-    // This avoids covering the sign-off and the following venture cards.
+    const titleTop = firstHeading.getBoundingClientRect().top;
+    const openingLine = startLine();
     const conclusionTop = story.querySelector('.waymaking-resolution')
       .getBoundingClientRect().top;
     const exitStart = height * 0.91;
     const exitEnd = height * 0.76;
 
-    const fadeIn = clamp(
-      (entranceStart - rect.top) / (entranceStart - entranceEnd)
-    );
-    const fadeOut = clamp(
-      (conclusionTop - exitEnd) / (exitStart - exitEnd)
-    );
-    const opacity = Math.min(fadeIn, fadeOut);
-    const active = rect.top < entranceStart && conclusionTop > exitEnd;
-
+    const fadeIn = clamp((openingLine - titleTop) / 68);
+    const fadeOut = clamp((conclusionTop - exitEnd) / (exitStart - exitEnd));
+    const active = titleTop < openingLine && conclusionTop > exitEnd;
     if (active) {
       story.dataset.waymakingPinned = 'true';
-      story.style.setProperty('--waymaking-pin-opacity', opacity.toFixed(4));
+      story.style.setProperty(
+        '--waymaking-pin-opacity', Math.min(fadeIn, fadeOut).toFixed(4)
+      );
     } else {
       delete story.dataset.waymakingPinned;
       story.style.removeProperty('--waymaking-pin-opacity');
     }
   };
-
   const update = () => {
     frame = 0;
     updatePin();
@@ -153,7 +153,15 @@
       }
     }
 
-    const fraction = phase / (beats.length - 1);
+    // Image reveal starts at the exact same first-title alignment as the
+    // viewport pin; headings retain their independent smooth color phases.
+    const firstDocY = scrollY + firstHeading.getBoundingClientRect().top;
+    const lastDocY = scrollY + lastHeading.getBoundingClientRect().top;
+    const paintStart = firstDocY - startLine();
+    const paintEnd = lastDocY - focus;
+    const fraction = clamp(
+      (scrollY - paintStart) / Math.max(1, paintEnd - paintStart)
+    );
     const revealed = clamp(0.025 + fraction * 0.975);
     // A fully opaque stroke paints the completed route. Seven increasingly
     // transparent brush layers feather the moving tip into the white paper.
