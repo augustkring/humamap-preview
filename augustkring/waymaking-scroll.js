@@ -40,7 +40,7 @@
     const fraction = Math.max(0, Math.min(1,
       (focusY - bounds.top) / Math.max(1, bounds.height)
     ));
-    const reveal = Math.max(0.09, Math.min(1, fraction * 1.12));
+    const reveal = Math.max(0.30, Math.min(1, 0.30 + fraction * 0.90));
     image.style.clipPath = `inset(0 0 ${(100 * (1 - reveal)).toFixed(2)}% 0)`;
 
     let selected = -1;
