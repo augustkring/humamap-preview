@@ -255,6 +255,17 @@ jobs:
                 assert.equal(editorial.hasHomepageStory,false);
                 await page.locator('.waymaking-narrative').scrollIntoViewIfNeeded();
                 await page.locator('.waymaking-road-art img').evaluate(img => img.decode());
+                // The body-level road is intentionally display:none outside
+                // Creative Thinking. Measure its real fixed dimensions only
+                // after activating the story, not while it is hidden.
+                const artEntryY=await page.evaluate(()=>{
+                  const title=document.querySelector('.waymaking-beat h3');
+                  const art=document.querySelector('.waymaking-road-wrap');
+                  const top=parseFloat(getComputedStyle(art).top);
+                  return scrollY+title.getBoundingClientRect().top-(top+16)+34;
+                });
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),artEntryY);
+                await page.waitForTimeout(120);
                 const waymakingLayout = await page.evaluate(() => {
                   const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
                   const image=document.querySelector('.waymaking-road-art img');
