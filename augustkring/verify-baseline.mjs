@@ -63,7 +63,7 @@ assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('asci
 const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'));
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-v5b'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-viewport-v6'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -77,6 +77,12 @@ assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My stor
 assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate chapters on either side of centered road');
 assert.ok(css.includes('margin-inline: auto;') && css.includes('width: min(33.5%, 390px);'),'Centered ink road corridor missing');
+assert.ok(css.includes('.waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap'),'Real viewport-fixed road rule missing');
+assert.ok(css.includes('position: fixed;') && css.includes('visibility: hidden;'),'Viewport road pin and hidden offstage styles missing');
+const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
+assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes("story.dataset.waymakingPinned = 'true'"),'Viewport pin controller missing');
+assert.ok(scrollController.includes('const fadeOut = clamp('),'Pinned road must fade before release');
+
 assert.ok(!css.slice(css.indexOf('/* Waymaking V5:'),css.indexOf('.work-section--waymaking-output {')).includes('border-top:'),'Waymaking top/bottom separators must not return');
 assert.ok(css.includes('linear-gradient(to right, transparent 0%'),'Mobile ink background fade missing');
 assert.ok(css.includes('.waymaking-road-art'),'Authored ink road artwork styling missing');
@@ -93,7 +99,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-centered-v5b':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-viewport-v6':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
