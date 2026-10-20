@@ -109,6 +109,7 @@ jobs:
                 await jump(page,Math.max(0,firstDocY-160));
                 const before=await snap(page);
                 assert.equal(before.roadVisibility,'hidden','No ink at Where I add value');
+                assert.equal(before.roadOpacity,0,'Hidden parent MUST have opacity zero; child visibility:visible cannot override it');
                 assert.equal(before.bodyActive,undefined,'Road must not activate before Creative Thinking');
                 assert.equal(before.roadBodyChild,true,'Road is outside scrolling containers');
                 await page.screenshot({path:'artifacts/before-Creative-'+width+'.png'});
@@ -177,6 +178,7 @@ jobs:
                 await jump(page,conclusionY-h*.69);
                 const signoff=await snap(page);
                 assert.equal(signoff.roadVisibility,'hidden','Painting should be finished and gone before Waymaker line');
+                assert.equal(signoff.roadOpacity,0,'Ink child artwork must not render behind the signoff');
                 assert.equal(signoff.bodyActive,undefined,'No body road beyond Waymaking');
                 await page.screenshot({path:'artifacts/signoff-'+width+'.png'});
 
@@ -190,6 +192,7 @@ jobs:
                   await jump(page,y);
                   const state=await snap(page);
                   assert.equal(state.roadVisibility,'hidden','Road overlays '+name);
+                  assert.equal(state.roadOpacity,0,'Road is still visually painted at '+name);
                   assert.equal(state.bodyActive,undefined,'Story activation leaked into '+name);
                   assert.equal(state.artificialPaperMats,false,'White patchwork style returned at '+name);
                   assert.ok(!state.scrollOverflow,'Overflow after Waymaking at '+name);
@@ -204,7 +207,9 @@ jobs:
                 assert.equal(back.roadVisibility,'visible');
                 assert.ok(Math.abs(back.road.top-entering.road.top)<1);
                 await jump(page,Math.max(0,firstDocY-160));
-                assert.equal((await snap(page)).roadVisibility,'hidden');
+                const returnedBefore=await snap(page);
+                assert.equal(returnedBefore.roadVisibility,'hidden');
+                assert.equal(returnedBefore.roadOpacity,0);
                 assert.deepEqual(exceptions,[],'No script exceptions');
                 console.log('PASS '+width+'px',JSON.stringify({
                   fixedTop:entering.road.top,chapterPositions:recorded.map(x=>x.road.top),
