@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"77bb9261","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"73c59797","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -38,7 +38,7 @@ for(const sentence of [
  "leave the world a little better than I found it."
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
-assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking narrative missing');
+assert.ok(thread.includes('aria-label="Waymaking"') && !thread.includes('id="waymaking-title"'),'Waymaking should continue without a visible section title');
 assert.ok(thread.includes("For me, that's what it means to be a <span>waymaker"),'Waymaker definition missing');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
@@ -63,9 +63,11 @@ assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('asci
 const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'));
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-v4b'),'Scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-v5b'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
-assert.ok(thread.includes('stroke-width="420"') && thread.includes('waymaking-brush-edge'),'Organic brush stroke filter and sufficient mask width missing');
+assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
+assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
+assert.ok(thread.includes('filterUnits="userSpaceOnUse" x="-180" y="-270" width="1100" height="1640"'),'Full brush filter region required to prevent hard clipping');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License') && license.includes('Copyright (c) 2026 nomagicln'),'MIT artwork source attribution missing');
@@ -73,10 +75,12 @@ assert.ok(html.includes("Where I'm putting that way of thinking to work today.")
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
-assert.ok(!css.slice(css.indexOf('/* Waymaking: compact editorial'),css.indexOf('.work-section--waymaking-output {')).includes('border-top:'),'Waymaking top/bottom separators must not return');
+assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate chapters on either side of centered road');
+assert.ok(css.includes('margin-inline: auto;') && css.includes('width: min(33.5%, 390px);'),'Centered ink road corridor missing');
+assert.ok(!css.slice(css.indexOf('/* Waymaking V5:'),css.indexOf('.work-section--waymaking-output {')).includes('border-top:'),'Waymaking top/bottom separators must not return');
 assert.ok(css.includes('linear-gradient(to right, transparent 0%'),'Mobile ink background fade missing');
 assert.ok(css.includes('.waymaking-road-art'),'Authored ink road artwork styling missing');
-assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h4>Purpose Driven</h4>'),'Purpose Driven should share competency typography');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven should share competency typography');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
@@ -89,7 +93,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-painted-v4a':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-centered-v5b':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

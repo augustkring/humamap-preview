@@ -464,133 +464,127 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   color: var(--copy);
 }
 
-/* Waymaking: compact editorial rhythm and brush-shaped scroll reveal. */
+/* Waymaking V5: centered fixed-in-view ink, alternating semantic story beats. */
 .home-main .thread-summary {
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
 }
-.home-main .thread-copy {
-  max-width: 620px;
-  padding-top: 0;
-}
-.home-main .thread-copy p {
-  line-height: 1.65;
-}
-.home-main .thread-copy p + p {
-  margin-top: 20px;
-}
+.home-main .thread-copy { max-width: 620px; padding-top: 0; }
+.home-main .thread-copy p { line-height: 1.65; }
+.home-main .thread-copy p + p { margin-top: 20px; }
+
 .waymaking-narrative {
   position: relative;
-  margin-top: clamp(76px, 8vw, 110px);
-  padding-top: clamp(24px, 3.2vw, 42px);
+  margin-top: clamp(48px, 5.5vw, 76px);
+  padding: 0;
 }
-.waymaking-intro {
-  margin: 0 0 clamp(24px, 3vw, 38px);
-  text-align: left;
-}
-.waymaking-eyebrow {
-  margin: 0 0 19px;
-  color: var(--red);
-  font: 700 12px/1.2 'AKFigtree', Arial, sans-serif;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-.waymaking-intro h3 {
-  margin: 0;
-  color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(38px, 4vw, 48px);
-  font-weight: 700;
-  line-height: 1.07;
-  letter-spacing: -.04em;
-}
-.waymaking-intro h3::after { content: '.'; }
 .waymaking-scene {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
-  column-gap: clamp(54px, 7vw, 100px);
-  align-items: stretch;
+  position: relative;
+  isolation: isolate;
 }
-.waymaking-copy-column { min-width: 0; }
+.waymaking-copy-column {
+  position: relative;
+  z-index: 1;
+}
 .waymaking-beat {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 34%) minmax(0, 1fr);
+  column-gap: clamp(12px, 1.5vw, 24px);
   align-items: center;
-  min-height: clamp(230px, 37vh, 340px);
-  padding: 24px 0;
+  min-height: clamp(240px, 38svh, 358px);
+  padding: 25px 0;
 }
 .waymaking-copy {
-  max-width: 440px;
   width: 100%;
+  max-width: 348px;
+  min-width: 0;
 }
-.waymaking-copy h4 {
+.waymaking-beat:nth-child(odd) .waymaking-copy {
+  grid-column: 1;
+  justify-self: end;
+  text-align: right;
+}
+.waymaking-beat:nth-child(even) .waymaking-copy {
+  grid-column: 3;
+  justify-self: start;
+  text-align: left;
+}
+.waymaking-copy h3 {
   margin: 0 0 13px;
   font-family: 'AKOutfit', Arial, sans-serif;
   color: var(--ink);
-  font-size: clamp(24px, 2.15vw, 28px);
+  font-size: clamp(23px, 2.05vw, 28px);
   font-weight: 700;
-  line-height: 1.14;
+  line-height: 1.15;
   letter-spacing: -.034em;
 }
 .waymaking-copy p {
   margin: 0;
   color: var(--copy);
   font-size: var(--body-copy-size);
-  line-height: 1.62;
+  line-height: 1.6;
+}
+.waymaking-copy .waymaking-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.waymaking-copy .waymaking-letter {
+  display: inline;
 }
 .waymaking-artspace {
-  position: relative;
-  min-width: 0;
-  align-self: stretch;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
   pointer-events: none;
 }
 .waymaking-road-wrap {
   position: sticky;
-  top: clamp(35px, 11vh, 110px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: min(76vh, 750px);
+  top: calc((100svh - min(72svh, 700px)) / 2);
+  width: min(33.5%, 390px);
+  height: min(72svh, 700px);
+  margin-inline: auto;
 }
-.waymaking-road-art {
+.waymaking-road-art,
+.waymaking-road-art img {
   display: block;
   width: 100%;
   height: 100%;
 }
 .waymaking-road-art img {
-  display: block;
-  width: 100%;
-  height: 100%;
   object-fit: contain;
   object-position: center;
 }
 .waymaking-paint-art {
-  display: none;
   position: absolute;
   inset: 0;
+  display: none;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
 .waymaking-resolution {
-  width: 100%;
-  margin: clamp(20px, 3vw, 36px) auto 0;
-  padding: clamp(24px, 3vw, 40px) 0 clamp(52px, 6vw, 76px);
-  text-align: left;
+  width: min(100%, 840px);
+  margin: 0 auto;
+  padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
+  text-align: center;
 }
 .waymaking-resolution::before { content: none; }
 .waymaking-resolution p {
-  max-width: 900px;
+  max-width: 840px;
   margin: 0;
   color: var(--ink);
   font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(24px, 2.5vw, 30px);
+  font-size: clamp(25px, 2.7vw, 34px);
   font-weight: 700;
   line-height: 1.24;
   letter-spacing: -.035em;
+  text-wrap: balance;
 }
 .waymaking-period { color: var(--red); }
-@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+
+/* Progressive enhancement only: the entire page remains readable without JS. */
+@media (prefers-reduced-motion: no-preference) {
   .waymaking-narrative[data-waymaking-painted="true"] .waymaking-road-art {
     visibility: hidden;
   }
@@ -602,20 +596,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-narrative[data-waymaking-complete="true"] .waymaking-road-art {
     visibility: visible;
-  }
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-copy h4 {
-    color: #5b6e80;
-    transition: color .33s ease;
-  }
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-copy p {
-    color: #526477;
-    transition: color .33s ease;
-  }
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-beat.is-current .waymaking-copy h4 {
-    color: var(--ink);
-  }
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-beat.is-current .waymaking-copy p {
-    color: var(--copy);
   }
 }
 .work-section--waymaking-output {
@@ -1671,19 +1651,21 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     gap: 24px;
   }
   .home-main .thread-copy { max-width: 680px; }
-  .waymaking-narrative {
-    margin-top: 70px;
-    padding-top: 28px;
+  .waymaking-narrative { margin-top: 38px; }
+  .waymaking-scene { position: relative; isolation: isolate; }
+  .waymaking-copy-column { position: relative; z-index: 1; }
+  .waymaking-beat {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: clamp(240px, 39svh, 350px);
+    padding: 32px 0;
   }
-  .waymaking-intro { margin-bottom: 24px; }
-  .waymaking-scene {
-    display: block;
-    position: relative;
-    isolation: isolate;
-  }
-  .waymaking-copy-column {
-    position: relative;
-    z-index: 1;
+  .waymaking-beat:nth-child(odd) .waymaking-copy,
+  .waymaking-beat:nth-child(even) .waymaking-copy {
+    width: min(100%, 440px);
+    max-width: 440px;
+    text-align: left;
   }
   .waymaking-artspace {
     position: absolute;
@@ -1693,60 +1675,34 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-wrap {
     position: sticky;
-    top: 14svh;
-    width: min(75vw, 350px);
-    height: min(70svh, 580px);
-    margin-left: auto;
-    margin-right: -12px;
-    display: block;
+    top: calc((100svh - min(68svh, 560px)) / 2);
+    width: min(100%, 360px);
+    height: min(68svh, 560px);
+    margin: 0 auto;
   }
-  .waymaking-road-art {
-    width: 100%;
-    height: 100%;
-    opacity: .13;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.4) 34%, #000 72%);
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.4) 34%, #000 72%);
+  .waymaking-road-art,
+  .waymaking-paint-art {
+    opacity: .28;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
   }
-  .waymaking-road-art img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .waymaking-paint-art { display: none !important; }
-  .waymaking-beat {
-    display: block;
-    min-height: 0;
-    padding: 29px 0 47px;
-  }
-  .waymaking-copy {
-    width: 100%;
-    max-width: 640px;
-  }
-  .waymaking-resolution {
-    margin-top: 0;
-    padding-top: 23px;
-  }
+  .waymaking-copy h3 { font-size: 26px; }
+  .waymaking-copy p { font-size: 18px; }
+  .waymaking-resolution { padding-top: 38px; }
 }
 @media (max-width: 600px) {
-  .waymaking-narrative {
-    margin-top: 60px;
-    padding-top: 18px;
-  }
-  .waymaking-intro h3 { font-size: 38px; }
-  .waymaking-eyebrow { margin-bottom: 14px; }
-  .waymaking-copy h4 { font-size: 24px; }
-  .waymaking-copy p { font-size: 17px; }
+  .waymaking-narrative { margin-top: 30px; }
   .waymaking-road-wrap {
-    top: 15svh;
-    width: min(83vw, 315px);
-    height: min(67svh, 520px);
+    top: calc((100svh - min(68svh, 540px)) / 2);
+    width: min(100%, 330px);
+    height: min(68svh, 540px);
   }
-  .waymaking-road-art { opacity: .115; }
-  .waymaking-beat { padding: 29px 0 53px; }
-  .waymaking-resolution {
-    padding-top: 23px;
-    padding-bottom: 66px;
-  }
+  .waymaking-road-art,
+  .waymaking-paint-art { opacity: .27; }
+  .waymaking-beat { min-height: clamp(250px, 40svh, 345px); padding: 32px 0; }
+  .waymaking-copy h3 { font-size: 24px; }
+  .waymaking-copy p { font-size: 17px; }
+  .waymaking-resolution { padding: 42px 0 68px; }
   .waymaking-resolution p { font-size: 26px; }
   .work-section--waymaking-output { padding-top: 54px; }
   .work-heading { align-items: flex-start; }
