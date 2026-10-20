@@ -1,7 +1,8 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * The ink starts alongside Creative Thinking and stays viewport-fixed. Scroll only changes
- * paint progress and readable color emphasis, never document position.
+ * The ink starts alongside Creative Thinking, is portaled directly to body,
+ * and stays viewport-fixed through the ENTIRE rest of the page. The only
+ * scroll-driven change is pigment reveal and chapter text focus.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -76,6 +77,8 @@
   const clearEnhancement = () => {
     delete story.dataset.waymakingPainted;
     delete story.dataset.waymakingComplete;
+    delete road.dataset.waymakingPainted;
+    delete road.dataset.waymakingComplete;
     brush.setAttribute('stroke-dashoffset', '1000');
     featherPaths.forEach(path => path.setAttribute('stroke-dashoffset', '1000'));
     beats.forEach(beat => beat.classList.remove('is-current'));
@@ -101,28 +104,25 @@
     return Math.min(entering, leaving);
   };
 
-  // Only Creative Thinking may activate the painting. Once activated,
-  // CSS fixes its screen position until the section's closing fade completes.
-  const updatePin = () => {
-    const height = window.innerHeight;
-    const titleTop = firstHeading.getBoundingClientRect().top;
-    const openingLine = startLine();
-    const conclusionTop = story.querySelector('.waymaking-resolution')
-      .getBoundingClientRect().top;
-    const exitStart = height * 0.91;
-    const exitEnd = height * 0.76;
+  // The artwork is a persistent viewport fixture, not a section-bound
+  // sticky element. Moving the existing DOM node directly under body keeps it
+  // out of Waymaking's clipping/stacking context and preserves the exact ink.
+  // This runs only with JS; the original in-flow artwork is the no-JS fallback.
+  road.dataset.waymakingViewport = 'true';
+  document.body.appendChild(road);
 
-    const fadeIn = clamp((openingLine - titleTop) / 68);
-    const fadeOut = clamp((conclusionTop - exitEnd) / (exitStart - exitEnd));
-    const active = titleTop < openingLine && conclusionTop > exitEnd;
+  // The ONLY visibility boundary is Creative Thinking at the precise
+  // art/heading alignment. Once crossed, the same road stays in the viewport
+  // through Purpose Driven, Waymaker, all subsequent sections and the footer.
+  // Scrolling back above Creative Thinking hides it again.
+  const updatePin = () => {
+    const active = firstHeading.getBoundingClientRect().top <= startLine();
     if (active) {
       story.dataset.waymakingPinned = 'true';
-      story.style.setProperty(
-        '--waymaking-pin-opacity', Math.min(fadeIn, fadeOut).toFixed(4)
-      );
+      document.body.dataset.waymakingRoadActive = 'true';
     } else {
       delete story.dataset.waymakingPinned;
-      story.style.removeProperty('--waymaking-pin-opacity');
+      delete document.body.dataset.waymakingRoadActive;
     }
   };
   const update = () => {
@@ -176,8 +176,14 @@
       path.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - partial))));
     });
     story.dataset.waymakingPainted = 'true';
-    if (revealed >= 0.999) story.dataset.waymakingComplete = 'true';
-    else delete story.dataset.waymakingComplete;
+    road.dataset.waymakingPainted = 'true';
+    if (revealed >= 0.999) {
+      story.dataset.waymakingComplete = 'true';
+      road.dataset.waymakingComplete = 'true';
+    } else {
+      delete story.dataset.waymakingComplete;
+      delete road.dataset.waymakingComplete;
+    }
 
     // Darker muted colors on mobile preserve paragraph contrast when ink sits
     // behind the words (normal body text stays above 4.5:1 even over the brush).
