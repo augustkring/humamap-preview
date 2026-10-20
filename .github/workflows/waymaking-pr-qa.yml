@@ -32,6 +32,7 @@ jobs:
             sleep 1
           done
           npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0 pngjs@7.0.0
+          /tmp/ak-browser-check/node_modules/.bin/playwright-core install ffmpeg
           chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$chrome"
           CHROME_BIN="$chrome" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
