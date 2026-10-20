@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"293e75ad","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"73c59797","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -67,6 +67,7 @@ assert.ok(html.includes('waymaking-scroll.js?v=20261020-v5a'),'Continuous scroll
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
+assert.ok(thread.includes('filterUnits="userSpaceOnUse" x="-180" y="-270" width="1100" height="1640"'),'Full brush filter region required to prevent hard clipping');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License') && license.includes('Copyright (c) 2026 nomagicln'),'MIT artwork source attribution missing');
