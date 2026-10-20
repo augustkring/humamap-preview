@@ -1726,10 +1726,14 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   transform: translateX(-50%);
   pointer-events: none;
   visibility: hidden;
-  opacity: var(--waymaking-handoff-opacity, 1);
+  /* visibility:hidden alone is insufficient: the completed child picture
+     declares visibility:visible. Ancestor opacity MUST be zero off-stage so
+     children cannot paint outside the five Waymaking chapters. */
+  opacity: 0;
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   visibility: visible;
+  opacity: var(--waymaking-handoff-opacity, 1);
 }
 /* Keep all foreground copy, cards and navigation above the persistent road. */
 .home-main,
