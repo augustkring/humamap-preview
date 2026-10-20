@@ -1,12 +1,11 @@
 /*
- * Waymaking road — continuous dry-brush texture mapped along the road.
+ * Waymaking road — continuous dry-brush texture warped along the road.
  *
  * Brush source: src/assets/ink/dry-brush.png from nomagicln/gomoko-must-win
- * (MIT, copyright 2026 nomagicln). The source is one long, transparent,
- * sumi-style dry-brush stroke. We crop its real alpha bounds, tint it to the
- * site's muted ink colour, then bend narrow sequential slices along each road
- * edge. The source texture is used once per edge, not tiled or repeatedly
- * stamped, so its real bristle fissures and pressure variation survive.
+ * (MIT, copyright 2026 nomagicln). The source is one long transparent
+ * sumi-style dry-brush stroke. Instead of stamping or slicing the texture,
+ * this renderer samples the original brush continuously along the road curve,
+ * preserving real fibres and pigment breaks without digital banding.
  *
  * No animation and no external runtime dependency.
  */
@@ -21,7 +20,7 @@
 
   const ink = { r: 67, g: 86, b: 108 }; // --muted
 
-  const cropAndTintBrush = image => {
+  const prepareBrush = image => {
     const source = document.createElement('canvas');
     source.width = image.naturalWidth;
     source.height = image.naturalHeight;
@@ -35,8 +34,6 @@
     let maxX = -1;
     let maxY = -1;
 
-    // This asset is dark ink on transparency. Measure effective pigment rather
-    // than raw alpha so faint transparent padding does not inflate the brush.
     for (let y = 0; y < source.height; y += 1) {
       for (let x = 0; x < source.width; x += 1) {
         const i = (y * source.width + x) * 4;
@@ -52,7 +49,7 @@
       }
     }
 
-    if (maxX < minX || maxY < minY) return source;
+    if (maxX < minX || maxY < minY) return null;
 
     const pad = 3;
     minX = Math.max(0, minX - pad);
@@ -62,267 +59,193 @@
 
     const width = maxX - minX + 1;
     const height = maxY - minY + 1;
-    const croppedData = sctx.getImageData(minX, minY, width, height);
-    const cd = croppedData.data;
+    const cropped = sctx.getImageData(minX, minY, width, height);
+    const cd = cropped.data;
+    const alphaField = new Float32Array(width * height);
 
-    for (let i = 0; i < cd.length; i += 4) {
+    for (let p = 0; p < width * height; p += 1) {
+      const i = p * 4;
       const alpha = cd[i + 3] / 255;
       const lum = (cd[i] + cd[i + 1] + cd[i + 2]) / (3 * 255);
-      const density = Math.pow(Math.max(0, alpha * (1 - lum)), 0.72);
-      cd[i] = ink.r;
-      cd[i + 1] = ink.g;
-      cd[i + 2] = ink.b;
-      cd[i + 3] = Math.round(Math.min(1, density) * 255);
+      alphaField[p] = Math.pow(Math.max(0, alpha * (1 - lum)), 0.72);
     }
 
-    const tinted = document.createElement('canvas');
-    tinted.width = width;
-    tinted.height = height;
-    const tctx = tinted.getContext('2d');
-    tctx.putImageData(croppedData, 0, 0);
-    return tinted;
+    return { width, height, alpha: alphaField };
   };
 
   const centreX = t =>
     0.50 +
-    0.27 * Math.sin(t * Math.PI * 2 - 0.66) +
-    0.055 * Math.sin(t * Math.PI * 4 + 0.34) +
-    0.014 * Math.sin(t * Math.PI * 6 + 1.04);
+    0.182 * Math.sin(t * Math.PI * 2 - 0.78) +
+    0.034 * Math.sin(t * Math.PI * 4 + 0.52);
 
   const halfRoad = t =>
-    0.16 +
-    0.016 * Math.sin(t * Math.PI * 2 + 0.85) +
-    0.007 * Math.sin(t * Math.PI * 5 - 0.35);
+    0.123 +
+    0.006 * Math.sin(t * Math.PI * 2 + 0.72);
 
-  const edgePoint = (t, side, w, h) => {
-    const independentWobble = side < 0
-      ? 0.018 * Math.sin(t * Math.PI * 6 + 0.32)
-      : 0.014 * Math.sin(t * Math.PI * 5 + 1.12);
-    return {
-      x: (centreX(t) + side * halfRoad(t) + independentWobble) * w,
-      y: t * h
-    };
+  const edgeX = (t, side) => {
+    const wobble = side < 0
+      ? 0.006 * Math.sin(t * Math.PI * 6 + 0.28) + 0.0027 * Math.sin(t * Math.PI * 10 + 0.48)
+      : 0.0055 * Math.sin(t * Math.PI * 6 + 1.62) + 0.0025 * Math.sin(t * Math.PI * 10 + 2.18);
+    return centreX(t) + side * halfRoad(t) + wobble;
   };
 
-  const centrePoint = (t, w, h) => ({
-    x: centreX(t) * w,
-    y: t * h
-  });
+  const sampleBrush = (brush, sx, sy) => {
+    if (sx < 0 || sy < 0 || sx >= brush.width - 1 || sy >= brush.height - 1) return 0;
 
-  const possibilityPoint = (t, side, w, h) => {
-    const local = Math.max(0, Math.min(1, (t - 0.055) / 0.19));
-    const ease = local * local * (3 - 2 * local);
-    const base = centrePoint(t, w, h);
-    const spread = side * ease * w * 0.24;
-    const wobble = Math.sin(local * Math.PI * 2 + (side < 0 ? 0.7 : 1.9)) * w * 0.012;
-    return { x: base.x + spread + wobble, y: base.y };
+    const x0 = Math.floor(sx);
+    const y0 = Math.floor(sy);
+    const x1 = x0 + 1;
+    const y1 = y0 + 1;
+    const fx = sx - x0;
+    const fy = sy - y0;
+    const row0 = y0 * brush.width;
+    const row1 = y1 * brush.width;
+    const a00 = brush.alpha[row0 + x0];
+    const a10 = brush.alpha[row0 + x1];
+    const a01 = brush.alpha[row1 + x0];
+    const a11 = brush.alpha[row1 + x1];
+    const top = a00 + (a10 - a00) * fx;
+    const bottom = a01 + (a11 - a01) * fx;
+    return top + (bottom - top) * fy;
   };
 
-
-  const tangentAngle = (pointFn, t, w, h) => {
-    const e = 0.0012;
-    const a = pointFn(Math.max(0, t - e), w, h);
-    const b = pointFn(Math.min(1, t + e), w, h);
-    return Math.atan2(b.y - a.y, b.x - a.x);
+  const compositeAlpha = (field, index, value) => {
+    field[index] = 1 - (1 - field[index]) * (1 - value);
   };
 
-  const drawBrushAlong = (
-    ctx,
+  const paintWarpedStroke = (
+    field,
     brush,
-    pointFn,
-    w,
-    h,
+    width,
+    height,
     {
+      pointX,
       t0 = 0,
       t1 = 1,
-      source0 = 0.035,
-      source1 = 0.965,
+      source0 = 0.02,
+      source1 = 0.98,
       reverse = false,
       thickness,
-      alpha,
-      normalOffset = 0,
+      opacity,
       phase = 0
     }
   ) => {
-    const targetLength = Math.max(1, (t1 - t0) * h * 1.06);
-    const stepPx = Math.max(11, Math.min(15, w * 0.095));
-    const steps = Math.max(12, Math.ceil(targetLength / stepPx));
-    const sourceSpan = Math.max(0.01, source1 - source0);
-    const sourceStep = sourceSpan * brush.width / steps;
-    const targetSliceLength = targetLength / steps * 1.24;
-    const sourceSliceWidth = Math.max(12, sourceStep * 1.48);
+    const yStart = Math.max(0, Math.floor(t0 * (height - 1)));
+    const yEnd = Math.min(height - 1, Math.ceil(t1 * (height - 1)));
+    const radius = Math.ceil(thickness * 0.72);
 
-    for (let i = 0; i <= steps; i += 1) {
-      const u = i / steps;
-      const t = t0 + (t1 - t0) * u;
+    for (let y = yStart; y <= yEnd; y += 1) {
+      const t = y / (height - 1);
+      const u = Math.max(0, Math.min(1, (t - t0) / Math.max(0.0001, t1 - t0)));
       const sourceU = reverse
-        ? source1 - sourceSpan * u
-        : source0 + sourceSpan * u;
+        ? source1 - (source1 - source0) * u
+        : source0 + (source1 - source0) * u;
+      const sx = sourceU * (brush.width - 1);
+      const cx = pointX(t) * width;
+      const pressure = 0.94 + 0.06 * Math.sin(t * Math.PI * 3.4 + phase);
+      const localThickness = thickness * pressure;
 
-      let sx = sourceU * brush.width - sourceSliceWidth * 0.5;
-      sx = Math.max(0, Math.min(brush.width - sourceSliceWidth, sx));
-
-      const p = pointFn(t, w, h);
-      const angle = tangentAngle(pointFn, t, w, h);
-      const normal = angle + Math.PI / 2;
-      const micro = Math.sin((i + phase) * 0.37) * 0.34;
-      const pressure = 0.94 + 0.075 * Math.sin((i + phase) * 0.11);
-
-      ctx.save();
-      ctx.translate(
-        p.x + Math.cos(normal) * (normalOffset + micro),
-        p.y + Math.sin(normal) * (normalOffset + micro)
-      );
-      ctx.rotate(angle);
-      ctx.globalAlpha = alpha;
-      ctx.drawImage(
-        brush,
-        sx,
-        0,
-        sourceSliceWidth,
-        brush.height,
-        -targetSliceLength * 0.5,
-        -thickness * pressure * 0.5,
-        targetSliceLength,
-        thickness * pressure
-      );
-      ctx.restore();
+      for (let x = Math.max(0, Math.floor(cx - radius)); x <= Math.min(width - 1, Math.ceil(cx + radius)); x += 1) {
+        const sy = (brush.height - 1) * 0.5 + (x - cx) * ((brush.height - 1) / localThickness);
+        const pigment = sampleBrush(brush, sx, sy);
+        if (pigment <= 0.001) continue;
+        compositeAlpha(field, y * width + x, Math.min(1, pigment * opacity));
+      }
     }
   };
 
-  const paintRoad = (ctx, brush, w, h) => {
-    const edgeThickness = Math.max(9.5, Math.min(23, w * 0.155));
+  const paintRoad = (field, brush, width, height) => {
+    const edgeThickness = Math.max(16, Math.min(28, width * 0.105));
 
-    drawBrushAlong(
-      ctx,
-      brush,
-      (t, ww, hh) => edgePoint(t, -1, ww, hh),
-      w,
-      h,
-      {
-        reverse: false,
-        thickness: edgeThickness,
-        alpha: 0.205,
-        normalOffset: -0.35,
-        phase: 11
-      }
-    );
+    paintWarpedStroke(field, brush, width, height, {
+      pointX: t => edgeX(t, -1),
+      reverse: false,
+      thickness: edgeThickness,
+      opacity: 0.37,
+      phase: 0.28
+    });
 
-    drawBrushAlong(
-      ctx,
-      brush,
-      (t, ww, hh) => edgePoint(t, 1, ww, hh),
-      w,
-      h,
-      {
-        reverse: true,
-        thickness: edgeThickness * 0.96,
-        alpha: 0.195,
-        normalOffset: 0.45,
-        phase: 47
-      }
-    );
-
+    paintWarpedStroke(field, brush, width, height, {
+      pointX: t => edgeX(t, 1),
+      reverse: true,
+      thickness: edgeThickness * 0.94,
+      opacity: 0.35,
+      phase: 1.62
+    });
   };
 
-  const paintPossibilityBranches = (ctx, brush, w, h) => {
-    if (w < 90) return;
-
-    const thickness = Math.max(6.5, Math.min(13.5, w * 0.085));
-    for (const side of [-1, 1]) {
-      drawBrushAlong(
-        ctx,
-        brush,
-        (t, ww, hh) => possibilityPoint(t, side, ww, hh),
-        w,
-        h,
-        {
-          t0: 0.055,
-          t1: 0.245,
-          source0: side < 0 ? 0.13 : 0.58,
-          source1: side < 0 ? 0.30 : 0.76,
-          reverse: side > 0,
-          thickness,
-          alpha: 0.105,
-          normalOffset: side * 0.2,
-          phase: side < 0 ? 61 : 83
-        }
-      );
-    }
-  };
-
-
-  const paintCentreMarks = (ctx, brush, w, h) => {
+  const paintCentreMarks = (field, brush, width, height) => {
     const ranges = [
-      [0.065, 0.103],
-      [0.205, 0.243],
-      [0.347, 0.386],
-      [0.492, 0.530],
-      [0.638, 0.676],
-      [0.782, 0.820],
-      [0.912, 0.950]
+      [0.065, 0.105],
+      [0.194, 0.235],
+      [0.325, 0.366],
+      [0.458, 0.500],
+      [0.594, 0.635],
+      [0.728, 0.770],
+      [0.864, 0.905]
     ];
-    const thickness = Math.max(3.6, Math.min(6.2, w * 0.041));
+    const thickness = Math.max(7, Math.min(12, width * 0.040));
 
     ranges.forEach(([a, b], index) => {
-      const sourceStart = 0.24 + (index % 4) * 0.11;
-      drawBrushAlong(
-        ctx,
-        brush,
-        centrePoint,
-        w,
-        h,
-        {
-          t0: a,
-          t1: b,
-          source0: sourceStart,
-          source1: Math.min(0.90, sourceStart + 0.18),
-          reverse: index % 2 === 1,
-          thickness,
-          alpha: 0.245,
-          normalOffset: (index % 2 ? 0.3 : -0.25),
-          phase: 17 + index * 13
-        }
-      );
+      paintWarpedStroke(field, brush, width, height, {
+        pointX: t => centreX(t) + 0.0017 * Math.sin(t * Math.PI * 8 + index * 0.83),
+        t0: a,
+        t1: b,
+        source0: 0.18,
+        source1: 0.78,
+        reverse: index % 2 === 1,
+        thickness,
+        opacity: 0.31,
+        phase: index * 0.7
+      });
     });
   };
 
   const render = brush => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width < 1 || rect.height < 1) return;
+    if (!brush || rect.width < 1 || rect.height < 1) return;
 
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const width = Math.round(rect.width * dpr);
-    const height = Math.round(rect.height * dpr);
+    // 1.5x is enough to retain real fibre detail at the rendered size while
+    // avoiding unnecessary multi-megapixel work on every responsive reflow.
+    const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    const width = Math.max(1, Math.round(rect.width * dpr));
+    const height = Math.max(1, Math.round(rect.height * dpr));
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
 
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-    ctx.scale(dpr, dpr);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    const alphaField = new Float32Array(width * height);
+    paintRoad(alphaField, brush, width, height);
+    paintCentreMarks(alphaField, brush, width, height);
 
-    paintPossibilityBranches(ctx, brush, rect.width, rect.height);
-    paintRoad(ctx, brush, rect.width, rect.height);
-    paintCentreMarks(ctx, brush, rect.width, rect.height);
+    const ctx = canvas.getContext('2d');
+    const image = ctx.createImageData(width, height);
+    const out = image.data;
+
+    for (let p = 0; p < alphaField.length; p += 1) {
+      const i = p * 4;
+      out[i] = ink.r;
+      out[i + 1] = ink.g;
+      out[i + 2] = ink.b;
+      out[i + 3] = Math.round(Math.min(1, alphaField[p]) * 255);
+    }
+
+    ctx.putImageData(image, 0, 0);
 
     canvas.dataset.paintReady = 'true';
     canvas.dataset.brushMaterial = 'continuous-dry-ink';
-    canvas.dataset.brushVersion = 'v4-story-curve';
+    canvas.dataset.brushVersion = 'v5-continuous-warp';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 
   brushImage.addEventListener('load', () => {
-    const tinted = cropAndTintBrush(brushImage);
-    requestAnimationFrame(() => render(tinted));
+    const brush = prepareBrush(brushImage);
+    requestAnimationFrame(() => render(brush));
 
     if ('ResizeObserver' in window) {
       let raf = 0;
       const observer = new ResizeObserver(() => {
         cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => render(tinted));
+        raf = requestAnimationFrame(() => render(brush));
       });
       observer.observe(canvas);
     }

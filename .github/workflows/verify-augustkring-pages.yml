@@ -62,7 +62,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-ink-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261020-dry-ink-v4' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261020-dry-ink-v5' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -82,18 +82,15 @@ jobs:
           grep -Fq '.waymaking-road-fallback-svg' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-dry-ink-v4" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-dry-ink-v5" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "nomagicln/gomoko-must-win" /tmp/augustkring-waymaking-brush.js
           grep -Fq "assets/waymaking-dry-brush.png?v=20261020-ink-v1" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "cropAndTintBrush" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "drawBrushAlong" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "paintPossibilityBranches" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "0.27 * Math.sin" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "alpha: 0.245" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "prepareBrush" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "sampleBrush" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "paintWarpedStroke" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "v5-continuous-warp" /tmp/augustkring-waymaking-brush.js
           grep -Fq "continuous-dry-ink" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "v4-story-curve" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "Math.min(23, w * 0.155)" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "w * 0.095" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "v5-continuous-warp" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "A restrained pigment ghost" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "3_rake.png" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
@@ -279,7 +276,7 @@ jobs:
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.paintReady,true,'MIT dry-brush canvas must render');
                 assert.equal(waymakingLayout.brushMaterial,'continuous-dry-ink','Road must use continuous dry-ink texture mapping');
-                assert.equal(waymakingLayout.brushVersion,'v4-story-curve','Road must preserve wide-slice dry-brush rendering');
+                assert.equal(waymakingLayout.brushVersion,'v5-continuous-warp','Road must preserve wide-slice dry-brush rendering');
                 assert.ok(waymakingLayout.canvasWidth>=40 && waymakingLayout.canvasHeight>1000,'Dry-brush canvas has real render resolution');
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after dry-brush painting');
                 assert.equal(waymakingLayout.obsoleteVectorBrush,false,'Obsolete vector brush paths must not return');
