@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261020-waymaking-brush-v2">
+  <link rel="stylesheet" href="styles.css?v=20261020-waymaking-editorial-v3">
 
   <script type="application/ld+json">
   {
@@ -175,66 +175,70 @@
       <div class="thread-summary">
         <div class="thread-lead">
           <h2 id="thread-title">Where I add value</h2>
-          <p>I do my best work in the early stages, when a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.</p>
         </div>
-
         <div class="thread-copy">
+          <p>I do my best work in the early stages, when a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.</p>
           <p>I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.</p>
           <p>What drives me is the desire to build towards a positive future, together with bold people, create things that matter and leave the world a little better than I found it.</p>
         </div>
       </div>
 
-      <section class="waymaking-narrative" aria-labelledby="waymaking-title">
+      <section class="waymaking-narrative" aria-labelledby="waymaking-title" data-waymaking-story>
         <header class="waymaking-intro">
+          <p class="waymaking-eyebrow">The way I work</p>
           <h3 id="waymaking-title">Waymaking</h3>
         </header>
 
-        <div class="waymaking-beats">
-          <div class="waymaking-road-wrap" aria-hidden="true">
-            <picture class="waymaking-road-art">
-              <source media="(max-width: 900px)" srcset="assets/waymaking-ink-road-brush-mobile.png">
-              <img src="assets/waymaking-ink-road-brush.png" alt="" width="504" height="4920" loading="lazy" decoding="async">
-            </picture>
+        <div class="waymaking-scene" data-waymaking-scene>
+          <div class="waymaking-copy-column">
+            <article class="waymaking-beat">
+              <div class="waymaking-copy">
+                <h4>Creative Thinking</h4>
+                <p>I work best before the answer is obvious. I question assumptions, explore different angles and look for ideas that are worth testing.</p>
+              </div>
+            </article>
+
+            <article class="waymaking-beat">
+              <div class="waymaking-copy">
+                <h4>Commercial Understanding</h4>
+                <p>I understand what an idea needs to become a viable business. I look at the customers, the market, the economics and what would make people choose it.</p>
+              </div>
+            </article>
+
+            <article class="waymaking-beat">
+              <div class="waymaking-copy">
+                <h4>Strategic Judgment</h4>
+                <p>I help choose a direction before everything is figured out. That means deciding what matters, what can wait and getting people behind a shared goal.</p>
+              </div>
+            </article>
+
+            <article class="waymaking-beat">
+              <div class="waymaking-copy">
+                <h4>AI-Native Building</h4>
+                <p>I can take an idea from words to something that works. I experiment, prototype and build products and systems myself, with AI as part of how I work.</p>
+              </div>
+            </article>
+
+            <article class="waymaking-beat waymaking-purpose">
+              <div class="waymaking-copy">
+                <h4>Purpose</h4>
+                <p>I want to build things that work commercially and make a positive difference. Not just for the business, but for the people it serves and the world around us.</p>
+              </div>
+            </article>
           </div>
 
-          <div class="waymaking-beat waymaking-beat--left">
-            <div class="waymaking-copy">
-              <h4>Creative Thinking</h4>
-              <p>I like questioning the obvious answer and looking at a problem from different angles. Early on, the most useful thing is often to see more possibilities before deciding which one to pursue.</p>
-            </div>
-          </div>
-
-          <div class="waymaking-beat waymaking-beat--right">
-            <div class="waymaking-copy">
-              <h4>Commercial Understanding</h4>
-              <p>A good idea needs a real reason to exist. Who needs it? What would make someone choose it? Can the numbers work? I ask those questions early, before we spend time building the wrong thing.</p>
-            </div>
-          </div>
-
-          <div class="waymaking-beat waymaking-beat--left">
-            <div class="waymaking-copy">
-              <h4>Strategic Judgment</h4>
-              <p>When the options are clear, I help choose a direction and bring people together around it. What matters most? What can wait? Good decisions move us forward while keeping us open to better ones.</p>
-            </div>
-          </div>
-
-          <div class="waymaking-beat waymaking-beat--right waymaking-beat--building">
-            <div class="waymaking-copy">
-              <h4>AI-Native Building</h4>
-              <p>I like getting close to the work and building things myself. AI lets me move from an idea to a prototype, product or working system faster. Then I can test what works and improve it with real feedback.</p>
-            </div>
-          </div>
-
-          <div class="waymaking-purpose">
-            <div class="waymaking-purpose-copy">
-              <h4>Purpose</h4>
-              <p>I want the work to make a difference. A business can succeed commercially and still do something good for people and the world around it. Those are the opportunities I want to work on.</p>
+          <div class="waymaking-artspace" aria-hidden="true">
+            <div class="waymaking-road-wrap">
+              <picture class="waymaking-road-art">
+                <source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">
+                <img src="assets/waymaking-ink-road-brush.png" width="720" height="1080" alt="" loading="lazy" decoding="async">
+              </picture>
             </div>
           </div>
         </div>
 
         <div class="waymaking-resolution">
-          <h3>For me, that is what it means to be a waymaker.</h3>
+          <p>For me, that's what it means to be a <span>waymaker<span class="waymaking-period">.</span></span></p>
         </div>
       </section>
 
@@ -370,6 +374,7 @@
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
+  <script src="waymaking-scroll.js?v=20261020-v3" defer></script>
   <script src="work-carousel.js" defer></script>
   <script src="mobile-nav.js?v=20261009-input-focus-v4" defer></script>
 </body>
