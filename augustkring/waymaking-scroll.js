@@ -15,6 +15,7 @@
   if (!story || !scene || !brush || !picture || beats.length !== 5 || featherPaths.length !== 7) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const narrow = window.matchMedia('(max-width: 900px)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
   const smooth = x => { const v = clamp(x); return v * v * (3 - 2 * v); };
   const dimTitle = [92, 107, 122];
@@ -130,17 +131,21 @@
     if (revealed >= 0.999) story.dataset.waymakingComplete = 'true';
     else delete story.dataset.waymakingComplete;
 
+    // Darker muted colors on mobile preserve paragraph contrast when ink sits
+    // behind the words (normal body text stays above 4.5:1 even over the brush).
+    const fromHeading = narrow.matches ? [55, 75, 94] : dimTitle;
+    const fromBody = narrow.matches ? [45, 63, 83] : dimBody;
     for (let i = 0; i < labels.length; i++) {
       const item = labels[i];
       const n = item.spans.length;
       for (let j = 0; j < n; j++) {
         const ink = letterWeight(phase, i, j, n);
-        const color = blend(dimTitle, activeTitle, ink);
+        const color = blend(fromHeading, activeTitle, ink);
         if (item.spans[j].style.color !== color) item.spans[j].style.color = color;
       }
       // Body text has a gentler, still high-contrast transition.
       const weight = smooth(1 - Math.abs(phase - i));
-      const bodyColor = blend(dimBody, activeBody, weight);
+      const bodyColor = blend(fromBody, activeBody, weight);
       if (item.paragraph.style.color !== bodyColor) item.paragraph.style.color = bodyColor;
       beats[i].classList.toggle('is-current', Math.round(phase) === i);
     }
@@ -153,6 +158,7 @@
   addEventListener('resize', requestUpdate, { passive: true });
   addEventListener('pageshow', requestUpdate);
   reduced.addEventListener('change', requestUpdate);
+  narrow.addEventListener('change', requestUpdate);
   picture.addEventListener('load', requestUpdate);
   requestUpdate();
 })();
