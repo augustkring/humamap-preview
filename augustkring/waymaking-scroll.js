@@ -10,8 +10,9 @@
   const scene = story?.querySelector('[data-waymaking-scene]');
   const brush = scene?.querySelector('[data-waymaking-paint-path]');
   const picture = scene?.querySelector('.waymaking-road-art img');
+  const featherPaths = scene ? [...scene.querySelectorAll('[data-waymaking-feather]')] : [];
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
-  if (!story || !scene || !brush || !picture || beats.length !== 5) return;
+  if (!story || !scene || !brush || !picture || beats.length !== 5 || featherPaths.length !== 7) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
@@ -62,6 +63,7 @@
     delete story.dataset.waymakingPainted;
     delete story.dataset.waymakingComplete;
     brush.setAttribute('stroke-dashoffset', '1000');
+    featherPaths.forEach(path => path.setAttribute('stroke-dashoffset', '1000'));
     beats.forEach(beat => beat.classList.remove('is-current'));
     if (!enhanced) return;
     for (const item of labels) {
@@ -114,7 +116,16 @@
 
     const fraction = phase / (beats.length - 1);
     const revealed = clamp(0.025 + fraction * 0.975);
-    brush.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - revealed))));
+    // A fully opaque stroke paints the completed route. Seven increasingly
+    // transparent brush layers feather the moving tip into the white paper.
+    // This avoids the abrupt flat cut visible in the earlier single cap.
+    const frontLength = Math.min(revealed, 0.11);
+    const solid = revealed - frontLength;
+    brush.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - solid))));
+    featherPaths.forEach((path, index) => {
+      const partial = solid + frontLength * ((index + 1) / featherPaths.length);
+      path.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - partial))));
+    });
     story.dataset.waymakingPainted = 'true';
     if (revealed >= 0.999) story.dataset.waymakingComplete = 'true';
     else delete story.dataset.waymakingComplete;
