@@ -1,7 +1,7 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * CSS sticky holds the existing ink artwork in the viewport. Scroll only
- * changes paint progress and readable color emphasis, never document position.
+ * A viewport pin holds the ink artwork completely still. Scroll only changes
+ * paint progress and readable color emphasis, never document position.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -88,8 +88,39 @@
     return Math.min(entering, leaving);
   };
 
+  // A sticky child is bounded by its containing block and eventually slides
+  // away. Pin the existing ink image to the viewport instead, for the whole
+  // Waymaking narrative including its concluding statement. Fade it out before
+  // unpinning, so the user never sees the road move with the document.
+  const updatePin = () => {
+    const rect = story.getBoundingClientRect();
+    const height = window.innerHeight;
+    const entranceStart = height * 0.92;
+    const entranceEnd = height * 0.63;
+    const exitStart = height * 0.46;
+    const exitEnd = height * 0.12;
+
+    const fadeIn = clamp(
+      (entranceStart - rect.top) / (entranceStart - entranceEnd)
+    );
+    const fadeOut = clamp(
+      (rect.bottom - exitEnd) / (exitStart - exitEnd)
+    );
+    const opacity = Math.min(fadeIn, fadeOut);
+    const active = rect.top < entranceStart && rect.bottom > exitEnd;
+
+    if (active) {
+      story.dataset.waymakingPinned = 'true';
+      story.style.setProperty('--waymaking-pin-opacity', opacity.toFixed(4));
+    } else {
+      delete story.dataset.waymakingPinned;
+      story.style.removeProperty('--waymaking-pin-opacity');
+    }
+  };
+
   const update = () => {
     frame = 0;
+    updatePin();
     // If AVIF cannot load inside SVG, preserve the static matching WebP.
     if (reduced.matches || !picture.currentSrc.endsWith('.avif')) {
       clearEnhancement();
@@ -162,5 +193,8 @@
   reduced.addEventListener('change', requestUpdate);
   narrow.addEventListener('change', requestUpdate);
   picture.addEventListener('load', requestUpdate);
+  // Only JavaScript-enhanced sessions hide the off-stage illustration;
+  // no-JavaScript visitors retain the original static document rendering.
+  story.dataset.waymakingReady = 'true';
   requestUpdate();
 })();
