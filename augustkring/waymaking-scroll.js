@@ -1,8 +1,9 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * The ink starts alongside Creative Thinking, is portaled directly to body,
- * and stays viewport-fixed through the ENTIRE rest of the page. The only
- * scroll-driven change is pigment reveal and chapter text focus.
+ * The ink starts alongside Creative Thinking, is portaled directly under body,
+ * stays physically fixed throughout the FIVE WAYMAKING CHAPTERS, and leaves
+ * during the blank transition before the centered Waymaker conclusion.
+ * Scroll changes the painted trail and text emphasis, never the road position.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -16,8 +17,10 @@
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
   const firstHeading = beats[0]?.querySelector('h3');
   const lastHeading = beats[beats.length - 1]?.querySelector('h3');
+  const conclusion = story?.querySelector('.waymaking-resolution');
   if (!story || !scene || !road || !brush || !picture || !firstHeading ||
-      !lastHeading || beats.length !== 5 || featherPaths.length !== 7) return;
+      !lastHeading || !conclusion || beats.length !== 5 ||
+      featherPaths.length !== 7) return;
 
   // Use the SAME CSS-derived viewport position on desktop and mobile.
   // The painting begins 16px above Creative Thinking when its title reaches
@@ -58,7 +61,9 @@
           continue;
         }
         const word = document.createElement('span');
-        word.className = 'waymaking-word';
+        // A separate class is crucial. The Waymaking Ventures logo also
+        // uses "waymaking-word" and gives it a fixed 32px font size.
+        word.className = 'waymaking-heading-word';
         word.setAttribute('aria-hidden', 'true');
         for (const glyph of Array.from(token)) {
           const letter = document.createElement('span');
@@ -111,18 +116,30 @@
   road.dataset.waymakingViewport = 'true';
   document.body.appendChild(road);
 
-  // The ONLY visibility boundary is Creative Thinking at the precise
-  // art/heading alignment. Once crossed, the same road stays in the viewport
-  // through Purpose Driven, Waymaker, all subsequent sections and the footer.
-  // Scrolling back above Creative Thinking hides it again.
+  // The fixed position is never changed by JavaScript. The road is active
+  // ONLY across the five skill chapters, not under the rest of the website.
+  // Finish the brush before the blank handoff, then release it without motion
+  // before the centered Waymaker sentence comes into view. The scroll position
+  // defines both boundaries, so scrolling back is deterministic.
   const updatePin = () => {
-    const active = firstHeading.getBoundingClientRect().top <= startLine();
-    if (active) {
+    const height = window.innerHeight;
+    const startReached = firstHeading.getBoundingClientRect().top <= startLine();
+    const conclusionTop = conclusion.getBoundingClientRect().top;
+    const fadeStart = height * 0.98;
+    const fadeEnd = height * 0.80;
+    const departure = smooth((fadeStart - conclusionTop) /
+      Math.max(1, fadeStart - fadeEnd));
+    const opacity = 1 - departure;
+    const withinStory = startReached && conclusionTop > fadeEnd;
+
+    if (withinStory) {
       story.dataset.waymakingPinned = 'true';
       document.body.dataset.waymakingRoadActive = 'true';
+      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
     } else {
       delete story.dataset.waymakingPinned;
       delete document.body.dataset.waymakingRoadActive;
+      road.style.removeProperty('--waymaking-handoff-opacity');
     }
   };
   const update = () => {
