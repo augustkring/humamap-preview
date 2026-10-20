@@ -64,7 +64,7 @@ const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'))
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
 assert.ok(thread.includes('loading="eager" fetchpriority="low"'),'Ink must start loaded while its parent is visually hidden');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-waymaking-scoped-v9'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-top-pin-v10'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -86,7 +86,10 @@ const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('document.body.appendChild(road)'),'Painting must be portaled outside scrolling/overflow containers');
 assert.ok(scrollController.includes("document.body.dataset.waymakingRoadActive = 'true'"),'Body road activation missing');
 assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes('firstHeading.getBoundingClientRect().top <= startLine()'),'Creative Thinking start controller missing');
-assert.ok(scrollController.includes('const startLine = () => pinTop() + 16;') && scrollController.includes('firstHeading.getBoundingClientRect().top <= startLine()'),'Start aligned to first heading and fixed art top');
+assert.ok(scrollController.includes('const PIN_TOP = 16;') && scrollController.includes('const startLine = () => Math.min(window.innerHeight * 0.38, 360);'),'Road must enter alongside Creative Thinking and pin at viewport top');
+assert.ok(scrollController.includes('const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);'),'Road must scroll UP to the pinned top, never teleport to the viewport center');
+assert.ok(css.includes('top: var(--waymaking-viewport-top, 16px);'),'Fixed road CSS must use true top pin coordinate, never center-of-viewport');
+assert.ok(!css.includes('body > .waymaking-road-wrap[data-waymaking-viewport="true"] {\n  position: fixed;\n  z-index: 0;\n  top: calc('),'Center-viewport pin must not return');
 assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Painting progress not aligned to Creative Thinking');
 assert.ok(scrollController.includes("const conclusionTop = conclusion.getBoundingClientRect().top"),'Waymaking exit must be tied to signoff, not page bottom');
 assert.ok(scrollController.includes("const withinStory = startReached && conclusionTop > fadeEnd"),'Road must stop at end of Waymaking chapters');
@@ -113,7 +116,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-scoped-v9':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-top-pinned-v10':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
