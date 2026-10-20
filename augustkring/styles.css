@@ -525,9 +525,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   font-size: var(--body-copy-size);
   line-height: 1.6;
 }
-.waymaking-copy .waymaking-word {
+.waymaking-copy .waymaking-heading-word {
   display: inline-block;
   white-space: nowrap;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
 }
 .waymaking-copy .waymaking-letter {
   display: inline;
@@ -1723,7 +1726,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   transform: translateX(-50%);
   pointer-events: none;
   visibility: hidden;
-  opacity: 1;
+  opacity: var(--waymaking-handoff-opacity, 1);
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   visibility: visible;
@@ -1734,57 +1737,8 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   position: relative;
   z-index: 1;
 }
-/* Feathered reading surfaces must not create horizontal page scrolling. The
-   artwork itself is already portaled directly to body and is unaffected. */
-body[data-waymaking-road-active="true"] .home-main {
-  overflow-x: clip;
-}
-/* Readable foreground on desktop without a solid white rectangle cutting
-   across the black brush. The painting is still completely fixed and opaque;
-   only stationary content has a soft paper-white reading surface behind it. */
-@media (min-width: 901px) {
-  body[data-waymaking-road-active="true"] .waymaking-resolution p,
-  body[data-waymaking-road-active="true"] .work-heading-copy,
-  body[data-waymaking-road-active="true"] .perspective-lead,
-  body[data-waymaking-road-active="true"] .perspective-copy,
-  body[data-waymaking-road-active="true"] .perspective-link,
-  body[data-waymaking-road-active="true"] .homepage-contact-invite,
-  body[data-waymaking-road-active="true"] .homepage-contact-signoff {
-    position: relative;
-    z-index: 1;
-    isolation: isolate;
-  }
-  body[data-waymaking-road-active="true"] .waymaking-resolution p::before,
-  body[data-waymaking-road-active="true"] .work-heading-copy::before,
-  body[data-waymaking-road-active="true"] .perspective-lead::before,
-  body[data-waymaking-road-active="true"] .perspective-copy::before,
-  body[data-waymaking-road-active="true"] .perspective-link::before,
-  body[data-waymaking-road-active="true"] .homepage-contact-invite::before,
-  body[data-waymaking-road-active="true"] .homepage-contact-signoff::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: -90px -110px;
-    pointer-events: none;
-    background: linear-gradient(to bottom,
-      transparent 0%, var(--page) 15%, var(--page) 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right,
-      transparent 0%, #000 13%, #000 87%, transparent 100%);
-    mask-image: linear-gradient(to right,
-      transparent 0%, #000 13%, #000 87%, transparent 100%);
-  }
-  /* A centered single-line conclusion needs a longer, smoother paper fade.
-     Otherwise its narrow reading matte cuts the ink like a horizontal stripe. */
-  body[data-waymaking-road-active="true"] .waymaking-resolution p::before {
-    inset: -175px -155px;
-    background: linear-gradient(to bottom,
-      transparent 0%, var(--page) 37%, var(--page) 63%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right,
-      transparent 0%, #000 18%, #000 82%, transparent 100%);
-    mask-image: linear-gradient(to right,
-      transparent 0%, #000 18%, #000 82%, transparent 100%);
-  }
-}
+/* No artificial paper mattes or overflow clipping elsewhere on the page.
+   The ink is only active over its own five-chapter narrative. */
 /* These selectors target the body-level graphic, not the Waymaking section. */
 @media (prefers-reduced-motion: no-preference) {
   body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-road-art {
@@ -1798,6 +1752,11 @@ body[data-waymaking-road-active="true"] .home-main {
   }
   body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-paint-art {
     display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    opacity: 1;
   }
 }
 @media (max-width: 900px) {
