@@ -1682,7 +1682,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-art,
   .waymaking-paint-art {
-    opacity: .25;
+    opacity: .28;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
     mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
   }
@@ -1698,7 +1698,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     height: min(68svh, 540px);
   }
   .waymaking-road-art,
-  .waymaking-paint-art { opacity: .24; }
+  .waymaking-paint-art { opacity: .27; }
   .waymaking-beat { min-height: clamp(250px, 40svh, 345px); padding: 32px 0; }
   .waymaking-copy h3 { font-size: 24px; }
   .waymaking-copy p { font-size: 17px; }
