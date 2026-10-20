@@ -1773,6 +1773,17 @@ body[data-waymaking-road-active="true"] .home-main {
     mask-image: linear-gradient(to right,
       transparent 0%, #000 13%, #000 87%, transparent 100%);
   }
+  /* A centered single-line conclusion needs a longer, smoother paper fade.
+     Otherwise its narrow reading matte cuts the ink like a horizontal stripe. */
+  body[data-waymaking-road-active="true"] .waymaking-resolution p::before {
+    inset: -175px -155px;
+    background: linear-gradient(to bottom,
+      transparent 0%, var(--page) 37%, var(--page) 63%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+      transparent 0%, #000 18%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to right,
+      transparent 0%, #000 18%, #000 82%, transparent 100%);
+  }
 }
 /* These selectors target the body-level graphic, not the Waymaking section. */
 @media (prefers-reduced-motion: no-preference) {
