@@ -263,7 +263,7 @@ jobs:
                 if(record){
                   // Render a real multi-second screen recording rather than
                   // trusting static checkpoints of this scroll experience.
-                  await go(page,target.start-110);
+                  await jump(page,firstDocY-110);
                   await page.evaluate(({from,to})=>new Promise(resolve=>{
                     let began;
                     const tick=now=>{
@@ -274,7 +274,7 @@ jobs:
                       else resolve();
                     };
                     requestAnimationFrame(tick);
-                  }),{from:target.start-110,to:target.outro-900*.62});
+                  }),{from:firstDocY-110,to:conclusionY-900*.62});
                   await pause(220);
                 }
                 await page.close();
