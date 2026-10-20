@@ -43,8 +43,8 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-waymaking-scoped-v9"
-          expected_road_js="waymaking-scroll.js?v=20261020-waymaking-scoped-v9"
+          expected_home="styles.css?v=20261020-waymaking-top-pinned-v10"
+          expected_road_js="waymaking-scroll.js?v=20261020-top-pin-v10"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -69,7 +69,7 @@ jobs:
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261020-waymaking-scoped-v9' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261020-top-pin-v10' /tmp/augustkring.html
           grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-feather="7"' /tmp/augustkring.html
@@ -111,11 +111,12 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-waymaking-scoped-v9" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-top-pin-v10" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const updatePin = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
           grep -Fq 'const withinStory = startReached && conclusionTop > fadeEnd' /tmp/waymaking-scroll.js
+          grep -Fq 'const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);' /tmp/waymaking-scroll.js
           ! grep -Fq 'through the ENTIRE rest of the page' /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -303,15 +304,13 @@ jobs:
                   }
                 }
                 if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
-                if(width<=900) assert.ok(waymakingLayout.road.height<=600,'Mobile sticky background should remain proportionate');
+                if(width<=900) assert.ok(waymakingLayout.road.height<=681,'Mobile top-pinned painting should fit most of viewport');
                 // The painting MUST be absent during Where I add value.
                 // It may appear only when Creative Thinking reaches the fixed
                 // painting top, which is 16px above the heading on every width.
                 const startAt=await page.evaluate(()=>{
                   const title=document.querySelector('.waymaking-beat h3');
-                  const road=document.querySelector('.waymaking-road-wrap');
-                  const pinTop=parseFloat(getComputedStyle(road).top);
-                  return scrollY + title.getBoundingClientRect().top - (pinTop + 16);
+                  return scrollY + title.getBoundingClientRect().top - Math.min(innerHeight*.38,360);
                 });
                 await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),Math.max(0,startAt-160));
                 await page.waitForTimeout(140);
@@ -334,8 +333,10 @@ jobs:
                 assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),'true',
                   'Ink must start exactly at Creative Thinking');
                 assert.equal(creativeEntrance.position,'fixed','Art must be fixed from its first visible frame');
-                assert.ok(Math.abs(creativeEntrance.titleTop-creativeEntrance.artTop)<25,
-                  'First brush and Creative Thinking must begin at the same screen height');
+                assert.ok(Math.abs((creativeEntrance.titleTop-16)-creativeEntrance.artTop)<2,
+                  'Art should first appear 16px above Creative Thinking and move UP with it');
+                assert.ok(creativeEntrance.artTop>130,
+                  'Art teleported immediately into a screen-centered or top-pinned position');
                 assert.equal(creativeEntrance.opacity,1,'Road must not fade at Creative Thinking');
                 if(width===320||width===390||width===1440){
                   await page.screenshot({path:`/tmp/ak-browser-check/creative-start-${width}.png`});
@@ -365,8 +366,16 @@ jobs:
                 }));
                 assert.equal(finalBeat.position,'fixed','Still fixed during Purpose Driven');
                 assert.equal(finalBeat.visibility,'visible');
-                assert.ok(Math.abs(finalBeat.top-firstRoad.top)<1,'Road moved during five chapters');
+                assert.ok(firstRoad.top-finalBeat.top>160,'Road must naturally rise UP before pinning');
+                assert.ok(Math.abs(finalBeat.top-16)<1,'Road must pin at 16px from viewport TOP');
                 assert.ok(Math.abs(finalBeat.left-firstRoad.left)<1);
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),startAt+360);
+                await page.waitForTimeout(110);
+                const pinnedAgain=await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top);
+                assert.ok(Math.abs(pinnedAgain-16)<1,'Road drifts after reaching pinned top');
+                await page.locator('.waymaking-beat').last().scrollIntoViewIfNeeded();
+                await page.waitForTimeout(110);
+                assert.ok(Math.abs(await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top)-16)<1);
                 const conclusionDocY=await page.locator('.waymaking-resolution').evaluate(el=>
                   scrollY+el.getBoundingClientRect().top);
                 await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),conclusionDocY-page.viewportSize().height*.67);

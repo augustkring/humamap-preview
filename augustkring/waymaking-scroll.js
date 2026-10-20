@@ -1,9 +1,9 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * The ink starts alongside Creative Thinking, is portaled directly under body,
- * stays physically fixed throughout the FIVE WAYMAKING CHAPTERS, and leaves
- * during the blank transition before the centered Waymaker conclusion.
- * Scroll changes the painted trail and text emphasis, never the road position.
+ * The ink begins IN FLOW beside Creative Thinking, travels upward with the
+ * opening chapter, then pins to the TOP of the viewport for the remaining
+ * Waymaking chapters. Once pinned, ONLY pigment reveal and text focus change.
+ * The road exits in the blank handoff before the Waymaker conclusion.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -22,15 +22,13 @@
       !lastHeading || !conclusion || beats.length !== 5 ||
       featherPaths.length !== 7) return;
 
-  // Use the SAME CSS-derived viewport position on desktop and mobile.
-  // The painting begins 16px above Creative Thinking when its title reaches
-  // this line, not when the preceding Where I add value section is visible.
-  const pinTop = () => {
-    const top = Number.parseFloat(getComputedStyle(road).top);
-    return Number.isFinite(top) ? top : window.innerHeight * 0.14;
-  };
-  const startLine = () => pinTop() + 16;
-
+  // A true top pin, not the old center-of-screen teleport. The painting
+  // first sits 16px above Creative Thinking, scrolls UP with that title and
+  // stops at 16px from the viewport top. There is NO pin release during the
+  // five chapters. Desktop and mobile use the same viewport coordinates.
+  const PIN_TOP = 16;
+  const ABOVE_TITLE = 16;
+  const startLine = () => Math.min(window.innerHeight * 0.38, 360);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
@@ -116,14 +114,13 @@
   road.dataset.waymakingViewport = 'true';
   document.body.appendChild(road);
 
-  // The fixed position is never changed by JavaScript. The road is active
-  // ONLY across the five skill chapters, not under the rest of the website.
-  // Finish the brush before the blank handoff, then release it without motion
-  // before the centered Waymaker sentence comes into view. The scroll position
-  // defines both boundaries, so scrolling back is deterministic.
+  // Three explicit phases: hidden -> rising to the top -> pinned.
+  // A stationary fade happens only in the blank handoff before the signoff.
   const updatePin = () => {
     const height = window.innerHeight;
-    const startReached = firstHeading.getBoundingClientRect().top <= startLine();
+    const titleTop = firstHeading.getBoundingClientRect().top;
+    const startReached = titleTop <= startLine();
+
     const conclusionTop = conclusion.getBoundingClientRect().top;
     const fadeStart = height * 0.88;
     const fadeEnd = height * 0.74;
@@ -133,12 +130,18 @@
     const withinStory = startReached && conclusionTop > fadeEnd;
 
     if (withinStory) {
+      const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);
+      road.style.setProperty('--waymaking-viewport-top', position.toFixed(2) + 'px');
+      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
       story.dataset.waymakingPinned = 'true';
       document.body.dataset.waymakingRoadActive = 'true';
-      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
+      if (position <= PIN_TOP + 0.5) road.dataset.waymakingTopPinned = 'true';
+      else delete road.dataset.waymakingTopPinned;
     } else {
       delete story.dataset.waymakingPinned;
       delete document.body.dataset.waymakingRoadActive;
+      delete road.dataset.waymakingTopPinned;
+      road.style.removeProperty('--waymaking-viewport-top');
       road.style.removeProperty('--waymaking-handoff-opacity');
     }
   };

@@ -1712,16 +1712,16 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* Permanent, viewport-fixed Waymaking painting (only after Creative Thinking).
-   In JS-enabled sessions this SAME artwork node is moved directly under body.
-   No parent story container can clip, scroll, fade, or release it. */
+/* Top-pinning Waymaking painting: the body-level art begins beside Creative
+   Thinking, rises naturally, then remains at 16px from the viewport top while
+   pigment grows. Its containing section never determines the pin position. */
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 0;
-  top: calc((100svh - min(72svh, 700px)) / 2);
+  top: var(--waymaking-viewport-top, 16px);
   left: 50%;
   width: min(33.5vw, 390px);
-  height: min(72svh, 700px);
+  height: min(82svh, 770px);
   margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
@@ -1767,16 +1767,14 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
 }
 @media (max-width: 900px) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    top: calc((100svh - min(68svh, 560px)) / 2);
     width: min(calc(100vw - 28px), 360px);
-    height: min(68svh, 560px);
+    height: min(79svh, 680px);
   }
 }
 @media (max-width: 600px) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    top: calc((100svh - min(68svh, 540px)) / 2);
     width: min(calc(100vw - 28px), 330px);
-    height: min(68svh, 540px);
+    height: min(79svh, 640px);
   }
 }
 
