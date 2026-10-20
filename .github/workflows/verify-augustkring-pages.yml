@@ -343,7 +343,7 @@ jobs:
                 assert.equal(firstRoad.isBodyChild,true,'Road must live at document root');
                 assert.equal(firstRoad.visibility,'visible');
                 assert.equal(firstRoad.opacity,1);
-                for(const selector of ['.waymaking-beat:last-child','.waymaking-resolution','#work','#perspective','#contact','.home-footer']){
+                for(const selector of ['.waymaking-beat:last-child','.waymaking-resolution','#work','#perspective','.homepage-contact','.home-footer']){
                   await page.locator(selector).first().scrollIntoViewIfNeeded();
                   await page.waitForTimeout(110);
                   const state=await page.locator('.waymaking-road-wrap').evaluate(el=>({
