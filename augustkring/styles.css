@@ -1709,34 +1709,106 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* Viewport-pinned painting: the artwork has one physical screen position.
-   Sticky remains only as the progressive-enhancement/no-JS fallback. */
-.waymaking-narrative[data-waymaking-ready="true"] .waymaking-road-wrap {
-  visibility: hidden;
-  opacity: 0;
-}
-.waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+/* Permanent, viewport-fixed Waymaking painting (only after Creative Thinking).
+   In JS-enabled sessions this SAME artwork node is moved directly under body.
+   No parent story container can clip, scroll, fade, or release it. */
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
+  z-index: 0;
   top: calc((100svh - min(72svh, 700px)) / 2);
   left: 50%;
   width: min(33.5vw, 390px);
   height: min(72svh, 700px);
   margin: 0;
   transform: translateX(-50%);
-  visibility: visible;
-  opacity: var(--waymaking-pin-opacity, 1);
   pointer-events: none;
-  will-change: opacity;
+  visibility: hidden;
+  opacity: 1;
+}
+body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  visibility: visible;
+}
+/* Keep all foreground copy, cards and navigation above the persistent road. */
+.home-main,
+.home-footer {
+  position: relative;
+  z-index: 1;
+}
+/* Feathered reading surfaces must not create horizontal page scrolling. The
+   artwork itself is already portaled directly to body and is unaffected. */
+body[data-waymaking-road-active="true"] .home-main {
+  overflow-x: clip;
+}
+/* Readable foreground on desktop without a solid white rectangle cutting
+   across the black brush. The painting is still completely fixed and opaque;
+   only stationary content has a soft paper-white reading surface behind it. */
+@media (min-width: 901px) {
+  body[data-waymaking-road-active="true"] .waymaking-resolution p,
+  body[data-waymaking-road-active="true"] .work-heading-copy,
+  body[data-waymaking-road-active="true"] .perspective-lead,
+  body[data-waymaking-road-active="true"] .perspective-copy,
+  body[data-waymaking-road-active="true"] .perspective-link,
+  body[data-waymaking-road-active="true"] .homepage-contact-invite,
+  body[data-waymaking-road-active="true"] .homepage-contact-signoff {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+  }
+  body[data-waymaking-road-active="true"] .waymaking-resolution p::before,
+  body[data-waymaking-road-active="true"] .work-heading-copy::before,
+  body[data-waymaking-road-active="true"] .perspective-lead::before,
+  body[data-waymaking-road-active="true"] .perspective-copy::before,
+  body[data-waymaking-road-active="true"] .perspective-link::before,
+  body[data-waymaking-road-active="true"] .homepage-contact-invite::before,
+  body[data-waymaking-road-active="true"] .homepage-contact-signoff::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -90px -110px;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+      transparent 0%, var(--page) 15%, var(--page) 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+      transparent 0%, #000 13%, #000 87%, transparent 100%);
+    mask-image: linear-gradient(to right,
+      transparent 0%, #000 13%, #000 87%, transparent 100%);
+  }
+  /* A centered single-line conclusion needs a longer, smoother paper fade.
+     Otherwise its narrow reading matte cuts the ink like a horizontal stripe. */
+  body[data-waymaking-road-active="true"] .waymaking-resolution p::before {
+    inset: -175px -155px;
+    background: linear-gradient(to bottom,
+      transparent 0%, var(--page) 37%, var(--page) 63%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+      transparent 0%, #000 18%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to right,
+      transparent 0%, #000 18%, #000 82%, transparent 100%);
+  }
+}
+/* These selectors target the body-level graphic, not the Waymaking section. */
+@media (prefers-reduced-motion: no-preference) {
+  body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-road-art {
+    visibility: hidden;
+  }
+  body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-paint-art {
+    display: block;
+  }
+  body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-road-art {
+    visibility: visible;
+  }
+  body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-paint-art {
+    display: none;
+  }
 }
 @media (max-width: 900px) {
-  .waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     top: calc((100svh - min(68svh, 560px)) / 2);
     width: min(calc(100vw - 28px), 360px);
     height: min(68svh, 560px);
   }
 }
 @media (max-width: 600px) {
-  .waymaking-narrative[data-waymaking-pinned="true"] .waymaking-road-wrap {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     top: calc((100svh - min(68svh, 540px)) / 2);
     width: min(calc(100vw - 28px), 330px);
     height: min(68svh, 540px);
