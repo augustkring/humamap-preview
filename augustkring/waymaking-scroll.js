@@ -9,6 +9,7 @@
   const story = document.querySelector('[data-waymaking-story]');
   const scene = story?.querySelector('[data-waymaking-scene]');
   const brush = scene?.querySelector('[data-waymaking-paint-path]');
+  const still = scene?.querySelector('.waymaking-road-art img');
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
 
   if (!story || !scene || !brush || beats.length !== 5) return;
@@ -28,7 +29,7 @@
   const update = () => {
     frame = 0;
 
-    if (!desktop.matches || reducedMotion.matches) {
+    if (!desktop.matches || reducedMotion.matches || !still?.currentSrc.endsWith('.avif')) {
       reset();
       return;
     }
