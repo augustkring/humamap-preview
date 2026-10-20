@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-waymaking-painted-v4a"
+          expected_home="styles.css?v=20261020-waymaking-centered-v5a"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -64,12 +64,15 @@ jobs:
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
-          grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
+          grep -Fq 'aria-label="Waymaking" data-waymaking-story' /tmp/augustkring.html
+          ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261020-v4b' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261020-v5a' /tmp/augustkring.html
           grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
-          grep -Fq 'Purpose Driven</h4>' /tmp/augustkring.html
+          grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-feather="7"' /tmp/augustkring.html
+          grep -Fq 'filterUnits="userSpaceOnUse" x="-180"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
@@ -90,6 +93,8 @@ jobs:
           grep -Fq '.waymaking-road-art' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
           grep -Fq '.waymaking-paint-art' /tmp/augustkring.css
+          grep -Fq '.waymaking-beat:nth-child(odd)' /tmp/augustkring.css
+          grep -Fq '.waymaking-beat:nth-child(even)' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
           for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
@@ -103,7 +108,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-v4b" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-v5a" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -152,7 +157,7 @@ jobs:
           (async () => {
             const browser = await chromium.launch({executablePath:process.env.CHROME_BIN, headless:true, args:['--no-sandbox']});
             try {
-              for (const width of [320, 390, 768, 1440]) {
+              for (const width of [320, 390, 768, 1024, 1440]) {
                 const page = await browser.newPage({viewport:{width,height:900}});
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/', {waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
@@ -201,9 +206,9 @@ jobs:
                     opener: document.querySelector('.thread-copy p:first-child').textContent.trim(),
                     visionCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
                     purposeCopy: document.querySelector('.thread-copy p:nth-child(3)').textContent.trim(),
-                    purposeTitle: document.querySelector('.waymaking-purpose h4').textContent.trim(),
+                    purposeTitle: document.querySelector('.waymaking-purpose h3').textContent.trim(),
                     workHeading: document.querySelector('#work-title').textContent.trim(),
-                    waymakingTitle: document.querySelector('#waymaking-title').textContent.trim(),
+                    waymakingTitle: document.querySelector('.waymaking-narrative').getAttribute('aria-label'),
                     waymakerDefinition: document.querySelector('.waymaking-resolution p').textContent.trim(),
                     waymakingBeatCount: document.querySelectorAll('.waymaking-beat').length,
                     hasHomepageStory: !!document.querySelector('#about-title'),
@@ -237,6 +242,7 @@ jobs:
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.waymakingTitle,'Waymaking');
+                assert.equal(await page.locator('#waymaking-title').count(),0,'The visible introductory Waymaking heading must be removed');
                 assert.equal(editorial.waymakerDefinition,"For me, that's what it means to be a waymaker.");
                 assert.equal(editorial.waymakingBeatCount,5);
                 assert.equal(editorial.hasHomepageStory,false);
@@ -272,7 +278,11 @@ jobs:
                 assert.ok(waymakingLayout.artUrl.endsWith('waymaking-editorial-ink.avif'),'Browser must select approved illustration');
                 if(width===1440) {
                   assert.ok(waymakingLayout.road.width>=300,'Desktop artwork must be given generous space');
-                  for(const block of waymakingLayout.blocks) assert.ok(block.right<waymakingLayout.road.left+12,'Editorial copy must not overlap artwork');
+                  for(let i=0;i<waymakingLayout.blocks.length;i++){
+                    const block=waymakingLayout.blocks[i];
+                    if(i%2===0) assert.ok(block.right<waymakingLayout.road.left+12,'Odd chapter must be left of centered road');
+                    else assert.ok(block.left>waymakingLayout.road.right-12,'Even chapter must be right of centered road');
+                  }
                 }
                 if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
                 if(width<=900) assert.ok(waymakingLayout.road.height<=600,'Mobile sticky background should remain proportionate');
@@ -567,7 +577,7 @@ jobs:
           (async () => {
             const browser = await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
             try {
-              for (const width of [320,390,768,1440]) {
+              for (const width of [320,390,768,1024,1440]) {
                 const page = await browser.newPage({ viewport: {width,height:940}});
                 const visited = new Set();
                 for (const target of cases) {
