@@ -116,9 +116,8 @@ jobs:
                 await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
                 const firstDocY=await page.evaluate(()=>{
                   const title=document.querySelector('.waymaking-beat h3');
-                  const road=document.querySelector('.waymaking-road-wrap');
                   return scrollY+title.getBoundingClientRect().top
-                    -(parseFloat(getComputedStyle(road).top)+16);
+                    -Math.min(innerHeight*.38,360);
                 });
                 const lastDocY=await page.evaluate(()=>{
                   const title=document.querySelector('.waymaking-beat:last-child h3');
@@ -145,7 +144,9 @@ jobs:
                 assert.equal(entering.roadVisibility,'visible');
                 assert.equal(entering.roadBodyChild,true);
                 assert.equal(entering.roadOpacity,1,'Ink starts fully opaque, without a global fade-in');
-                assert.ok(Math.abs(entering.road.top-entering.firstHeading.top)<26,'Road starts adjacent to first title');
+                assert.ok(Math.abs((entering.firstHeading.top-16)-entering.road.top)<2,'Road must start 16px ABOVE Creative Thinking');
+                assert.ok(entering.road.top>130,'Road teleported into its top pin instead of beginning in the page');
+                assert.equal(entering.roadOpacity,1,'Road must not fade in when it starts');
                 assert.deepEqual(entering.titleNames,labels);
                 assert.equal(entering.wrongLogoClass,false,'Animated letters must not inherit Ventures logo font rules');
                 assert.ok(entering.titleSizes.every((size,i)=>Math.abs(size-entering.wordSizes[i])<.2),
@@ -168,15 +169,25 @@ jobs:
                   assert.equal(state.roadBodyChild,true);
                   assert.equal(state.roadVisibility,'visible','Ink must persist through all five chapters');
                   assert.equal(state.bodyActive,'true');
-                  assert.ok(Math.abs(state.road.top-entering.road.top)<1,'Ink shifted vertically');
+                  assert.ok(state.road.top<=entering.road.top+1,'Ink moved down rather than up toward the pin');
                   assert.ok(Math.abs(state.road.left-entering.road.left)<1,'Ink shifted horizontally');
                   assert.ok(!state.scrollOverflow,'Horizontal overflow');
                   if(n===0||n===3||n===6||n===9||n===12){
                     await page.screenshot({path:'artifacts/chapter-'+width+'-'+n+'.png'});
                   }
                 }
-                for(let i=1;i<recorded.length;i++)
+                for(let i=1;i<recorded.length;i++){
                   assert.ok(recorded[i].paintOffset<=recorded[i-1].paintOffset+2,'Pigment must grow smoothly while scrolling');
+                  assert.ok(recorded[i].road.top<=recorded[i-1].road.top+1,
+                    'Road moved down when it should travel UP into its fixed position');
+                }
+                const pinnedIndex=recorded.findIndex(x=>Math.abs(x.road.top-16)<1);
+                assert.ok(pinnedIndex>=1&&pinnedIndex<=8,'Road did not naturally travel UP and pin at the viewport top');
+                for(let i=pinnedIndex;i<recorded.length;i++){
+                  assert.ok(Math.abs(recorded[i].road.top-16)<1,'Road did not stay fixed at the viewport top after pinning');
+                }
+                assert.ok(recorded[0].road.top-recorded[pinnedIndex].road.top>90,
+                  'Road never moved naturally UP to pin after first appearing');
                 assert.ok(recorded[0].paintOffset-recorded.at(-1).paintOffset>850,'Painting should finish by Purpose Driven');
                 if(width>=901){
                   const arrangement=await page.evaluate(()=>{
@@ -194,7 +205,7 @@ jobs:
                 await jump(page,conclusionY-h*.82);
                 const handoff=await snap(page);
                 assert.equal(handoff.roadMode,'fixed','Road cannot slide during exit');
-                assert.ok(Math.abs(handoff.road.top-entering.road.top)<1);
+                assert.ok(Math.abs(handoff.road.top-16)<1,'Road slid during the exit transition');
                 assert.ok(Math.abs(handoff.road.left-entering.road.left)<1);
                 assert.ok(handoff.roadOpacity>0&&handoff.roadOpacity<1,'Transition should happen only in blank handoff');
                 await page.screenshot({path:'artifacts/handoff-'+width+'.png'});
@@ -232,14 +243,15 @@ jobs:
                 const back=await snap(page);
                 assert.equal(back.bodyActive,'true','Returning to the chapters must restore ink');
                 assert.equal(back.roadVisibility,'visible');
-                assert.ok(Math.abs(back.road.top-entering.road.top)<1);
+                assert.ok(Math.abs(back.road.top-16)<1,'Returning to chapters should restore the top pin');
                 await jump(page,Math.max(0,firstDocY-160));
                 const returnedBefore=await snap(page);
                 assert.equal(returnedBefore.roadVisibility,'hidden');
                 assert.equal(returnedBefore.roadOpacity,0);
                 assert.deepEqual(exceptions,[],'No script exceptions');
                 console.log('PASS '+width+'px',JSON.stringify({
-                  fixedTop:entering.road.top,chapterPositions:recorded.map(x=>x.road.top),
+                  initialTop:entering.road.top,pinnedTop:16,pinnedIndex,
+                  chapterPositions:recorded.map(x=>x.road.top),
                   pigment:recorded.map(x=>x.paintOffset),outsideHidden:true
                 }));
                 await page.close();
