@@ -7,8 +7,8 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
-      - "augustkring/assets/waymaking-ink-road.svg"
-      - "augustkring/assets/waymaking-ink-road-mobile.svg"
+      - "augustkring/assets/waymaking-ink-road-brush.png"
+      - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
@@ -40,7 +40,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-waymaking-ink-v1"
+          expected_home="styles.css?v=20261020-waymaking-brush-v2"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -62,8 +62,8 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-ink-road.svg' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-ink-road-mobile.svg' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-ink-road-brush.png' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-ink-road-brush-mobile.png' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
@@ -84,12 +84,10 @@ jobs:
           grep -Fq '.waymaking-purpose' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          for art in waymaking-ink-road.svg waymaking-ink-road-mobile.svg; do
+          for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
             curl -fsSL --max-time 20 "${base}assets/${art}" -o "/tmp/${art}"
-            grep -Fq '<svg ' "/tmp/${art}"
-            grep -Fq 'Original authored ink-road illustration' "/tmp/${art}"
-            ! grep -Eq '<script|<foreignObject|javascript:' "/tmp/${art}"
-            test "$(wc -c < "/tmp/${art}")" -gt 10000
+            test "$(xxd -p -l 8 "/tmp/${art}")" = "89504e470d0a1a0a"
+            test "$(wc -c < "/tmp/${art}")" -gt 100000
           done
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
@@ -255,8 +253,8 @@ jobs:
                 assert.equal(waymakingLayout.purposeVisible,true,'Purpose section missing');
                 assert.equal(waymakingLayout.obsoleteCanvas,false,'Canvas road must not return');
                 assert.ok(waymakingLayout.road.height>700,'Ink road should span the narrative');
-                if(width<=900) assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-mobile.svg'),'Mobile artwork not selected');
-                else assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road.svg'),'Desktop artwork not selected');
+                if(width<=900) assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush-mobile.png'),'Mobile artwork not selected');
+                else assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush.png'),'Desktop artwork not selected');
                 if(width===1440){
                   assert.ok(waymakingLayout.road.width<=149,'Desktop painted road corridor stays within art-directed width');
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left copy stays clear of road');
