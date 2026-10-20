@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"054f8f41","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"062ffaac","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -36,10 +36,12 @@ assert.ok(thread.includes('For me, that is what it means to be a Waymaker.'),'Wa
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
-assert.ok(thread.includes('data-waymaking-rake-road'),'Artist rake-brush canvas target missing');
-assert.ok(html.includes('waymaking-brush.js?v=20261020-rake-road-v2'),'Artist rake-brush renderer missing');
-const rakeBrush=readFileSync(join(root,'assets/waymaking-rake-brush.png'));
-assert.ok(rakeBrush.length>5000 && rakeBrush[0]===0x89 && rakeBrush[1]===0x50 && rakeBrush[2]===0x4e && rakeBrush[3]===0x47,'CC0 rake-brush PNG asset missing or invalid');
+assert.ok(thread.includes('data-waymaking-ink-road'),'Artist dry-brush canvas target missing');
+assert.ok(html.includes('waymaking-brush.js?v=20261020-dry-ink-v1'),'Artist dry-brush renderer missing');
+const dryBrush=readFileSync(join(root,'assets/waymaking-dry-brush.png'));
+assert.ok(dryBrush.length>100000 && dryBrush[0]===0x89 && dryBrush[1]===0x50 && dryBrush[2]===0x4e && dryBrush[3]===0x47,'MIT dry-brush PNG asset missing or invalid');
+const dryBrushLicense=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
+assert.ok(dryBrushLicense.includes('Copyright (c) 2026 nomagicln') && dryBrushLicense.includes('MIT License'),'Dry-brush third-party notice missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
@@ -58,7 +60,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-rake-road-v2':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-dry-ink-v1':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

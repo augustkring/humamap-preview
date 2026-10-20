@@ -1,23 +1,27 @@
 /*
- * Waymaking road — artist brush-tip renderer.
+ * Waymaking road — continuous dry-brush texture mapped along the road.
  *
- * The brush tip is David Revoy's 3_rake.png from his CC0 Krita brush kit
- * (public domain), mirrored at taro-0/krita-brushes.
- * We stamp the real rake-brush texture along two controlled S-curves.
+ * Brush source: src/assets/ink/dry-brush.png from nomagicln/gomoko-must-win
+ * (MIT, copyright 2026 nomagicln). The source is one long, transparent,
+ * sumi-style dry-brush stroke. We crop its real alpha bounds, tint it to the
+ * site's muted ink colour, then bend narrow sequential slices along each road
+ * edge. The source texture is used once per edge, not tiled or repeatedly
+ * stamped, so its real bristle fissures and pressure variation survive.
+ *
  * No animation and no external runtime dependency.
  */
 (() => {
-  const canvas = document.querySelector('[data-waymaking-rake-road]');
+  const canvas = document.querySelector('[data-waymaking-ink-road]');
   if (!canvas) return;
 
   const fallback = document.querySelector('[data-waymaking-fallback]');
   const brushImage = new Image();
   brushImage.decoding = 'async';
-  brushImage.src = 'assets/waymaking-rake-brush.png?v=20261019-rake-v1';
+  brushImage.src = 'assets/waymaking-dry-brush.png?v=20261020-ink-v1';
 
   const ink = { r: 67, g: 86, b: 108 }; // --muted
 
-  const makeTintedBrush = image => {
+  const cropAndTintBrush = image => {
     const source = document.createElement('canvas');
     source.width = image.naturalWidth;
     source.height = image.naturalHeight;
@@ -26,46 +30,74 @@
 
     const pixels = sctx.getImageData(0, 0, source.width, source.height);
     const d = pixels.data;
+    let minX = source.width;
+    let minY = source.height;
+    let maxX = -1;
+    let maxY = -1;
 
-    let alphaPixels = 0;
-    let lumSum = 0;
-    for (let i = 0; i < d.length; i += 4) {
-      if (d[i + 3] > 8) {
-        alphaPixels += 1;
-        lumSum += (d[i] + d[i + 1] + d[i + 2]) / 3;
+    // This asset is dark ink on transparency. Measure effective pigment rather
+    // than raw alpha so faint transparent padding does not inflate the brush.
+    for (let y = 0; y < source.height; y += 1) {
+      for (let x = 0; x < source.width; x += 1) {
+        const i = (y * source.width + x) * 4;
+        const alpha = d[i + 3] / 255;
+        const lum = (d[i] + d[i + 1] + d[i + 2]) / (3 * 255);
+        const density = alpha * (1 - lum);
+        if (density > 0.018) {
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
       }
     }
-    const meanLum = alphaPixels ? lumSum / alphaPixels : 0;
-    const lightInk = meanLum > 128;
 
-    for (let i = 0; i < d.length; i += 4) {
-      const sourceAlpha = d[i + 3] / 255;
-      const lum = (d[i] + d[i + 1] + d[i + 2]) / (3 * 255);
-      const density = sourceAlpha * (lightInk ? lum : 1 - lum);
-      d[i] = ink.r;
-      d[i + 1] = ink.g;
-      d[i + 2] = ink.b;
-      d[i + 3] = Math.round(Math.max(0, Math.min(1, density)) * 255);
+    if (maxX < minX || maxY < minY) return source;
+
+    const pad = 3;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(source.width - 1, maxX + pad);
+    maxY = Math.min(source.height - 1, maxY + pad);
+
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+    const croppedData = sctx.getImageData(minX, minY, width, height);
+    const cd = croppedData.data;
+
+    for (let i = 0; i < cd.length; i += 4) {
+      const alpha = cd[i + 3] / 255;
+      const lum = (cd[i] + cd[i + 1] + cd[i + 2]) / (3 * 255);
+      const density = Math.pow(Math.max(0, alpha * (1 - lum)), 0.86);
+      cd[i] = ink.r;
+      cd[i + 1] = ink.g;
+      cd[i + 2] = ink.b;
+      cd[i + 3] = Math.round(Math.min(1, density) * 255);
     }
-    sctx.putImageData(pixels, 0, 0);
-    return source;
+
+    const tinted = document.createElement('canvas');
+    tinted.width = width;
+    tinted.height = height;
+    const tctx = tinted.getContext('2d');
+    tctx.putImageData(croppedData, 0, 0);
+    return tinted;
   };
 
   const centreX = t =>
     0.50 +
-    0.165 * Math.sin(t * Math.PI * 2 - 0.62) +
-    0.048 * Math.sin(t * Math.PI * 4 + 0.38) +
-    0.016 * Math.sin(t * Math.PI * 6 + 1.08);
+    0.15 * Math.sin(t * Math.PI * 2 - 0.62) +
+    0.045 * Math.sin(t * Math.PI * 4 + 0.38) +
+    0.012 * Math.sin(t * Math.PI * 6 + 1.08);
 
   const halfRoad = t =>
-    0.17 +
-    0.012 * Math.sin(t * Math.PI * 2 + 0.85) +
-    0.006 * Math.sin(t * Math.PI * 5 - 0.35);
+    0.158 +
+    0.010 * Math.sin(t * Math.PI * 2 + 0.85) +
+    0.005 * Math.sin(t * Math.PI * 5 - 0.35);
 
   const edgePoint = (t, side, w, h) => {
     const independentWobble = side < 0
-      ? 0.012 * Math.sin(t * Math.PI * 6 + 0.32)
-      : 0.009 * Math.sin(t * Math.PI * 5 + 1.12);
+      ? 0.008 * Math.sin(t * Math.PI * 6 + 0.32)
+      : 0.007 * Math.sin(t * Math.PI * 5 + 1.12);
     return {
       x: (centreX(t) + side * halfRoad(t) + independentWobble) * w,
       y: t * h
@@ -84,113 +116,178 @@
     return Math.atan2(b.y - a.y, b.x - a.x);
   };
 
-  const stamp = (ctx, brush, x, y, angle, size, alpha, stretch = 1) => {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(angle);
-    ctx.globalAlpha = alpha;
-    ctx.drawImage(
-      brush,
-      -size * stretch * 0.5,
-      -size * 0.5,
-      size * stretch,
-      size
-    );
-    ctx.restore();
-  };
-
-  const paintEdge = (ctx, brush, side, w, h, seedOffset) => {
-    const spacing = Math.max(4.8, w * 0.038);
-    const steps = Math.ceil(h / spacing);
-    const baseSize = Math.max(15, w * 0.16);
+  const drawBrushAlong = (
+    ctx,
+    brush,
+    pointFn,
+    w,
+    h,
+    {
+      t0 = 0,
+      t1 = 1,
+      source0 = 0.035,
+      source1 = 0.965,
+      reverse = false,
+      thickness,
+      alpha,
+      normalOffset = 0,
+      phase = 0
+    }
+  ) => {
+    const targetLength = Math.max(1, (t1 - t0) * h * 1.06);
+    const stepPx = Math.max(2.2, Math.min(3.4, w * 0.021));
+    const steps = Math.max(12, Math.ceil(targetLength / stepPx));
+    const sourceSpan = Math.max(0.01, source1 - source0);
+    const sourceStep = sourceSpan * brush.width / steps;
+    const targetSliceLength = targetLength / steps * 1.28;
+    const sourceSliceWidth = Math.max(2, sourceStep * 1.36);
 
     for (let i = 0; i <= steps; i += 1) {
-      // Intentional dry gaps stop the edge becoming one synthetic vector rail.
-      const dryPhase = (i + seedOffset) % 23;
-      if (dryPhase === 10 || dryPhase === 11) continue;
+      const u = i / steps;
+      const t = t0 + (t1 - t0) * u;
+      const sourceU = reverse
+        ? source1 - sourceSpan * u
+        : source0 + sourceSpan * u;
 
-      const t = i / steps;
-      const p = edgePoint(t, side, w, h);
-      const angle = tangentAngle(
-        (tt, ww, hh) => edgePoint(tt, side, ww, hh),
-        t,
-        w,
-        h
-      );
+      let sx = sourceU * brush.width - sourceSliceWidth * 0.5;
+      sx = Math.max(0, Math.min(brush.width - sourceSliceWidth, sx));
 
-      const wave = Math.sin((i + seedOffset) * 0.61);
-      const slow = Math.sin((i + seedOffset) * 0.11);
-      const size = baseSize * (0.90 + 0.12 * wave + 0.055 * slow);
+      const p = pointFn(t, w, h);
+      const angle = tangentAngle(pointFn, t, w, h);
       const normal = angle + Math.PI / 2;
-      const drift = 1.15 * Math.sin((i + seedOffset) * 0.37);
-      const angleJitter = 0.045 * Math.sin((i + seedOffset) * 0.47);
+      const micro = Math.sin((i + phase) * 0.37) * 0.34;
+      const pressure = 0.94 + 0.075 * Math.sin((i + phase) * 0.11);
 
-      // Main pigment. Fewer, larger stamps preserve the real rake texture.
-      stamp(
-        ctx,
-        brush,
-        p.x + Math.cos(normal) * drift,
-        p.y + Math.sin(normal) * drift,
-        angle + angleJitter,
-        size,
-        0.056 + 0.020 * (wave + 1) / 2,
-        0.84
+      ctx.save();
+      ctx.translate(
+        p.x + Math.cos(normal) * (normalOffset + micro),
+        p.y + Math.sin(normal) * (normalOffset + micro)
       );
-
-      // Sparse dry-brush echo sits slightly outside the road edge.
-      if (i % 4 === 0) {
-        const echo = side * (1.6 + 0.7 * Math.sin(i * 0.23));
-        stamp(
-          ctx,
-          brush,
-          p.x + Math.cos(normal) * echo,
-          p.y + Math.sin(normal) * echo,
-          angle - angleJitter * 0.55,
-          size * 0.88,
-          0.026,
-          0.96
-        );
-      }
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(
+        brush,
+        sx,
+        0,
+        sourceSliceWidth,
+        brush.height,
+        -targetSliceLength * 0.5,
+        -thickness * pressure * 0.5,
+        targetSliceLength,
+        thickness * pressure
+      );
+      ctx.restore();
     }
+  };
+
+  const paintRoad = (ctx, brush, w, h) => {
+    const edgeThickness = Math.max(7.2, w * 0.088);
+
+    drawBrushAlong(
+      ctx,
+      brush,
+      (t, ww, hh) => edgePoint(t, -1, ww, hh),
+      w,
+      h,
+      {
+        reverse: false,
+        thickness: edgeThickness,
+        alpha: 0.24,
+        normalOffset: -0.35,
+        phase: 11
+      }
+    );
+
+    drawBrushAlong(
+      ctx,
+      brush,
+      (t, ww, hh) => edgePoint(t, 1, ww, hh),
+      w,
+      h,
+      {
+        reverse: true,
+        thickness: edgeThickness * 0.96,
+        alpha: 0.225,
+        normalOffset: 0.45,
+        phase: 47
+      }
+    );
+
+    // A restrained pigment ghost adds material depth without creating a
+    // second visible line. It uses a different source interval and offset.
+    drawBrushAlong(
+      ctx,
+      brush,
+      (t, ww, hh) => edgePoint(t, -1, ww, hh),
+      w,
+      h,
+      {
+        source0: 0.18,
+        source1: 0.82,
+        reverse: true,
+        thickness: edgeThickness * 0.62,
+        alpha: 0.055,
+        normalOffset: -1.05,
+        phase: 83
+      }
+    );
+    drawBrushAlong(
+      ctx,
+      brush,
+      (t, ww, hh) => edgePoint(t, 1, ww, hh),
+      w,
+      h,
+      {
+        source0: 0.16,
+        source1: 0.84,
+        reverse: false,
+        thickness: edgeThickness * 0.58,
+        alpha: 0.05,
+        normalOffset: 1.10,
+        phase: 101
+      }
+    );
   };
 
   const paintCentreMarks = (ctx, brush, w, h) => {
     const ranges = [
-      [0.065, 0.102],
-      [0.205, 0.242],
-      [0.347, 0.385],
-      [0.492, 0.529],
-      [0.638, 0.675],
-      [0.782, 0.819],
-      [0.912, 0.948]
+      [0.065, 0.103],
+      [0.205, 0.243],
+      [0.347, 0.386],
+      [0.492, 0.530],
+      [0.638, 0.676],
+      [0.782, 0.820],
+      [0.912, 0.950]
     ];
-    const size = Math.max(7.2, w * 0.066);
+    const thickness = Math.max(2.4, w * 0.026);
 
     ranges.forEach(([a, b], index) => {
-      const lengthPx = (b - a) * h;
-      const steps = Math.max(3, Math.ceil(lengthPx / Math.max(4.2, w * 0.029)));
-      for (let i = 0; i <= steps; i += 1) {
-        const t = a + (b - a) * (i / steps);
-        const p = centrePoint(t, w, h);
-        const angle = tangentAngle(centrePoint, t, w, h);
-        const wiggle = Math.sin((i + index * 7) * 0.63) * 0.35;
-        stamp(
-          ctx,
-          brush,
-          p.x + Math.cos(angle + Math.PI / 2) * wiggle,
-          p.y + Math.sin(angle + Math.PI / 2) * wiggle,
-          angle,
-          size * (0.92 + 0.08 * Math.sin(i * 0.71)),
-          0.042,
-          0.58
-        );
-      }
+      const sourceStart = 0.24 + (index % 4) * 0.11;
+      drawBrushAlong(
+        ctx,
+        brush,
+        centrePoint,
+        w,
+        h,
+        {
+          t0: a,
+          t1: b,
+          source0: sourceStart,
+          source1: Math.min(0.90, sourceStart + 0.18),
+          reverse: index % 2 === 1,
+          thickness,
+          alpha: 0.20,
+          normalOffset: (index % 2 ? 0.3 : -0.25),
+          phase: 17 + index * 13
+        }
+      );
     });
   };
 
   const render = brush => {
     const rect = canvas.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;
+
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const width = Math.round(rect.width * dpr);
     const height = Math.round(rect.height * dpr);
@@ -198,19 +295,22 @@
     if (canvas.height !== height) canvas.height = height;
 
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, width, height);
     ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
-    paintEdge(ctx, brush, -1, rect.width, rect.height, 11);
-    paintEdge(ctx, brush, 1, rect.width, rect.height, 43);
+    paintRoad(ctx, brush, rect.width, rect.height);
     paintCentreMarks(ctx, brush, rect.width, rect.height);
 
     canvas.dataset.paintReady = 'true';
+    canvas.dataset.brushMaterial = 'continuous-dry-ink';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 
   brushImage.addEventListener('load', () => {
-    const tinted = makeTintedBrush(brushImage);
+    const tinted = cropAndTintBrush(brushImage);
     requestAnimationFrame(() => render(tinted));
 
     if ('ResizeObserver' in window) {

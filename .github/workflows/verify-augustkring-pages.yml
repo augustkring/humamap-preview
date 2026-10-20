@@ -8,7 +8,8 @@ on:
       - "augustkring/index.html"
       - "augustkring/styles.css"
       - "augustkring/waymaking-brush.js"
-      - "augustkring/assets/waymaking-rake-brush.png"
+      - "augustkring/assets/waymaking-dry-brush.png"
+      - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
       - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
@@ -38,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-rake-road-v2"
+          expected_home="styles.css?v=20261020-dry-ink-v1"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -60,8 +61,8 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-rake-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261020-rake-road-v2' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-ink-road' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261020-dry-ink-v1' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -81,17 +82,20 @@ jobs:
           grep -Fq '.waymaking-road-fallback-svg' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-rake-road-v2" -o /tmp/augustkring-waymaking-brush.js
-          grep -Fq "David Revoy's 3_rake.png" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "assets/waymaking-rake-brush.png?v=20261019-rake-v1" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "paintEdge" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "paintCentreMarks" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "Intentional dry gaps" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "w * 0.038" /tmp/augustkring-waymaking-brush.js
-          grep -Fq "0.165 * Math.sin" /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-dry-ink-v1" -o /tmp/augustkring-waymaking-brush.js
+          grep -Fq "nomagicln/gomoko-must-win" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "assets/waymaking-dry-brush.png?v=20261020-ink-v1" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "cropAndTintBrush" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "drawBrushAlong" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "continuous-dry-ink" /tmp/augustkring-waymaking-brush.js
+          ! grep -Fq "3_rake.png" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
-          curl -fsSL --max-time 20 "${base}assets/waymaking-rake-brush.png?v=20261019-rake-v1" -o /tmp/waymaking-rake.png
-          test "$(xxd -p -l 8 /tmp/waymaking-rake.png)" = "89504e470d0a1a0a"
+          curl -fsSL --max-time 20 "${base}assets/waymaking-dry-brush.png?v=20261020-ink-v1" -o /tmp/waymaking-dry-brush.png
+          test "$(xxd -p -l 8 /tmp/waymaking-dry-brush.png)" = "89504e470d0a1a0a"
+          test "$(wc -c < /tmp/waymaking-dry-brush.png)" -gt 100000
+          curl -fsSL --max-time 20 "${base}assets/waymaking-dry-brush-LICENSE.txt" -o /tmp/waymaking-dry-brush-license.txt
+          grep -Fq "Copyright (c) 2026 nomagicln" /tmp/waymaking-dry-brush-license.txt
+          grep -Fq "MIT License" /tmp/waymaking-dry-brush-license.txt
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
@@ -244,7 +248,7 @@ jobs:
                 assert.equal(editorial.hasHomepageStory,false);
                 const waymakingLayout = await page.evaluate(() => {
                   const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
-                  const canvas=document.querySelector('[data-waymaking-rake-road]');
+                  const canvas=document.querySelector('[data-waymaking-ink-road]');
                   const fallback=document.querySelector('[data-waymaking-fallback]');
                   const blocks=[...document.querySelectorAll('.waymaking-copy')].map(el=>{
                     const r=el.getBoundingClientRect();
@@ -254,6 +258,7 @@ jobs:
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
                     paintReady:canvas.dataset.paintReady==='true',
+                    brushMaterial:canvas.dataset.brushMaterial,
                     canvasWidth:canvas.width,
                     canvasHeight:canvas.height,
                     fallbackHidden:fallback?.hasAttribute('hidden') ?? false,
@@ -264,9 +269,10 @@ jobs:
                 const heights=waymakingLayout.blocks.map(x=>x.height);
                 assert.ok(Math.max(...heights)/Math.min(...heights)<1.85,'Waymaking text blocks remain visually balanced');
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
-                assert.equal(waymakingLayout.paintReady,true,'CC0 rake-brush canvas must render');
-                assert.ok(waymakingLayout.canvasWidth>=40 && waymakingLayout.canvasHeight>1000,'Rake-brush canvas has real render resolution');
-                assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after rake-brush painting');
+                assert.equal(waymakingLayout.paintReady,true,'MIT dry-brush canvas must render');
+                assert.equal(waymakingLayout.brushMaterial,'continuous-dry-ink','Road must use continuous dry-ink texture mapping');
+                assert.ok(waymakingLayout.canvasWidth>=40 && waymakingLayout.canvasHeight>1000,'Dry-brush canvas has real render resolution');
+                assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after dry-brush painting');
                 assert.equal(waymakingLayout.obsoleteVectorBrush,false,'Obsolete vector brush paths must not return');
                 if(width===1440){
                   assert.ok(waymakingLayout.road.width<=149,'Desktop painted road corridor stays within art-directed width');
