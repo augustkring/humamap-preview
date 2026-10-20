@@ -500,7 +500,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 50%;
-  width: clamp(88px, 9vw, 100px);
+  width: clamp(132px, 13.5vw, 148px);
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -513,7 +513,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
 }
 .waymaking-road-canvas {
-  opacity: .92;
+  opacity: 1;
   mix-blend-mode: multiply;
 }
 .waymaking-road-fallback-svg {
@@ -522,10 +522,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-road-fallback {
   fill: none;
   stroke: var(--muted);
-  stroke-width: 2.2px;
+  stroke-width: 1.8px;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: .10;
+  opacity: .07;
   vector-effect: non-scaling-stroke;
 }
 [data-waymaking-fallback][hidden] {
@@ -536,8 +536,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   z-index: 1;
   min-height: clamp(252px, 24vw, 300px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(88px, 9vw, 100px) minmax(0, 1fr);
-  column-gap: clamp(38px, 4.7vw, 58px);
+  grid-template-columns: minmax(0, 1fr) clamp(132px, 13.5vw, 148px) minmax(0, 1fr);
+  column-gap: clamp(28px, 3.5vw, 46px);
   align-items: center;
 }
 .waymaking-beat--left .waymaking-copy {
@@ -1671,11 +1671,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     margin-right: 0;
   }
   .waymaking-beats {
-    padding-left: 54px;
+    padding-left: 68px;
   }
   .waymaking-road-wrap {
-    inset: 0 auto 0 -5px;
-    width: 54px;
+    inset: 0 auto 0 -8px;
+    width: 66px;
     transform: none;
   }
   .waymaking-beat {
@@ -1702,11 +1702,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 @media (max-width: 600px) {
   .waymaking-beats {
-    padding-left: 48px;
+    padding-left: 64px;
   }
   .waymaking-road-wrap {
-    left: -8px;
-    width: 50px;
+    left: -10px;
+    width: 62px;
   }
   .waymaking-copy h4 {
     font-size: 24px;

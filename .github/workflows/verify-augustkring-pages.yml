@@ -38,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261019-rake-road-v1"
+          expected_home="styles.css?v=20261020-rake-road-v2"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="AI is at the heart of everything I do."
           for attempt in $(seq 1 24); do
@@ -61,7 +61,7 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-rake-road' /tmp/augustkring.html
-          grep -Fq 'waymaking-brush.js?v=20261019-rake-road-v1' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush.js?v=20261020-rake-road-v2' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
@@ -76,16 +76,19 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(88px, 9vw, 100px);' /tmp/augustkring.css
+          grep -Fq 'width: clamp(132px, 13.5vw, 148px);' /tmp/augustkring.css
           grep -Fq '.waymaking-road-canvas' /tmp/augustkring.css
           grep -Fq '.waymaking-road-fallback-svg' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261019-rake-road-v1" -o /tmp/augustkring-waymaking-brush.js
+          curl -fsSL --max-time 20 "${base}waymaking-brush.js?v=20261020-rake-road-v2" -o /tmp/augustkring-waymaking-brush.js
           grep -Fq "David Revoy's 3_rake.png" /tmp/augustkring-waymaking-brush.js
           grep -Fq "assets/waymaking-rake-brush.png?v=20261019-rake-v1" /tmp/augustkring-waymaking-brush.js
           grep -Fq "paintEdge" /tmp/augustkring-waymaking-brush.js
           grep -Fq "paintCentreMarks" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "Intentional dry gaps" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "w * 0.038" /tmp/augustkring-waymaking-brush.js
+          grep -Fq "0.165 * Math.sin" /tmp/augustkring-waymaking-brush.js
           ! grep -Fq "Figma Biopic" /tmp/augustkring-waymaking-brush.js
           curl -fsSL --max-time 20 "${base}assets/waymaking-rake-brush.png?v=20261019-rake-v1" -o /tmp/waymaking-rake.png
           test "$(xxd -p -l 8 /tmp/waymaking-rake.png)" = "89504e470d0a1a0a"
@@ -266,11 +269,11 @@ jobs:
                 assert.equal(waymakingLayout.fallbackHidden,true,'Fallback hides after rake-brush painting');
                 assert.equal(waymakingLayout.obsoleteVectorBrush,false,'Obsolete vector brush paths must not return');
                 if(width===1440){
-                  assert.ok(waymakingLayout.road.width<=101,'Desktop painted road remains visually secondary');
+                  assert.ok(waymakingLayout.road.width<=149,'Desktop painted road corridor stays within art-directed width');
                   assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left copy stays clear of road');
                   assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 10,'Right copy stays clear of road');
                 }
-                if(width===390) assert.ok(waymakingLayout.road.width<=51,'Mobile painted road remains visually secondary');
+                if(width===390) assert.ok(waymakingLayout.road.width<=63,'Mobile painted road corridor stays within art-directed width');
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');

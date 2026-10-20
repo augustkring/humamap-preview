@@ -53,17 +53,24 @@
 
   const centreX = t =>
     0.50 +
-    0.105 * Math.sin(t * Math.PI * 2 - 0.42) +
-    0.038 * Math.sin(t * Math.PI * 4 + 0.55);
+    0.165 * Math.sin(t * Math.PI * 2 - 0.62) +
+    0.048 * Math.sin(t * Math.PI * 4 + 0.38) +
+    0.016 * Math.sin(t * Math.PI * 6 + 1.08);
 
   const halfRoad = t =>
-    0.225 +
-    0.012 * Math.sin(t * Math.PI * 2 + 0.85);
+    0.17 +
+    0.012 * Math.sin(t * Math.PI * 2 + 0.85) +
+    0.006 * Math.sin(t * Math.PI * 5 - 0.35);
 
-  const edgePoint = (t, side, w, h) => ({
-    x: (centreX(t) + side * halfRoad(t)) * w,
-    y: t * h
-  });
+  const edgePoint = (t, side, w, h) => {
+    const independentWobble = side < 0
+      ? 0.012 * Math.sin(t * Math.PI * 6 + 0.32)
+      : 0.009 * Math.sin(t * Math.PI * 5 + 1.12);
+    return {
+      x: (centreX(t) + side * halfRoad(t) + independentWobble) * w,
+      y: t * h
+    };
+  };
 
   const centrePoint = (t, w, h) => ({
     x: centreX(t) * w,
@@ -93,11 +100,15 @@
   };
 
   const paintEdge = (ctx, brush, side, w, h, seedOffset) => {
-    const spacing = Math.max(1.15, w * 0.0125);
+    const spacing = Math.max(4.8, w * 0.038);
     const steps = Math.ceil(h / spacing);
-    const baseSize = Math.max(8.5, w * 0.125);
+    const baseSize = Math.max(15, w * 0.16);
 
     for (let i = 0; i <= steps; i += 1) {
+      // Intentional dry gaps stop the edge becoming one synthetic vector rail.
+      const dryPhase = (i + seedOffset) % 23;
+      if (dryPhase === 10 || dryPhase === 11) continue;
+
       const t = i / steps;
       const p = edgePoint(t, side, w, h);
       const angle = tangentAngle(
@@ -107,36 +118,37 @@
         h
       );
 
-      const wave = Math.sin((i + seedOffset) * 0.43);
-      const slow = Math.sin((i + seedOffset) * 0.071);
-      const size = baseSize * (0.92 + 0.085 * wave + 0.045 * slow);
+      const wave = Math.sin((i + seedOffset) * 0.61);
+      const slow = Math.sin((i + seedOffset) * 0.11);
+      const size = baseSize * (0.90 + 0.12 * wave + 0.055 * slow);
       const normal = angle + Math.PI / 2;
-      const drift = 0.55 * Math.sin((i + seedOffset) * 0.29);
+      const drift = 1.15 * Math.sin((i + seedOffset) * 0.37);
+      const angleJitter = 0.045 * Math.sin((i + seedOffset) * 0.47);
 
-      // Main pigment
+      // Main pigment. Fewer, larger stamps preserve the real rake texture.
       stamp(
         ctx,
         brush,
         p.x + Math.cos(normal) * drift,
         p.y + Math.sin(normal) * drift,
-        angle,
+        angle + angleJitter,
         size,
-        0.042 + 0.008 * (wave + 1) / 2,
-        1.08
+        0.056 + 0.020 * (wave + 1) / 2,
+        0.84
       );
 
-      // Sparse bristle echo
-      if (i % 3 === 0) {
-        const echo = side * (0.7 + 0.45 * Math.sin(i * 0.19));
+      // Sparse dry-brush echo sits slightly outside the road edge.
+      if (i % 4 === 0) {
+        const echo = side * (1.6 + 0.7 * Math.sin(i * 0.23));
         stamp(
           ctx,
           brush,
           p.x + Math.cos(normal) * echo,
           p.y + Math.sin(normal) * echo,
-          angle + 0.018 * Math.sin(i * 0.31),
-          size * 0.78,
-          0.018,
-          1.20
+          angle - angleJitter * 0.55,
+          size * 0.88,
+          0.026,
+          0.96
         );
       }
     }
@@ -152,11 +164,11 @@
       [0.782, 0.819],
       [0.912, 0.948]
     ];
-    const size = Math.max(5.2, w * 0.064);
+    const size = Math.max(7.2, w * 0.066);
 
     ranges.forEach(([a, b], index) => {
       const lengthPx = (b - a) * h;
-      const steps = Math.max(4, Math.ceil(lengthPx / Math.max(1.5, w * 0.017)));
+      const steps = Math.max(3, Math.ceil(lengthPx / Math.max(4.2, w * 0.029)));
       for (let i = 0; i <= steps; i += 1) {
         const t = a + (b - a) * (i / steps);
         const p = centrePoint(t, w, h);
@@ -169,8 +181,8 @@
           p.y + Math.sin(angle + Math.PI / 2) * wiggle,
           angle,
           size * (0.92 + 0.08 * Math.sin(i * 0.71)),
-          0.028,
-          0.72
+          0.042,
+          0.58
         );
       }
     });
