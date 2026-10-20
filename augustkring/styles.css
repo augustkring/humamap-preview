@@ -1734,9 +1734,9 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   position: relative;
   z-index: 1;
 }
-/* Keep the road unchanged behind the rest of the page, while protecting
-   long-form reading on desktop. These are plain white paper surfaces, not
-   road opacity changes, cards, movement, or animation. */
+/* Readable foreground on desktop without a solid white rectangle cutting
+   across the black brush. The painting is still completely fixed and opaque;
+   only stationary content has a soft paper-white reading surface behind it. */
 @media (min-width: 901px) {
   body[data-waymaking-road-active="true"] .waymaking-resolution p,
   body[data-waymaking-road-active="true"] .work-heading-copy,
@@ -1747,8 +1747,26 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   body[data-waymaking-road-active="true"] .homepage-contact-signoff {
     position: relative;
     z-index: 1;
-    background-color: var(--page);
-    box-shadow: 0 0 34px 22px var(--page);
+    isolation: isolate;
+  }
+  body[data-waymaking-road-active="true"] .waymaking-resolution p::before,
+  body[data-waymaking-road-active="true"] .work-heading-copy::before,
+  body[data-waymaking-road-active="true"] .perspective-lead::before,
+  body[data-waymaking-road-active="true"] .perspective-copy::before,
+  body[data-waymaking-road-active="true"] .perspective-link::before,
+  body[data-waymaking-road-active="true"] .homepage-contact-invite::before,
+  body[data-waymaking-road-active="true"] .homepage-contact-signoff::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -90px -110px;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+      transparent 0%, var(--page) 15%, var(--page) 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+      transparent 0%, #000 13%, #000 87%, transparent 100%);
+    mask-image: linear-gradient(to right,
+      transparent 0%, #000 13%, #000 87%, transparent 100%);
   }
 }
 /* These selectors target the body-level graphic, not the Waymaking section. */
