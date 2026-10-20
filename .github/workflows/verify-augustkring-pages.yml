@@ -309,7 +309,7 @@ jobs:
                 assert.ok(Math.abs(pinBeginning.top-pinFinalChapter.top)<1,'Road drifted vertically across chapters');
                 assert.ok(Math.abs(pinBeginning.left-pinFinalChapter.left)<1,'Road drifted horizontally across chapters');
                 const signoffTop=await page.locator('.waymaking-resolution').evaluate(el=>scrollY+el.getBoundingClientRect().top);
-                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),signoffTop-window.innerHeight*.44);
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),signoffTop-page.viewportSize().height*.44);
                 await page.waitForTimeout(110);
                 assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),null,
                   'Painting must disappear before the centered Waymaker conclusion');
