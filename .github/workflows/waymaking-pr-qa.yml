@@ -31,12 +31,35 @@ jobs:
             if curl --silent --fail http://127.0.0.1:8765/humamap-preview/augustkring/ >/dev/null; then break; fi
             sleep 1
           done
-          npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0
+          npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0 pngjs@7.0.0
           chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$chrome"
           CHROME_BIN="$chrome" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
           const assert=require('node:assert/strict');
           const {chromium}=require('playwright-core');
+          const {PNG}=require('pngjs');
+          // Compare actual raster frames. A CSS 'visibility:hidden' on the
+          // container was previously overridden by 'visibility:visible' on
+          // the completed child painting, so computed-style tests passed
+          // while the ink remained visibly printed outside the story.
+          async function assertNoRenderedRoad(page,section,width) {
+            const road=page.locator('.waymaking-road-wrap');
+            const withRoad=PNG.sync.read(await page.screenshot());
+            await road.evaluate(el=>el.style.display='none');
+            const withoutRoad=PNG.sync.read(await page.screenshot());
+            await road.evaluate(el=>el.style.removeProperty('display'));
+            assert.equal(withRoad.width,withoutRoad.width);
+            assert.equal(withRoad.height,withoutRoad.height);
+            let changed=0;
+            for(let pixel=0;pixel<withRoad.data.length;pixel+=4) {
+              const diff=Math.abs(withRoad.data[pixel]-withoutRoad.data[pixel])
+                +Math.abs(withRoad.data[pixel+1]-withoutRoad.data[pixel+1])
+                +Math.abs(withRoad.data[pixel+2]-withoutRoad.data[pixel+2]);
+              if(diff>6) changed++;
+            }
+            assert.equal(changed,0,'Road is STILL visible as pixels outside the five chapters: '+section+' '+width+' ('+changed+' pixels)');
+            console.log('PIXEL_HIDDEN',width,section,changed);
+          }
           const widths=[320,390,768,1024,1440];
           const site='http://127.0.0.1:8765/humamap-preview/augustkring/';
           const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
@@ -112,6 +135,7 @@ jobs:
                 assert.equal(before.roadOpacity,0,'Hidden parent MUST have opacity zero; child visibility:visible cannot override it');
                 assert.equal(before.bodyActive,undefined,'Road must not activate before Creative Thinking');
                 assert.equal(before.roadBodyChild,true,'Road is outside scrolling containers');
+                await assertNoRenderedRoad(page,'Before Creative',width);
                 await page.screenshot({path:'artifacts/before-Creative-'+width+'.png'});
 
                 await jump(page,firstDocY+12);
@@ -180,6 +204,7 @@ jobs:
                 assert.equal(signoff.roadVisibility,'hidden','Painting should be finished and gone before Waymaker line');
                 assert.equal(signoff.roadOpacity,0,'Ink child artwork must not render behind the signoff');
                 assert.equal(signoff.bodyActive,undefined,'No body road beyond Waymaking');
+                await assertNoRenderedRoad(page,'Waymaker signoff',width);
                 await page.screenshot({path:'artifacts/signoff-'+width+'.png'});
 
                 for(const [name,selector] of [
@@ -196,6 +221,8 @@ jobs:
                   assert.equal(state.bodyActive,undefined,'Story activation leaked into '+name);
                   assert.equal(state.artificialPaperMats,false,'White patchwork style returned at '+name);
                   assert.ok(!state.scrollOverflow,'Overflow after Waymaking at '+name);
+                  if(name==='Shift-I-See'||name==='Footer')
+                    await assertNoRenderedRoad(page,name,width);
                   await page.screenshot({path:'artifacts/after-'+name+'-'+width+'.png'});
                 }
 
