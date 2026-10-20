@@ -99,19 +99,22 @@
     // the preceding Where I add value copy free of decorative ink.
     const entranceStart = height * 0.78;
     const entranceEnd = height * 0.51;
-    // Start releasing after the fifth chapter, before its centered sign-off
-    // reaches the painting or the following project cards become visible.
+    // Release the ink while crossing the intentional pause after the last
+    // chapter, BEFORE the centered Waymaker line enters the picture area.
+    // This avoids covering the sign-off and the following venture cards.
+    const conclusionTop = story.querySelector('.waymaking-resolution')
+      .getBoundingClientRect().top;
     const exitStart = height * 0.91;
-    const exitEnd = height * 0.70;
+    const exitEnd = height * 0.76;
 
     const fadeIn = clamp(
       (entranceStart - rect.top) / (entranceStart - entranceEnd)
     );
     const fadeOut = clamp(
-      (rect.bottom - exitEnd) / (exitStart - exitEnd)
+      (conclusionTop - exitEnd) / (exitStart - exitEnd)
     );
     const opacity = Math.min(fadeIn, fadeOut);
-    const active = rect.top < entranceStart && rect.bottom > exitEnd;
+    const active = rect.top < entranceStart && conclusionTop > exitEnd;
 
     if (active) {
       story.dataset.waymakingPinned = 'true';
