@@ -95,10 +95,14 @@
   const updatePin = () => {
     const rect = story.getBoundingClientRect();
     const height = window.innerHeight;
-    const entranceStart = height * 0.92;
-    const entranceEnd = height * 0.63;
-    const exitStart = height * 0.46;
-    const exitEnd = height * 0.12;
+    // Entrance is delayed until the story actually owns the screen, keeping
+    // the preceding Where I add value copy free of decorative ink.
+    const entranceStart = height * 0.78;
+    const entranceEnd = height * 0.51;
+    // Start releasing after the fifth chapter, before its centered sign-off
+    // reaches the painting or the following project cards become visible.
+    const exitStart = height * 0.91;
+    const exitEnd = height * 0.70;
 
     const fadeIn = clamp(
       (entranceStart - rect.top) / (entranceStart - entranceEnd)
