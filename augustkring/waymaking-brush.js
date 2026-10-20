@@ -90,14 +90,14 @@
     0.012 * Math.sin(t * Math.PI * 6 + 1.08);
 
   const halfRoad = t =>
-    0.158 +
-    0.010 * Math.sin(t * Math.PI * 2 + 0.85) +
-    0.005 * Math.sin(t * Math.PI * 5 - 0.35);
+    0.17 +
+    0.012 * Math.sin(t * Math.PI * 2 + 0.85) +
+    0.006 * Math.sin(t * Math.PI * 5 - 0.35);
 
   const edgePoint = (t, side, w, h) => {
     const independentWobble = side < 0
-      ? 0.008 * Math.sin(t * Math.PI * 6 + 0.32)
-      : 0.007 * Math.sin(t * Math.PI * 5 + 1.12);
+      ? 0.018 * Math.sin(t * Math.PI * 6 + 0.32)
+      : 0.014 * Math.sin(t * Math.PI * 5 + 1.12);
     return {
       x: (centreX(t) + side * halfRoad(t) + independentWobble) * w,
       y: t * h
@@ -135,12 +135,12 @@
     }
   ) => {
     const targetLength = Math.max(1, (t1 - t0) * h * 1.06);
-    const stepPx = Math.max(2.2, Math.min(3.4, w * 0.021));
+    const stepPx = Math.max(4.5, Math.min(7.5, w * 0.042));
     const steps = Math.max(12, Math.ceil(targetLength / stepPx));
     const sourceSpan = Math.max(0.01, source1 - source0);
     const sourceStep = sourceSpan * brush.width / steps;
-    const targetSliceLength = targetLength / steps * 1.28;
-    const sourceSliceWidth = Math.max(2, sourceStep * 1.36);
+    const targetSliceLength = targetLength / steps * 1.16;
+    const sourceSliceWidth = Math.max(4, sourceStep * 1.18);
 
     for (let i = 0; i <= steps; i += 1) {
       const u = i / steps;
@@ -181,7 +181,7 @@
   };
 
   const paintRoad = (ctx, brush, w, h) => {
-    const edgeThickness = Math.max(7.2, w * 0.088);
+    const edgeThickness = Math.max(9.5, Math.min(20, w * 0.14));
 
     drawBrushAlong(
       ctx,
@@ -192,7 +192,7 @@
       {
         reverse: false,
         thickness: edgeThickness,
-        alpha: 0.24,
+        alpha: 0.175,
         normalOffset: -0.35,
         phase: 11
       }
@@ -207,7 +207,7 @@
       {
         reverse: true,
         thickness: edgeThickness * 0.96,
-        alpha: 0.225,
+        alpha: 0.165,
         normalOffset: 0.45,
         phase: 47
       }
@@ -225,8 +225,8 @@
         source0: 0.18,
         source1: 0.82,
         reverse: true,
-        thickness: edgeThickness * 0.62,
-        alpha: 0.055,
+        thickness: edgeThickness * 0.72,
+        alpha: 0.042,
         normalOffset: -1.05,
         phase: 83
       }
@@ -241,8 +241,8 @@
         source0: 0.16,
         source1: 0.84,
         reverse: false,
-        thickness: edgeThickness * 0.58,
-        alpha: 0.05,
+        thickness: edgeThickness * 0.68,
+        alpha: 0.038,
         normalOffset: 1.10,
         phase: 101
       }
@@ -259,7 +259,7 @@
       [0.782, 0.820],
       [0.912, 0.950]
     ];
-    const thickness = Math.max(2.4, w * 0.026);
+    const thickness = Math.max(3.2, Math.min(4.8, w * 0.032));
 
     ranges.forEach(([a, b], index) => {
       const sourceStart = 0.24 + (index % 4) * 0.11;
@@ -276,7 +276,7 @@
           source1: Math.min(0.90, sourceStart + 0.18),
           reverse: index % 2 === 1,
           thickness,
-          alpha: 0.20,
+          alpha: 0.16,
           normalOffset: (index % 2 ? 0.3 : -0.25),
           phase: 17 + index * 13
         }
@@ -306,6 +306,7 @@
 
     canvas.dataset.paintReady = 'true';
     canvas.dataset.brushMaterial = 'continuous-dry-ink';
+    canvas.dataset.brushVersion = 'v2-broad-material';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 

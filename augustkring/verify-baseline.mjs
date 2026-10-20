@@ -37,7 +37,7 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(thread.includes('data-waymaking-ink-road'),'Artist dry-brush canvas target missing');
-assert.ok(html.includes('waymaking-brush.js?v=20261020-dry-ink-v1'),'Artist dry-brush renderer missing');
+assert.ok(html.includes('waymaking-brush.js?v=20261020-dry-ink-v2'),'Artist dry-brush renderer missing');
 const dryBrush=readFileSync(join(root,'assets/waymaking-dry-brush.png'));
 assert.ok(dryBrush.length>100000 && dryBrush[0]===0x89 && dryBrush[1]===0x50 && dryBrush[2]===0x4e && dryBrush[3]===0x47,'MIT dry-brush PNG asset missing or invalid');
 const dryBrushLicense=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
