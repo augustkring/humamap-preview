@@ -108,7 +108,12 @@ jobs:
             const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
             try{
               for(const width of widths){
-                const page=await browser.newPage({viewport:{width,height:900}});
+                const record=width===390||width===1440;
+                const context=await browser.newContext({
+                  viewport:{width,height:900},
+                  recordVideo:record?{dir:'artifacts/videos',size:{width,height:900}}:undefined
+                });
+                const page=await context.newPage();
                 const exceptions=[];
                 page.on('pageerror',error=>exceptions.push(error.message));
                 await page.goto(site,{waitUntil:'networkidle'});
@@ -254,7 +259,25 @@ jobs:
                   chapterPositions:recorded.map(x=>x.road.top),
                   pigment:recorded.map(x=>x.paintOffset),outsideHidden:true
                 }));
+                if(record){
+                  // Render a real multi-second screen recording rather than
+                  // trusting static checkpoints of this scroll experience.
+                  await go(page,target.start-110);
+                  await page.evaluate(({from,to})=>new Promise(resolve=>{
+                    let began;
+                    const tick=now=>{
+                      if(began===undefined)began=now;
+                      const t=Math.min(1,(now-began)/5400);
+                      window.scrollTo({top:from+(to-from)*t,behavior:'instant'});
+                      if(t<1)requestAnimationFrame(tick);
+                      else resolve();
+                    };
+                    requestAnimationFrame(tick);
+                  }),{from:target.start-110,to:target.outro-900*.62});
+                  await pause(220);
+                }
                 await page.close();
+                await context.close();
               }
               const reduced=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
               await reduced.goto(site,{waitUntil:'networkidle'});
