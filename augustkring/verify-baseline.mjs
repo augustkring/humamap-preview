@@ -85,7 +85,7 @@ const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('document.body.appendChild(road)'),'Painting must be portaled out of the section');
 assert.ok(scrollController.includes("document.body.dataset.waymakingRoadActive = 'true'"),'Body road activation missing');
 assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes('firstHeading.getBoundingClientRect().top <= startLine()'),'Creative Thinking start controller missing');
-assert.ok(scrollController.includes('const openingLine = startLine()'),'Start aligned to first heading and fixed art top');
+assert.ok(scrollController.includes('const startLine = () => pinTop() + 16;') && scrollController.includes('firstHeading.getBoundingClientRect().top <= startLine()'),'Start aligned to first heading and fixed art top');
 assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Painting progress not aligned to Creative Thinking');
 assert.ok(!scrollController.includes('const fadeOut') && !scrollController.includes('conclusionTop') && !scrollController.includes('waymaking-pin-opacity'),'Forbidden fade/unpin logic must never return');
 assert.ok(css.includes('.waymaking-road-art'),'Authored ink road artwork styling missing');
