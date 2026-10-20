@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"891c9a97","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"f70936db","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -39,17 +39,17 @@ for(const sentence of [
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
 assert.ok(thread.includes('<h3 id="waymaking-title">Waymaking</h3>'),'Waymaking narrative missing');
-assert.ok(thread.includes('For me, that is what it means to be a waymaker.'),'Waymaker definition missing');
+assert.ok(thread.includes("For me, that's what it means to be a <span>waymaker"),'Waymaker definition missing');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
-assert.ok(thread.includes('assets/waymaking-ink-road-brush.png') && thread.includes('assets/waymaking-ink-road-brush-mobile.png'),'Baked desktop/mobile ink art missing');
+assert.ok(thread.includes('assets/waymaking-editorial-ink.avif'),'Approved original ink illustration missing');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must be retired');
 for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose','For me, that is what it means to be a waymaker.']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose',"For me, that's what it means to be a"]){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -58,14 +58,18 @@ for(const name of ['waymaking-ink-road-brush.png','waymaking-ink-road-brush-mobi
  const art=readFileSync(join(root,'assets',name));
  assert.ok(art.length>100000 && art[0]===0x89 && art[1]===0x50 && art[2]===0x4e && art[3]===0x47,'High-resolution ink PNG missing or invalid: '+name);
 }
+const editorialInk=readFileSync(join(root,'assets/waymaking-editorial-ink.avif'));
+assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('ascii')==='ftypavif','Approved ink AVIF missing or corrupt');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-v3'),'Scroll story enhancement missing');
+assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License') && license.includes('Copyright (c) 2026 nomagicln'),'MIT artwork source attribution missing');
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
-assert.ok(css.includes('width: clamp(132px, 13.5vw, 148px);'),'Waymaking painted road corridor drift');
+assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
 assert.ok(css.includes('.waymaking-road-art'),'Authored ink road artwork styling missing');
-assert.ok(css.includes('.waymaking-purpose'),'Purpose layout styling missing');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"'),'Purpose should share competency typography');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
@@ -78,7 +82,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-brush-v2':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-editorial-v3':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

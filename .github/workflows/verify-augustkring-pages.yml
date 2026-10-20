@@ -9,6 +9,8 @@ on:
       - "augustkring/styles.css"
       - "augustkring/assets/waymaking-ink-road-brush.png"
       - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
+      - "augustkring/assets/waymaking-editorial-ink.avif"
+      - "augustkring/waymaking-scroll.js"
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
@@ -40,13 +42,13 @@ jobs:
         run: |
           set -euo pipefail
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261020-waymaking-brush-v2"
+          expected_home="styles.css?v=20261020-waymaking-editorial-v3"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that is what it means to be a waymaker." /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "For me, that" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
               echo "Approved Waymaking homepage and stylesheet are published."
               break
             fi
@@ -63,13 +65,15 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq '<h3 id="waymaking-title">Waymaking</h3>' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-ink-road-brush.png' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-ink-road-brush-mobile.png' /tmp/augustkring.html
+          grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261020-v3' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
-          grep -Fq 'For me, that is what it means to be a waymaker.' /tmp/augustkring.html
+          grep -Fq "For me, that" /tmp/augustkring.html
+          grep -Fq "waymaker" /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
@@ -79,9 +83,9 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(132px, 13.5vw, 148px);' /tmp/augustkring.css
+          grep -Fq 'position: sticky;' /tmp/augustkring.css
           grep -Fq '.waymaking-road-art' /tmp/augustkring.css
-          grep -Fq '.waymaking-purpose' /tmp/augustkring.css
+          grep -Fq '.waymaking-scene' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
           for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
@@ -89,6 +93,11 @@ jobs:
             test "$(xxd -p -l 8 "/tmp/${art}")" = "89504e470d0a1a0a"
             test "$(wc -c < "/tmp/${art}")" -gt 100000
           done
+          curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.avif" -o /tmp/waymaking-editorial-ink.avif
+          test "$(xxd -p -s 4 -l 8 /tmp/waymaking-editorial-ink.avif)" = "6674797061766966"
+          test "$(wc -c < /tmp/waymaking-editorial-ink.avif)" -gt 4000
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261020-v3" -o /tmp/waymaking-scroll.js
+          grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
@@ -182,13 +191,13 @@ jobs:
                   const perspectivesBlock = document.querySelector('.perspectives-block');
                   const cardTitle = document.querySelector('.perspective-link-title');
                   return {
-                    opener: document.querySelector('.thread-lead p').textContent.trim(),
-                    visionCopy: document.querySelector('.thread-copy p:first-child').textContent.trim(),
-                    purposeCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    opener: document.querySelector('.thread-copy p:first-child').textContent.trim(),
+                    visionCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
+                    purposeCopy: document.querySelector('.thread-copy p:nth-child(3)').textContent.trim(),
                     purposeTitle: document.querySelector('.waymaking-purpose h4').textContent.trim(),
                     workHeading: document.querySelector('#work-title').textContent.trim(),
                     waymakingTitle: document.querySelector('#waymaking-title').textContent.trim(),
-                    waymakerDefinition: document.querySelector('.waymaking-resolution h3').textContent.trim(),
+                    waymakerDefinition: document.querySelector('.waymaking-resolution p').textContent.trim(),
                     waymakingBeatCount: document.querySelectorAll('.waymaking-beat').length,
                     hasHomepageStory: !!document.querySelector('#about-title'),
                     statementTypeface: getComputedStyle(statement).fontFamily,
@@ -200,19 +209,20 @@ jobs:
                 });
                 console.log('Editorial polish', width, editorial);
                 assert.equal(editorial.opener,'I do my best work in the early stages, when a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.');
-                const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.thread-lead > p, .perspective-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
+                const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.perspective-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
                   text:el.textContent.trim(),
                   width:el.getBoundingClientRect().width
                 })));
-                assert.equal(homeSubtitleWidths.length,3,'All three homepage section subtitles are present');
+                assert.equal(homeSubtitleWidths.length,2,'Remaining homepage section subtitles are present');
                 for(const entry of homeSubtitleWidths) assert.ok(entry.width<=390.5,'Homepage subtitle must stay within shared 390px measure: '+entry.text);
                 if(width===1440) {
-                  const subtitle = await page.locator('.thread-lead > p').evaluate(el => ({
+                  const summary = await page.locator('.thread-copy p:first-child').evaluate(el => ({
                     width: el.getBoundingClientRect().width,
                     height: el.getBoundingClientRect().height,
                     lineHeight: parseFloat(getComputedStyle(el).lineHeight)
                   }));
-                  assert.ok(subtitle.height > subtitle.lineHeight * 2, 'Holistic introduction must remain readable as a paragraph');
+                  assert.ok(summary.width>=350&&summary.width<=640,'Holistic introduction should have a comfortable reading width');
+                  assert.ok(summary.height>summary.lineHeight*2,'Holistic introduction should remain a readable paragraph');
                 }
                 assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
                 assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future, together with bold people, create things that matter and leave the world a little better than I found it.");
@@ -220,14 +230,14 @@ jobs:
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.waymakingTitle,'Waymaking');
-                assert.equal(editorial.waymakerDefinition,'For me, that is what it means to be a waymaker.');
-                assert.equal(editorial.waymakingBeatCount,4);
+                assert.equal(editorial.waymakerDefinition,"For me, that's what it means to be a waymaker.");
+                assert.equal(editorial.waymakingBeatCount,5);
                 assert.equal(editorial.hasHomepageStory,false);
                 await page.locator('.waymaking-narrative').scrollIntoViewIfNeeded();
                 await page.locator('.waymaking-road-art img').evaluate(img => img.decode());
                 const waymakingLayout = await page.evaluate(() => {
                   const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
-                  const art=document.querySelector('.waymaking-road-art img');
+                  const image=document.querySelector('.waymaking-road-art img');
                   const blocks=[...document.querySelectorAll('.waymaking-copy')].map(el=>{
                     const r=el.getBoundingClientRect();
                     return {left:r.left,right:r.right,height:r.height};
@@ -235,10 +245,10 @@ jobs:
                   return {
                     road:{left:road.left,right:road.right,width:road.width,height:road.height},
                     blocks,
-                    imageComplete:art.complete,
-                    imageWidth:art.naturalWidth,
-                    artUrl:art.currentSrc,
-                    hasMobileArt:!!document.querySelector('.waymaking-road-art source[media="(max-width: 900px)"]'),
+                    imageComplete:image.complete,
+                    imageWidth:image.naturalWidth,
+                    artUrl:image.currentSrc,
+                    hasApprovedArt:!!document.querySelector('.waymaking-road-art source[type="image/avif"]'),
                     purposeVisible:!!document.querySelector('.waymaking-purpose'),
                     obsoleteCanvas:!!document.querySelector('.waymaking-road-canvas, [data-waymaking-ink-road]'),
                     overflow:document.documentElement.scrollWidth>innerWidth+1
@@ -249,18 +259,16 @@ jobs:
                 assert.equal(waymakingLayout.overflow,false,'Waymaking never causes horizontal overflow');
                 assert.equal(waymakingLayout.imageComplete,true,'Authored ink artwork loaded');
                 assert.ok(waymakingLayout.imageWidth>=126,'Ink artwork has real intrinsic size');
-                assert.equal(waymakingLayout.hasMobileArt,true,'Mobile art direction missing');
+                assert.equal(waymakingLayout.hasApprovedArt,true,'Approved original ink artwork source missing');
                 assert.equal(waymakingLayout.purposeVisible,true,'Purpose section missing');
                 assert.equal(waymakingLayout.obsoleteCanvas,false,'Canvas road must not return');
-                assert.ok(waymakingLayout.road.height>700,'Ink road should span the narrative');
-                if(width<=900) assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush-mobile.png'),'Mobile artwork not selected');
-                else assert.ok(waymakingLayout.artUrl.endsWith('waymaking-ink-road-brush.png'),'Desktop artwork not selected');
-                if(width===1440){
-                  assert.ok(waymakingLayout.road.width<=149,'Desktop painted road corridor stays within art-directed width');
-                  assert.ok(waymakingLayout.blocks[0].right < waymakingLayout.road.left + 10,'Left copy stays clear of road');
-                  assert.ok(waymakingLayout.blocks[1].left > waymakingLayout.road.right - 10,'Right copy stays clear of road');
+                assert.ok(waymakingLayout.artUrl.endsWith('waymaking-editorial-ink.avif'),'Browser must select approved illustration');
+                if(width===1440) {
+                  assert.ok(waymakingLayout.road.width>=300,'Desktop artwork must be given generous space');
+                  for(const block of waymakingLayout.blocks) assert.ok(block.right<waymakingLayout.road.left+12,'Editorial copy must not overlap artwork');
                 }
-                if(width===390||width===320) assert.ok(waymakingLayout.road.width<=75,'Mobile painted road corridor stays within art-directed width');
+                if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
+                if(width===320||width===390) assert.ok(waymakingLayout.road.height<=470,'Mobile painting must not dominate full scroll');
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
