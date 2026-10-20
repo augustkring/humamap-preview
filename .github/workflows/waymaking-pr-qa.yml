@@ -215,6 +215,7 @@ jobs:
               const reduced=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
               await reduced.goto(pageURL,{waitUntil:'networkidle'});
               await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
+              await reduced.waitForTimeout(150);
               assert.equal(await reduced.locator('.waymaking-narrative').getAttribute('data-waymaking-painted'),null,'Reduced motion disables staged painting');
               assert.equal(await reduced.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),'true','Reduced motion still anchors the full static painting');
               assert.equal(await reduced.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).position),'fixed');
