@@ -79,7 +79,7 @@ assert.ok(css.includes('margin-inline: auto;') && css.includes('width: min(33.5%
 assert.ok(!css.slice(css.indexOf('/* Waymaking V5:'),css.indexOf('.work-section--waymaking-output {')).includes('border-top:'),'Waymaking top/bottom separators must not return');
 assert.ok(css.includes('linear-gradient(to right, transparent 0%'),'Mobile ink background fade missing');
 assert.ok(css.includes('.waymaking-road-art'),'Authored ink road artwork styling missing');
-assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h4>Purpose Driven</h4>'),'Purpose Driven should share competency typography');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven should share competency typography');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
