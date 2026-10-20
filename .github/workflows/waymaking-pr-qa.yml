@@ -275,7 +275,7 @@ jobs:
                     };
                     requestAnimationFrame(tick);
                   }),{from:firstDocY-110,to:conclusionY-900*.62});
-                  await pause(220);
+                  await sleep(220);
                 }
                 await page.close();
                 await context.close();
