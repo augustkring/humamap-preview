@@ -95,6 +95,10 @@ jobs:
                 assert.ok(Math.abs(first.road.center-first.story.center)<3,'Ink road must be centered');
                 assert.equal(first.painted,'true','Scroll-driven brush should work on all widths');
                 assert.ok(first.firstLetters.every(x=>x>8),'Visual heading glyph animation is missing');
+                if(width<=900){
+                  const inactiveBody=await beats.last().locator('p').evaluate(el=>getComputedStyle(el).color);
+                  assert.equal(inactiveBody,'rgb(45, 63, 83)','Mobile inactive copy must stay dark enough to read over ink');
+                }
                 assert.notEqual(first.brushVisible,'none','Scroll-masked artwork must remain active on mobile and desktop');
 
                 const byScreenCenter=await page.evaluate(()=>{
