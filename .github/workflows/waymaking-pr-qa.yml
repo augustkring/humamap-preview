@@ -199,7 +199,7 @@ jobs:
                 // over the text as it did in the first viewport-fixed attempt.
                 const signoffTop=await page.locator('.waymaking-resolution').evaluate(el=>
                   scrollY+el.getBoundingClientRect().top);
-                const signoffOnScreen=await sampleScroll(signoffTop-window.innerHeight*.44);
+                const signoffOnScreen=await sampleScroll(signoffTop-page.viewportSize().height*.44);
                 assert.equal(signoffOnScreen.pinned,undefined,
                   'Ink must vanish before the centered Waymaker closing copy');
                 assert.equal(signoffOnScreen.roadVisibility,'hidden',
