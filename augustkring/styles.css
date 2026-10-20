@@ -596,7 +596,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .waymaking-narrative[data-waymaking-active="true"] .waymaking-beat {
-    opacity: .56;
+    opacity: .80;
   }
   .waymaking-narrative[data-waymaking-active="true"] .waymaking-beat.is-current {
     opacity: 1;
