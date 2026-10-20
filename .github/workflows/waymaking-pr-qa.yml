@@ -103,6 +103,8 @@ jobs:
                   await page.waitForTimeout(250);
                   const last=await page.locator('[data-waymaking-paint-path]').getAttribute('stroke-dashoffset');
                   assert.ok(Number(last)<first-250,'Artwork must paint progressively along curve');
+                  assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-complete'),'true','The final painting should display the untouched original');
+                  assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible','The original artwork must be visible when brush completes');
                   const focus=await page.locator('.waymaking-beat').last().evaluate(el=>getComputedStyle(el.querySelector('h4')).color);
                   const off=await page.locator('.waymaking-beat').first().evaluate(el=>getComputedStyle(el.querySelector('h4')).color);
                   assert.notEqual(focus,off,'Active chapter must become darker');
