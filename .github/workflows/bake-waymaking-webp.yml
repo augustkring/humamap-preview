@@ -1,0 +1,48 @@
+name: Bake Waymaking artwork fallback
+
+on:
+  push:
+    branches:
+      - design/waymaking-brush-paint-mobile-v4
+    paths:
+      - ".github/workflows/bake-waymaking-webp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout original artwork
+        uses: actions/checkout@v4
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install image decoder
+        run: python -m pip install --disable-pip-version-check "pillow==12.0.0"
+      - name: Encode compatible image without changing the illustration
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          root=Path('augustkring/assets')
+          image=Image.open(root/'waymaking-editorial-ink.avif').convert('RGBA')
+          assert image.size==(720,1080)
+          destination=root/'waymaking-editorial-ink.webp'
+          image.save(destination,format='WEBP',quality=86,method=6)
+          assert destination.stat().st_size>10000
+          print(destination, destination.stat().st_size)
+          PY
+      - name: Commit approved artwork fallback
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add augustkring/assets/waymaking-editorial-ink.webp
+          if ! git diff --cached --quiet; then
+            git commit -m "Add WebP fallback from the approved Waymaking painting"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
