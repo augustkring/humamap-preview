@@ -63,7 +63,7 @@ assert.ok(editorialInk.length>4000 && editorialInk.subarray(4,12).toString('asci
 const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'));
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-v5a'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261020-v5b'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -93,7 +93,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-centered-v5a':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-centered-v5b':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
