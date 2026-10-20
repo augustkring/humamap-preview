@@ -125,8 +125,8 @@
     const height = window.innerHeight;
     const startReached = firstHeading.getBoundingClientRect().top <= startLine();
     const conclusionTop = conclusion.getBoundingClientRect().top;
-    const fadeStart = height * 0.98;
-    const fadeEnd = height * 0.80;
+    const fadeStart = height * 0.84;
+    const fadeEnd = height * 0.69;
     const departure = smooth((fadeStart - conclusionTop) /
       Math.max(1, fadeStart - fadeEnd));
     const opacity = 1 - departure;
