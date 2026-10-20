@@ -120,7 +120,9 @@
     // A fully opaque stroke paints the completed route. Seven increasingly
     // transparent brush layers feather the moving tip into the white paper.
     // This avoids the abrupt flat cut visible in the earlier single cap.
-    const frontLength = Math.min(revealed, 0.11);
+    // Gradually narrow the translucent brush tip as the road completes,
+    // so the final unmasked original appears without a sudden visual jump.
+    const frontLength = Math.min(revealed, 0.11, (1 - revealed) * 0.5);
     const solid = revealed - frontLength;
     brush.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - solid))));
     featherPaths.forEach((path, index) => {
