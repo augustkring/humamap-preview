@@ -1676,7 +1676,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .waymaking-road-wrap {
     position: sticky;
     top: calc((100svh - min(68svh, 560px)) / 2);
-    width: min(84vw, 360px);
+    width: min(100%, 360px);
     height: min(68svh, 560px);
     margin: 0 auto;
   }
@@ -1694,7 +1694,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .waymaking-narrative { margin-top: 30px; }
   .waymaking-road-wrap {
     top: calc((100svh - min(68svh, 540px)) / 2);
-    width: min(90vw, 330px);
+    width: min(100%, 330px);
     height: min(68svh, 540px);
   }
   .waymaking-road-art,
