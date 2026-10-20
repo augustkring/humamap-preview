@@ -176,15 +176,15 @@
 
   const paintCentreMarks = (field, brush, width, height) => {
     const ranges = [
-      [0.065, 0.105],
-      [0.194, 0.235],
-      [0.325, 0.366],
-      [0.458, 0.500],
-      [0.594, 0.635],
-      [0.728, 0.770],
-      [0.864, 0.905]
+      [0.066, 0.096],
+      [0.188, 0.231],
+      [0.327, 0.357],
+      [0.452, 0.497],
+      [0.594, 0.627],
+      [0.724, 0.769],
+      [0.868, 0.899]
     ];
-    const thickness = Math.max(7, Math.min(12, width * 0.040));
+    const thickness = Math.max(7.5, Math.min(13, width * 0.044));
 
     ranges.forEach(([a, b], index) => {
       paintWarpedStroke(field, brush, width, height, {
@@ -195,7 +195,7 @@
         source1: 0.78,
         reverse: index % 2 === 1,
         thickness,
-        opacity: 0.31,
+        opacity: 0.39,
         phase: index * 0.7
       });
     });
@@ -233,7 +233,7 @@
 
     canvas.dataset.paintReady = 'true';
     canvas.dataset.brushMaterial = 'continuous-dry-ink';
-    canvas.dataset.brushVersion = 'v5-continuous-warp';
+    canvas.dataset.brushVersion = 'v6-ink-marks';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 

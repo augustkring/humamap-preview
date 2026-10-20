@@ -109,3 +109,6 @@ Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.
 
 
 **Approved change 2026-10-20 (continuous dry-brush warp):** Screenshot review of the story-curve pass exposed visible horizontal slice banding in the canvas road. The MIT dry-brush source and existing muted palette are retained, but the renderer no longer stamps rectangular source slices. It now samples the original brush continuously pixel-by-pixel along each curved road edge, preserving authentic bristle fibres and pigment gaps without digital striping. The experimental Creative-thinking branch is removed in this pass so the road remains calm and authoritative. The stronger S-curve and more legible centre markings remain. No approved `Where I add value` or `The shift I see` copy changed.
+
+
+**Approved change 2026-10-20 (painted centre-mark refinement):** The continuous-warp browser render was reviewed at 1440px and 390px and retained. Its road edges, S-curve, material and spacing are unchanged. Only the centre road markings were refined: their lengths now vary deliberately, their brush width is slightly stronger and their pigment opacity rises enough for the illustration to read immediately as a road rather than two unrelated brush strokes. The road remains materially lighter than the surrounding typography and stays visually secondary. No website copy changed.
