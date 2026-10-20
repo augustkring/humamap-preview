@@ -68,7 +68,7 @@
     for (let i = 0; i < cd.length; i += 4) {
       const alpha = cd[i + 3] / 255;
       const lum = (cd[i] + cd[i + 1] + cd[i + 2]) / (3 * 255);
-      const density = Math.pow(Math.max(0, alpha * (1 - lum)), 0.86);
+      const density = Math.pow(Math.max(0, alpha * (1 - lum)), 0.72);
       cd[i] = ink.r;
       cd[i + 1] = ink.g;
       cd[i + 2] = ink.b;
@@ -135,12 +135,12 @@
     }
   ) => {
     const targetLength = Math.max(1, (t1 - t0) * h * 1.06);
-    const stepPx = Math.max(4.5, Math.min(7.5, w * 0.042));
+    const stepPx = Math.max(11, Math.min(15, w * 0.095));
     const steps = Math.max(12, Math.ceil(targetLength / stepPx));
     const sourceSpan = Math.max(0.01, source1 - source0);
     const sourceStep = sourceSpan * brush.width / steps;
-    const targetSliceLength = targetLength / steps * 1.16;
-    const sourceSliceWidth = Math.max(4, sourceStep * 1.18);
+    const targetSliceLength = targetLength / steps * 1.24;
+    const sourceSliceWidth = Math.max(12, sourceStep * 1.48);
 
     for (let i = 0; i <= steps; i += 1) {
       const u = i / steps;
@@ -181,7 +181,7 @@
   };
 
   const paintRoad = (ctx, brush, w, h) => {
-    const edgeThickness = Math.max(9.5, Math.min(20, w * 0.14));
+    const edgeThickness = Math.max(9.5, Math.min(23, w * 0.155));
 
     drawBrushAlong(
       ctx,
@@ -192,7 +192,7 @@
       {
         reverse: false,
         thickness: edgeThickness,
-        alpha: 0.175,
+        alpha: 0.205,
         normalOffset: -0.35,
         phase: 11
       }
@@ -207,46 +207,12 @@
       {
         reverse: true,
         thickness: edgeThickness * 0.96,
-        alpha: 0.165,
+        alpha: 0.195,
         normalOffset: 0.45,
         phase: 47
       }
     );
 
-    // A restrained pigment ghost adds material depth without creating a
-    // second visible line. It uses a different source interval and offset.
-    drawBrushAlong(
-      ctx,
-      brush,
-      (t, ww, hh) => edgePoint(t, -1, ww, hh),
-      w,
-      h,
-      {
-        source0: 0.18,
-        source1: 0.82,
-        reverse: true,
-        thickness: edgeThickness * 0.72,
-        alpha: 0.042,
-        normalOffset: -1.05,
-        phase: 83
-      }
-    );
-    drawBrushAlong(
-      ctx,
-      brush,
-      (t, ww, hh) => edgePoint(t, 1, ww, hh),
-      w,
-      h,
-      {
-        source0: 0.16,
-        source1: 0.84,
-        reverse: false,
-        thickness: edgeThickness * 0.68,
-        alpha: 0.038,
-        normalOffset: 1.10,
-        phase: 101
-      }
-    );
   };
 
   const paintCentreMarks = (ctx, brush, w, h) => {
@@ -259,7 +225,7 @@
       [0.782, 0.820],
       [0.912, 0.950]
     ];
-    const thickness = Math.max(3.2, Math.min(4.8, w * 0.032));
+    const thickness = Math.max(3.1, Math.min(5.2, w * 0.035));
 
     ranges.forEach(([a, b], index) => {
       const sourceStart = 0.24 + (index % 4) * 0.11;
@@ -276,7 +242,7 @@
           source1: Math.min(0.90, sourceStart + 0.18),
           reverse: index % 2 === 1,
           thickness,
-          alpha: 0.16,
+          alpha: 0.185,
           normalOffset: (index % 2 ? 0.3 : -0.25),
           phase: 17 + index * 13
         }
@@ -306,7 +272,7 @@
 
     canvas.dataset.paintReady = 'true';
     canvas.dataset.brushMaterial = 'continuous-dry-ink';
-    canvas.dataset.brushVersion = 'v2-broad-material';
+    canvas.dataset.brushVersion = 'v3-wide-slices';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 
