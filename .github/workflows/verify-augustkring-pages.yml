@@ -288,29 +288,34 @@ jobs:
                 }
                 if(width<=900) assert.ok(waymakingLayout.road.width<=420,'Mobile painting fits viewport');
                 if(width<=900) assert.ok(waymakingLayout.road.height<=600,'Mobile sticky background should remain proportionate');
-                // Regression: real viewport fixation must continue through the
-                // closing Waymaker line, not stop when the beat container ends.
+                // A genuine viewport pin must hold through the fifth chapter,
+                // then fade away BEFORE the closing Waymaker statement and work.
                 await page.locator('.waymaking-beat').first().scrollIntoViewIfNeeded();
                 await page.waitForTimeout(110);
                 const pinBeginning=await page.locator('.waymaking-road-wrap').evaluate(el=>({
                   top:el.getBoundingClientRect().top,
                   left:el.getBoundingClientRect().left,
-                  mode:getComputedStyle(el).position,
-                  opacity:parseFloat(getComputedStyle(el).opacity)
+                  mode:getComputedStyle(el).position
                 }));
-                await page.locator('.waymaking-resolution').scrollIntoViewIfNeeded();
+                await page.locator('.waymaking-beat').last().scrollIntoViewIfNeeded();
                 await page.waitForTimeout(110);
-                const pinConclusion=await page.locator('.waymaking-road-wrap').evaluate(el=>({
+                const pinFinalChapter=await page.locator('.waymaking-road-wrap').evaluate(el=>({
                   top:el.getBoundingClientRect().top,
                   left:el.getBoundingClientRect().left,
-                  mode:getComputedStyle(el).position,
-                  opacity:parseFloat(getComputedStyle(el).opacity)
+                  mode:getComputedStyle(el).position
                 }));
                 assert.equal(pinBeginning.mode,'fixed','Ink road must be genuinely fixed on entry');
-                assert.equal(pinConclusion.mode,'fixed','Ink road must remain fixed at Waymaker conclusion');
-                assert.ok(Math.abs(pinBeginning.top-pinConclusion.top)<1,'Road moved vertically by chapter conclusion');
-                assert.ok(Math.abs(pinBeginning.left-pinConclusion.left)<1,'Road moved horizontally by chapter conclusion');
-                console.log('Published viewport pin',width,pinBeginning,pinConclusion);
+                assert.equal(pinFinalChapter.mode,'fixed','Ink road must remain fixed through the last chapter');
+                assert.ok(Math.abs(pinBeginning.top-pinFinalChapter.top)<1,'Road drifted vertically across chapters');
+                assert.ok(Math.abs(pinBeginning.left-pinFinalChapter.left)<1,'Road drifted horizontally across chapters');
+                const signoffTop=await page.locator('.waymaking-resolution').evaluate(el=>scrollY+el.getBoundingClientRect().top);
+                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),signoffTop-window.innerHeight*.44);
+                await page.waitForTimeout(110);
+                assert.equal(await page.locator('.waymaking-narrative').getAttribute('data-waymaking-pinned'),null,
+                  'Painting must disappear before the centered Waymaker conclusion');
+                assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).visibility),'hidden',
+                  'Road must not obscure the Waymaker conclusion or My current focus');
+                console.log('Published viewport fixation and exit',width,pinBeginning,pinFinalChapter);
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
