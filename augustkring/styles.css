@@ -1734,6 +1734,11 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   position: relative;
   z-index: 1;
 }
+/* Feathered reading surfaces must not create horizontal page scrolling. The
+   artwork itself is already portaled directly to body and is unaffected. */
+body[data-waymaking-road-active="true"] .home-main {
+  overflow-x: clip;
+}
 /* Readable foreground on desktop without a solid white rectangle cutting
    across the black brush. The painting is still completely fixed and opaque;
    only stationary content has a soft paper-white reading surface behind it. */
