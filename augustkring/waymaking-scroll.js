@@ -20,6 +20,7 @@
 
   const reset = () => {
     delete story.dataset.waymakingPainted;
+    delete story.dataset.waymakingComplete;
     brush.setAttribute('stroke-dashoffset', '1000');
     beats.forEach(beat => beat.classList.remove('is-current'));
   };
@@ -43,6 +44,8 @@
     // Its round moving brush tip avoids the old straight horizontal crop.
     const revealed = clamp(0.035 + progress * 1.01, 0, 1);
     brush.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - revealed))));
+    if (revealed >= 0.995) story.dataset.waymakingComplete = 'true';
+    else delete story.dataset.waymakingComplete;
 
     let selected = 0;
     let distance = Infinity;
