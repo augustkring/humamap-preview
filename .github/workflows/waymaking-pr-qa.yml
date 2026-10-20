@@ -212,7 +212,7 @@ jobs:
                   ['Waymaker signoff','.waymaking-resolution'],
                   ['My Current Focus','#work'],
                   ['The Shift I See','#perspective'],
-                  ['Contact','#contact'],
+                  ['Contact','.homepage-contact'],
                   ['Footer','.home-footer']
                 ];
                 const sectionStates=[];
