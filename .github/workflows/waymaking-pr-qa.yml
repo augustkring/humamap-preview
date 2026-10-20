@@ -159,8 +159,8 @@ jobs:
                   const r=document.querySelector('.waymaking-narrative').getBoundingClientRect();
                   return {top:scrollY+r.top,bottom:scrollY+r.bottom,height:innerHeight};
                 });
-                const enterAt=narrativeBounds.top-narrativeBounds.height*.80;
-                const exitAt=narrativeBounds.bottom-narrativeBounds.height*.37;
+                const enterAt=narrativeBounds.top-narrativeBounds.height*.66;
+                const exitAt=narrativeBounds.bottom-narrativeBounds.height*.80;
                 const sampleScroll=async y=>{
                   await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
                   await page.waitForTimeout(100);
@@ -181,12 +181,12 @@ jobs:
                 assert.ok(ending.roadOpacity>0&&ending.roadOpacity<1,
                   'Leave softly without moving the painting');
                 await page.screenshot({path:'artifacts/pinned-ending-'+width+'.png'});
-                const outAfter=await sampleScroll(narrativeBounds.bottom-narrativeBounds.height*.07);
+                const outAfter=await sampleScroll(narrativeBounds.bottom-narrativeBounds.height*.65);
                 assert.equal(outAfter.pinned,undefined,'Art should unpin only after fading out');
                 assert.equal(outAfter.roadVisibility,'hidden',
                   'Never show the road sliding away when it leaves the story');
                 await page.screenshot({path:'artifacts/after-waymaking-'+width+'.png'});
-                const inBefore=await sampleScroll(narrativeBounds.top-narrativeBounds.height*.97);
+                const inBefore=await sampleScroll(narrativeBounds.top-narrativeBounds.height*.85);
                 assert.equal(inBefore.pinned,undefined,'Art must not float over content before Waymaking');
                 assert.equal(inBefore.roadVisibility,'hidden');
                 console.log('PIN '+width,JSON.stringify({
@@ -194,6 +194,18 @@ jobs:
                   entryOpacity:entering.roadOpacity,signoffOpacity:ending.roadOpacity,
                   hiddenAfter:outAfter.roadVisibility
                 }));
+                // The Waymaker sign-off and the first venture cards must be
+                // unobscured; the road should already be invisible, not drifting
+                // over the text as it did in the first viewport-fixed attempt.
+                const signoffTop=await page.locator('.waymaking-resolution').evaluate(el=>
+                  scrollY+el.getBoundingClientRect().top);
+                const signoffOnScreen=await sampleScroll(signoffTop-window.innerHeight*.44);
+                assert.equal(signoffOnScreen.pinned,undefined,
+                  'Ink must vanish before the centered Waymaker closing copy');
+                assert.equal(signoffOnScreen.roadVisibility,'hidden',
+                  'The road cannot visually cover the Waymaker signoff');
+                await page.screenshot({path:'artifacts/clear-signoff-'+width+'.png'});
+
 
                 // In-between stages must contain a genuine range of heading colors,
                 // not instantly swap all the characters at one breakpoint.
