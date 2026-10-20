@@ -85,14 +85,14 @@
 
   const centreX = t =>
     0.50 +
-    0.15 * Math.sin(t * Math.PI * 2 - 0.62) +
-    0.045 * Math.sin(t * Math.PI * 4 + 0.38) +
-    0.012 * Math.sin(t * Math.PI * 6 + 1.08);
+    0.27 * Math.sin(t * Math.PI * 2 - 0.66) +
+    0.055 * Math.sin(t * Math.PI * 4 + 0.34) +
+    0.014 * Math.sin(t * Math.PI * 6 + 1.04);
 
   const halfRoad = t =>
-    0.17 +
-    0.012 * Math.sin(t * Math.PI * 2 + 0.85) +
-    0.006 * Math.sin(t * Math.PI * 5 - 0.35);
+    0.16 +
+    0.016 * Math.sin(t * Math.PI * 2 + 0.85) +
+    0.007 * Math.sin(t * Math.PI * 5 - 0.35);
 
   const edgePoint = (t, side, w, h) => {
     const independentWobble = side < 0
@@ -108,6 +108,16 @@
     x: centreX(t) * w,
     y: t * h
   });
+
+  const possibilityPoint = (t, side, w, h) => {
+    const local = Math.max(0, Math.min(1, (t - 0.055) / 0.19));
+    const ease = local * local * (3 - 2 * local);
+    const base = centrePoint(t, w, h);
+    const spread = side * ease * w * 0.24;
+    const wobble = Math.sin(local * Math.PI * 2 + (side < 0 ? 0.7 : 1.9)) * w * 0.012;
+    return { x: base.x + spread + wobble, y: base.y };
+  };
+
 
   const tangentAngle = (pointFn, t, w, h) => {
     const e = 0.0012;
@@ -215,6 +225,33 @@
 
   };
 
+  const paintPossibilityBranches = (ctx, brush, w, h) => {
+    if (w < 90) return;
+
+    const thickness = Math.max(6.5, Math.min(13.5, w * 0.085));
+    for (const side of [-1, 1]) {
+      drawBrushAlong(
+        ctx,
+        brush,
+        (t, ww, hh) => possibilityPoint(t, side, ww, hh),
+        w,
+        h,
+        {
+          t0: 0.055,
+          t1: 0.245,
+          source0: side < 0 ? 0.13 : 0.58,
+          source1: side < 0 ? 0.30 : 0.76,
+          reverse: side > 0,
+          thickness,
+          alpha: 0.105,
+          normalOffset: side * 0.2,
+          phase: side < 0 ? 61 : 83
+        }
+      );
+    }
+  };
+
+
   const paintCentreMarks = (ctx, brush, w, h) => {
     const ranges = [
       [0.065, 0.103],
@@ -225,7 +262,7 @@
       [0.782, 0.820],
       [0.912, 0.950]
     ];
-    const thickness = Math.max(3.1, Math.min(5.2, w * 0.035));
+    const thickness = Math.max(3.6, Math.min(6.2, w * 0.041));
 
     ranges.forEach(([a, b], index) => {
       const sourceStart = 0.24 + (index % 4) * 0.11;
@@ -242,7 +279,7 @@
           source1: Math.min(0.90, sourceStart + 0.18),
           reverse: index % 2 === 1,
           thickness,
-          alpha: 0.185,
+          alpha: 0.245,
           normalOffset: (index % 2 ? 0.3 : -0.25),
           phase: 17 + index * 13
         }
@@ -267,12 +304,13 @@
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
+    paintPossibilityBranches(ctx, brush, rect.width, rect.height);
     paintRoad(ctx, brush, rect.width, rect.height);
     paintCentreMarks(ctx, brush, rect.width, rect.height);
 
     canvas.dataset.paintReady = 'true';
     canvas.dataset.brushMaterial = 'continuous-dry-ink';
-    canvas.dataset.brushVersion = 'v3-wide-slices';
+    canvas.dataset.brushVersion = 'v4-story-curve';
     if (fallback) fallback.setAttribute('hidden', '');
   };
 
