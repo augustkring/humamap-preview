@@ -139,6 +139,9 @@ jobs:
                       src:picture.currentSrc,
                       maskSrc:document.querySelector('.waymaking-paint-art image').getAttribute('href'),
                       progress:Number(path.getAttribute('stroke-dashoffset')),
+                      scrollY,firstTop:document.querySelector('.waymaking-beat h3').getBoundingClientRect().top,
+                      lastTop:document.querySelector('.waymaking-beat:last-child h3').getBoundingClientRect().top,
+                      reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
                       svgDisplay:getComputedStyle(svg).display,
                       picVisibility:getComputedStyle(picture.parentElement).visibility,
                       overflow:document.documentElement.scrollWidth>innerWidth+1
@@ -148,6 +151,7 @@ jobs:
                   assert.equal(state.active,'true');
                   assert.equal(state.painted,'true',
                     engineName+' failed to render progressive pigment (AVIF/WebP source guard?)');
+                  console.log('PROGRESS_PROBE',engineName,width,JSON.stringify({pos,state,errors}));
                   assert.ok(state.progress>100&&state.progress<900,'Ink progress wrong');
                   assert.notEqual(state.svgDisplay,'none',engineName+' not showing masked SVG');
                   assert.equal(state.picVisibility,'hidden',engineName+' showed complete static ink');
