@@ -42,6 +42,7 @@ async function info(page) {
    road:box(road),roadVisible:pos.visibility==='visible'&&pos.display!=='none',
    roadOpacity:Number(pos.opacity),active:document.body.dataset.waymakingRoadActive==='true',
    viewportHeight:innerHeight,clip:Number.parseFloat(road.style.getPropertyValue('--waymaking-entrance-clip'))||0,
+   conclusionClip:Number.parseFloat(road.style.getPropertyValue('--waymaking-conclusion-clip'))||0,
    parentBody:road.parentElement===document.body,
    artBackground:getComputedStyle(svg).backgroundColor,
    artViewBox:svg.getAttribute('viewBox'),
@@ -114,6 +115,10 @@ function fixedInvariant(state,width,name) {
   assert.ok(state.clip>=state.introBottom-state.road.top-22,
    name+' original ink intersects Where I add value intro');
  }
+ if(state.signoff.top<state.road.bottom) {
+  assert.ok(state.conclusionClip>=state.road.bottom-state.signoff.top+27,
+   name+' extended ink overlaps the Waymaker conclusion');
+ }
 }
 async function runOne(browser,engine,width) {
  const page=await browser.newPage({viewport:{width,height:900}});
@@ -169,6 +174,16 @@ async function runOne(browser,engine,width) {
   assert.ok(avg<=old*.79,'Gaps are not reduced to 50–75% of V16: '+avg+' / '+old);
   assert.ok(Math.max(...heights)-Math.min(...heights)<=85,
     'The five chapter heights are not uniform: '+JSON.stringify(heights));
+  // Separate real signoff reading-position screenshot is required: five
+  // chapter screenshots alone allowed the ink to bleed across this line.
+  const signoffY=await page.locator('.waymaking-resolution').evaluate(el=>
+    scrollY+el.getBoundingClientRect().top);
+  await go(page,signoffY-900*.55);
+  const signoffState=await info(page);
+  assert.ok(signoffState.road.bottom-signoffState.conclusionClip <= signoffState.signoff.top-25,
+    'Visible route covers the Waymaker line during signoff reading');
+  if([320,390,1440].includes(width))
+    await page.screenshot({path:join(output,engine+'-'+width+'-waymaker-signoff.png'),animations:'disabled');
   const gap=await page.evaluate(()=>{
    const end=document.querySelector('.waymaking-resolution').getBoundingClientRect();
    const last=document.querySelector('.waymaking-purpose .waymaking-copy').getBoundingClientRect();

@@ -567,7 +567,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   transform: translateX(-50%);
   width: min(30vw, 360px);
   height: min(69svh, 630px);
-  clip-path: inset(var(--waymaking-entrance-clip, 0px) 0 0 0);
+  clip-path: inset(var(--waymaking-entrance-clip, 0px) 0 var(--waymaking-conclusion-clip, 0px) 0);
   margin: 0;
   pointer-events: none;
   display: none;

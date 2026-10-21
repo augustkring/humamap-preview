@@ -108,6 +108,12 @@
     const fixedTop=Math.min(vh*.30,270);
     const entranceClip=Math.max(0,summaryBottom-fixedTop+18);
     road.style.setProperty('--waymaking-entrance-clip',entranceClip.toFixed(2)+'px');
+    // The signoff has full-width centred text that extends beneath the mobile
+    // road rail. Clip ONLY the lower visible ink at that signoff boundary.
+    // This is not a coordinate transform; the art remains pixel-fixed.
+    const fixedHeight=Math.min(vh*.69,630);
+    const conclusionClip=Math.max(0,fixedTop+fixedHeight-(signoffTop-30));
+    road.style.setProperty('--waymaking-conclusion-clip',conclusionClip.toFixed(2)+'px');
     const arriving=smooth((vh*.97-firstTop)/Math.max(1,vh*.23))*
       smooth((vh*.84-summaryBottom)/Math.max(1,vh*.23));
     const departure=lastCopyBottom<vh*.36
