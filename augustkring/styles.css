@@ -529,12 +529,14 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -.034em;
+  overflow-wrap: anywhere;
 }
 .waymaking-copy p {
   margin: 0;
   color: var(--copy);
   font-size: var(--body-copy-size);
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 .waymaking-copy .waymaking-heading-word {
   display: inline-block;

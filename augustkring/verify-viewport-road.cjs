@@ -189,8 +189,46 @@ async function runOne(browser,engine,width) {
    }
    assert.equal(pixels,0,'Road continued under '+selector+': '+pixels+' rendered pixels');
   }
+  // A real visitor can scroll BACK from later sections; mask and road
+  // must return to their exact previous state, not remain faded or hidden.
+  await scroll(page,middles[2]-900*.49);
+  const restored=await checkpoint(page);
+  assert.ok(restored.roadOpacity>.99,'Road did not reappear after reverse scroll from later content');
+  assert.ok(Math.abs(restored.fraction-stages[2].fraction)<.008,
+    'Road did not rewind to Strategic Judgment after leaving story');
+
+  // 200% copy enlargement: normal HTML reflows without a horizontally
+  // scrolling page or text obscured by the decorative SVG.
+  if(width===320){
+    await page.evaluate(()=>{
+      for(const node of document.querySelectorAll('.waymaking-copy h3, .waymaking-copy p')){
+        const size=parseFloat(getComputedStyle(node).fontSize);
+        node.style.fontSize=(2*size)+'px';
+        node.style.lineHeight='1.5';
+      }
+    });
+    await page.waitForTimeout(140);
+    const reflow=await checkpoint(page);
+    assert.equal(reflow.overflow,false,'200% mobile text should reflow without horizontal scrolling');
+  }
+
+  // Live viewport changes: switching between authored mobile and desktop
+  // vector art must preserve a valid progressive SVG mask and readable copy.
+  if(width===390){
+    await page.setViewportSize({width:1024,height:900});
+    await page.waitForTimeout(180);
+    const resized=await checkpoint(page);
+    assert.equal(resized.overflow,false,'Responsive resize introduced horizontal overflow');
+    assert.ok(resized.fraction>.10&&resized.fraction<=1,'Road stopped drawing after responsive resize');
+    assert.ok(resized.length>100,'The desktop vector path was not selected');
+    assert.equal(resized.bitmap,false,'Responsive resize restored raster assets');
+    for(const text of resized.texts){
+      assert.equal(overlap(resized.road,text),0,'Road obscures copy after 390→1024 resizing');
+    }
+  }
+
   assert.deepEqual(problems,[],'Browser JS errors');
-  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:false,opaqueRect:false,overlaps:0,noLaterInk:true}));
+  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:false,opaqueRect:false,overlaps:0,noLaterInk:true,reverseFromExit:true}));
  }finally {await page.close();}
 }
 (async()=>{
