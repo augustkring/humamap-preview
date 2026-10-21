@@ -489,6 +489,14 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   grid-area: 1 / 1;
   z-index: 1;
 }
+/* Enter with room for the approved full image to settle at top:16px
+   BEFORE Creative Thinking is first read, without overlap or a JS pop. */
+.waymaking-copy-column::before {
+  content: '';
+  display: block;
+  height: clamp(285px, 42svh, 410px);
+  pointer-events: none;
+}
 /* The spacer extends the real sticky containing block beyond the final beat;
    the art may leave naturally only after the last text has passed. */
 .waymaking-copy-column::after {

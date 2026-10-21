@@ -84,11 +84,30 @@ function pngDifference(aBuffer, bBuffer, threshold = 8) {
 
 async function paintedPixels(page) {
   const road = page.locator('.waymaking-road-wrap');
-  const before=await page.screenshot({ animations:'disabled' });
+  const rect = await road.boundingBox();
+  const viewport = page.viewportSize();
+  if (!rect || rect.y + rect.height <= 0 || rect.y >= viewport.height ||
+      rect.x + rect.width <= 0 || rect.x >= viewport.width) return 0;
+
+  const before=PNG.sync.read(await page.screenshot({ animations:'disabled' }));
   await road.evaluate(el=>el.style.setProperty('visibility','hidden','important'));
-  const after=await page.screenshot({ animations:'disabled' });
+  const after=PNG.sync.read(await page.screenshot({ animations:'disabled' }));
   await road.evaluate(el=>el.style.removeProperty('visibility'));
-  return pngDifference(before,after);
+  const x0=Math.max(0,Math.floor(rect.x)-2);
+  const x1=Math.min(before.width,Math.ceil(rect.x+rect.width)+2);
+  const y0=Math.max(0,Math.floor(rect.y)-2);
+  const y1=Math.min(before.height,Math.ceil(rect.y+rect.height)+2);
+  let count=0;
+  for(let y=y0;y<y1;y++){
+    for(let x=x0;x<x1;x++){
+      const i=(y*before.width+x)*4;
+      const difference=Math.abs(before.data[i]-after.data[i])+
+        Math.abs(before.data[i+1]-after.data[i+1])+
+        Math.abs(before.data[i+2]-after.data[i+2]);
+      if(difference>8)count++;
+    }
+  }
+  return count;
 }
 
 async function coords(page) {
@@ -133,10 +152,8 @@ async function verifyViewport(browser,engine,width){
         'Graphic overlaps introductory Where I add value paragraphs');
       const pixels=await paintedPixels(page);
       assert.ok(pixels>1000,'The road is invisible while chapter '+labels[i]+' is being read');
-      if(i>=1){
-        assert.ok(Math.abs(g.road.top-16)<1.2,
-          'Road failed to stay at top=16 through chapters: '+labels[i]+' at '+g.road.top);
-      }
+      assert.ok(Math.abs(g.road.top-16)<1.2,
+        'Road must already be pinned for '+labels[i]+' at '+g.road.top);
       captured.push({chapter:labels[i],roadTop:g.road.top,visiblePixels:pixels,
         copyRect:g.copies[i],roadRect:g.road});
       if (width===320||width===390||width===1440) {
