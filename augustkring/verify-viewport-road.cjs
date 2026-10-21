@@ -141,7 +141,7 @@ async function runOne(browser,engine,width) {
   assert.equal(first.sticky,false,'Road must be FIXED, never sticky');
   assert.equal(first.fixed,true,'Road is not CSS fixed to viewport');
   assert.equal(first.sourceViewHeight,2148,'Artwork must be the extended original, not its old short copy');
-  assert.equal(first.imagePieces,2,'Exact original pixels must be present twice in extended art');
+  assert.equal(first.imagePieces,1,'Must be exactly ONE unbroken original ink image, not a repeated seam');
   assert.equal(first.overflow,false,'No horizontal scrollbar');
   const chapterSpacing=await page.locator('.waymaking-copy-column').evaluate(el=>({
     direction:getComputedStyle(el).flexDirection,

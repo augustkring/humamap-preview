@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"fed43864","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"75585698","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -62,8 +62,8 @@ assert.ok(thread.includes('href="assets/waymaking-editorial-ink.webp"'),'Animate
 assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
 assert.equal((thread.match(/<path data-waymaking-reveal /g)||[]).length,1,'Exactly one continuous, doubled-length original painting curve required');
 assert.ok(thread.includes('viewBox="0 0 720 2148"'),'Extended original artwork must have doubled height');
-assert.ok(thread.includes('transform="translate(0 2148) scale(1 -1)"'),'Second original copy must join at source end');
-assert.equal((thread.match(/<image href="assets\/waymaking-editorial-ink.webp"/g)||[]).length,2,'Extension must contain two copies of EXACT original image pixels');
+assert.ok(thread.includes('preserveAspectRatio="none"'),'Source pixels must be stretched as ONE continuous original illustration');
+assert.equal((thread.match(/<image href="assets\/waymaking-editorial-ink.webp"/g)||[]).length,1,'Extended road must use ONE original bitmap and never a repeated seam');
 assert.equal((thread.match(/data-waymaking-feather=/g)||[]).length,7,'Seven original brush feathers required');
 assert.ok(thread.includes('id="waymaking-brush-trail"')&&thread.includes('feTurbulence'),'Original authored mask missing');
 for(const [filename,sha] of [
