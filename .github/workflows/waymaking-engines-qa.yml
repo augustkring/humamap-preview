@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check approved editorial baseline
         run: node augustkring/verify-baseline.mjs
-      - name: Run actual firefox,webkit progressive vector road and visual-overlap QA
+      - name: Run actual firefox,webkit viewport-fixed extended original and compact-spacing QA
         shell: bash
         run: |
           set -euo pipefail
@@ -32,11 +32,11 @@ jobs:
           done
           npm install --prefix /tmp/ak-v13-qa --no-audit --no-fund --silent playwright@1.55.0 pngjs@7.0.0
           /tmp/ak-v13-qa/node_modules/.bin/playwright install --with-deps firefox webkit
-          ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=firefox,webkit ROAD_WIDTHS=390,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-viewport-road.cjs
+          ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=firefox,webkit ROAD_WIDTHS=390,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-viewport-fixed-v17.cjs
       - name: Upload actual-browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: waymaking-progressive-v15-firefox,webkit-screenshots
+          name: waymaking-fixed-v17-firefox,webkit-screenshots
           path: artifacts/
           if-no-files-found: warn
