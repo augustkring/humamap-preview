@@ -468,6 +468,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .home-main .thread-summary {
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
+  /* A naturally opaque editorial introduction sits above the graphic:
+     only the five story beats should scroll across the ink itself. */
+  position: relative;
+  z-index: 2;
+  background: var(--page);
 }
 .home-main .thread-copy { max-width: 620px; padding-top: 0; }
 .home-main .thread-copy p { line-height: 1.65; }

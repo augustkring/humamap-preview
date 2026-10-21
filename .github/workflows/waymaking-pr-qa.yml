@@ -155,6 +155,13 @@ jobs:
                 assert.ok(early.roadOpacity>0&&early.roadOpacity<1,'Road must smoothly arrive as first beat enters');
                 assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),
                   'visible','Original image must remain present during brush painting');
+                const introSurface=await page.locator('.thread-summary').evaluate(el=>({
+                  background:getComputedStyle(el).backgroundColor,
+                  zIndex:Number(getComputedStyle(el).zIndex)
+                }));
+                assert.equal(introSurface.background,'rgb(255, 255, 255)',
+                  'Where I add value introduction must not be painted over by the early backdrop');
+                assert.ok(introSurface.zIndex>0,'Approved introduction must layer above the road');
                 const withInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
                 await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.display='none');
                 const withoutInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
