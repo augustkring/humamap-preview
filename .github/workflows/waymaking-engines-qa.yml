@@ -88,7 +88,7 @@ jobs:
                     const last=document.querySelector('.waymaking-beat:last-child h3');
                     const end=document.querySelector('.waymaking-resolution');
                     return {
-                      first:scrollY+h.getBoundingClientRect().top-32,
+                      first:scrollY+document.querySelector('.waymaking-beat').getBoundingClientRect().top-innerHeight*.88,
                       last:scrollY+last.getBoundingClientRect().top-innerHeight*.51,
                       conclusion:scrollY+end.getBoundingClientRect().top
                     };
@@ -113,7 +113,7 @@ jobs:
                   assert.equal(probe.root,'BODY',engineName+' failed to run portal initialization');
                   assert.equal(probe.display,'none',
                     engineName+' painted road should be hidden before Creative Thinking');
-                  await visit(page,pos.first+25);
+                  await visit(page,pos.first+Math.max(160,900*.21));
                   const beginning=await page.evaluate(()=>{
                     const art=document.querySelector('.waymaking-road-wrap');
                     return {top:art.getBoundingClientRect().top,
@@ -154,7 +154,7 @@ jobs:
                   console.log('PROGRESS_PROBE',engineName,width,JSON.stringify({pos,state,errors}));
                   assert.ok(state.progress>100&&state.progress<900,'Ink progress wrong');
                   assert.notEqual(state.svgDisplay,'none',engineName+' not showing masked SVG');
-                  assert.equal(state.picVisibility,'hidden',engineName+' showed complete static ink');
+                  assert.equal(state.picVisibility,'visible',engineName+' hid original image when SVG brush was painting');
                   assert.equal(state.overflow,false);
                   const delta=await changedPixels(page);
                   assert.ok(delta>180,
@@ -175,6 +175,7 @@ jobs:
                   });
                   assert.equal(fallback.ok,true,engineName+' WebP fallback missing');
 
+                  // No early exit: the original remains while the fifth heading is read.
                   await visit(page,pos.last+80);
                   assert.ok(Math.abs(await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top)-16)<1,
                     engineName+' ink drifted at last chapter');
