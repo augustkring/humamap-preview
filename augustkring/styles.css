@@ -565,7 +565,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(39vw, 440px);
+  width: min(30vw, 360px);
   height: min(86svh, 790px);
   margin: 0;
   pointer-events: none;
@@ -1745,7 +1745,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
     column-gap: 13px;
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    width: 26vw;
+    width: 25vw;
     height: min(85svh, 725px);
   }
   .waymaking-beat {
