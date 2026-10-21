@@ -1712,13 +1712,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* Top-pinning Waymaking painting: the body-level art begins beside Creative
-   Thinking, rises naturally, then remains at 16px from the viewport top while
-   pigment grows. Its containing section never determines the pin position. */
+/* Permanent coordinate while active: the approved art NEVER moves on scroll.
+   Only the brush trail is revealed; the entire layer is hidden outside the
+   five story beats. Body-level fixed positioning avoids sticky-container drift. */
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 0;
-  top: var(--waymaking-viewport-top, 16px);
+  top: 16px;
   left: 50%;
   width: min(33.5vw, 390px);
   height: min(82svh, 770px);
