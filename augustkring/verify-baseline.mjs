@@ -64,7 +64,7 @@ const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'))
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
 assert.ok(thread.includes('loading="eager" fetchpriority="low"'),'Ink must start loaded while its parent is visually hidden');
-assert.ok(html.includes('waymaking-scroll.js?v=20261021-unchanging-viewport-ink-v13'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261021-waymaking-sticky-layout-v14'),'Foreground chapter focus enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -78,24 +78,18 @@ assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My stor
 assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate chapters on either side of centered road');
 assert.ok(css.includes('margin-inline: auto;') && css.includes('width: min(33.5%, 390px);'),'Centered ink road corridor missing');
-assert.ok(css.includes('body > .waymaking-road-wrap[data-waymaking-viewport="true"]'),'Viewport-fixed background selector missing');
-assert.ok(css.includes('position: fixed;') && css.includes('top: 16px;'),'Background must remain immutably fixed at 16px');
-assert.ok(css.includes('opacity: 1;') && css.includes('clip-path: inset(var(--waymaking-clip-top, 100%)'),'Artwork must be fully opaque and clipped to the story bounds, never faded');
-assert.ok(css.includes('body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {\n  display: none;'),'The moving SVG painting must be inactive');
-assert.ok(css.includes('.home-main,\n.home-footer {\n  position: relative;\n  z-index: 1;'),'Text must remain above the fixed background');
+assert.ok(css.includes('.waymaking-scene {\n  position: relative;\n  display: grid;'),'Waymaking must use a real layered grid rather than a clipped absolute artspace');
+assert.ok(css.includes('grid-area: 1 / 1;'),'Sticky artspace must share the five-beat grid row');
+assert.ok(css.includes('.waymaking-copy-column::after'),'Artwork must not leave while the last chapter is visible');
+assert.ok(css.includes('position: sticky;\n  top: 16px;'),'Native sticky road must hold its position while the chapter copy scrolls');
+assert.ok(css.includes('grid-template-columns: minmax(78px, 27%) minmax(0, 1fr);'),'Mobile copy must have its own column apart from the illustration');
+assert.ok(!css.includes('body > .waymaking-road-wrap[data-waymaking-viewport="true"]'),'Obsolete body-level fixed portal CSS must be removed');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
-assert.ok(scrollController.includes('document.body.appendChild(road)'),'The artwork must be outside all scrolling or clipping ancestors');
-assert.ok(scrollController.includes('const updateBackdropClip = () =>'),'The scene boundary must be clipped, not faded');
-assert.ok(scrollController.includes('const sceneTop = scene.getBoundingClientRect().top'),'Clip must start at the actual story position');
-assert.ok(scrollController.includes('const signoffTop = conclusion.querySelector(\'p\').getBoundingClientRect().top'),'Clip must end before Waymaker');
-assert.ok(scrollController.includes('downstreamTop - window.innerHeight'),'Road must fully disappear before the next section enters viewport');
-assert.ok(scrollController.includes("road.style.setProperty('--waymaking-clip-top'"),'Stationary viewport crop missing');
-for (const forbidden of ['--waymaking-handoff-opacity','--waymaking-original-ink-opacity','--waymaking-extra-ink-opacity','startLine()','updatePin()','stroke-dashoffset', 'road.style.top']) {
-  assert.ok(!scrollController.includes(forbidden),'Road may not be animated, faded or moved: '+forbidden);
+assert.ok(scrollController.includes('const schedule = () =>'),'Native scroll may only adjust foreground type emphasis');
+for(const forbidden of ['document.body.appendChild(road)','updateBackdropClip','--waymaking-clip-top','--waymaking-viewport-top','--waymaking-handoff-opacity','road.style','brush.setAttribute']) {
+  assert.ok(!scrollController.includes(forbidden),'Old artwork mutator must not return: '+forbidden);
 }
-assert.ok(thread.includes('<image href="assets/waymaking-editorial-ink.webp"'),'Retained source SVG provenance missing');
-assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Full original bitmap missing');
-assert.ok(!css.includes('body[data-waymaking-road-active="true"]'),'The old conditional road activation CSS must stay removed');
+assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Approved original source image must be retained');
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(scrollController.includes("word.className = 'waymaking-heading-word'"),'Heading words must not inherit Venture logo typography');
 assert.ok(css.includes('.waymaking-copy .waymaking-heading-word') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand wordmark namespaces must be distinct');
@@ -113,7 +107,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261021-unchanging-viewport-ink-v13':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261021-waymaking-sticky-layout-v14':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

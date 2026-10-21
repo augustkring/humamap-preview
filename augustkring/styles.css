@@ -480,11 +480,30 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-scene {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   isolation: isolate;
 }
 .waymaking-copy-column {
   position: relative;
+  grid-area: 1 / 1;
   z-index: 1;
+}
+/* Enter with room for the approved full image to settle at top:16px
+   BEFORE Creative Thinking is first read, without overlap or a JS pop. */
+.waymaking-copy-column::before {
+  content: '';
+  display: block;
+  height: clamp(285px, 42svh, 410px);
+  pointer-events: none;
+}
+/* The spacer extends the real sticky containing block beyond the final beat;
+   the art may leave naturally only after the last text has passed. */
+.waymaking-copy-column::after {
+  content: '';
+  display: block;
+  height: min(82svh, 770px);
+  pointer-events: none;
 }
 .waymaking-beat {
   position: relative;
@@ -536,17 +555,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   display: inline;
 }
 .waymaking-artspace {
-  position: absolute;
+  position: relative;
+  grid-area: 1 / 1;
+  align-self: stretch;
   z-index: 0;
-  inset: 0;
+  min-height: 0;
   pointer-events: none;
 }
 .waymaking-road-wrap {
   position: sticky;
-  top: calc((100svh - min(72svh, 700px)) / 2);
+  top: 16px;
   width: min(33.5%, 390px);
-  height: min(72svh, 700px);
+  height: min(82svh, 770px);
   margin-inline: auto;
+  pointer-events: none;
 }
 .waymaking-road-art,
 .waymaking-road-art img {
@@ -556,7 +578,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-road-art img {
   object-fit: contain;
-  object-position: center;
+  object-position: center top;
 }
 .waymaking-paint-art {
   position: absolute;
@@ -569,7 +591,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-resolution {
   width: min(100%, 840px);
   /* Give the fixed ink space to finish and disappear before the conclusion. */
-  margin: clamp(700px, 98svh, 1050px) auto 0;
+  margin: clamp(190px, 28svh, 300px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
@@ -1643,39 +1665,63 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .home-main .thread-copy { max-width: 680px; }
   .waymaking-narrative { margin-top: 38px; }
-  .waymaking-scene { position: relative; isolation: isolate; }
-  .waymaking-copy-column { position: relative; z-index: 1; }
+  .waymaking-scene {
+    grid-template-columns: minmax(104px, 30%) minmax(0, 1fr);
+    gap: clamp(14px, 2.8vw, 28px);
+  }
+  .waymaking-artspace {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    inset: auto;
+    align-self: stretch;
+  }
+  .waymaking-copy-column {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .waymaking-copy-column::after { height: min(76svh, 630px); }
+  .waymaking-road-wrap {
+    position: sticky;
+    top: 16px;
+    width: 100%;
+    height: min(76svh, 630px);
+    margin: 0;
+  }
+  .waymaking-road-art {
+    position: relative;
+    overflow: hidden;
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  /* Responsive art direction: crop only the empty left/right margin of the
+     unchanged ink illustration, increasing its visible vertical scale. */
+  .waymaking-road-art img {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 175%;
+    max-width: none;
+    height: auto;
+    transform: translateX(-50%);
+    object-fit: contain;
+  }
   .waymaking-beat {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: clamp(240px, 39svh, 350px);
-    padding: 32px 0;
+    min-height: clamp(245px, 37svh, 345px);
+    padding: 28px 0;
   }
   .waymaking-beat:nth-child(odd) .waymaking-copy,
   .waymaking-beat:nth-child(even) .waymaking-copy {
-    width: min(100%, 440px);
-    max-width: 440px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     text-align: left;
-  }
-  .waymaking-artspace {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
-  .waymaking-road-wrap {
-    position: sticky;
-    top: calc((100svh - min(68svh, 560px)) / 2);
-    width: min(100%, 360px);
-    height: min(68svh, 560px);
-    margin: 0 auto;
-  }
-  .waymaking-road-art,
-  .waymaking-paint-art {
-    opacity: .28;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,.65) 22%, #000 61%);
   }
   .waymaking-copy h3 { font-size: 26px; }
   .waymaking-copy p { font-size: 18px; }
@@ -1683,72 +1729,24 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 @media (max-width: 600px) {
   .waymaking-narrative { margin-top: 30px; }
-  .waymaking-road-wrap {
-    top: calc((100svh - min(68svh, 540px)) / 2);
-    width: min(100%, 330px);
-    height: min(68svh, 540px);
+  .waymaking-scene {
+    grid-template-columns: minmax(78px, 27%) minmax(0, 1fr);
+    gap: 12px;
   }
-  .waymaking-road-art,
-  .waymaking-paint-art { opacity: .27; }
-  .waymaking-beat { min-height: clamp(250px, 40svh, 345px); padding: 32px 0; }
-  .waymaking-copy h3 { font-size: 24px; }
-  .waymaking-copy p { font-size: 17px; }
+  .waymaking-road-wrap,
+  .waymaking-copy-column::after { height: min(72svh, 580px); }
+  .waymaking-beat { min-height: clamp(275px, 42svh, 360px); padding: 25px 0; }
+  .waymaking-copy h3 { font-size: clamp(21px, 5.6vw, 24px); }
+  .waymaking-copy p { font-size: 16px; line-height: 1.55; }
   .waymaking-resolution { padding: 42px 0 68px; }
   .waymaking-resolution p { font-size: 26px; }
   .work-section--waymaking-output { padding-top: 54px; }
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* V13: the full approved image is a genuine viewport fixture.
-   Scroll never changes top, left, width, height or opacity.
-   Only the rectangular scene-boundary clip is updated. */
-body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-  position: fixed;
-  z-index: 0;
-  top: 16px;
-  left: 50%;
-  width: min(33.5vw, 390px);
-  height: min(82svh, 770px);
-  margin: 0;
-  transform: translateX(-50%);
-  pointer-events: none;
-  display: block;
-  visibility: visible;
-  opacity: 1;
-  clip-path: inset(var(--waymaking-clip-top, 100%) 0 var(--waymaking-clip-bottom, 0px) 0);
-}
-body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-  display: block;
-  visibility: visible;
-  opacity: 1;
-}
-body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
-  display: none;
-}
-/* Foreground copy is above the complete fixed background. */
-.home-main,
-.home-footer {
-  position: relative;
-  z-index: 1;
-}
-@media (max-width: 900px) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    width: min(calc(100vw - 28px), 360px);
-    height: min(79svh, 680px);
-  }
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: .42;
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-}
-@media (max-width: 600px) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    width: min(calc(100vw - 28px), 330px);
-    height: min(79svh, 640px);
-  }
-}
-
+/* V14: the illustration remains in its semantic grid column. Native
+   sticky positioning supplies the fixed-on-screen reading experience,
+   with no JavaScript portal, dynamic clip-path, fade or moving pigment. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
