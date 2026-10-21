@@ -134,10 +134,15 @@ async function runOne(browser,engine,width) {
   assert.equal(first.roadParent,true,'Road must be portaled to viewport body');
   assert.equal(first.sticky,false,'Road must be FIXED, never sticky');
   assert.equal(first.overflow,false,'No horizontal scrollbar');
-  const beatHeights=await page.locator('.waymaking-beat').evaluateAll(nodes=>
-    nodes.map(n=>n.getBoundingClientRect().height));
-  assert.ok(Math.max(...beatHeights)-Math.min(...beatHeights)<5,
-    'Five chapters must have UNIFORM spacing, not ad hoc section heights');
+  const chapterSpacing=await page.locator('.waymaking-copy-column').evaluate(el=>({
+    direction:getComputedStyle(el).flexDirection,
+    gap:parseFloat(getComputedStyle(el).gap)
+  }));
+  assert.equal(chapterSpacing.direction,'column','Competency chapters must remain one flex track');
+  assert.ok(chapterSpacing.gap>=8&&chapterSpacing.gap<=12,
+    'Equal chapter-to-chapter gap must be 8-12px, not individually assigned');
+  // Paragraphs have different lengths; requiring equal *box heights* would
+  // make short and long copy awkward, while CSS gap stays exactly uniform.
   assert.ok(first.textWidth>=145,'Mobile text is too narrow');
   const storyGap=first.endTop-first.lastCopyBottom;
   assert.ok(storyGap>10&&storyGap<340,

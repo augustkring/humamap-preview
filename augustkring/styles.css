@@ -488,6 +488,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: relative;
   grid-area: 1 / 1;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1svh, 12px);
 }
 /* Enter with room for the approved full image to settle at top:16px
    BEFORE Creative Thinking is first read, without overlap or a JS pop. */
