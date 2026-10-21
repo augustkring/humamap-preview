@@ -1,15 +1,16 @@
 /*
- * Waymaking V16: the exact approved original image is back.
- * Its OWN original mask path from V12 reveals its paint progressively.
- * No substitute vector road, no raster resampling or page-scroll hijacking.
+ * Waymaking V17: exact original brush is extended and viewport FIXED.
+ * Only the SVG mask draw length + entrance/exit opacity change with scroll.
+ * Its screen coordinates NEVER change while the five shorter chapters pass.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
   const road = story?.querySelector('.waymaking-road-wrap');
+  const summary = document.querySelector('.thread-summary');
   const signoff = story?.querySelector('.waymaking-resolution p');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
-  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 1) return;
+  if (!story || !road || !summary || !signoff || beats.length !== 5 || revealPaths.length !== 1) return;
   const strokes = revealPaths.map(path => {
     const length = path.getTotalLength();
     const feathers = [...path.parentElement.querySelectorAll('[data-waymaking-feather]')];
@@ -21,6 +22,8 @@
     return {path,length,feathers};
   }).filter(Boolean);
   if (strokes.length !== 1) return;
+  road.dataset.waymakingViewport = 'true';
+  document.body.appendChild(road);
   story.dataset.waymakingAnimated = 'true';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -90,10 +93,31 @@
     return Math.min(entering, leaving);
   };
 
+  // The road is a fixed body child, and these are ONLY visibility gates.
+  // No scroll handler writes its geometry or transforms.
+  const updateVisibility = () => {
+    const vh=window.innerHeight;
+    const firstTop=beats[0].getBoundingClientRect().top;
+    const summaryBottom=summary.getBoundingClientRect().bottom;
+    const lastCopyBottom=beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
+    const signoffTop=signoff.getBoundingClientRect().top;
+    const storyBottom=story.getBoundingClientRect().bottom;
+    const arriving=smooth((vh*.97-firstTop)/Math.max(1,vh*.23))*
+      smooth((vh*.84-summaryBottom)/Math.max(1,vh*.23));
+    const departure=lastCopyBottom<vh*.36
+      ?smooth((vh*.88-signoffTop)/Math.max(1,vh*.38)) :0;
+    const alpha=Math.max(0,Math.min(1,arriving*(1-departure)));
+    if(firstTop<vh&&storyBottom>0&&signoffTop>0&&alpha>.001)
+      document.body.dataset.waymakingRoadActive='true';
+    else delete document.body.dataset.waymakingRoadActive;
+    road.style.setProperty('--waymaking-visibility-opacity',alpha.toFixed(4));
+  };
+
   const update = () => {
     frame = 0;
+    updateVisibility();
     if (reduced.matches) {
-      road.style.opacity = '1';
+      /* Reduced motion keeps the fully painted original at this fixed point. */
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
         for (const feather of feathers) feather.style.strokeDashoffset = '0';
@@ -134,16 +158,6 @@
         }
       }
     }
-    // After Purpose Driven passes, hand the completed road off to the
-    // Waymaker conclusion; this never fades the ink during any of the five
-    // chapter reading positions, and prevents its tail entering the next section.
-    const lastCopyBottom = beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
-    const signoffTop = signoff.getBoundingClientRect().top;
-    const farewell = lastCopyBottom < window.innerHeight * .48
-      ? smooth((window.innerHeight * .83 - signoffTop) /
-          Math.max(1, window.innerHeight * .32)) : 0;
-    road.style.opacity = String(1 - farewell);
-
     if (Math.abs(fraction - previousFraction) > 0.00025) {
       // Seven translucent brush layers feather the leading ink tip. The
       // geometric mask travels continuously, not in five jumped pieces.
