@@ -13,8 +13,20 @@ const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment
 mkdirSync(output,{recursive:true});
 
 async function scroll(page,y) {
- await page.evaluate(top=>window.scrollTo({top:Math.max(0,top),behavior:'instant'}),y);
- await page.waitForTimeout(140);
+ // WebKit can still be mid-smooth-scroll when the old nonstandard
+ // behavior:'instant' scrollTo option returns. That produced false chapter
+ // checkpoints with identical progress. Disable CSS scroll smoothing ONLY
+ // in the QA browser session and verify actual final scroll coordinates.
+ const target=Math.max(0,y);
+ await page.evaluate(top=>{
+   document.documentElement.style.setProperty('scroll-behavior','auto','important');
+   document.body.style.setProperty('scroll-behavior','auto','important');
+   window.scrollTo({top,behavior:'auto'});
+ },target);
+ await page.waitForFunction(top=>Math.abs(window.scrollY-top)<3,target,{timeout:7000});
+ await page.evaluate(()=>new Promise(resolve=>
+   requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ await page.waitForTimeout(65);
 }
 async function checkpoint(page) {
  return page.evaluate(()=>{
@@ -37,7 +49,7 @@ async function checkpoint(page) {
    dashOffset:parseFloat(mask.style.strokeDashoffset),
    rawOffset:mask.style.strokeDashoffset,
    length:mask.getTotalLength(),
-   road:box(road),art:box(art),scene:box(qs('.waymaking-scene')),
+   scrollY:window.scrollY,road:box(road),art:box(art),scene:box(qs('.waymaking-scene')),
    intro:box(qs('.thread-summary')),
    texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
    headings:beats.map(x=>box(x.querySelector('h3'))),
