@@ -16,7 +16,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"55702a46","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"5e26e724","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -64,7 +64,7 @@ const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'))
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
 assert.ok(thread.includes('loading="eager" fetchpriority="low"'),'Ink must start loaded while its parent is visually hidden');
-assert.ok(html.includes('waymaking-scroll.js?v=20261020-top-pin-v10'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261021-immutable-pin-v11'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -86,14 +86,15 @@ const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('document.body.appendChild(road)'),'Painting must be portaled outside scrolling/overflow containers');
 assert.ok(scrollController.includes("document.body.dataset.waymakingRoadActive = 'true'"),'Body road activation missing');
 assert.ok(scrollController.includes('const updatePin = () =>') && scrollController.includes('const startReached = titleTop <= startLine()'),'Creative Thinking start controller missing');
-assert.ok(scrollController.includes('const PIN_TOP = 16;') && scrollController.includes('const startLine = () => Math.min(window.innerHeight * 0.38, 360);'),'Road must enter alongside Creative Thinking and pin at viewport top');
-assert.ok(scrollController.includes('const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);'),'Road must scroll UP to the pinned top, never teleport to the viewport center');
-assert.ok(css.includes('top: var(--waymaking-viewport-top, 16px);'),'Fixed road CSS must use true top pin coordinate, never center-of-viewport');
-assert.ok(!css.includes('body > .waymaking-road-wrap[data-waymaking-viewport="true"] {\n  position: fixed;\n  z-index: 0;\n  top: calc('),'Center-viewport pin must not return');
-assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Painting progress not aligned to Creative Thinking');
-assert.ok(scrollController.includes("const conclusionTop = conclusion.getBoundingClientRect().top"),'Waymaking exit must be tied to signoff, not page bottom');
-assert.ok(scrollController.includes("const withinStory = startReached && conclusionTop > fadeEnd"),'Road must stop at end of Waymaking chapters');
-assert.ok(scrollController.includes("road.style.setProperty('--waymaking-handoff-opacity'"),'Road must finish motionlessly in the empty handoff before signoff');
+assert.ok(scrollController.includes('const PIN_TOP = 16;') && scrollController.includes('const startLine = () => PIN_TOP + 16;'),'Ink must start beside first heading at an immutable fixed coordinate');
+assert.ok(css.includes('top: 16px;') && !css.includes('--waymaking-viewport-top'),'Never interpolate or mutate the visual ink position');
+assert.ok(!scrollController.includes('--waymaking-viewport-top') && !scrollController.includes('const position = Math.max('),'Scroll-driven top position mutation must never return');
+assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Paint reveal must start at first-title alignment');
+assert.ok(scrollController.includes('const lastBeatBottom = beats[beats.length - 1].getBoundingClientRect().bottom'),'End transition must wait for fifth chapter');
+assert.ok(scrollController.includes('const withinStory = startReached && lastBeatBottom > fadeEnd'),'Road must stop only after the fifth chapter');
+assert.ok(scrollController.includes("road.style.setProperty('--waymaking-handoff-opacity'"),'Stationary blank-space handoff missing');
+assert.ok(!scrollController.includes("!picture.currentSrc.endsWith('.avif')"),'AVIF-only animation gate must never return');
+assert.ok(thread.includes('<image href="assets/waymaking-editorial-ink.webp"'),'SVG paint should use widely supported approved WebP artwork');
 assert.ok(!scrollController.includes("through the ENTIRE rest of the page") && !scrollController.includes("all subsequent sections"),'Page-wide road rendering must not return');
 assert.ok(css.includes('opacity: var(--waymaking-handoff-opacity, 1);'),'Scoped road must fade without moving at its end');
 assert.ok(css.includes('display: none;\n  visibility: hidden;\n  opacity: 0;'),'Offstage road must not render even if children force visibility:visible');
@@ -116,7 +117,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261020-waymaking-top-pinned-v10':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261021-immutable-pin-v11':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
