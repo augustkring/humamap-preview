@@ -76,7 +76,7 @@ jobs:
           grep -Fq 'waymaking-scroll.js?v=20261021-restore-approved-original-v16' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
-          grep -Fq 'maskContentUnits="userSpaceOnUse"' /tmp/augustkring.html
+          grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
