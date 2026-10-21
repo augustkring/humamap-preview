@@ -88,6 +88,7 @@ assert.ok(scrollController.includes('document.body.appendChild(road)'),'The artw
 assert.ok(scrollController.includes('const updateBackdropClip = () =>'),'The scene boundary must be clipped, not faded');
 assert.ok(scrollController.includes('const sceneTop = scene.getBoundingClientRect().top'),'Clip must start at the actual story position');
 assert.ok(scrollController.includes('const signoffTop = conclusion.querySelector(\'p\').getBoundingClientRect().top'),'Clip must end before Waymaker');
+assert.ok(scrollController.includes('downstreamTop - window.innerHeight'),'Road must fully disappear before the next section enters viewport');
 assert.ok(scrollController.includes("road.style.setProperty('--waymaking-clip-top'"),'Stationary viewport crop missing');
 for (const forbidden of ['--waymaking-handoff-opacity','--waymaking-original-ink-opacity','--waymaking-extra-ink-opacity','startLine()','updatePin()','stroke-dashoffset', 'road.style.top']) {
   assert.ok(!scrollController.includes(forbidden),'Road may not be animated, faded or moved: '+forbidden);

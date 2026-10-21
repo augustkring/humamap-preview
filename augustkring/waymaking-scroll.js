@@ -19,8 +19,9 @@
   const firstBeat = beats[0];
   const firstHeading = firstBeat?.querySelector('h3');
   const conclusion = story?.querySelector('.waymaking-resolution');
+  const downstream = document.querySelector('#work');
   if (!story || !scene || !road || !picture || !firstHeading ||
-      !firstBeat || !conclusion || beats.length !== 5) return;
+      !firstBeat || !conclusion || !downstream || beats.length !== 5) return;
 
   // CSS alone owns the artwork coordinates and constant pixel opacity.
   // Updating a clip boundary does not move or repaint the artwork itself.
@@ -115,12 +116,16 @@
     const illustration = road.getBoundingClientRect();
     const sceneTop = scene.getBoundingClientRect().top;
     const signoffTop = conclusion.querySelector('p').getBoundingClientRect().top;
+    const downstreamTop = downstream.getBoundingClientRect().top;
     // Pre-roll the stationary background into view before the first heading
     // reaches the reading area; it is fully visible across all chapter centres.
     // This is viewport clipping, not image movement or opacity animation.
     const visualEntry = sceneTop - illustration.height * 0.45;
     const visibleTop = Math.max(illustration.top, visualEntry);
-    const visibleBottom = Math.min(illustration.bottom, signoffTop - 64);
+    // A full-viewport discharge distance clears ink BEFORE the next section
+    // is visible, rather than waiting for its text to overlap the drawing.
+    const visibleBottom = Math.min(illustration.bottom, signoffTop - 64,
+      downstreamTop - window.innerHeight);
 
     if (visibleBottom <= visibleTop) {
       road.style.setProperty('--waymaking-clip-top', illustration.height + 'px');

@@ -169,7 +169,18 @@ async function oneViewport(browser, engine, width) {
       const y = await page.locator(selector).evaluate(el =>
         scrollY + el.getBoundingClientRect().top - innerHeight * 0.4);
       await jump(page, y);
-      assert.equal(await renderedRoadPixels(page), 0, engine + '/' + width +
+      const region = await state(page);
+      const rendered = await renderedRoadPixels(page);
+      if (rendered > 0) {
+        console.log('OUTSIDE_FAIL', engine, width, selector, JSON.stringify({
+          roadTop: region.top, roadHeight: region.height,
+          clipTop: region.clipTop, clipBottom: region.clipBottom,
+          clipPath: region.clipPath, sourceOpacity: region.imageOpacity,
+          renderedPixels: rendered
+        }));
+        await page.screenshot({ path: join(output, engine + '-' + width + '-outside-debug.png') });
+      }
+      assert.equal(rendered, 0, engine + '/' + width +
         ': road leaked into ' + selector);
     }
     await jump(page, positions.beats[1] - 450);
