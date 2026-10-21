@@ -587,21 +587,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-period { color: var(--red); }
 
-/* Progressive enhancement only: the entire page remains readable without JS. */
-@media (prefers-reduced-motion: no-preference) {
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-road-art {
-    visibility: visible;
-  }
-  .waymaking-narrative[data-waymaking-painted="true"] .waymaking-paint-art {
-    display: block;
-  }
-  .waymaking-narrative[data-waymaking-complete="true"] .waymaking-paint-art {
-    display: block;
-  }
-  .waymaking-narrative[data-waymaking-complete="true"] .waymaking-road-art {
-    visibility: visible;
-  }
-}
+/* The V13 background uses the actual complete source image at every scroll
+   position. SVG painting stays retired, including in reduced-motion mode. */
 .work-section--waymaking-output {
   padding-top: clamp(64px, 6.5vw, 88px);
 }
@@ -1712,9 +1699,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* Permanent coordinate while active: the approved art NEVER moves on scroll.
-   Only the brush trail is revealed; the entire layer is hidden outside the
-   five story beats. Body-level fixed positioning avoids sticky-container drift. */
+/* V13: the full approved image is a genuine viewport fixture.
+   Scroll never changes top, left, width, height or opacity.
+   Only the rectangular scene-boundary clip is updated. */
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 0;
@@ -1725,55 +1712,24 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
-  /* A descendant explicitly declares visibility:visible once the brush is
-     complete. Hiding by visibility alone failed in real Chrome screenshots.
-     Fully remove the portaled layer from painting outside these chapters. */
-  display: none;
-  visibility: hidden;
-  opacity: 0;
-}
-body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: block;
   visibility: visible;
-  opacity: var(--waymaking-handoff-opacity, 1);
+  opacity: 1;
+  clip-path: inset(var(--waymaking-clip-top, 100%) 0 var(--waymaking-clip-bottom, 0px) 0);
 }
-/* Source artwork remains perceptible throughout; brush SVG adds stronger ink. */
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-  opacity: var(--waymaking-original-ink-opacity, .58);
+  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
-  opacity: var(--waymaking-extra-ink-opacity, .42);
+  display: none;
 }
-/* Keep all foreground copy, cards and navigation above the persistent road. */
+/* Foreground copy is above the complete fixed background. */
 .home-main,
 .home-footer {
   position: relative;
   z-index: 1;
-}
-/* No artificial paper mattes or overflow clipping elsewhere on the page.
-   The ink is only active over its own five-chapter narrative. */
-/* These selectors target the body-level graphic, not the Waymaking section. */
-@media (prefers-reduced-motion: no-preference) {
-  body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-road-art {
-    visibility: visible;
-  }
-  body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-paint-art {
-    display: block;
-  }
-  body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-road-art {
-    visibility: visible;
-  }
-  body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-paint-art {
-    display: block;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    opacity: 1;
-  }
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: 1;
-  }
 }
 @media (max-width: 900px) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
@@ -1781,26 +1737,15 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art
     height: min(79svh, 680px);
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: var(--waymaking-original-ink-opacity, .2);
-  }
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
-    opacity: var(--waymaking-extra-ink-opacity, .08);
+    opacity: .42;
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }
 @media (max-width: 600px) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     width: min(calc(100vw - 28px), 330px);
     height: min(79svh, 640px);
-  }
-}
-@media (prefers-reduced-motion: reduce) and (max-width: 900px) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: .28;
-  }
-}
-@media (prefers-reduced-motion: reduce) and (max-width: 600px) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: .27;
   }
 }
 
