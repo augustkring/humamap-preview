@@ -569,7 +569,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-resolution {
   width: min(100%, 840px);
   /* Give the fixed ink space to finish and disappear before the conclusion. */
-  margin: clamp(280px, 34svh, 320px) auto 0;
+  margin: clamp(500px, 72svh, 740px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
@@ -590,13 +590,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 /* Progressive enhancement only: the entire page remains readable without JS. */
 @media (prefers-reduced-motion: no-preference) {
   .waymaking-narrative[data-waymaking-painted="true"] .waymaking-road-art {
-    visibility: hidden;
+    visibility: visible;
   }
   .waymaking-narrative[data-waymaking-painted="true"] .waymaking-paint-art {
     display: block;
   }
   .waymaking-narrative[data-waymaking-complete="true"] .waymaking-paint-art {
-    display: none;
+    display: block;
   }
   .waymaking-narrative[data-waymaking-complete="true"] .waymaking-road-art {
     visibility: visible;
@@ -1737,6 +1737,13 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
   visibility: visible;
   opacity: var(--waymaking-handoff-opacity, 1);
 }
+/* Source artwork remains perceptible throughout; brush SVG adds stronger ink. */
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
+  opacity: .58;
+}
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
+  opacity: .42;
+}
 /* Keep all foreground copy, cards and navigation above the persistent road. */
 .home-main,
 .home-footer {
@@ -1748,7 +1755,7 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
 /* These selectors target the body-level graphic, not the Waymaking section. */
 @media (prefers-reduced-motion: no-preference) {
   body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-road-art {
-    visibility: hidden;
+    visibility: visible;
   }
   body > .waymaking-road-wrap[data-waymaking-painted="true"] .waymaking-paint-art {
     display: block;
@@ -1757,11 +1764,14 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
     visibility: visible;
   }
   body > .waymaking-road-wrap[data-waymaking-complete="true"] .waymaking-paint-art {
-    display: none;
+    display: block;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    opacity: 1;
+  }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
     opacity: 1;
   }
 }
@@ -1770,11 +1780,27 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
     width: min(calc(100vw - 28px), 360px);
     height: min(79svh, 680px);
   }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
+    opacity: .2;
+  }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
+    opacity: .08;
+  }
 }
 @media (max-width: 600px) {
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     width: min(calc(100vw - 28px), 330px);
     height: min(79svh, 640px);
+  }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 900px) {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
+    opacity: .28;
+  }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 600px) {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
+    opacity: .27;
   }
 }
 

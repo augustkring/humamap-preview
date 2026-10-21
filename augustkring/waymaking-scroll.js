@@ -3,7 +3,9 @@
  * The ink is in a SINGLE immutable viewport-fixed position from its first
  * visible frame. Its top coordinate is NEVER updated during scrolling.
  * Native scroll controls only SVG pigment-mask progress and text emphasis.
- * The road is confined to the five Waymaking chapters.
+ * The original illustration remains visible behind all five chapters.
+ * The SVG adds stronger painted ink on top instead of hiding the source art.
+ * The fixed road exits only after the final Purpose Driven text has passed.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -15,18 +17,20 @@
   const featherPaths = scene ? [...scene.querySelectorAll('[data-waymaking-feather]')] : [];
   const road = scene?.querySelector('.waymaking-road-wrap');
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
-  const firstHeading = beats[0]?.querySelector('h3');
+  const firstBeat = beats[0];
+  const firstHeading = firstBeat?.querySelector('h3');
+  const finalCopy = beats[beats.length - 1]?.querySelector('.waymaking-copy');
   const lastHeading = beats[beats.length - 1]?.querySelector('h3');
   const conclusion = story?.querySelector('.waymaking-resolution');
   if (!story || !scene || !road || !brush || !picture || !firstHeading ||
-      !lastHeading || !conclusion || beats.length !== 5 ||
+      !firstBeat || !finalCopy || !lastHeading || !conclusion || beats.length !== 5 ||
       featherPaths.length !== 7) return;
 
   // A real fixed position is a CONST. Positioning an element with
   // position:fixed while writing a new `top` on every scroll is still MOVING it.
-  // Ink begins exactly as Creative Thinking reaches this fixed screen line.
-  const PIN_TOP = 16;
-  const startLine = () => PIN_TOP + 16;
+  // Activate before the first chapter becomes readable, not when its
+  // heading almost disappears at the top; fixed 16px is CSS-only.
+  const startLine = () => window.innerHeight * 0.88;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
@@ -112,23 +116,20 @@
   road.dataset.waymakingViewport = 'true';
   document.body.appendChild(road);
 
-  // Two states, no animated positioning: absent outside Waymaking, and
-  // physically fixed during Waymaking. Only the separate pigment mask moves.
+  // Only opacity changes at entrance and after the final copy; never top.
+  // The expanded blank handoff keeps the Waymaker conclusion unobstructed.
   const updatePin = () => {
-    const titleTop = firstHeading.getBoundingClientRect().top;
-    const startReached = titleTop <= startLine();
-    const signoffTop = conclusion.getBoundingClientRect().top;
-
-    // End in the actual blank space before the centered Waymaker sentence.
-    // Measuring the signoff itself avoids viewport- and browser-dependent
-    // guesses based on the bottom of Purpose Driven. This DOES NOT change
-    // the artwork position: it only controls its opacity at the end.
-    const fadeStart = window.innerHeight * 0.94;
-    const fadeEnd = window.innerHeight * 0.73;
-    const departure = smooth((fadeStart - signoffTop) /
-      Math.max(1, fadeStart - fadeEnd));
-    const opacity = 1 - departure;
-    const withinStory = startReached && signoffTop > fadeEnd;
+    const entryTop = firstBeat.getBoundingClientRect().top;
+    const startReached = entryTop <= startLine();
+    const finalCopyBottom = finalCopy.getBoundingClientRect().bottom;
+    const signoffTop = conclusion.querySelector('p').getBoundingClientRect().top;
+    const entryDistance = Math.max(64, window.innerHeight * 0.12);
+    const fadeDistance = Math.max(100, window.innerHeight * 0.16);
+    const arrival = smooth((startLine() - entryTop) / entryDistance);
+    const departure = smooth(-finalCopyBottom / fadeDistance);
+    const withinStory = startReached && finalCopyBottom > -fadeDistance &&
+      signoffTop > window.innerHeight * 0.5;
+    const opacity = arrival * (1 - departure);
 
     if (withinStory) {
       story.dataset.waymakingPinned = 'true';
@@ -172,9 +173,8 @@
       }
     }
 
-    // Image reveal starts at the exact same first-title alignment as the
-    // viewport pin; headings retain their independent smooth color phases.
-    const firstDocY = scrollY + firstHeading.getBoundingClientRect().top;
+    // Paint EXTRA pigment from early beat entry, above the visible source art.
+    const firstDocY = scrollY + firstBeat.getBoundingClientRect().top;
     const lastDocY = scrollY + lastHeading.getBoundingClientRect().top;
     const paintStart = firstDocY - startLine();
     const paintEnd = lastDocY - focus;
