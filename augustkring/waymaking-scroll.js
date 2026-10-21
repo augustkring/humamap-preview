@@ -13,9 +13,10 @@
   const firstHeading = beats[0]?.querySelector('h3');
   const summary = story?.previousElementSibling;
   const finalCopy = beats[4]?.querySelector('.waymaking-copy');
+  const downstream = document.querySelector('#work');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
   if (!story || !road || !signoff || !summary || !firstHeading ||
-      !finalCopy || beats.length !== 5 || revealPaths.length !== 1) return;
+      !finalCopy || !downstream || beats.length !== 5 || revealPaths.length !== 1) return;
   // The original artwork is fixed to the viewport. Only the SVG reveal
   // mask progresses with scroll; the picture never changes screen position.
   road.dataset.waymakingViewport = 'true';
@@ -105,7 +106,9 @@
     if (reduced.matches) {
       document.body.dataset.waymakingRoadActive =
         summary.getBoundingClientRect().bottom <= 16 &&
-        finalCopy.getBoundingClientRect().bottom > 16 ? 'true' : 'false';
+        finalCopy.getBoundingClientRect().bottom > 16 &&
+        downstream.getBoundingClientRect().top > window.innerHeight * .45
+          ? 'true' : 'false';
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
         for (const feather of feathers) feather.style.strokeDashoffset = '0';
@@ -120,8 +123,11 @@
     // No opacity fade-in or fade-out. The full-strength road is visible
     // only after the preceding editorial intro has left the reading area,
     // and until the final competency has passed the fixed top position.
+    // The next section must never share the viewport with the road
+    // once its heading has entered the central reading zone.
     const active = summary.getBoundingClientRect().bottom <= 16 &&
-      finalCopy.getBoundingClientRect().bottom > 16;
+      finalCopy.getBoundingClientRect().bottom > 16 &&
+      downstream.getBoundingClientRect().top > window.innerHeight * .45;
     document.body.dataset.waymakingRoadActive = active ? 'true' : 'false';
     const focus = window.innerHeight * 0.16;
     const centers = beats.map(beat => {
