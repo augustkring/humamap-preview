@@ -562,11 +562,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 0;
-  top: 16px;
+  top: min(30svh, 270px);
   left: 50%;
   transform: translateX(-50%);
   width: min(30vw, 360px);
-  height: min(86svh, 790px);
+  height: min(69svh, 630px);
+  clip-path: inset(var(--waymaking-entrance-clip, 0px) 0 0 0);
   margin: 0;
   pointer-events: none;
   display: none;
@@ -1714,7 +1715,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
     left: max(var(--gutter), calc((100vw - var(--max)) / 2));
     transform: none;
     width: min(26vw, 235px);
-    height: min(86svh, 750px);
+    height: min(69svh, 630px);
   }
   /* Preserve the exact same source image on mobile and desktop. */
   .waymaking-beat {
@@ -1746,7 +1747,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     width: 25vw;
-    height: min(85svh, 725px);
+    height: min(69svh, 630px);
   }
   .waymaking-beat {
     min-height: clamp(215px, 30svh, 275px);

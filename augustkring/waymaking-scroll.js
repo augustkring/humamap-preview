@@ -102,6 +102,12 @@
     const lastCopyBottom=beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
     const signoffTop=signoff.getBoundingClientRect().top;
     const storyBottom=story.getBoundingClientRect().bottom;
+    // Clip the stationary ink exactly below the remaining intro copy,
+    // rather than letting its first brush strokes obscure the introduction.
+    // Cropping cannot move the road: top/left/width/height are CSS-only.
+    const fixedTop=Math.min(vh*.30,270);
+    const entranceClip=Math.max(0,summaryBottom-fixedTop+18);
+    road.style.setProperty('--waymaking-entrance-clip',entranceClip.toFixed(2)+'px');
     const arriving=smooth((vh*.97-firstTop)/Math.max(1,vh*.23))*
       smooth((vh*.84-summaryBottom)/Math.max(1,vh*.23));
     const departure=lastCopyBottom<vh*.36
