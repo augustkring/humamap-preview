@@ -1710,7 +1710,7 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
     margin: 0 auto;
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    left: max(var(--gutter), calc((100vw - var(--page-width)) / 2));
+    left: var(--gutter, 20px);
     width: min(27vw, 125px);
     height: min(68svh, 620px);
     transform: none;

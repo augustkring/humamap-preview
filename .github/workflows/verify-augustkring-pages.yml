@@ -305,7 +305,7 @@ jobs:
                       maskOffset:parseFloat(mask.style.strokeDashoffset),
                       animated:story.dataset.waymakingAnimated==='true',
                       sticky:getComputedStyle(road).position==='sticky',
-                      parent:road.parentElement.classList.contains('waymaking-artspace'),
+                      parent:road.parentElement===document.body,
                       approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
                       approvedPaint:svg.querySelector('image')?.getAttribute('href'),
                       opaqueBacking:!!svg.querySelector('rect,foreignObject'),
@@ -313,8 +313,8 @@ jobs:
                       opacity:Number(getComputedStyle(road).opacity)
                     };
                   });
-                  assert.equal(state.sticky,true,'Road must use native sticky layout');
-                  assert.equal(state.parent,true,'Road must stay in its actual scene');
+                  assert.equal(state.sticky,false,'Road must be viewport-fixed instead of sticky');
+                  assert.equal(state.parent,true,'Road must be portaled to document.body');
                   assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
                   assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
                   assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
