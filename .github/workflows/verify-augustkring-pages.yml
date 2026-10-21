@@ -116,7 +116,7 @@ jobs:
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const updatePin = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
-          grep -Fq 'const withinStory = startReached && conclusionTop > fadeEnd' /tmp/waymaking-scroll.js
+          grep -Fq 'const withinStory = startReached && lastBeatBottom > fadeEnd' /tmp/waymaking-scroll.js
           grep -Fq 'const startLine = () => PIN_TOP + 16;' /tmp/waymaking-scroll.js
           ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
           ! grep -Fq "!picture.currentSrc.endsWith('.avif')" /tmp/waymaking-scroll.js
