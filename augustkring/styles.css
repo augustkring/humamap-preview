@@ -574,7 +574,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   z-index: 10;
   top: clamp(200px, 25svh, 245px);
   left: 50%;
-  width: min(35vw, 390px);
+  width: min(31vw, 350px);
   height: min(66svh, 650px);
   transform: translateX(-50%);
   margin: 0;
