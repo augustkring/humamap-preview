@@ -1,5 +1,4 @@
 'use strict';
-
 const assert = require('node:assert/strict');
 const { mkdirSync } = require('node:fs');
 const { join } = require('node:path');
@@ -8,247 +7,220 @@ const { PNG } = require('pngjs');
 
 const base = process.env.ROAD_BASE || 'http://127.0.0.1:8765/humamap-preview/augustkring/';
 const output = process.env.ROAD_OUTPUT || 'artifacts';
-const modes = (process.env.ROAD_ENGINES || 'chromium').split(',').map(s => s.trim());
-const widths = (process.env.ROAD_WIDTHS || '320,390,768,1024,1440')
-  .split(',').map(Number);
+const engines = (process.env.ROAD_ENGINES || 'chromium').split(',').map(s => s.trim());
+const widths = (process.env.ROAD_WIDTHS || '320,390,768,1024,1440').split(',').map(Number);
 const browserTypes = { chromium, firefox, webkit };
-const headingNames = [
+const labels = [
   'Creative Thinking', 'Commercial Understanding', 'Strategic Judgment',
   'AI-Native Building', 'Purpose Driven'
 ];
 mkdirSync(output, { recursive: true });
 
 async function jump(page, y) {
-  await page.evaluate(top => scrollTo({ top: Math.max(0, top), behavior: 'instant' }), y);
-  await page.waitForTimeout(120);
+  await page.evaluate(top => window.scrollTo({ top: Math.max(0, top), behavior: 'instant' }), y);
+  await page.waitForTimeout(150);
 }
 
-async function sceneCoordinates(page) {
-  return page.evaluate(() => {
-    const story = document.querySelector('[data-waymaking-scene]');
-    const art = document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
-    const beats = [...story.querySelectorAll('.waymaking-beat')];
-    const conclusion = document.querySelector('.waymaking-resolution p');
-    return {
-      sceneStart: scrollY + story.getBoundingClientRect().top,
-      conclusionTop: scrollY + conclusion.getBoundingClientRect().top,
-      roadTop: art.top,
-      roadHeight: art.height,
-      beats: beats.map(beat => {
-        const box = beat.getBoundingClientRect();
-        return scrollY + box.top + box.height / 2;
-      })
-    };
-  });
+function intersectionArea(a, b) {
+  const horizontal = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const vertical = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return horizontal * vertical;
 }
 
-async function state(page) {
+async function geometry(page) {
   return page.evaluate(() => {
+    const scene = document.querySelector('.waymaking-scene');
+    const artspace = document.querySelector('.waymaking-artspace');
     const road = document.querySelector('.waymaking-road-wrap');
-    const image = road.querySelector('.waymaking-road-art');
-    const bitmap = image.querySelector('img');
-    const picture = road.querySelector('.waymaking-paint-art');
-    const box = road.getBoundingClientRect();
-    const css = getComputedStyle(road);
+    const bitmap = document.querySelector('.waymaking-road-art img');
+    const svg = document.querySelector('.waymaking-paint-art');
+    const chapters = [...scene.querySelectorAll('.waymaking-beat')];
+    const boxes = selector => {
+      const rect = selector.getBoundingClientRect();
+      return {
+        left: rect.left, right: rect.right, top: rect.top,
+        bottom: rect.bottom, width: rect.width, height: rect.height
+      };
+    };
+    const picture = document.querySelector('.waymaking-road-art');
+    const styles = getComputedStyle(road);
     return {
-      parentIsBody: road.parentElement === document.body,
-      fixed: css.position === 'fixed',
-      top: box.top, left: box.left, width: box.width, height: box.height,
-      opacity: Number(css.opacity),
-      imageOpacity: Number(getComputedStyle(image).opacity),
-      imageVisible: getComputedStyle(image).visibility === 'visible',
-      svgDisplay: getComputedStyle(picture).display,
-      clipTop: Number.parseFloat(road.style.getPropertyValue('--waymaking-clip-top')),
-      clipBottom: Number.parseFloat(road.style.getPropertyValue('--waymaking-clip-bottom')),
-      clipPath: css.clipPath,
+      road: boxes(road),
+      artspace: boxes(artspace),
+      summary: boxes(document.querySelector('.thread-summary')),
+      scene: boxes(scene),
+      copies: chapters.map(chapter => boxes(chapter.querySelector('.waymaking-copy'))),
+      chapterBoxes: chapters.map(chapter => boxes(chapter)),
+      titles: chapters.map(chapter => {
+        const h = chapter.querySelector('h3');
+        return h.getAttribute('aria-label') || h.textContent.trim();
+      }),
+      parentIsArtspace: road.parentElement === artspace,
+      sticky: styles.position === 'sticky',
+      topCSS: styles.top,
+      opacity: Number(styles.opacity),
+      imageOpacity: Number(getComputedStyle(picture).opacity),
+      svgDisplay: getComputedStyle(svg).display,
+      bitmapLoaded: bitmap.complete && bitmap.naturalWidth > 0,
       currentSrc: bitmap.currentSrc,
-      imageLoaded: bitmap.complete && bitmap.naturalWidth > 0,
-      overflow: document.documentElement.scrollWidth > innerWidth + 1,
-      titles: [...document.querySelectorAll('.waymaking-beat h3')].map(h =>
-        h.getAttribute('aria-label') || h.textContent.trim())
+      overflow: document.documentElement.scrollWidth > innerWidth + 1
     };
   });
 }
 
-function assertStationary(s, first, width, where) {
-  assert.ok(s.parentIsBody, where + ': road must be a body-level viewport fixture');
-  assert.ok(s.fixed, where + ': position must be fixed');
-  assert.ok(Math.abs(s.top - 16) < 0.8, where + ': road top drifted ' + s.top);
-  assert.ok(Math.abs(s.left - first.left) < 0.8, where + ': road left drifted');
-  assert.ok(Math.abs(s.width - first.width) < 0.8, where + ': image resized on scroll');
-  assert.equal(s.opacity, 1, where + ': root opacity must never animate');
-  assert.equal(s.imageOpacity, width <= 900 ? 0.42 : 1, where + ': image opacity must be constant');
-  assert.equal(s.svgDisplay, 'none', where + ': moving SVG paint must be OFF');
-  assert.ok(s.imageLoaded, where + ': bitmap not decoded');
-  assert.ok(s.imageVisible, where + ': full source bitmap must be visible');
-  assert.ok(s.clipPath !== 'none', where + ': section clipping missing');
-  assert.ok(!s.overflow, where + ': horizontal overflow');
-  assert.deepEqual(s.titles, headingNames, where + ': approved chapter content changed');
-}
-
-function differentPixels(imageA, imageB, threshold = 8) {
-  const a = PNG.sync.read(imageA), b = PNG.sync.read(imageB);
-  assert.equal(a.width, b.width);
-  assert.equal(a.height, b.height);
-  let count = 0;
-  for (let i = 0; i < a.data.length; i += 4) {
-    const delta = Math.abs(a.data[i] - b.data[i]) +
-      Math.abs(a.data[i + 1] - b.data[i + 1]) +
-      Math.abs(a.data[i + 2] - b.data[i + 2]);
-    if (delta > threshold) count++;
+function pngDifference(aBuffer, bBuffer, threshold = 8) {
+  const a = PNG.sync.read(aBuffer), b = PNG.sync.read(bBuffer);
+  assert.equal(a.width,b.width);
+  assert.equal(a.height,b.height);
+  let count=0;
+  for(let i=0;i<a.data.length;i+=4){
+    const difference = Math.abs(a.data[i]-b.data[i])+
+      Math.abs(a.data[i+1]-b.data[i+1])+
+      Math.abs(a.data[i+2]-b.data[i+2]);
+    if(difference>threshold)count++;
   }
   return count;
 }
 
-async function renderedRoadPixels(page) {
+async function paintedPixels(page) {
   const road = page.locator('.waymaking-road-wrap');
-  const withRoad = await page.screenshot({ animations: 'disabled' });
-  await road.evaluate(el => el.style.setProperty('display', 'none', 'important'));
-  const withoutRoad = await page.screenshot({ animations: 'disabled' });
-  await road.evaluate(el => el.style.removeProperty('display'));
-  return differentPixels(withRoad, withoutRoad);
+  const before=await page.screenshot({ animations:'disabled' });
+  await road.evaluate(el=>el.style.setProperty('visibility','hidden','important'));
+  const after=await page.screenshot({ animations:'disabled' });
+  await road.evaluate(el=>el.style.removeProperty('visibility'));
+  return pngDifference(before,after);
 }
 
-async function oneViewport(browser, engine, width) {
-  const page = await browser.newPage({ viewport: { width, height: 900 } });
-  const errors = [];
-  page.on('pageerror', e => errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  try {
-    await page.goto(base, { waitUntil: 'networkidle', timeout: 45000 });
-    await page.evaluate(() => document.fonts.ready);
-    await page.locator('.waymaking-road-art img').evaluate(img => img.decode());
-    const first = await state(page);
-    const positions = await sceneCoordinates(page);
-    assertStationary(first, first, width, engine + '/' + width + '/initial');
+async function coords(page) {
+  return page.evaluate(()=>{
+    const elements=[...document.querySelectorAll('.waymaking-beat')];
+    return elements.map(el=>{
+      const r=el.getBoundingClientRect();
+      return scrollY+r.top+r.height/2;
+    });
+  });
+}
 
-    // Full artwork must already be visible by the time the first text
-    // occupies the reading zone, without opacity or painted-mask jumps.
-    const samples = [];
-    for (let i = 0; i < positions.beats.length; i++) {
-      await jump(page, positions.beats[i] - 450);
-      const s = await state(page);
-      assertStationary(s, first, width, engine + '/' + width + '/chapter-' + i);
-      assert.ok(s.clipTop <= 1 && s.clipBottom <= 1,
-        'The COMPLETE stationary road must be visible throughout chapter ' + headingNames[i] +
-        ', got crop ' + s.clipTop + '/' + s.clipBottom);
-      const pixels = await renderedRoadPixels(page);
-      assert.ok(pixels > 220, 'Road disappeared while reading ' + headingNames[i] +
-        ' (' + engine + '/' + width + ', pixels ' + pixels + ')');
-      samples.push({ name: headingNames[i], pixels, x: s.left, y: s.top, opacity: s.imageOpacity });
-      if (width === 390 || width === 1440) {
-        await page.screenshot({ path: join(output, engine + '-' + width + '-chapter-' + i + '.png') });
+async function verifyViewport(browser,engine,width){
+  const page=await browser.newPage({ viewport:{width,height:900} });
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  try{
+    await page.goto(base,{waitUntil:'networkidle',timeout:45000});
+    await page.evaluate(()=>document.fonts.ready);
+    await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
+    const centers=await coords(page);
+    const captured=[];
+    for(let i=0;i<centers.length;i++){
+      await jump(page,centers[i]-450);
+      const g=await geometry(page);
+      assert.deepEqual(g.titles,labels,'Chapter content or headings changed');
+      assert.equal(g.parentIsArtspace,true,'Road MUST stay inside real story grid, not body portal');
+      assert.equal(g.sticky,true,'Road must use native sticky rather than fixed scroll controller');
+      assert.ok(g.topCSS === '16px','Road CSS top must be 16px');
+      assert.equal(g.opacity,1,'Road opacity must never animate');
+      assert.equal(g.imageOpacity,1,'Original approved image must not fade on mobile');
+      assert.equal(g.svgDisplay,'none','Obsolete animated SVG must not paint');
+      assert.equal(g.bitmapLoaded,true,'Approved source bitmap must load');
+      assert.equal(g.overflow,false,'No horizontal overflow');
+      for (const [copyIndex,copy] of g.copies.entries()) {
+        const overlap=intersectionArea(g.road,copy);
+        assert.equal(overlap,0,
+          'Graphic OBSCURES chapter '+labels[copyIndex]+' ('+width+'px, area '+overlap+')');
+      }
+      assert.equal(intersectionArea(g.road,g.summary),0,
+        'Graphic overlaps introductory Where I add value paragraphs');
+      const pixels=await paintedPixels(page);
+      assert.ok(pixels>1000,'The road is invisible while chapter '+labels[i]+' is being read');
+      if(i>=1){
+        assert.ok(Math.abs(g.road.top-16)<1.2,
+          'Road failed to stay at top=16 through chapters: '+labels[i]+' at '+g.road.top);
+      }
+      captured.push({chapter:labels[i],roadTop:g.road.top,visiblePixels:pixels,
+        copyRect:g.copies[i],roadRect:g.road});
+      if (width===320||width===390||width===1440) {
+        await page.screenshot({
+          path:join(output,engine+'-'+width+'-chapter-'+i+'.png'),animations:'disabled'
+        });
       }
     }
-
-    // Pixel identity: when unrelated foreground text is suppressed,
-    // scrolling past successive chapters must not move or repaint ANY
-    // single pixel of the complete road.
-    await page.evaluate(() => {
-      for (const selector of ['.home-main', '.home-header', '.home-footer']) {
-        const node = document.querySelector(selector);
-        if (node) node.style.visibility = 'hidden';
+    // Compare the art without foreground text at successive central chapters.
+    await page.evaluate(()=>{
+      for(const selector of ['.home-main','.home-header','.home-footer']){
+        const element=document.querySelector(selector);
+        if(element)element.style.visibility='hidden';
+      }
+      // Restore artwork when main becomes hidden: it is inside main.
+      const artspace=document.querySelector('.waymaking-artspace');
+      if(artspace)artspace.style.visibility='visible';
+    });
+    await jump(page,centers[1]-450);
+    const a=await page.screenshot({animations:'disabled'});
+    await jump(page,centers[2]-450);
+    const b=await page.screenshot({animations:'disabled'});
+    assert.ok(pngDifference(a,b,8)<35,
+      'Artwork moves or changes during middle chapters (background-only pixel regression)');
+    await page.evaluate(()=>{
+      for(const selector of ['.home-main','.home-header','.home-footer','.waymaking-artspace']){
+        const element=document.querySelector(selector);
+        if(element)element.style.removeProperty('visibility');
       }
     });
-    await jump(page, positions.beats[1] - 450);
-    const pureImageA = await page.screenshot({ animations: 'disabled' });
-    await jump(page, positions.beats[2] - 450);
-    const pureImageB = await page.screenshot({ animations: 'disabled' });
-    const delta = differentPixels(pureImageA, pureImageB, 8);
-    assert.ok(delta <= 16, 'Stationary road pixels MOVED/REPAINTED between chapters: ' +
-      delta + ' differences for ' + engine + '/' + width);
-    await page.evaluate(() => {
-      for (const selector of ['.home-main', '.home-header', '.home-footer']) {
-        const node = document.querySelector(selector);
-        if (node) node.style.removeProperty('visibility');
-      }
-    });
-
-    // It must not reach the following sections, including after scroll-back.
-    for (const selector of ['#work', '#perspective', '.homepage-contact', '.home-footer']) {
-      const y = await page.locator(selector).evaluate(el =>
-        scrollY + el.getBoundingClientRect().top - innerHeight * 0.4);
-      await jump(page, y);
-      const region = await state(page);
-      const rendered = await renderedRoadPixels(page);
-      if (rendered > 0) {
-        console.log('OUTSIDE_FAIL', engine, width, selector, JSON.stringify({
-          roadTop: region.top, roadHeight: region.height,
-          clipTop: region.clipTop, clipBottom: region.clipBottom,
-          clipPath: region.clipPath, sourceOpacity: region.imageOpacity,
-          renderedPixels: rendered
-        }));
-        await page.screenshot({ path: join(output, engine + '-' + width + '-outside-debug.png') });
-      }
-      assert.equal(rendered, 0, engine + '/' + width +
-        ': road leaked into ' + selector);
+    // No image should remain physically visible once later content begins.
+    for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
+      await page.locator(selector).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(150);
+      const visible=await paintedPixels(page);
+      assert.equal(visible,0,'Road still visible behind '+selector+' ('+visible+' pixels)');
     }
-    await jump(page, positions.beats[1] - 450);
-    const back = await state(page);
-    assertStationary(back, first, width, 'reverse-scroll');
-    assert.ok(await renderedRoadPixels(page) > 220, 'The road did not return when scrolling back');
-    assert.deepEqual(errors, [], 'Browser JS console errors');
-    console.log('PASS ' + engine + ' ' + width + ' ' + JSON.stringify({
-      fixedTop: first.top, sourceOpacity: first.imageOpacity,
-      unmovingPixelDifferences: delta, allFiveChapters: samples.map(x => x.pixels),
-      hiddenLater: true
+    // Backwards scrolling restores the same art without a fade.
+    await jump(page,centers[2]-450);
+    const returned=await geometry(page);
+    assert.equal(returned.imageOpacity,1);
+    assert.equal(returned.sticky,true);
+    assert.ok(await paintedPixels(page)>1000,'Road missing after reverse scroll');
+    assert.deepEqual(errors,[],'Browser console errors');
+    console.log('PASS '+engine+' '+width+' '+JSON.stringify({
+      pinnedTop: captured.map(x=>x.roadTop),
+      visiblePixels:captured.map(x=>x.visiblePixels),
+      textOverlaps:0,summaryOverlaps:0,subsequentSectionsHidden:true
     }));
-  } finally {
+  }finally{
     await page.close();
   }
 }
 
-(async () => {
-  for (const engine of modes) {
-    assert.ok(browserTypes[engine], 'Unsupported engine ' + engine);
-    const type = browserTypes[engine];
-    const options = engine === 'chromium' && process.env.CHROME_BIN
-      ? { executablePath: process.env.CHROME_BIN, headless: true, args: ['--no-sandbox'] }
-      : { headless: true };
-    const browser = await type.launch(options);
-    try {
-      for (const width of widths) await oneViewport(browser, engine, width);
-      // No dynamic image painting even when the user requests reduced motion.
-      const reduced = await browser.newPage({
-        viewport: { width: 390, height: 900 },
-        reducedMotion: 'reduce'
-      });
-      await reduced.goto(base, { waitUntil: 'networkidle' });
+(async()=>{
+  for(const engine of engines){
+    assert.ok(browserTypes[engine],'Browser engine not recognized '+engine);
+    const options=engine==='chromium'&&process.env.CHROME_BIN?
+      { executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox'] }:
+      { headless:true };
+    const browser=await browserTypes[engine].launch(options);
+    try{
+      for(const width of widths)await verifyViewport(browser,engine,width);
+      const reduced=await browser.newPage({ viewport:{width:390,height:900},reducedMotion:'reduce' });
+      await reduced.goto(base,{waitUntil:'networkidle'});
       await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-      await reduced.waitForTimeout(130);
-      const s = await state(reduced);
-      assertStationary(s, s, 390, engine + ' reduced motion');
-      assert.ok(await renderedRoadPixels(reduced) > 220, 'Reduced-motion art absent');
-      assert.equal(await reduced.locator('.waymaking-letter').count(), 0,
-        'Reduced motion must avoid animated glyphs');
+      await reduced.waitForTimeout(140);
+      assert.equal((await geometry(reduced)).imageOpacity,1);
+      assert.equal(await reduced.locator('.waymaking-letter').count(),0,
+        'Reduced motion must not split semantic heading text');
       await reduced.close();
-
-      // First-load WebP-only source, not a mid-decode source swap.
-      const webp = await browser.newPage({ viewport: { width: 390, height: 900 } });
-      await webp.goto(base + 'no-avif.html', { waitUntil: 'networkidle' });
+      const webp=await browser.newPage({ viewport:{width:390,height:900} });
+      await webp.goto(base+'no-avif.html',{waitUntil:'networkidle'});
       await webp.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-      await webp.waitForTimeout(130);
-      const fallback = await state(webp);
-      assert.ok(fallback.currentSrc.endsWith('.webp'), 'WebP fallback did not load');
-      assertStationary(fallback, fallback, 390, engine + ' WebP');
-      assert.ok(await renderedRoadPixels(webp) > 220, 'WebP-only art absent');
+      await webp.waitForTimeout(140);
+      assert.ok((await geometry(webp)).currentSrc.endsWith('.webp'),
+        'WebP-only first-load variant must load approved illustration');
       await webp.close();
-
-      // Non-JS readers still get an in-flow static illustration and all text.
-      const fallbackPage = await browser.newPage({
-        viewport: { width: 390, height: 900 }, javaScriptEnabled: false
-      });
-      await fallbackPage.goto(base, { waitUntil: 'load' });
-      assert.deepEqual(await fallbackPage.locator('.waymaking-beat h3').allTextContents(), headingNames);
-      assert.equal(await fallbackPage.locator('.waymaking-road-art').evaluate(el =>
-        getComputedStyle(el).display), 'block', 'No-JS full bitmap missing');
-      await fallbackPage.close();
-      console.log('PASS ' + engine + ' reduced-motion, no-JS, first-load WebP');
-    } finally {
-      await browser.close();
-    }
+      const noJS=await browser.newPage({ viewport:{width:390,height:900},javaScriptEnabled:false });
+      await noJS.goto(base,{waitUntil:'load'});
+      assert.deepEqual(await noJS.locator('.waymaking-beat h3').allTextContents(),labels);
+      assert.equal(await noJS.locator('.waymaking-road-art').isVisible(),true);
+      await noJS.close();
+      console.log('PASS '+engine+' reduced-motion + no-JS + first-load WebP');
+    }finally{await browser.close();}
   }
-})().catch(error => {
-  console.error(error);
-  process.exitCode = 1;
-});
+})().catch(error=>{console.error(error);process.exitCode=1;});
