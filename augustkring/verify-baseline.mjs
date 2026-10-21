@@ -64,7 +64,7 @@ const inkFallback=readFileSync(join(root,'assets/waymaking-editorial-ink.webp'))
 assert.ok(inkFallback.length>10000 && inkFallback.toString('ascii',0,4)==='RIFF' && inkFallback.toString('ascii',8,12)==='WEBP','Approved original illustration WebP fallback missing');
 assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Matching original artwork fallback reference missing');
 assert.ok(thread.includes('loading="eager" fetchpriority="low"'),'Ink must start loaded while its parent is visually hidden');
-assert.ok(html.includes('waymaking-scroll.js?v=20261021-immutable-pin-v11'),'Continuous scroll story enhancement missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261021-signoff-handoff-v11-1'),'Continuous scroll story enhancement missing');
 assert.ok(thread.includes('data-waymaking-paint-path') && thread.includes('stroke-dashoffset="1000"'),'Curved SVG painter path missing');
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('stroke-width="468"') && thread.includes('waymaking-brush-edge') && thread.includes('data-waymaking-feather="7"'),'Original painting aligned mask with seven organic feather layers missing');
@@ -90,8 +90,10 @@ assert.ok(scrollController.includes('const PIN_TOP = 16;') && scrollController.i
 assert.ok(css.includes('top: 16px;') && !css.includes('--waymaking-viewport-top'),'Never interpolate or mutate the visual ink position');
 assert.ok(!scrollController.includes('--waymaking-viewport-top') && !scrollController.includes('const position = Math.max('),'Scroll-driven top position mutation must never return');
 assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Paint reveal must start at first-title alignment');
-assert.ok(scrollController.includes('const lastBeatBottom = beats[beats.length - 1].getBoundingClientRect().bottom'),'End transition must wait for fifth chapter');
-assert.ok(scrollController.includes('const withinStory = startReached && lastBeatBottom > fadeEnd'),'Road must stop only after the fifth chapter');
+assert.ok(scrollController.includes('const signoffTop = conclusion.getBoundingClientRect().top'),'Measure fixed-road exit against actual Waymaker signoff position');
+assert.ok(scrollController.includes('const withinStory = startReached && signoffTop > fadeEnd'),'End road in white handoff BEFORE the Waymaker sentence enters');
+assert.ok(scrollController.includes('const fadeStart = window.innerHeight * 0.94;') &&
+          scrollController.includes('const fadeEnd = window.innerHeight * 0.73;'),'Protect stable signoff handoff window on all viewports');
 assert.ok(scrollController.includes("road.style.setProperty('--waymaking-handoff-opacity'"),'Stationary blank-space handoff missing');
 assert.ok(!scrollController.includes("!picture.currentSrc.endsWith('.avif')"),'AVIF-only animation gate must never return');
 assert.ok(thread.includes('<image href="assets/waymaking-editorial-ink.webp"'),'SVG paint should use widely supported approved WebP artwork');
