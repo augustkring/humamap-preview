@@ -468,11 +468,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .home-main .thread-summary {
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
-  /* A naturally opaque editorial introduction sits above the graphic:
-     only the five story beats should scroll across the ink itself. */
-  position: relative;
-  z-index: 2;
-  background: var(--page);
 }
 .home-main .thread-copy { max-width: 620px; padding-top: 0; }
 .home-main .thread-copy p { line-height: 1.65; }
@@ -574,7 +569,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-resolution {
   width: min(100%, 840px);
   /* Give the fixed ink space to finish and disappear before the conclusion. */
-  margin: clamp(500px, 72svh, 740px) auto 0;
+  margin: clamp(700px, 98svh, 1050px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
@@ -1744,10 +1739,10 @@ body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-vi
 }
 /* Source artwork remains perceptible throughout; brush SVG adds stronger ink. */
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-  opacity: .58;
+  opacity: var(--waymaking-original-ink-opacity, .58);
 }
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
-  opacity: .42;
+  opacity: var(--waymaking-extra-ink-opacity, .42);
 }
 /* Keep all foreground copy, cards and navigation above the persistent road. */
 .home-main,
@@ -1786,10 +1781,10 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art
     height: min(79svh, 680px);
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-road-art {
-    opacity: .2;
+    opacity: var(--waymaking-original-ink-opacity, .2);
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-paint-art {
-    opacity: .08;
+    opacity: var(--waymaking-extra-ink-opacity, .08);
   }
 }
 @media (max-width: 600px) {

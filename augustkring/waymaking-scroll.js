@@ -11,6 +11,7 @@
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
+  const summary = story?.previousElementSibling;
   const scene = story?.querySelector('[data-waymaking-scene]');
   const brush = scene?.querySelector('[data-waymaking-paint-path]');
   const picture = scene?.querySelector('.waymaking-road-art img');
@@ -22,7 +23,7 @@
   const finalCopy = beats[beats.length - 1]?.querySelector('.waymaking-copy');
   const lastHeading = beats[beats.length - 1]?.querySelector('h3');
   const conclusion = story?.querySelector('.waymaking-resolution');
-  if (!story || !scene || !road || !brush || !picture || !firstHeading ||
+  if (!story || !summary?.matches('.thread-summary') || !scene || !road || !brush || !picture || !firstHeading ||
       !firstBeat || !finalCopy || !lastHeading || !conclusion || beats.length !== 5 ||
       featherPaths.length !== 7) return;
 
@@ -128,13 +129,25 @@
     const arrival = smooth((startLine() - entryTop) / entryDistance);
     const departure = smooth(-finalCopyBottom / fadeDistance);
     const withinStory = startReached && finalCopyBottom > -fadeDistance &&
-      signoffTop > window.innerHeight * 0.5;
+      signoffTop > window.innerHeight;
     const opacity = arrival * (1 - departure);
 
     if (withinStory) {
       story.dataset.waymakingPinned = 'true';
       document.body.dataset.waymakingRoadActive = 'true';
       road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
+      // The introductory editorial summary is above this story in document
+      // flow. Keep the route perceptible but light until that copy leaves,
+      // without covering it with an opaque layer that makes the ink disappear.
+      const summaryBottom = summary.getBoundingClientRect().bottom;
+      const introClearance = smooth((window.innerHeight * 0.86 - summaryBottom) /
+        Math.max(1, window.innerHeight * 0.75));
+      const inkPresence = 0.48 + 0.52 * introClearance;
+      const narrow = window.innerWidth <= 900;
+      road.style.setProperty('--waymaking-original-ink-opacity',
+        ((narrow ? 0.2 : 0.58) * inkPresence).toFixed(4));
+      road.style.setProperty('--waymaking-extra-ink-opacity',
+        ((narrow ? 0.08 : 0.42) * inkPresence).toFixed(4));
       road.dataset.waymakingTopPinned = 'true';
     } else {
       delete story.dataset.waymakingPinned;

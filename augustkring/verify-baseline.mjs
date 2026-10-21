@@ -92,14 +92,14 @@ assert.ok(!scrollController.includes('--waymaking-viewport-top') && !scrollContr
 assert.ok(scrollController.includes('const paintStart = firstDocY - startLine()'),'Paint reveal must start at first-title alignment');
 assert.ok(scrollController.includes('const finalCopyBottom = finalCopy.getBoundingClientRect().bottom'),'Fifth chapter must remain visible while fixed road stays');
 assert.ok(scrollController.includes('const departure = smooth(-finalCopyBottom / fadeDistance);'),'Fade only after Purpose Driven copy has exited');
-assert.ok(scrollController.includes('signoffTop > window.innerHeight * 0.5;'),'Waymaker signoff must remain free of ink');
+assert.ok(scrollController.includes('signoffTop > window.innerHeight;'),'Waymaker signoff must be offscreen before road begins its exit');
 assert.ok(scrollController.includes("road.style.setProperty('--waymaking-handoff-opacity'"),'Stationary blank-space handoff missing');
 assert.ok(!scrollController.includes("!picture.currentSrc.endsWith('.avif')"),'AVIF-only animation gate must never return');
 assert.ok(thread.includes('<image href="assets/waymaking-editorial-ink.webp"'),'SVG paint should use widely supported approved WebP artwork');
 assert.ok(!scrollController.includes("through the ENTIRE rest of the page") && !scrollController.includes("all subsequent sections"),'Page-wide road rendering must not return');
 assert.ok(css.includes('opacity: var(--waymaking-handoff-opacity, 1);'),'Scoped road must fade without moving at its end');
 assert.ok(css.includes('display: none;\n  visibility: hidden;\n  opacity: 0;'),'Offstage road must not render even if children force visibility:visible');
-assert.ok(css.includes('opacity: .58;') && css.includes('opacity: .42;'),'Approved original must be continuously visible under SVG pigment');
+assert.ok(css.includes('opacity: var(--waymaking-original-ink-opacity, .58);') && css.includes('opacity: var(--waymaking-extra-ink-opacity, .42);'),'Approved original must be continuously visible under SVG pigment');
 assert.ok(css.includes('display: block;\n  visibility: visible;\n  opacity: var(--waymaking-handoff-opacity, 1);'),'The viewport road may display only while story is active');
 
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');

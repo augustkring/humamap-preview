@@ -155,13 +155,10 @@ jobs:
                 assert.ok(early.roadOpacity>0&&early.roadOpacity<1,'Road must smoothly arrive as first beat enters');
                 assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),
                   'visible','Original image must remain present during brush painting');
-                const introSurface=await page.locator('.thread-summary').evaluate(el=>({
-                  background:getComputedStyle(el).backgroundColor,
-                  zIndex:Number(getComputedStyle(el).zIndex)
-                }));
-                assert.equal(introSurface.background,'rgb(255, 255, 255)',
-                  'Where I add value introduction must not be painted over by the early backdrop');
-                assert.ok(introSurface.zIndex>0,'Approved introduction must layer above the road');
+                const sourceOpacity=await page.locator('.waymaking-road-art').evaluate(el=>
+                  Number(getComputedStyle(el).opacity));
+                assert.ok(sourceOpacity>.05&&sourceOpacity<.58,
+                  'Ink should remain visible but softer while Where I add value is still on screen');
                 const withInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
                 await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.display='none');
                 const withoutInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
@@ -242,6 +239,8 @@ jobs:
                 assert.ok(Math.abs(handoff.road.top-16)<1,'Road slid during the exit transition');
                 assert.ok(Math.abs(handoff.road.left-entering.road.left)<1);
                 assert.ok(handoff.roadOpacity>0&&handoff.roadOpacity<1,'Transition should happen only in blank handoff');
+                const signoffBeforeHandoff=await page.locator('.waymaking-resolution p').boundingBox();
+                assert.ok(signoffBeforeHandoff.y>=h,'The Waymaker signoff must NOT enter the viewport while the road is visible');
                 await page.screenshot({path:'artifacts/handoff-'+width+'.png'});
 
                 await jump(page,finalCopyDocY+h*.2);
