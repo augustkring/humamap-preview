@@ -165,6 +165,9 @@ async function runOne(browser,engine,width) {
    assert.equal(state.animated,true,'No working motion controller');
    assert.equal(state.roadOpacity,1,'Road opacity MUST remain 1 during all five chapters');
    assert.equal(state.visible,true,'The ORIGINAL road is not visible with '+labels[i]);
+   assert.equal(state.roadOpacity,1,'Road opacity changed during '+labels[i]);
+   assert.equal(state.clipTop,0,'Top clip returned during '+labels[i]);
+   assert.equal(state.clipBottom,0,'Bottom clip returned during '+labels[i]);
    assert.ok(Number.isFinite(state.fraction),'Progress missing');
    assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
    const frontLength=Math.min(state.fraction,.055,(1-state.fraction)*.55);
