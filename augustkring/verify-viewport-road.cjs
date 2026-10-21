@@ -44,6 +44,7 @@ async function checkpoint(page) {
    endTop:scrollY+end.getBoundingClientRect().top,
    lastCopyBottom:scrollY+beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom,
    sticky:getComputedStyle(road).position==='sticky',
+   roadOpacity:Number(getComputedStyle(road).opacity),
    topCSS:getComputedStyle(road).top,
    background:surface.backgroundColor,
    opaqueRect:!!art.querySelector('rect, image, foreignObject'),
@@ -123,6 +124,7 @@ async function runOne(browser,engine,width) {
    await scroll(page,middles[i]-900*.49);
    const state=await checkpoint(page);
    assert.equal(state.animated,true,'No working motion controller');
+   assert.equal(state.roadOpacity,1,'Road cannot fade while any of the five chapters are being read');
    assert.ok(Number.isFinite(state.fraction),'Progress missing');
    assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
    assert.ok(Math.abs(state.dashOffset-state.length*(1-state.fraction))<state.length*.006,

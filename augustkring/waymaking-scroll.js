@@ -7,8 +7,10 @@
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
+  const road = story?.querySelector('.waymaking-road-wrap');
+  const signoff = story?.querySelector('.waymaking-resolution p');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
-  if (!story || beats.length !== 5 || revealPaths.length !== 2) return;
+  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 2) return;
   const strokes = revealPaths.map(path => {
     const length = path.getTotalLength();
     if (!(length > 0)) return null;
@@ -88,6 +90,7 @@
   const update = () => {
     frame = 0;
     if (reduced.matches) {
+      road.style.opacity = '1';
       for (const {path} of strokes) path.style.strokeDashoffset = '0';
       story.dataset.waymakingProgress = '1.000';
       previousFraction = 1;
@@ -125,6 +128,16 @@
         }
       }
     }
+    // After Purpose Driven passes, hand the completed road off to the
+    // Waymaker conclusion; this never fades the ink during any of the five
+    // chapter reading positions, and prevents its tail entering the next section.
+    const lastCopyBottom = beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
+    const signoffTop = signoff.getBoundingClientRect().top;
+    const farewell = lastCopyBottom < window.innerHeight * .48
+      ? smooth((window.innerHeight * .83 - signoffTop) /
+          Math.max(1, window.innerHeight * .32)) : 0;
+    road.style.opacity = String(1 - farewell);
+
     if (Math.abs(fraction - previousFraction) > 0.00025) {
       for (const {path,length} of strokes) {
         path.style.strokeDashoffset = String(length * (1 - fraction));
