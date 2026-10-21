@@ -63,6 +63,9 @@ jobs:
                 for(const width of [390,1440]){
                   const page=await browser.newPage({viewport:{width,height:900}});
                   const errors=[];
+                  page.on('console',message=>{
+                    if(message.type()==='error') errors.push('console: '+message.text());
+                  });
                   page.on('pageerror',e=>errors.push(e.message));
                   await page.goto(root,{waitUntil:'networkidle'});
                   const pos=await page.evaluate(()=>{
@@ -76,7 +79,24 @@ jobs:
                     };
                   });
                   await visit(page,pos.first-90);
-                  assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).display),'none',
+                  const probe=await page.evaluate(()=>{
+                    const road=document.querySelector('.waymaking-road-wrap');
+                    const title=document.querySelector('.waymaking-beat h3');
+                    return {
+                      scrollY,headingTop:title.getBoundingClientRect().top,
+                      artTop:road.getBoundingClientRect().top,
+                      root:road.parentElement.tagName,
+                      viewportAttribute:road.dataset.waymakingViewport,
+                      active:document.body.dataset.waymakingRoadActive,
+                      display:getComputedStyle(road).display,
+                      picCurrent:document.querySelector('.waymaking-road-art img').currentSrc,
+                      cssLoaded:[...document.styleSheets].map(s=>s.href).filter(Boolean),
+                      scriptCount:document.querySelectorAll('script[src*="waymaking-scroll"]').length
+                    };
+                  });
+                  console.log('BEFORE_PROBE',engineName,width,JSON.stringify({pos,probe,errors}));
+                  assert.equal(probe.root,'BODY',engineName+' failed to run portal initialization');
+                  assert.equal(probe.display,'none',
                     engineName+' painted road should be hidden before Creative Thinking');
                   await visit(page,pos.first+25);
                   const beginning=await page.evaluate(()=>{
