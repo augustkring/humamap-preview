@@ -1,0 +1,169 @@
+name: Waymaking cross-browser visual QA
+
+on:
+  pull_request:
+    paths:
+      - "augustkring/**"
+      - ".github/workflows/waymaking-engines-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  webkit-firefox:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser engines and PNG comparison support
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix /tmp/ak-engines --no-audit --no-fund --silent playwright@1.55.0 pngjs@7.0.0
+          /tmp/ak-engines/node_modules/.bin/playwright install --with-deps firefox webkit
+      - name: Audit viewport fixed pigment in Firefox and WebKit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python3 -m http.server 8766 --directory . >/tmp/waymaking-cross-browser.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" || true' EXIT
+          for i in $(seq 1 30); do
+            curl -fsS 'http://127.0.0.1:8766/augustkring/' >/dev/null && break
+            sleep 1
+          done
+          NODE_PATH=/tmp/ak-engines/node_modules node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {firefox,webkit}=require('playwright');
+          const {PNG}=require('pngjs');
+          const root='http://127.0.0.1:8766/augustkring/';
+          const nap=ms=>new Promise(r=>setTimeout(r,ms));
+          async function visit(page,y){
+            await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
+            await nap(200);
+          }
+          async function changedPixels(page){
+            const art=page.locator('.waymaking-road-wrap');
+            const a=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+            await art.evaluate(el=>el.style.setProperty('display','none','important'));
+            const b=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+            await art.evaluate(el=>el.style.removeProperty('display'));
+            let changed=0;
+            for(let i=0;i<a.data.length;i+=4){
+              if(Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])
+                +Math.abs(a.data[i+2]-b.data[i+2])>8)changed++;
+            }
+            return changed;
+          }
+          (async()=>{
+            for(const [engineName,browserType] of [['Firefox',firefox],['WebKit',webkit]]){
+              const browser=await browserType.launch({headless:true});
+              try {
+                for(const width of [390,1440]){
+                  const page=await browser.newPage({viewport:{width,height:900}});
+                  const errors=[];
+                  page.on('pageerror',e=>errors.push(e.message));
+                  await page.goto(root,{waitUntil:'networkidle'});
+                  const pos=await page.evaluate(()=>{
+                    const h=document.querySelector('.waymaking-beat h3');
+                    const last=document.querySelector('.waymaking-beat:last-child h3');
+                    const end=document.querySelector('.waymaking-resolution');
+                    return {
+                      first:scrollY+h.getBoundingClientRect().top-32,
+                      last:scrollY+last.getBoundingClientRect().top-innerHeight*.51,
+                      conclusion:scrollY+end.getBoundingClientRect().top
+                    };
+                  });
+                  await visit(page,pos.first-90);
+                  assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).display),'none',
+                    engineName+' painted road should be hidden before Creative Thinking');
+                  await visit(page,pos.first+25);
+                  const beginning=await page.evaluate(()=>{
+                    const art=document.querySelector('.waymaking-road-wrap');
+                    return {top:art.getBoundingClientRect().top,
+                      position:getComputedStyle(art).position,
+                      display:getComputedStyle(art).display,
+                      opacity:Number(getComputedStyle(art).opacity)};
+                  });
+                  assert.ok(Math.abs(beginning.top-16)<1,engineName+' moved ink at activation');
+                  assert.equal(beginning.position,'fixed');
+                  assert.equal(beginning.display,'block');
+                  assert.equal(beginning.opacity,1);
+                  const middle=pos.first+(pos.last-pos.first)*.56;
+                  await visit(page,middle);
+                  const state=await page.evaluate(()=>{
+                    const road=document.querySelector('.waymaking-road-wrap');
+                    const path=document.querySelector('[data-waymaking-paint-path]');
+                    const svg=document.querySelector('.waymaking-paint-art');
+                    const picture=document.querySelector('.waymaking-road-art img');
+                    return {
+                      top:road.getBoundingClientRect().top,
+                      painted:road.dataset.waymakingPainted,
+                      active:document.body.dataset.waymakingRoadActive,
+                      src:picture.currentSrc,
+                      maskSrc:document.querySelector('.waymaking-paint-art image').getAttribute('href'),
+                      progress:Number(path.getAttribute('stroke-dashoffset')),
+                      svgDisplay:getComputedStyle(svg).display,
+                      picVisibility:getComputedStyle(picture.parentElement).visibility,
+                      overflow:document.documentElement.scrollWidth>innerWidth+1
+                    };
+                  });
+                  assert.ok(Math.abs(state.top-16)<1);
+                  assert.equal(state.active,'true');
+                  assert.equal(state.painted,'true',
+                    engineName+' failed to render progressive pigment (AVIF/WebP source guard?)');
+                  assert.ok(state.progress>100&&state.progress<900,'Ink progress wrong');
+                  assert.notEqual(state.svgDisplay,'none',engineName+' not showing masked SVG');
+                  assert.equal(state.picVisibility,'hidden',engineName+' showed complete static ink');
+                  assert.equal(state.overflow,false);
+                  const delta=await changedPixels(page);
+                  assert.ok(delta>180,
+                    engineName+' did not actually draw visible PNG pixels for WebP inside masked SVG ('+delta+')');
+                  await page.screenshot({path:'artifacts/'+engineName+'-'+width+'-middle.png'});
+                  console.log('ENGINE',engineName,width,state,'VISIBLE_PIXELS',delta);
+
+                  // Force browser to select fallback WebP and verify animation
+                  // does NOT silently disable when AVIF is unavailable.
+                  await page.evaluate(async()=>{
+                    const pic=document.querySelector('.waymaking-road-art picture')||
+                      document.querySelector('picture.waymaking-road-art');
+                    pic.querySelector('source[type="image/avif"]')?.remove();
+                    const img=pic.querySelector('img');
+                    img.src='assets/waymaking-editorial-ink.webp?test_webp=1';
+                    await img.decode();
+                    dispatchEvent(new Event('scroll'));
+                  });
+                  await nap(160);
+                  const fallback=await page.evaluate(()=>{
+                    const img=document.querySelector('.waymaking-road-art img');
+                    return {
+                      url:img.currentSrc,
+                      painted:document.querySelector('.waymaking-road-wrap').dataset.waymakingPainted,
+                      svg:getComputedStyle(document.querySelector('.waymaking-paint-art')).display
+                    };
+                  });
+                  assert.ok(fallback.url.includes('.webp'),engineName+' failed to select WebP');
+                  assert.equal(fallback.painted,'true',engineName+' WebP fallback disabled pigment');
+                  assert.notEqual(fallback.svg,'none');
+                  await visit(page,pos.last+80);
+                  assert.ok(Math.abs(await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top)-16)<1,
+                    engineName+' ink drifted at last chapter');
+                  await visit(page,pos.conclusion-900*.60);
+                  assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).display),'none',
+                    engineName+' ink leaked behind the Waymaker conclusion');
+                  assert.equal(await changedPixels(page),0,engineName+' hidden ink still physically painted');
+                  assert.deepEqual(errors,[],engineName+' JavaScript errors');
+                  await page.close();
+                }
+              } finally {await browser.close();}
+            }
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
+      - name: Upload WebKit and Firefox screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: waymaking-cross-browser-screenshots
+          path: artifacts/
+          if-no-files-found: warn
