@@ -115,7 +115,11 @@
     const illustration = road.getBoundingClientRect();
     const sceneTop = scene.getBoundingClientRect().top;
     const signoffTop = conclusion.querySelector('p').getBoundingClientRect().top;
-    const visibleTop = Math.max(illustration.top, sceneTop);
+    // Pre-roll the stationary background into view before the first heading
+    // reaches the reading area; it is fully visible across all chapter centres.
+    // This is viewport clipping, not image movement or opacity animation.
+    const visualEntry = sceneTop - illustration.height * 0.45;
+    const visibleTop = Math.max(illustration.top, visualEntry);
     const visibleBottom = Math.min(illustration.bottom, signoffTop - 64);
 
     if (visibleBottom <= visibleTop) {
