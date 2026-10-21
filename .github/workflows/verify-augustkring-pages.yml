@@ -329,7 +329,7 @@ jobs:
                   if(index>0){
                     assert.ok(state.fraction>stages[index-1].fraction+.10,
                       'Road did not grow when chapter changed');
-                    assert.ok(Math.abs(state.route.top-16)<1.5,'Road is not stationary while chapters pass');
+                    assert.ok(Math.abs(state.route.top-225)<2,'Road is not stationary while chapters pass');
                   } else {
                     assert.ok(Math.abs(state.firstHeading.top-state.route.top)<110,
                       'Creative Thinking does not start alongside the initial route');

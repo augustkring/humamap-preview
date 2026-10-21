@@ -572,7 +572,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 10;
-  top: 16px;
+  top: clamp(200px, 25svh, 245px);
   left: 50%;
   width: min(35vw, 390px);
   height: min(66svh, 650px);

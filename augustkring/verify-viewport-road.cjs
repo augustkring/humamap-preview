@@ -168,7 +168,7 @@ async function runOne(browser,engine,width) {
    assert.equal(state.imageSource,'assets/waymaking-editorial-ink.webp','Wrong original asset');
    assert.equal(state.roadParent,true);
    assert.equal(state.sticky,false,'Road may not move with the narrative container');
-   assert.ok(Math.abs(state.road.top-16)<1.5,'Road drifted while scrolling: '+state.road.top);
+   assert.ok(Math.abs(state.road.top-225)<2,'Road drifted while scrolling: '+state.road.top);
    assert.equal(state.overflow,false);
    for(const [index,text] of state.texts.entries()) {
     const collision=overlap(state.road,text);
