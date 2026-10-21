@@ -121,8 +121,8 @@
 
     // The end handoff starts only once the final chapter is leaving. A
     // stationary fade finishes in whitespace before the Waymaker signoff.
-    const fadeStart = window.innerHeight * 0.40;
-    const fadeEnd = window.innerHeight * 0.21;
+    const fadeStart = window.innerHeight * 0.54;
+    const fadeEnd = window.innerHeight * 0.27;
     const departure = smooth((fadeStart - lastBeatBottom) /
       Math.max(1, fadeStart - fadeEnd));
     const opacity = 1 - departure;
