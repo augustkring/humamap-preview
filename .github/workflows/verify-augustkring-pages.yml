@@ -97,7 +97,7 @@ jobs:
           grep -Fq '.waymaking-vector' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
           grep -Fq '.waymaking-vector--mobile' /tmp/augustkring.css
-          grep -Fq 'grid-template-columns: minmax(78px, 27%) minmax(0, 1fr);' /tmp/augustkring.css
+          grep -Fq 'grid-template-columns: minmax(77px, 26%) minmax(0, 1fr);' /tmp/augustkring.css
           ! grep -Fq '.waymaking-copy-column::before' /tmp/augustkring.css
           ! grep -Fq '.waymaking-copy-column::after' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:nth-child(odd)' /tmp/augustkring.css
