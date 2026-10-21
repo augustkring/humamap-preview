@@ -14,6 +14,8 @@
   const summary = story?.previousElementSibling;
   const finalCopy = beats[4]?.querySelector('.waymaking-copy');
   const downstream = document.querySelector('#work');
+  const picture = road?.querySelector('.waymaking-original-reveal');
+  let responsiveArtMode = '';
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
   if (!story || !road || !signoff || !summary || !firstHeading ||
       !finalCopy || !downstream || beats.length !== 5 || revealPaths.length !== 1) return;
@@ -101,9 +103,33 @@
     return Math.min(entering, leaving);
   };
 
+  // Mobile must see the same ORIGINAL pixels, including the hairpin at the
+  // seam. Crop only the transparent margins of the SVG canvas, NEVER its ink.
+  // Attribute changes occur solely on responsive viewport changes.
+  const updateArtworkViewport = () => {
+    const mode = window.innerWidth <= 600 ? 'narrow' :
+      window.innerWidth <= 900 ? 'tablet' : 'desktop';
+    if (mode === responsiveArtMode) return;
+    picture.setAttribute('viewBox',mode==='narrow' ? '130 0 540 2148' :
+      mode==='tablet' ? '80 0 600 2148' : '0 0 720 2148');
+    picture.setAttribute('preserveAspectRatio','xMidYMin meet');
+    responsiveArtMode = mode;
+  };
+
+  // No fade: as the Waymaker conclusion enters, physically bound the
+  // *drawing* to the text-free area above it. The fixed image never shifts.
+  const updateConclusionCut = () => {
+    const rect = road.getBoundingClientRect();
+    const endAt = signoff.getBoundingClientRect().top - 18;
+    const cut = Math.max(0, Math.min(rect.height,rect.bottom - endAt));
+    road.style.setProperty('--waymaking-conclusion-cut',cut.toFixed(2)+'px');
+  };
+
   const update = () => {
     frame = 0;
     if (reduced.matches) {
+      updateArtworkViewport();
+      updateConclusionCut();
       document.body.dataset.waymakingRoadActive =
         summary.getBoundingClientRect().bottom <= 16 &&
         finalCopy.getBoundingClientRect().bottom > 16 &&
@@ -120,6 +146,8 @@
     }
     prepareText();
 
+    updateArtworkViewport();
+    updateConclusionCut();
     // No opacity fade-in or fade-out. The full-strength road is visible
     // only after the preceding editorial intro has left the reading area,
     // and until the final competency has passed the fixed top position.
