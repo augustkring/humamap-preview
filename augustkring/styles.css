@@ -568,6 +568,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
   background: none;
   overflow: visible;
+  /* Feather the physically ending brush into white paper, preventing the
+     dead-flat crop at the edge of SVG's viewBox. No opaque matte or rectangle. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 90%, transparent 100%);
 }
 .waymaking-vector--desktop { display: block; }
 .waymaking-vector--mobile { display: none; }

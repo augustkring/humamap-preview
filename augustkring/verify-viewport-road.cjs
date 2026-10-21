@@ -162,6 +162,12 @@ async function runOne(browser,engine,width) {
     scrollY+el.getBoundingClientRect().top-innerHeight*.42);
    await scroll(page,pos);
    const pixels=await paintedPixels(page);
+   if(pixels>0){
+    const state=await checkpoint(page);
+    const coords=await page.evaluate(()=>({scrollY,viewportHeight:innerHeight}));
+    console.log('EXIT_FAIL_DIAGNOSTIC',engine,width,selector,JSON.stringify({pixels,road:state.road,scene:state.scene,intro:state.intro,coords,storyGap:state.endTop-state.lastCopyBottom}));
+    await page.screenshot({path:join(output,engine+'-'+width+'-exit-debug.png'),animations:'disabled'});
+   }
    assert.equal(pixels,0,'Road continued under '+selector+': '+pixels+' rendered pixels');
   }
   assert.deepEqual(problems,[],'Browser JS errors');
