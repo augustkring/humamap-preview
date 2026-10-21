@@ -1,37 +1,30 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * The ink is in a SINGLE immutable viewport-fixed position from its first
- * visible frame. Its top coordinate is NEVER updated during scrolling.
- * Native scroll controls only SVG pigment-mask progress and text emphasis.
- * The original illustration remains visible behind all five chapters.
- * The SVG adds stronger painted ink on top instead of hiding the source art.
- * The fixed road exits only after the final Purpose Driven text has passed.
+ * The approved road is always the SAME complete image, at a fixed
+ * viewport coordinate. Neither opacity, paint progression nor image
+ * position changes with scrolling. The story's viewport intersection
+ * merely CLIPS this stationary image at the scene's beginning/end.
+ * Only the optional foreground heading emphasis responds to scroll.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
-  const summary = story?.previousElementSibling;
   const scene = story?.querySelector('[data-waymaking-scene]');
-  const brush = scene?.querySelector('[data-waymaking-paint-path]');
+  // The authored SVG mask remains in the DOM for asset provenance but is
+  // never displayed or animated. The source <picture> is the full artwork.
   const picture = scene?.querySelector('.waymaking-road-art img');
-  const featherPaths = scene ? [...scene.querySelectorAll('[data-waymaking-feather]')] : [];
   const road = scene?.querySelector('.waymaking-road-wrap');
   const beats = scene ? [...scene.querySelectorAll('.waymaking-beat')] : [];
   const firstBeat = beats[0];
   const firstHeading = firstBeat?.querySelector('h3');
-  const finalCopy = beats[beats.length - 1]?.querySelector('.waymaking-copy');
-  const lastHeading = beats[beats.length - 1]?.querySelector('h3');
   const conclusion = story?.querySelector('.waymaking-resolution');
-  if (!story || !summary?.matches('.thread-summary') || !scene || !road || !brush || !picture || !firstHeading ||
-      !firstBeat || !finalCopy || !lastHeading || !conclusion || beats.length !== 5 ||
-      featherPaths.length !== 7) return;
+  const downstream = document.querySelector('#work');
+  if (!story || !scene || !road || !picture || !firstHeading ||
+      !firstBeat || !conclusion || !downstream || beats.length !== 5) return;
 
-  // A real fixed position is a CONST. Positioning an element with
-  // position:fixed while writing a new `top` on every scroll is still MOVING it.
-  // Activate before the first chapter becomes readable, not when its
-  // heading almost disappears at the top; fixed 16px is CSS-only.
-  const startLine = () => window.innerHeight * 0.88;
+  // CSS alone owns the artwork coordinates and constant pixel opacity.
+  // Updating a clip boundary does not move or repaint the artwork itself.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
@@ -85,8 +78,6 @@
     delete story.dataset.waymakingComplete;
     delete road.dataset.waymakingPainted;
     delete road.dataset.waymakingComplete;
-    brush.setAttribute('stroke-dashoffset', '1000');
-    featherPaths.forEach(path => path.setAttribute('stroke-dashoffset', '1000'));
     beats.forEach(beat => beat.classList.remove('is-current'));
     if (!enhanced) return;
     for (const item of labels) {
@@ -117,48 +108,39 @@
   road.dataset.waymakingViewport = 'true';
   document.body.appendChild(road);
 
-  // Only opacity changes at entrance and after the final copy; never top.
-  // The expanded blank handoff keeps the Waymaker conclusion unobstructed.
-  const updatePin = () => {
-    const entryTop = firstBeat.getBoundingClientRect().top;
-    const startReached = entryTop <= startLine();
-    const finalCopyBottom = finalCopy.getBoundingClientRect().bottom;
+  // A single FULL illustration is fixed behind the scrolling copy.
+  // Clip it to the portion of the viewport occupied by the story, so it
+  // neither pops into existence at an arbitrary threshold nor leaks into
+  // the final Waymaker statement or the following page sections.
+  const updateBackdropClip = () => {
+    const illustration = road.getBoundingClientRect();
+    const sceneTop = scene.getBoundingClientRect().top;
     const signoffTop = conclusion.querySelector('p').getBoundingClientRect().top;
-    const entryDistance = Math.max(64, window.innerHeight * 0.12);
-    const fadeDistance = Math.max(100, window.innerHeight * 0.16);
-    const arrival = smooth((startLine() - entryTop) / entryDistance);
-    const departure = smooth(-finalCopyBottom / fadeDistance);
-    const withinStory = startReached && finalCopyBottom > -fadeDistance &&
-      signoffTop > window.innerHeight;
-    const opacity = arrival * (1 - departure);
+    const downstreamTop = downstream.getBoundingClientRect().top;
+    // Pre-roll the stationary background into view before the first heading
+    // reaches the reading area; it is fully visible across all chapter centres.
+    // This is viewport clipping, not image movement or opacity animation.
+    const visualEntry = sceneTop - illustration.height * 0.45;
+    const visibleTop = Math.max(illustration.top, visualEntry);
+    // A full-viewport discharge distance clears ink BEFORE the next section
+    // is visible, rather than waiting for its text to overlap the drawing.
+    const visibleBottom = Math.min(illustration.bottom, signoffTop - 64,
+      downstreamTop - window.innerHeight);
 
-    if (withinStory) {
-      story.dataset.waymakingPinned = 'true';
-      document.body.dataset.waymakingRoadActive = 'true';
-      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
-      // The introductory editorial summary is above this story in document
-      // flow. Keep the route perceptible but light until that copy leaves,
-      // without covering it with an opaque layer that makes the ink disappear.
-      const summaryBottom = summary.getBoundingClientRect().bottom;
-      const introClearance = smooth((window.innerHeight * 0.86 - summaryBottom) /
-        Math.max(1, window.innerHeight * 0.75));
-      const inkPresence = 0.48 + 0.52 * introClearance;
-      const narrow = window.innerWidth <= 900;
-      road.style.setProperty('--waymaking-original-ink-opacity',
-        ((narrow ? 0.2 : 0.58) * inkPresence).toFixed(4));
-      road.style.setProperty('--waymaking-extra-ink-opacity',
-        ((narrow ? 0.08 : 0.42) * inkPresence).toFixed(4));
-      road.dataset.waymakingTopPinned = 'true';
-    } else {
-      delete story.dataset.waymakingPinned;
-      delete document.body.dataset.waymakingRoadActive;
-      delete road.dataset.waymakingTopPinned;
-      road.style.removeProperty('--waymaking-handoff-opacity');
+    if (visibleBottom <= visibleTop) {
+      road.style.setProperty('--waymaking-clip-top', illustration.height + 'px');
+      road.style.setProperty('--waymaking-clip-bottom', '0px');
+      return;
     }
+
+    road.style.setProperty('--waymaking-clip-top',
+      Math.max(0, visibleTop - illustration.top).toFixed(2) + 'px');
+    road.style.setProperty('--waymaking-clip-bottom',
+      Math.max(0, illustration.bottom - visibleBottom).toFixed(2) + 'px');
   };
   const update = () => {
     frame = 0;
-    updatePin();
+    updateBackdropClip();
     // AVIF and WebP are both legitimate image sources. The old guard
     // silently DISABLED painting on browsers that select the WebP fallback.
     // The SVG's image source uses WebP for cross-browser consistency.
@@ -186,37 +168,8 @@
       }
     }
 
-    // Paint EXTRA pigment from early beat entry, above the visible source art.
-    const firstDocY = scrollY + firstBeat.getBoundingClientRect().top;
-    const lastDocY = scrollY + lastHeading.getBoundingClientRect().top;
-    const paintStart = firstDocY - startLine();
-    const paintEnd = lastDocY - focus;
-    const fraction = clamp(
-      (scrollY - paintStart) / Math.max(1, paintEnd - paintStart)
-    );
-    const revealed = clamp(0.025 + fraction * 0.975);
-    // A fully opaque stroke paints the completed route. Seven increasingly
-    // transparent brush layers feather the moving tip into the white paper.
-    // This avoids the abrupt flat cut visible in the earlier single cap.
-    // Gradually narrow the translucent brush tip as the road completes,
-    // so the final unmasked original appears without a sudden visual jump.
-    const frontLength = Math.min(revealed, 0.11, (1 - revealed) * 0.5);
-    const solid = revealed - frontLength;
-    brush.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - solid))));
-    featherPaths.forEach((path, index) => {
-      const partial = solid + frontLength * ((index + 1) / featherPaths.length);
-      path.setAttribute('stroke-dashoffset', String(Math.round(1000 * (1 - partial))));
-    });
-    story.dataset.waymakingPainted = 'true';
-    road.dataset.waymakingPainted = 'true';
-    if (revealed >= 0.999) {
-      story.dataset.waymakingComplete = 'true';
-      road.dataset.waymakingComplete = 'true';
-    } else {
-      delete story.dataset.waymakingComplete;
-      delete road.dataset.waymakingComplete;
-    }
-
+    // The approved road pixels never change with scroll. Only the text focus
+    // below can change; all SVG painting is intentionally retired.
     // Darker muted colors on mobile preserve paragraph contrast when ink sits
     // behind the words (normal body text stays above 4.5:1 even over the brush).
     const fromHeading = narrow.matches ? [55, 75, 94] : dimTitle;
@@ -249,5 +202,6 @@
   // Only JavaScript-enhanced sessions hide the off-stage illustration;
   // no-JavaScript visitors retain the original static document rendering.
   story.dataset.waymakingReady = 'true';
-  requestUpdate();
+  // Avoid a one-frame empty flash on initial load and restored scroll pages.
+  update();
 })();

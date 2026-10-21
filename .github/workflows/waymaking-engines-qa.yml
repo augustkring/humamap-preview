@@ -10,217 +10,41 @@ permissions:
   contents: read
 
 jobs:
-  webkit-firefox:
+  review:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Install browser engines and PNG comparison support
+      - name: Check approved editorial baseline
+        run: node augustkring/verify-baseline.mjs
+      - name: Run actual firefox,webkit pixel-based stationary-road QA
         shell: bash
         run: |
           set -euo pipefail
-          npm install --prefix /tmp/ak-engines --no-audit --no-fund --silent playwright@1.55.0 pngjs@7.0.0
-          /tmp/ak-engines/node_modules/.bin/playwright install --with-deps firefox webkit
-      - name: Audit viewport fixed pigment in Firefox and WebKit
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts /tmp/ak-engine-local/humamap-preview
-          cp -R augustkring /tmp/ak-engine-local/humamap-preview/augustkring
-          # index.html explicitly declares <base href="/humamap-preview/augustkring/">.
-          # Serve assets at THAT path; otherwise the stylesheet and JS 404 and
-          # falsely resemble a browser rendering failure.
-          # Serve a second HTML document with its AVIF <source> removed,
-          # so browsers genuinely select WebP at initial load rather than
-          # racing against an artificial source swap during decode.
+          mkdir -p /tmp/ak-road-site/humamap-preview artifacts
+          cp -R augustkring /tmp/ak-road-site/humamap-preview/augustkring
           python3 - <<'PY'
           from pathlib import Path
-          root=Path('/tmp/ak-engine-local/humamap-preview/augustkring')
-          html=(root/'index.html').read_text()
-          needle='<source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">'
-          assert needle in html
-          (root/'no-avif.html').write_text(html.replace(needle,''))
+          page=Path('/tmp/ak-road-site/humamap-preview/augustkring/index.html')
+          source='<source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">'
+          html=page.read_text()
+          assert source in html, 'Original approved AVIF source missing'
+          page.with_name('no-avif.html').write_text(html.replace(source,''))
           PY
-          python3 -m http.server 8766 --directory /tmp/ak-engine-local >/tmp/waymaking-cross-browser.log 2>&1 &
+          python3 -m http.server 8765 --directory /tmp/ak-road-site >/tmp/ak-road-server.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
           for i in $(seq 1 30); do
-            curl -fsS 'http://127.0.0.1:8766/humamap-preview/augustkring/' >/dev/null && break
+            curl -fsS http://127.0.0.1:8765/humamap-preview/augustkring/ >/dev/null && break
             sleep 1
           done
-          NODE_PATH=/tmp/ak-engines/node_modules node <<'NODE'
-          const assert=require('node:assert/strict');
-          const {firefox,webkit}=require('playwright');
-          const {PNG}=require('pngjs');
-          const root='http://127.0.0.1:8766/humamap-preview/augustkring/';
-          const nap=ms=>new Promise(r=>setTimeout(r,ms));
-          async function visit(page,y){
-            await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
-            await nap(200);
-          }
-          async function changedPixels(page){
-            const art=page.locator('.waymaking-road-wrap');
-            const a=PNG.sync.read(await page.screenshot({animations:'disabled'}));
-            await art.evaluate(el=>el.style.setProperty('display','none','important'));
-            const b=PNG.sync.read(await page.screenshot({animations:'disabled'}));
-            await art.evaluate(el=>el.style.removeProperty('display'));
-            let changed=0;
-            for(let i=0;i<a.data.length;i+=4){
-              if(Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])
-                +Math.abs(a.data[i+2]-b.data[i+2])>8)changed++;
-            }
-            return changed;
-          }
-          (async()=>{
-            for(const [engineName,browserType] of [['Firefox',firefox],['WebKit',webkit]]){
-              const browser=await browserType.launch({headless:true});
-              try {
-                for(const width of [390,1440]){
-                  const page=await browser.newPage({viewport:{width,height:900}});
-                  const errors=[];
-                  page.on('console',message=>{
-                    if(message.type()==='error') errors.push('console: '+message.text());
-                  });
-                  page.on('pageerror',e=>errors.push(e.message));
-                  await page.goto(root,{waitUntil:'networkidle'});
-                  const pos=await page.evaluate(()=>{
-                    const h=document.querySelector('.waymaking-beat h3');
-                    const last=document.querySelector('.waymaking-beat:last-child h3');
-                    const end=document.querySelector('.waymaking-resolution');
-                    return {
-                      first:scrollY+document.querySelector('.waymaking-beat').getBoundingClientRect().top-innerHeight*.88,
-                      last:scrollY+last.getBoundingClientRect().top-innerHeight*.51,
-                      conclusion:scrollY+end.getBoundingClientRect().top
-                    };
-                  });
-                  await visit(page,pos.first-90);
-                  const probe=await page.evaluate(()=>{
-                    const road=document.querySelector('.waymaking-road-wrap');
-                    const title=document.querySelector('.waymaking-beat h3');
-                    return {
-                      scrollY,headingTop:title.getBoundingClientRect().top,
-                      artTop:road.getBoundingClientRect().top,
-                      root:road.parentElement.tagName,
-                      viewportAttribute:road.dataset.waymakingViewport,
-                      active:document.body.dataset.waymakingRoadActive,
-                      display:getComputedStyle(road).display,
-                      picCurrent:document.querySelector('.waymaking-road-art img').currentSrc,
-                      cssLoaded:[...document.styleSheets].map(s=>s.href).filter(Boolean),
-                      scriptCount:document.querySelectorAll('script[src*="waymaking-scroll"]').length
-                    };
-                  });
-                  console.log('BEFORE_PROBE',engineName,width,JSON.stringify({pos,probe,errors}));
-                  assert.equal(probe.root,'BODY',engineName+' failed to run portal initialization');
-                  assert.equal(probe.display,'none',
-                    engineName+' painted road should be hidden before Creative Thinking');
-                  await visit(page,pos.first+Math.max(160,900*.21));
-                  const beginning=await page.evaluate(()=>{
-                    const art=document.querySelector('.waymaking-road-wrap');
-                    return {top:art.getBoundingClientRect().top,
-                      position:getComputedStyle(art).position,
-                      display:getComputedStyle(art).display,
-                      opacity:Number(getComputedStyle(art).opacity)};
-                  });
-                  assert.ok(Math.abs(beginning.top-16)<1,engineName+' moved ink at activation');
-                  assert.equal(beginning.position,'fixed');
-                  assert.equal(beginning.display,'block');
-                  assert.equal(beginning.opacity,1);
-                  const middle=pos.first+(pos.last-pos.first)*.56;
-                  await visit(page,middle);
-                  const state=await page.evaluate(()=>{
-                    const road=document.querySelector('.waymaking-road-wrap');
-                    const path=document.querySelector('[data-waymaking-paint-path]');
-                    const svg=document.querySelector('.waymaking-paint-art');
-                    const picture=document.querySelector('.waymaking-road-art img');
-                    return {
-                      top:road.getBoundingClientRect().top,
-                      painted:road.dataset.waymakingPainted,
-                      active:document.body.dataset.waymakingRoadActive,
-                      src:picture.currentSrc,
-                      maskSrc:document.querySelector('.waymaking-paint-art image').getAttribute('href'),
-                      progress:Number(path.getAttribute('stroke-dashoffset')),
-                      scrollY,firstTop:document.querySelector('.waymaking-beat h3').getBoundingClientRect().top,
-                      lastTop:document.querySelector('.waymaking-beat:last-child h3').getBoundingClientRect().top,
-                      reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
-                      svgDisplay:getComputedStyle(svg).display,
-                      picVisibility:getComputedStyle(picture.parentElement).visibility,
-                      overflow:document.documentElement.scrollWidth>innerWidth+1
-                    };
-                  });
-                  assert.ok(Math.abs(state.top-16)<1);
-                  assert.equal(state.active,'true');
-                  assert.equal(state.painted,'true',
-                    engineName+' failed to render progressive pigment (AVIF/WebP source guard?)');
-                  console.log('PROGRESS_PROBE',engineName,width,JSON.stringify({pos,state,errors}));
-                  assert.ok(state.progress>100&&state.progress<900,'Ink progress wrong');
-                  assert.notEqual(state.svgDisplay,'none',engineName+' not showing masked SVG');
-                  assert.equal(state.picVisibility,'visible',engineName+' hid original image when SVG brush was painting');
-                  assert.equal(state.overflow,false);
-                  const delta=await changedPixels(page);
-                  assert.ok(delta>180,
-                    engineName+' did not actually draw visible PNG pixels for WebP inside masked SVG ('+delta+')');
-                  await page.screenshot({path:'artifacts/'+engineName+'-'+width+'-middle.png'});
-                  console.log('ENGINE',engineName,width,state,'VISIBLE_PIXELS',delta);
-
-                  // The production animation no longer gates on AVIF. The
-                  // artwork within the SVG already uses WebP, verified by
-                  // actual rendered pixel differences above. Check HTTP
-                  // fallback independently: forcing a hidden <picture>
-                  // to swap formats mid-decode is not a reliable browser test.
-                  const fallback=await page.evaluate(async()=>{
-                    const response=await fetch(
-                      new URL('assets/waymaking-editorial-ink.webp',document.baseURI)
-                    );
-                    return {ok:response.ok,type:response.headers.get('content-type')};
-                  });
-                  assert.equal(fallback.ok,true,engineName+' WebP fallback missing');
-
-                  // No early exit: the original remains while the fifth heading is read.
-                  await visit(page,pos.last+80);
-                  assert.ok(Math.abs(await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().top)-16)<1,
-                    engineName+' ink drifted at last chapter');
-                  await visit(page,pos.conclusion-900*.60);
-                  assert.equal(await page.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).display),'none',
-                    engineName+' ink leaked behind the Waymaker conclusion');
-                  assert.equal(await changedPixels(page),0,engineName+' hidden ink still physically painted');
-                  assert.deepEqual(errors,[],engineName+' JavaScript errors');
-                  await page.close();
-
-                  // Independent first-load WebP fallback, not a dynamic format
-                  // swap of an already loaded hidden <picture>.
-                  const noAvif=await browser.newPage({viewport:{width,height:900}});
-                  await noAvif.goto(root+'no-avif.html',{waitUntil:'networkidle'});
-                  await visit(noAvif,middle);
-                  const webpState=await noAvif.evaluate(()=>{
-                    const road=document.querySelector('.waymaking-road-wrap');
-                    const img=document.querySelector('.waymaking-road-art img');
-                    return {
-                      src:img.currentSrc,
-                      painted:road.dataset.waymakingPainted,
-                      pin:road.getBoundingClientRect().top,
-                      mask:getComputedStyle(document.querySelector('.waymaking-paint-art')).display
-                    };
-                  });
-                  assert.ok(webpState.src.includes('.webp'),
-                    engineName+' did not select actual WebP fallback');
-                  assert.equal(webpState.painted,'true',
-                    engineName+' silently disabled scroll painting for WebP');
-                  assert.ok(Math.abs(webpState.pin-16)<1);
-                  assert.notEqual(webpState.mask,'none');
-                  const webpPixels=await changedPixels(noAvif);
-                  assert.ok(webpPixels>180,engineName+' SVG pigment disappeared in WebP-only page');
-                  await noAvif.screenshot({path:'artifacts/'+engineName+'-'+width+'-forced-WebP.png'});
-                  console.log('WEBP_ONLY',engineName,width,webpPixels,webpState);
-                  await noAvif.close();
-                }
-              } finally {await browser.close();}
-            }
-          })().catch(e=>{console.error(e);process.exitCode=1});
-          NODE
-      - name: Upload WebKit and Firefox screenshots
+          npm install --prefix /tmp/ak-v13-qa --no-audit --no-fund --silent playwright@1.55.0 pngjs@7.0.0
+          /tmp/ak-v13-qa/node_modules/.bin/playwright install --with-deps firefox webkit
+          ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=firefox,webkit ROAD_WIDTHS=390,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-viewport-road.cjs
+      - name: Upload actual-browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: waymaking-cross-browser-screenshots
+          name: waymaking-static-firefox,webkit-screenshots
           path: artifacts/
           if-no-files-found: warn

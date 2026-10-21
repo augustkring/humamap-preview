@@ -12,324 +12,40 @@ permissions:
 jobs:
   review:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
-      - name: Checkout candidate
-        uses: actions/checkout@v4
-      - name: Verify protected sections and approved text
+      - uses: actions/checkout@v4
+      - name: Check approved editorial baseline
         run: node augustkring/verify-baseline.mjs
-      - name: Check real Chrome rendering
+      - name: Run actual chromium pixel-based stationary-road QA
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/ak-local/humamap-preview artifacts
-          cp -R augustkring /tmp/ak-local/humamap-preview/augustkring
-          python3 -m http.server 8765 --directory /tmp/ak-local >/tmp/ak-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" || true' EXIT
-          for attempt in $(seq 1 30); do
-            if curl --silent --fail http://127.0.0.1:8765/humamap-preview/augustkring/ >/dev/null; then break; fi
+          mkdir -p /tmp/ak-road-site/humamap-preview artifacts
+          cp -R augustkring /tmp/ak-road-site/humamap-preview/augustkring
+          python3 - <<'PY'
+          from pathlib import Path
+          page=Path('/tmp/ak-road-site/humamap-preview/augustkring/index.html')
+          source='<source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">'
+          html=page.read_text()
+          assert source in html, 'Original approved AVIF source missing'
+          page.with_name('no-avif.html').write_text(html.replace(source,''))
+          PY
+          python3 -m http.server 8765 --directory /tmp/ak-road-site >/tmp/ak-road-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" || true' EXIT
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8765/humamap-preview/augustkring/ >/dev/null && break
             sleep 1
           done
-          npm install --prefix /tmp/ak-browser-check --no-audit --no-fund --silent playwright-core@1.55.0 pngjs@7.0.0
-          /tmp/ak-browser-check/node_modules/.bin/playwright-core install ffmpeg
-          chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
-          test -n "$chrome"
-          CHROME_BIN="$chrome" NODE_PATH=/tmp/ak-browser-check/node_modules node <<'NODE'
-          const assert=require('node:assert/strict');
-          const {chromium}=require('playwright-core');
-          const {PNG}=require('pngjs');
-          // Compare actual raster frames. A CSS 'visibility:hidden' on the
-          // container was previously overridden by 'visibility:visible' on
-          // the completed child painting, so computed-style tests passed
-          // while the ink remained visibly printed outside the story.
-          async function assertNoRenderedRoad(page,section,width) {
-            const road=page.locator('.waymaking-road-wrap');
-            const withRoad=PNG.sync.read(await page.screenshot());
-            await road.evaluate(el=>el.style.display='none');
-            const withoutRoad=PNG.sync.read(await page.screenshot());
-            await road.evaluate(el=>el.style.removeProperty('display'));
-            assert.equal(withRoad.width,withoutRoad.width);
-            assert.equal(withRoad.height,withoutRoad.height);
-            let changed=0;
-            for(let pixel=0;pixel<withRoad.data.length;pixel+=4) {
-              const diff=Math.abs(withRoad.data[pixel]-withoutRoad.data[pixel])
-                +Math.abs(withRoad.data[pixel+1]-withoutRoad.data[pixel+1])
-                +Math.abs(withRoad.data[pixel+2]-withoutRoad.data[pixel+2]);
-              if(diff>6) changed++;
-            }
-            assert.equal(changed,0,'Road is STILL visible as pixels outside the five chapters: '+section+' '+width+' ('+changed+' pixels)');
-            console.log('PIXEL_HIDDEN',width,section,changed);
-          }
-          const widths=[320,390,768,1024,1440];
-          const site='http://127.0.0.1:8765/humamap-preview/augustkring/';
-          const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
-          const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-          async function jump(page,y){
-            await page.evaluate(pos=>window.scrollTo({top:pos,behavior:'instant'}),y);
-            await sleep(95);
-          }
-          async function snap(page){
-            return page.evaluate(()=>{
-              const $=s=>document.querySelector(s);
-              const box=el=>{const r=el.getBoundingClientRect();return {top:r.top,left:r.left,right:r.right,bottom:r.bottom,width:r.width,height:r.height,center:(r.left+r.right)/2}};
-              const road=$('.waymaking-road-wrap');
-              const heading=$('.waymaking-beat h3');
-              const computed=getComputedStyle(road);
-              return {
-                road:box(road),
-                roadMode:computed.position,
-                roadOpacity:parseFloat(computed.opacity),
-                roadVisibility:computed.visibility,
-                bodyActive:document.body.dataset.waymakingRoadActive,
-                roadBodyChild:road.parentElement===document.body,
-                storyPinned:$('.waymaking-narrative').dataset.waymakingPinned,
-                paintOffset:Number($('[data-waymaking-paint-path]').getAttribute('stroke-dashoffset')),
-                paintComplete:road.dataset.waymakingComplete,
-                firstHeading:box(heading),
-                titleNames:[...document.querySelectorAll('.waymaking-beat h3')].map(h=>h.getAttribute('aria-label')||h.textContent.trim()),
-                titleSizes:[...document.querySelectorAll('.waymaking-beat h3')].map(h=>parseFloat(getComputedStyle(h).fontSize)),
-                wordSizes:[...document.querySelectorAll('.waymaking-beat h3')].map(h=>{
-                  const word=h.querySelector('.waymaking-heading-word');
-                  return word?parseFloat(getComputedStyle(word).fontSize):null;
-                }),
-                wrongLogoClass:!!document.querySelector('.waymaking-copy .waymaking-word'),
-                signoffText:$('.waymaking-resolution').textContent.trim(),
-                scrollOverflow:document.documentElement.scrollWidth>innerWidth+1,
-                mainCopy:$('.thread-copy').textContent.trim(),
-                maskSrc:$('.waymaking-paint-art image').getAttribute('href'),
-                staticSrc:$('.waymaking-road-art img').currentSrc,
-                reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
-                artificialPaperMats:getComputedStyle($('.perspective-copy'),'::before').content!=='none',
-                scene:box($('.waymaking-scene'))
-              };
-            });
-          }
-          (async()=>{
-            const browser=await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
-            try{
-              for(const width of widths){
-                const record=width===390||width===1440;
-                const context=await browser.newContext({
-                  viewport:{width,height:900},
-                  recordVideo:record?{dir:'artifacts/videos',size:{width,height:900}}:undefined
-                });
-                const page=await context.newPage();
-                const exceptions=[];
-                page.on('pageerror',error=>exceptions.push(error.message));
-                await page.goto(site,{waitUntil:'networkidle'});
-                await page.evaluate(()=>document.fonts.ready);
-                await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
-                const firstDocY=await page.evaluate(()=>{
-                  const beat=document.querySelector('.waymaking-beat');
-                  return scrollY+beat.getBoundingClientRect().top-innerHeight*.88;
-                });
-                const finalCopyDocY=await page.evaluate(()=>{
-                  const copy=document.querySelector('.waymaking-beat:last-child .waymaking-copy');
-                  return scrollY+copy.getBoundingClientRect().bottom;
-                });
-                const lastDocY=await page.evaluate(()=>{
-                  const title=document.querySelector('.waymaking-beat:last-child h3');
-                  return scrollY+title.getBoundingClientRect().top-innerHeight*.51;
-                });
-                const conclusionY=await page.evaluate(()=>{
-                  const el=document.querySelector('.waymaking-resolution');
-                  return scrollY+el.getBoundingClientRect().top;
-                });
-                const h=page.viewportSize().height;
-                await jump(page,Math.max(0,firstDocY-160));
-                const before=await snap(page);
-                assert.equal(before.roadVisibility,'hidden','No ink at Where I add value');
-                assert.equal(before.roadOpacity,0,'Hidden parent MUST have opacity zero; child visibility:visible cannot override it');
-                assert.equal(before.bodyActive,undefined,'Road must not activate before Creative Thinking');
-                assert.equal(before.roadBodyChild,true,'Road is outside scrolling containers');
-                await assertNoRenderedRoad(page,'Before Creative',width);
-                await page.screenshot({path:'artifacts/before-Creative-'+width+'.png'});
-
-                // Check genuine early pixels before Creative Thinking is halfway
-                // up the screen, not an artificially late 32px heading trigger.
-                await jump(page,firstDocY+48);
-                const early=await snap(page);
-                assert.equal(early.bodyActive,'true');
-                assert.equal(early.roadMode,'fixed');
-                assert.ok(early.roadOpacity>0&&early.roadOpacity<1,'Road must smoothly arrive as first beat enters');
-                assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),
-                  'visible','Original image must remain present during brush painting');
-                const sourceOpacity=await page.locator('.waymaking-road-art').evaluate(el=>
-                  Number(getComputedStyle(el).opacity));
-                assert.ok(sourceOpacity>.05&&sourceOpacity<.58,
-                  'Ink should remain visible but softer while Where I add value is still on screen');
-                const withInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
-                await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.display='none');
-                const withoutInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
-                await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.removeProperty('display'));
-                let inkPixels=0;
-                for(let i=0;i<withInk.data.length;i+=4){
-                  const diff=Math.abs(withInk.data[i]-withoutInk.data[i])
-                    +Math.abs(withInk.data[i+1]-withoutInk.data[i+1])
-                    +Math.abs(withInk.data[i+2]-withoutInk.data[i+2]);
-                  if(diff>8) inkPixels++;
-                }
-                assert.ok(inkPixels>180,'No visible original road pixels while first story beat enters ('+inkPixels+')');
-                await jump(page,firstDocY+Math.max(160,h*.21));
-                const entering=await snap(page);
-                assert.equal(entering.roadMode,'fixed');
-                assert.equal(entering.bodyActive,'true','Road must appear at Creative Thinking');
-                assert.equal(entering.roadVisibility,'visible');
-                assert.equal(entering.roadBodyChild,true);
-                assert.equal(entering.roadOpacity,1,'Ink must already be fully visible by first heading');
-                assert.ok(entering.firstHeading.top>=0&&entering.firstHeading.top<h,'Road must already be visible while Creative Thinking is still onscreen');
-                assert.ok(Math.abs(entering.road.top-16)<1,'Road must already be pinned from first frame');
-                assert.equal(entering.roadOpacity,1,'Road stays continuously present during all five beats');
-                assert.deepEqual(entering.titleNames,labels);
-                assert.equal(entering.wrongLogoClass,false,'Animated letters must not inherit Ventures logo font rules');
-                assert.ok(entering.titleSizes.every((size,i)=>Math.abs(size-entering.wordSizes[i])<.2),
-                  'Letter animation must not alter title font sizes');
-                assert.ok(entering.signoffText.includes("For me, that's what it means to be a waymaker."));
-                assert.ok(entering.mainCopy.includes('build towards a positive future, together with bold people'));
-                assert.ok(entering.staticSrc.endsWith('waymaking-editorial-ink.avif'));
-                assert.ok(entering.maskSrc.endsWith('waymaking-editorial-ink.webp'),'SVG pigment source should work when browser selects WebP');
-                assert.ok(!entering.scrollOverflow);
-                await page.screenshot({path:'artifacts/Creative-start-'+width+'.png'});
-                console.log('START '+width,JSON.stringify({title:entering.firstHeading.top,road:entering.road.top,opacity:entering.roadOpacity}));
-
-                const recorded=[];
-                const first=firstDocY+Math.max(160,h*.21),finish=lastDocY;
-                for(let n=0;n<=12;n++){
-                  await jump(page,first+(finish-first)*n/12);
-                  const state=await snap(page);
-                  recorded.push(state);
-                  assert.equal(state.roadMode,'fixed');
-                  assert.equal(state.roadBodyChild,true);
-                  assert.equal(state.roadVisibility,'visible','Ink must persist through all five chapters');
-                  assert.equal(state.bodyActive,'true');
-                  assert.ok(Math.abs(state.road.top-16)<1,'Ink shifted during the storytelling scroll');
-                  assert.ok(Math.abs(state.road.left-entering.road.left)<1,'Ink shifted horizontally');
-                  assert.ok(!state.scrollOverflow,'Horizontal overflow');
-                  if(n===0||n===3||n===6||n===9||n===12){
-                    await page.screenshot({path:'artifacts/chapter-'+width+'-'+n+'.png'});
-                  }
-                }
-                for(let i=1;i<recorded.length;i++)
-                  assert.ok(recorded[i].paintOffset<=recorded[i-1].paintOffset+2,
-                    'Pigment should grow smoothly with forward scrolling');
-                for(const stage of recorded){
-                  assert.ok(Math.abs(stage.road.top-16)<1,'Ink road moved from its immutable top coordinate');
-                  assert.equal(stage.roadOpacity,1,'Road must not fade while chapter content is active');
-                }
-                assert.ok(recorded[0].paintOffset-recorded.at(-1).paintOffset>850,'Painting should finish by Purpose Driven');
-                if(width>=901){
-                  const arrangement=await page.evaluate(()=>{
-                    const road=document.querySelector('.waymaking-road-wrap').getBoundingClientRect();
-                    return [...document.querySelectorAll('.waymaking-copy')].map((el,i)=>{
-                      const b=el.getBoundingClientRect();
-                      return i%2===0?b.right<=road.left+14:b.left>=road.right-14;
-                    });
-                  });
-                  assert.ok(arrangement.every(Boolean),'Desktop text must alternate without overlapping road');
-                }
-
-                // Road is anchored while finishing but leaves in blank space
-                // before the centered Waymaker close, NOT under later sections.
-                await jump(page,finalCopyDocY-36);
-                assert.equal((await snap(page)).roadOpacity,1,'Painting may not disappear while last Purpose Driven copy is still visible');
-                await jump(page,finalCopyDocY+h*.08);
-                const handoff=await snap(page);
-                assert.equal(handoff.roadMode,'fixed','Road cannot slide during exit');
-                assert.ok(Math.abs(handoff.road.top-16)<1,'Road slid during the exit transition');
-                assert.ok(Math.abs(handoff.road.left-entering.road.left)<1);
-                assert.ok(handoff.roadOpacity>0&&handoff.roadOpacity<1,'Transition should happen only in blank handoff');
-                const signoffBeforeHandoff=await page.locator('.waymaking-resolution p').boundingBox();
-                assert.ok(signoffBeforeHandoff.y>=h,'The Waymaker signoff must NOT enter the viewport while the road is visible');
-                await page.screenshot({path:'artifacts/handoff-'+width+'.png'});
-
-                await jump(page,finalCopyDocY+h*.2);
-                const signoff=await snap(page);
-                assert.equal(signoff.roadVisibility,'hidden','Painting should be finished and gone before Waymaker line');
-                assert.equal(signoff.roadOpacity,0,'Ink child artwork must not render behind the signoff');
-                assert.equal(signoff.bodyActive,undefined,'No body road beyond Waymaking');
-                await assertNoRenderedRoad(page,'Waymaker signoff',width);
-                await page.screenshot({path:'artifacts/signoff-'+width+'.png'});
-
-                for(const [name,selector] of [
-                  ['Current-Focus','#work'],
-                  ['Shift-I-See','#perspective'],
-                  ['Contact','.homepage-contact'],
-                  ['Footer','.home-footer']
-                ]){
-                  const y=await page.locator(selector).evaluate(el=>scrollY+el.getBoundingClientRect().top-innerHeight*.45);
-                  await jump(page,y);
-                  const state=await snap(page);
-                  assert.equal(state.roadVisibility,'hidden','Road overlays '+name);
-                  assert.equal(state.roadOpacity,0,'Road is still visually painted at '+name);
-                  assert.equal(state.bodyActive,undefined,'Story activation leaked into '+name);
-                  assert.equal(state.artificialPaperMats,false,'White patchwork style returned at '+name);
-                  assert.ok(!state.scrollOverflow,'Overflow after Waymaking at '+name);
-                  if(name==='Shift-I-See'||name==='Footer')
-                    await assertNoRenderedRoad(page,name,width);
-                  await page.screenshot({path:'artifacts/after-'+name+'-'+width+'.png'});
-                }
-
-                // Reverse scrolling may re-enter the chapter story; it must
-                // never unpin or move the ink while the story is active.
-                await jump(page,(firstDocY+lastDocY)/2);
-                const back=await snap(page);
-                assert.equal(back.bodyActive,'true','Returning to the chapters must restore ink');
-                assert.equal(back.roadVisibility,'visible');
-                assert.ok(Math.abs(back.road.top-16)<1,'Returning to chapters should restore the top pin');
-                await jump(page,Math.max(0,firstDocY-160));
-                const returnedBefore=await snap(page);
-                assert.equal(returnedBefore.roadVisibility,'hidden');
-                assert.equal(returnedBefore.roadOpacity,0);
-                assert.deepEqual(exceptions,[],'No script exceptions');
-                console.log('PASS '+width+'px',JSON.stringify({
-                  fixedTop:entering.road.top,
-                  chapterPositions:recorded.map(x=>x.road.top),
-                  pigment:recorded.map(x=>x.paintOffset),outsideHidden:true
-                }));
-                if(record){
-                  // Render a real multi-second screen recording rather than
-                  // trusting static checkpoints of this scroll experience.
-                  await jump(page,firstDocY-110);
-                  await page.evaluate(({from,to})=>new Promise(resolve=>{
-                    let began;
-                    const tick=now=>{
-                      if(began===undefined)began=now;
-                      const t=Math.min(1,(now-began)/5400);
-                      window.scrollTo({top:from+(to-from)*t,behavior:'instant'});
-                      if(t<1)requestAnimationFrame(tick);
-                      else resolve();
-                    };
-                    requestAnimationFrame(tick);
-                  }),{from:firstDocY-110,to:conclusionY-900*.62});
-                  await sleep(220);
-                }
-                await page.close();
-                await context.close();
-              }
-              const reduced=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
-              await reduced.goto(site,{waitUntil:'networkidle'});
-              await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-              await sleep(150);
-              assert.equal(await reduced.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible');
-              assert.equal(await reduced.locator('.waymaking-beat h3').first().evaluate(el=>el.querySelectorAll('.waymaking-letter').length),0);
-              await reduced.locator('#work').scrollIntoViewIfNeeded();
-              await sleep(150);
-              assert.equal(await reduced.locator('.waymaking-road-wrap').evaluate(el=>getComputedStyle(el).visibility),'hidden');
-              await reduced.close();
-              const noJS=await browser.newPage({viewport:{width:390,height:900},javaScriptEnabled:false});
-              await noJS.goto(site,{waitUntil:'load'});
-              assert.deepEqual(await noJS.locator('.waymaking-beat h3').allTextContents(),labels);
-              assert.equal(await noJS.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),'visible');
-              await noJS.close();
-              console.log('PASS reduced-motion and no-script fallbacks');
-            }finally{await browser.close();}
-          })().catch(err=>{console.error(err);process.exitCode=1});
-          NODE
-      - name: Upload desktop and mobile review screenshots
+          npm install --prefix /tmp/ak-v13-qa --no-audit --no-fund --silent playwright@1.55.0 pngjs@7.0.0
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_BIN"
+          ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=chromium ROAD_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-viewport-road.cjs
+      - name: Upload actual-browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: waymaking-pr-screenshots
+          name: waymaking-static-chromium-screenshots
           path: artifacts/
           if-no-files-found: warn
