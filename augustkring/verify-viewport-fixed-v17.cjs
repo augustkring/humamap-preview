@@ -183,7 +183,7 @@ async function runOne(browser,engine,width) {
   assert.ok(signoffState.road.bottom-signoffState.conclusionClip <= signoffState.signoff.top-25,
     'Visible route covers the Waymaker line during signoff reading');
   if([320,390,1440].includes(width))
-    await page.screenshot({path:join(output,engine+'-'+width+'-waymaker-signoff.png'),animations:'disabled');
+    await page.screenshot({path:join(output,engine+'-'+width+'-waymaker-signoff.png'),animations:'disabled'});
   const gap=await page.evaluate(()=>{
    const end=document.querySelector('.waymaking-resolution').getBoundingClientRect();
    const last=document.querySelector('.waymaking-purpose .waymaking-copy').getBoundingClientRect();
