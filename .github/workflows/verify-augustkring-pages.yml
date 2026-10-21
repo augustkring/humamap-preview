@@ -284,8 +284,8 @@ jobs:
                   await page.waitForTimeout(170);
                   const state=await page.evaluate(()=>{
                     const story=document.querySelector('[data-waymaking-story]');
-                    const road=story.querySelector('.waymaking-road-wrap');
-                    const svg=story.querySelector('.waymaking-original-reveal');
+                    const road=document.querySelector('body > .waymaking-road-wrap[data-waymaking-viewport="true"]');
+                    const svg=road.querySelector('.waymaking-original-reveal');
                     const mask=svg.querySelector('[data-waymaking-reveal]');
                     const beatCopies=[...story.querySelectorAll('.waymaking-copy')];
                     const box=x=>{
@@ -305,6 +305,8 @@ jobs:
                       maskOffset:parseFloat(mask.style.strokeDashoffset),
                       animated:story.dataset.waymakingAnimated==='true',
                       sticky:getComputedStyle(road).position==='sticky',
+                      fixed:getComputedStyle(road).position==='fixed',
+                      clipTop:parseFloat(road.style.getPropertyValue('--waymaking-safe-top'))||0,
                       parent:road.parentElement===document.body,
                       approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
                       approvedPaint:svg.querySelector('image')?.getAttribute('href'),
@@ -313,7 +315,9 @@ jobs:
                       opacity:Number(getComputedStyle(road).opacity)
                     };
                   });
-                  assert.equal(state.sticky,false,'Road must be viewport-fixed instead of sticky');
+                  assert.equal(state.sticky,false,'Road must not be sticky');
+                  assert.equal(state.fixed,true,'Road must be fixed on screen');
+                  assert.ok(Math.abs(state.route.top-225)<2,'Road is moving during native scrolling');
                   assert.equal(state.parent,true,'Road must be portaled to document.body');
                   assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
                   assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
@@ -331,8 +335,8 @@ jobs:
                       'Road did not grow when chapter changed');
                     assert.ok(Math.abs(state.route.top-225)<2,'Road is not stationary while chapters pass');
                   } else {
-                    assert.ok(Math.abs(state.firstHeading.top-state.route.top)<110,
-                      'Creative Thinking does not start alongside the initial route');
+                    assert.ok(Math.abs(state.firstHeading.top-state.scene.top)<110,
+                      'Creative Thinking starts too far below the beginning of the story');
                   }
                   assert.ok(state.opacity>.99,'The artwork must not fade under the chapter text');
                   const overlap=(x,y)=>
@@ -341,7 +345,10 @@ jobs:
                   for(const copy of state.texts){
                     assert.equal(overlap(state.route,copy),0,'Road overlaps readable copy');
                   }
-                  assert.equal(overlap(state.route,state.intro),0,'Road overlaps introductory copy');
+                  if(overlap(state.route,state.intro)>0){
+                    assert.ok(state.route.top+state.clipTop>=state.intro.bottom+10,
+                      'Clipped visible ink overlaps the introduction');
+                  }
                   assert.equal(state.overflow,false,'Horizontal overflow');
                   stages.push(state);
                   if((width===320||width===390||width===1440)){
@@ -364,10 +371,11 @@ jobs:
                   await page.waitForTimeout(130);
                   const aftermath=await page.locator('.waymaking-road-wrap').evaluate(el=>({
                     bottom:el.getBoundingClientRect().bottom,
-                    opacity:Number(getComputedStyle(el).opacity)
+                    opacity:Number(getComputedStyle(el).opacity),
+                    display:getComputedStyle(el).display
                   }));
-                  assert.ok(aftermath.bottom<=0||aftermath.opacity<.02,
-                    'Completed road must exit before reading '+selector);
+                  assert.ok(aftermath.display==='none'||aftermath.bottom<=0||aftermath.opacity<.02,
+                    'Completed road must disappear before reading '+selector);
                 }
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
