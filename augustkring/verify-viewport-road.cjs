@@ -17,12 +17,14 @@ async function scroll(page,y) {
  // behavior:'instant' scrollTo option returns. That produced false chapter
  // checkpoints with identical progress. Disable CSS scroll smoothing ONLY
  // in the QA browser session and verify actual final scroll coordinates.
- const target=Math.max(0,y);
- await page.evaluate(top=>{
+ const target=await page.evaluate(top=>{
    document.documentElement.style.setProperty('scroll-behavior','auto','important');
    document.body.style.setProperty('scroll-behavior','auto','important');
-   window.scrollTo({top,behavior:'auto'});
- },target);
+   const end=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+   const clamped=Math.max(0,Math.min(top,end));
+   window.scrollTo({top:clamped,behavior:'auto'});
+   return clamped;
+ },y);
  await page.waitForFunction(top=>Math.abs(window.scrollY-top)<3,target,{timeout:7000});
  await page.evaluate(()=>new Promise(resolve=>
    requestAnimationFrame(()=>requestAnimationFrame(resolve))));
