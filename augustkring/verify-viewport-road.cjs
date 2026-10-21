@@ -1,252 +1,197 @@
 'use strict';
-const assert = require('node:assert/strict');
-const { mkdirSync } = require('node:fs');
-const { join } = require('node:path');
-const { chromium, firefox, webkit } = require('playwright');
-const { PNG } = require('pngjs');
+const assert=require('node:assert/strict');
+const {mkdirSync}=require('node:fs');
+const {join}=require('node:path');
+const {chromium,firefox,webkit}=require('playwright');
+const {PNG}=require('pngjs');
+const base=process.env.ROAD_BASE||'http://127.0.0.1:8765/humamap-preview/augustkring/';
+const output=process.env.ROAD_OUTPUT||'artifacts';
+const engines=(process.env.ROAD_ENGINES||'chromium').split(',');
+const widths=(process.env.ROAD_WIDTHS||'320,390,768,1024,1440').split(',').map(Number);
+const browserTypes={chromium,firefox,webkit};
+const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
+mkdirSync(output,{recursive:true});
 
-const base = process.env.ROAD_BASE || 'http://127.0.0.1:8765/humamap-preview/augustkring/';
-const output = process.env.ROAD_OUTPUT || 'artifacts';
-const engines = (process.env.ROAD_ENGINES || 'chromium').split(',').map(s => s.trim());
-const widths = (process.env.ROAD_WIDTHS || '320,390,768,1024,1440').split(',').map(Number);
-const browserTypes = { chromium, firefox, webkit };
-const labels = [
-  'Creative Thinking', 'Commercial Understanding', 'Strategic Judgment',
-  'AI-Native Building', 'Purpose Driven'
-];
-mkdirSync(output, { recursive: true });
-
-async function jump(page, y) {
-  await page.evaluate(top => window.scrollTo({ top: Math.max(0, top), behavior: 'instant' }), y);
-  await page.waitForTimeout(150);
+async function scroll(page,y) {
+ await page.evaluate(top=>window.scrollTo({top:Math.max(0,top),behavior:'instant'}),y);
+ await page.waitForTimeout(140);
 }
-
-function intersectionArea(a, b) {
-  const horizontal = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
-  const vertical = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-  return horizontal * vertical;
+async function checkpoint(page) {
+ return page.evaluate(()=>{
+  const qs=s=>document.querySelector(s);
+  const box=el=>{
+   const r=el.getBoundingClientRect();
+   return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+  };
+  const road=qs('.waymaking-road-wrap');
+  const story=qs('[data-waymaking-story]');
+  const beats=[...document.querySelectorAll('.waymaking-beat')];
+  const actual=window.innerWidth<=900?'mobile':'desktop';
+  const art=qs('.waymaking-vector--'+actual);
+  const mask=art.querySelector('[data-waymaking-reveal]');
+  const surface=getComputedStyle(art);
+  const end=qs('.waymaking-resolution');
+  return {
+   fraction:Number(story.dataset.waymakingProgress),
+   animated:story.dataset.waymakingAnimated==='true',
+   dashOffset:Number(mask.style.strokeDashoffset),
+   length:mask.getTotalLength(),
+   road:box(road),art:box(art),scene:box(qs('.waymaking-scene')),
+   intro:box(qs('.thread-summary')),
+   texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
+   headings:beats.map(x=>box(x.querySelector('h3'))),
+   titles:beats.map(x=>x.querySelector('h3').getAttribute('aria-label')||x.querySelector('h3').textContent.trim()),
+   endTop:scrollY+end.getBoundingClientRect().top,
+   lastCopyBottom:scrollY+beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom,
+   sticky:getComputedStyle(road).position==='sticky',
+   topCSS:getComputedStyle(road).top,
+   background:surface.backgroundColor,
+   opaqueRect:!!art.querySelector('rect, image, foreignObject'),
+   bitmap:!!road.querySelector('img,picture,canvas'),
+   roadParent:road.parentElement.classList.contains('waymaking-artspace'),
+   overflow:document.documentElement.scrollWidth>innerWidth+1,
+   bodyWidth:document.documentElement.scrollWidth,
+   textWidth:beats[0].querySelector('.waymaking-copy').getBoundingClientRect().width
+  };
+ });
 }
-
-async function geometry(page) {
-  return page.evaluate(() => {
-    const scene = document.querySelector('.waymaking-scene');
-    const artspace = document.querySelector('.waymaking-artspace');
-    const road = document.querySelector('.waymaking-road-wrap');
-    const bitmap = document.querySelector('.waymaking-road-art img');
-    const svg = document.querySelector('.waymaking-paint-art');
-    const chapters = [...scene.querySelectorAll('.waymaking-beat')];
-    const boxes = selector => {
-      const rect = selector.getBoundingClientRect();
-      return {
-        left: rect.left, right: rect.right, top: rect.top,
-        bottom: rect.bottom, width: rect.width, height: rect.height
-      };
-    };
-    const picture = document.querySelector('.waymaking-road-art');
-    const styles = getComputedStyle(road);
-    return {
-      road: boxes(road),
-      artspace: boxes(artspace),
-      summary: boxes(document.querySelector('.thread-summary')),
-      scene: boxes(scene),
-      copies: chapters.map(chapter => boxes(chapter.querySelector('.waymaking-copy'))),
-      chapterBoxes: chapters.map(chapter => boxes(chapter)),
-      titles: chapters.map(chapter => {
-        const h = chapter.querySelector('h3');
-        return h.getAttribute('aria-label') || h.textContent.trim();
-      }),
-      parentIsArtspace: road.parentElement === artspace,
-      sticky: styles.position === 'sticky',
-      topCSS: styles.top,
-      opacity: Number(styles.opacity),
-      imageOpacity: Number(getComputedStyle(picture).opacity),
-      svgDisplay: getComputedStyle(svg).display,
-      bitmapLoaded: bitmap.complete && bitmap.naturalWidth > 0,
-      currentSrc: bitmap.currentSrc,
-      overflow: document.documentElement.scrollWidth > innerWidth + 1
-    };
-  });
+function overlap(a,b) {
+ return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*
+        Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
 }
-
-function pngDifference(aBuffer, bBuffer, threshold = 8) {
-  const a = PNG.sync.read(aBuffer), b = PNG.sync.read(bBuffer);
-  assert.equal(a.width,b.width);
-  assert.equal(a.height,b.height);
-  let count=0;
-  for(let i=0;i<a.data.length;i+=4){
-    const difference = Math.abs(a.data[i]-b.data[i])+
-      Math.abs(a.data[i+1]-b.data[i+1])+
-      Math.abs(a.data[i+2]-b.data[i+2]);
-    if(difference>threshold)count++;
-  }
-  return count;
+function changedPixels(a,b,rect) {
+ const x=PNG.sync.read(a),y=PNG.sync.read(b);
+ assert.equal(x.width,y.width);assert.equal(x.height,y.height);
+ let changes=0;
+ const left=rect?Math.max(0,Math.floor(rect.left)-2):0;
+ const right=rect?Math.min(x.width,Math.ceil(rect.right)+2):x.width;
+ const top=rect?Math.max(0,Math.floor(rect.top)-2):0;
+ const bottom=rect?Math.min(x.height,Math.ceil(rect.bottom)+2):x.height;
+ for(let j=top;j<bottom;j++)for(let i=left;i<right;i++) {
+  const pos=(j*x.width+i)*4;
+  const delta=Math.abs(x.data[pos]-y.data[pos])+
+    Math.abs(x.data[pos+1]-y.data[pos+1])+
+    Math.abs(x.data[pos+2]-y.data[pos+2]);
+  if(delta>9)changes++;
+ }
+ return changes;
 }
-
 async function paintedPixels(page) {
-  const road = page.locator('.waymaking-road-wrap');
-  const rect = await road.boundingBox();
-  const viewport = page.viewportSize();
-  if (!rect || rect.y + rect.height <= 0 || rect.y >= viewport.height ||
-      rect.x + rect.width <= 0 || rect.x >= viewport.width) return 0;
-
-  const before=PNG.sync.read(await page.screenshot({ animations:'disabled' }));
-  await road.evaluate(el=>el.style.setProperty('visibility','hidden','important'));
-  const after=PNG.sync.read(await page.screenshot({ animations:'disabled' }));
-  await road.evaluate(el=>el.style.removeProperty('visibility'));
-  const x0=Math.max(0,Math.floor(rect.x)-2);
-  const x1=Math.min(before.width,Math.ceil(rect.x+rect.width)+2);
-  const y0=Math.max(0,Math.floor(rect.y)-2);
-  const y1=Math.min(before.height,Math.ceil(rect.y+rect.height)+2);
-  let count=0;
-  for(let y=y0;y<y1;y++){
-    for(let x=x0;x<x1;x++){
-      const i=(y*before.width+x)*4;
-      const difference=Math.abs(before.data[i]-after.data[i])+
-        Math.abs(before.data[i+1]-after.data[i+1])+
-        Math.abs(before.data[i+2]-after.data[i+2]);
-      if(difference>8)count++;
-    }
+ const state=await checkpoint(page);
+ const view=page.viewportSize();
+ if(state.road.bottom<=0||state.road.top>=view.height) return 0;
+ const before=await page.screenshot({animations:'disabled'});
+ await page.locator('.waymaking-road-wrap').evaluate(x=>x.style.setProperty('visibility','hidden','important'));
+ const after=await page.screenshot({animations:'disabled'});
+ await page.locator('.waymaking-road-wrap').evaluate(x=>x.style.removeProperty('visibility'));
+ return changedPixels(before,after,state.road);
+}
+async function centers(page) {
+ return page.evaluate(()=>[...document.querySelectorAll('.waymaking-beat')].map(beat=>{
+  const r=beat.getBoundingClientRect();
+  return scrollY+r.top+r.height*.5;
+ }));
+}
+async function runOne(browser,engine,width) {
+ const page=await browser.newPage({viewport:{width,height:900}});
+ const problems=[];
+ page.on('pageerror',e=>problems.push(e.message));
+ page.on('console',e=>{if(e.type()==='error')problems.push(e.text());});
+ try {
+  await page.goto(base,{waitUntil:'networkidle',timeout:45000});
+  await page.evaluate(()=>document.fonts.ready);
+  const middles=await centers(page);
+  const storyTop=await page.locator('.waymaking-scene').evaluate(el=>
+    scrollY+el.getBoundingClientRect().top);
+  await scroll(page,storyTop-110);
+  const first=await checkpoint(page);
+  assert.deepEqual(first.titles,labels);
+  assert.ok(first.headings[0].top-first.scene.top<=95,
+    'Creative Thinking starts too far BELOW the route ('+(first.headings[0].top-first.scene.top)+'px)');
+  assert.equal(first.opaqueRect,false,'SVG MUST NOT contain an opaque background rectangle');
+  assert.equal(first.bitmap,false,'No bitmap image/canvas allowed: scalable artwork only');
+  assert.equal(first.background,'rgba(0, 0, 0, 0)','Artwork SVG background must be transparent');
+  assert.equal(first.roadParent,true,'Route must remain within sticky scene');
+  assert.equal(first.sticky,true,'Native sticky positioning required');
+  assert.equal(first.overflow,false,'No horizontal scrollbar');
+  assert.ok(first.textWidth>=145,'Mobile text is too narrow');
+  const storyGap=first.endTop-first.lastCopyBottom;
+  assert.ok(storyGap>10&&storyGap<475,
+    'Too much blank space before Waymaker conclusion: '+storyGap+'px');
+  const stages=[];
+  for(let i=0;i<5;i++) {
+   await scroll(page,middles[i]-900*.49);
+   const state=await checkpoint(page);
+   assert.equal(state.animated,true,'No working motion controller');
+   assert.ok(Number.isFinite(state.fraction),'Progress missing');
+   assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
+   assert.ok(Math.abs(state.dashOffset-state.length*(1-state.fraction))<state.length*.006,
+     'Stroke mask progress does not match scroll state at '+labels[i]);
+   assert.equal(state.opaqueRect,false,'Vector drawing must not contain framed image/card');
+   assert.equal(state.roadParent,true);
+   assert.equal(state.sticky,true);
+   assert.equal(state.overflow,false);
+   for(const [index,text] of state.texts.entries()) {
+    const collision=overlap(state.road,text);
+    assert.equal(collision,0,'Road overlays paragraph '+labels[index]+' at '+width+'px');
+   }
+   assert.equal(overlap(state.road,state.intro),0,'Road obscures introductory summary');
+   if(i>0)assert.ok(state.fraction>stages[i-1].fraction+.10,
+     'Road did NOT grow into '+labels[i]+', previous '+stages[i-1].fraction+' next '+state.fraction);
+   const pixels=await paintedPixels(page);
+   assert.ok(pixels>150,'SVG road failed to paint at '+labels[i]+' ('+pixels+' pixels)');
+   stages.push({chapter:labels[i],fraction:state.fraction,pixels,top:state.road.top});
+   if([320,390,1440].includes(width)) {
+    await page.screenshot({path:join(output,engine+'-'+width+'-chapter-'+i+'.png'),animations:'disabled'});
+   }
   }
-  return count;
-}
-
-async function coords(page) {
-  return page.evaluate(()=>{
-    const elements=[...document.querySelectorAll('.waymaking-beat')];
-    return elements.map(el=>{
-      const r=el.getBoundingClientRect();
-      return scrollY+r.top+r.height/2;
-    });
-  });
-}
-
-async function verifyViewport(browser,engine,width){
-  const page=await browser.newPage({ viewport:{width,height:900} });
-  const errors=[];
-  page.on('pageerror',e=>errors.push(e.message));
-  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-  try{
-    await page.goto(base,{waitUntil:'networkidle',timeout:45000});
-    await page.evaluate(()=>document.fonts.ready);
-    await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
-    const centers=await coords(page);
-    const captured=[];
-    for(let i=0;i<centers.length;i++){
-      await jump(page,centers[i]-450);
-      const g=await geometry(page);
-      assert.deepEqual(g.titles,labels,'Chapter content or headings changed');
-      assert.equal(g.parentIsArtspace,true,'Road MUST stay inside real story grid, not body portal');
-      assert.equal(g.sticky,true,'Road must use native sticky rather than fixed scroll controller');
-      assert.ok(g.topCSS === '16px','Road CSS top must be 16px');
-      assert.equal(g.opacity,1,'Road opacity must never animate');
-      assert.equal(g.imageOpacity,1,'Original approved image must not fade on mobile');
-      assert.equal(g.svgDisplay,'none','Obsolete animated SVG must not paint');
-      assert.equal(g.bitmapLoaded,true,'Approved source bitmap must load');
-      assert.equal(g.overflow,false,'No horizontal overflow');
-      for (const [copyIndex,copy] of g.copies.entries()) {
-        const overlap=intersectionArea(g.road,copy);
-        assert.equal(overlap,0,
-          'Graphic OBSCURES chapter '+labels[copyIndex]+' ('+width+'px, area '+overlap+')');
-      }
-      assert.equal(intersectionArea(g.road,g.summary),0,
-        'Graphic overlaps introductory Where I add value paragraphs');
-      const pixels=await paintedPixels(page);
-      assert.ok(pixels>1000,'The road is invisible while chapter '+labels[i]+' is being read');
-      assert.ok(Math.abs(g.road.top-16)<1.2,
-        'Road must already be pinned for '+labels[i]+' at '+g.road.top);
-      captured.push({chapter:labels[i],roadTop:g.road.top,visiblePixels:pixels,
-        copyRect:g.copies[i],roadRect:g.road});
-      if (width===320||width===390||width===1440) {
-        await page.screenshot({
-          path:join(output,engine+'-'+width+'-chapter-'+i+'.png'),animations:'disabled'
-        });
-      }
-    }
-    // Compare the art without foreground text at successive central chapters.
-    await page.evaluate(()=>{
-      for(const selector of ['.home-main','.home-header','.home-footer']){
-        const element=document.querySelector(selector);
-        if(element)element.style.visibility='hidden';
-      }
-      // Restore artwork when main becomes hidden: it is inside main.
-      const artspace=document.querySelector('.waymaking-artspace');
-      if(artspace)artspace.style.visibility='visible';
-    });
-    await jump(page,centers[1]-450);
-    const a=await page.screenshot({animations:'disabled'});
-    await jump(page,centers[2]-450);
-    const b=await page.screenshot({animations:'disabled'});
-    assert.ok(pngDifference(a,b,8)<35,
-      'Artwork moves or changes during middle chapters (background-only pixel regression)');
-    await page.evaluate(()=>{
-      for(const selector of ['.home-main','.home-header','.home-footer','.waymaking-artspace']){
-        const element=document.querySelector(selector);
-        if(element)element.style.removeProperty('visibility');
-      }
-    });
-    // No image should remain physically visible once later content begins.
-    for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
-      const readPosition=await page.locator(selector).evaluate(element=>
-        scrollY+element.getBoundingClientRect().top-innerHeight*0.4);
-      await jump(page,readPosition);
-      const visible=await paintedPixels(page);
-      if(visible>0){
-        const diagnostic=await geometry(page);
-        console.log('EXIT_DIAGNOSTIC',engine,width,selector,JSON.stringify({
-          visible,road:diagnostic.road,scene:diagnostic.scene,
-          viewportHeight:900,readingY:readPosition
-        }));
-        await page.screenshot({path:join(output,engine+'-'+width+'-exit-failed.png')});
-      }
-      assert.equal(visible,0,'Road still visible while reading '+selector+' ('+visible+' pixels)');
-    }
-    // Backwards scrolling restores the same art without a fade.
-    await jump(page,centers[2]-450);
-    const returned=await geometry(page);
-    assert.equal(returned.imageOpacity,1);
-    assert.equal(returned.sticky,true);
-    assert.ok(await paintedPixels(page)>1000,'Road missing after reverse scroll');
-    assert.deepEqual(errors,[],'Browser console errors');
-    console.log('PASS '+engine+' '+width+' '+JSON.stringify({
-      pinnedTop: captured.map(x=>x.roadTop),
-      visiblePixels:captured.map(x=>x.visiblePixels),
-      textOverlaps:0,summaryOverlaps:0,subsequentSectionsHidden:true
-    }));
-  }finally{
-    await page.close();
+  // The mask MUST grow visible black painted pixels, not merely change a number.
+  // This comparison is taken while the SVG geometry is pinned on screen.
+  const earlier=stages[0].pixels,later=stages[3].pixels;
+  assert.ok(later>earlier*1.3,
+    'The drawing has NOT visibly expanded from Creative Thinking to AI-Native Building: '+earlier+' -> '+later);
+  // Reverse scrub: revisit previous chapters and measure actual mask rewind.
+  await scroll(page,middles[1]-900*.49);
+  const rewind=await checkpoint(page);
+  assert.ok(Math.abs(rewind.fraction-stages[1].fraction)<.008,
+    'Reverse scrolling must deterministically redraw same path fraction');
+  await scroll(page,middles[4]-900*.49);
+  // Following sections MUST be clean; crop test to on-screen road region only.
+  for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']) {
+   const pos=await page.locator(selector).first().evaluate(el=>
+    scrollY+el.getBoundingClientRect().top-innerHeight*.42);
+   await scroll(page,pos);
+   const pixels=await paintedPixels(page);
+   assert.equal(pixels,0,'Road continued under '+selector+': '+pixels+' rendered pixels');
   }
+  assert.deepEqual(problems,[],'Browser JS errors');
+  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:false,opaqueRect:false,overlaps:0,noLaterInk:true}));
+ }finally {await page.close();}
 }
-
 (async()=>{
-  for(const engine of engines){
-    assert.ok(browserTypes[engine],'Browser engine not recognized '+engine);
-    const options=engine==='chromium'&&process.env.CHROME_BIN?
-      { executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox'] }:
-      { headless:true };
-    const browser=await browserTypes[engine].launch(options);
-    try{
-      for(const width of widths)await verifyViewport(browser,engine,width);
-      const reduced=await browser.newPage({ viewport:{width:390,height:900},reducedMotion:'reduce' });
-      await reduced.goto(base,{waitUntil:'networkidle'});
-      await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-      await reduced.waitForTimeout(140);
-      assert.equal((await geometry(reduced)).imageOpacity,1);
-      assert.equal(await reduced.locator('.waymaking-letter').count(),0,
-        'Reduced motion must not split semantic heading text');
-      await reduced.close();
-      const webp=await browser.newPage({ viewport:{width:390,height:900} });
-      await webp.goto(base+'no-avif.html',{waitUntil:'networkidle'});
-      await webp.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-      await webp.waitForTimeout(140);
-      assert.ok((await geometry(webp)).currentSrc.endsWith('.webp'),
-        'WebP-only first-load variant must load approved illustration');
-      await webp.close();
-      const noJS=await browser.newPage({ viewport:{width:390,height:900},javaScriptEnabled:false });
-      await noJS.goto(base,{waitUntil:'load'});
-      assert.deepEqual(await noJS.locator('.waymaking-beat h3').allTextContents(),labels);
-      assert.equal(await noJS.locator('.waymaking-road-art').isVisible(),true);
-      await noJS.close();
-      console.log('PASS '+engine+' reduced-motion + no-JS + first-load WebP');
-    }finally{await browser.close();}
-  }
-})().catch(error=>{console.error(error);process.exitCode=1;});
+ for(const engine of engines) {
+  assert.ok(browserTypes[engine],'Unknown engine '+engine);
+  const opts=engine==='chromium'&&process.env.CHROME_BIN?
+   {executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']}:
+   {headless:true};
+  const browser=await browserTypes[engine].launch(opts);
+  try {
+   for(const width of widths)await runOne(browser,engine,width);
+   const reduced=await browser.newPage({viewport:{width:390,height:900},reducedMotion:'reduce'});
+   await reduced.goto(base,{waitUntil:'networkidle'});
+   await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
+   await reduced.waitForTimeout(130);
+   const reducedState=await checkpoint(reduced);
+   assert.equal(reducedState.fraction,1,'Reduced-motion must show COMPLETE static illustration');
+   assert.ok(Math.abs(reducedState.dashOffset)<.01,'Reduced-motion mask must be fully revealed');
+   assert.equal(await reduced.locator('.waymaking-letter').count(),0);
+   await reduced.close();
+   const nojs=await browser.newPage({viewport:{width:390,height:900},javaScriptEnabled:false});
+   await nojs.goto(base,{waitUntil:'load'});
+   assert.deepEqual(await nojs.locator('.waymaking-beat h3').allTextContents(),labels);
+   assert.equal(await nojs.locator('.waymaking-vector--mobile').isVisible(),true);
+   await nojs.close();
+   console.log('PASS '+engine+' no-JS, reduced motion, semantic content');
+  }finally {await browser.close();}
+ }
+})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -17,20 +17,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check approved editorial baseline
         run: node augustkring/verify-baseline.mjs
-      - name: Run actual firefox,webkit pixel-based stationary-road QA
+      - name: Run actual firefox,webkit progressive vector road and visual-overlap QA
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/ak-road-site/humamap-preview artifacts
           cp -R augustkring /tmp/ak-road-site/humamap-preview/augustkring
-          python3 - <<'PY'
-          from pathlib import Path
-          page=Path('/tmp/ak-road-site/humamap-preview/augustkring/index.html')
-          source='<source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">'
-          html=page.read_text()
-          assert source in html, 'Original approved AVIF source missing'
-          page.with_name('no-avif.html').write_text(html.replace(source,''))
-          PY
           python3 -m http.server 8765 --directory /tmp/ak-road-site >/tmp/ak-road-server.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
@@ -45,6 +37,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: waymaking-static-firefox,webkit-screenshots
+          name: waymaking-progressive-v15-firefox,webkit-screenshots
           path: artifacts/
           if-no-files-found: warn
