@@ -1751,15 +1751,16 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
 @media (max-width: 600px) {
   .waymaking-narrative { margin-top: 26px; }
   .waymaking-scene {
-    grid-template-columns: minmax(110px, 42%) minmax(0, 1fr);
-    column-gap: 11px;
+    grid-template-columns: minmax(100px, 36%) minmax(0, 1fr);
+    column-gap: 10px;
   }
   .waymaking-road-wrap {
     width: 100%;
     height: min(67svh, 575px);
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    width: min(37vw, 150px);
+    left: 0;
+    width: min(40vw, 150px);
     height: min(83svh, 745px);
   }
   .waymaking-beat {
