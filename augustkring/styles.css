@@ -540,7 +540,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 .waymaking-copy .waymaking-heading-word {
   display: inline-block;
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font-size: inherit;
   line-height: inherit;
   letter-spacing: inherit;
