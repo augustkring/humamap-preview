@@ -312,7 +312,7 @@ jobs:
                       fixed:getComputedStyle(road).position==='fixed',
                       entryClip:parseFloat(road.style.getPropertyValue('--waymaking-entrance-clip'))||0,
                       exitClip:parseFloat(road.style.getPropertyValue('--waymaking-conclusion-clip'))||0,
-                      signoff:box(story.querySelector('.waymaking-resolution')),
+                      signoff:box(story.querySelector('.waymaking-resolution p')),
                       parent:road.parentElement===document.body,
                       approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
                       approvedPaint:svg.querySelector('image')?.getAttribute('href'),
@@ -369,13 +369,13 @@ jobs:
                   'Road is not visibly expanding across the five chapters');
                 // Regression: browser capture at the real signoff reading point,
                 // not only at chapter centres. Prior versions obscured it.
-                const signoffY=await page.locator('.waymaking-resolution').evaluate(el=>
+                const signoffY=await page.locator('.waymaking-resolution p').evaluate(el=>
                   scrollY+el.getBoundingClientRect().top);
                 await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),signoffY-900*.55);
                 await page.waitForTimeout(160);
                 const handoff=await page.evaluate(()=>{
                   const road=document.querySelector('.waymaking-road-wrap');
-                  const signoff=document.querySelector('.waymaking-resolution');
+                  const signoff=document.querySelector('.waymaking-resolution p');
                   return {
                     roadBottom:road.getBoundingClientRect().bottom,
                     signoffTop:signoff.getBoundingClientRect().top,

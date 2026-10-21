@@ -54,7 +54,7 @@ async function info(page) {
    copyBoxes:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
    titles:beats.map(x=>x.querySelector('h3').getAttribute('aria-label')||x.querySelector('h3').textContent.trim()),
    intro:box(q('.thread-summary')),introBottom:box(q('.thread-summary')).bottom,
-   signoff:box(q('.waymaking-resolution')),
+   signoff:box(q('.waymaking-resolution p')),
    lastCopy:box(beats.at(-1).querySelector('.waymaking-copy')),
    story:box(story),
    noHorizontalOverflow:document.documentElement.scrollWidth<=innerWidth+1,
@@ -176,7 +176,7 @@ async function runOne(browser,engine,width) {
     'The five chapter heights are not uniform: '+JSON.stringify(heights));
   // Separate real signoff reading-position screenshot is required: five
   // chapter screenshots alone allowed the ink to bleed across this line.
-  const signoffY=await page.locator('.waymaking-resolution').evaluate(el=>
+  const signoffY=await page.locator('.waymaking-resolution p').evaluate(el=>
     scrollY+el.getBoundingClientRect().top);
   await go(page,signoffY-900*.55);
   const signoffState=await info(page);
