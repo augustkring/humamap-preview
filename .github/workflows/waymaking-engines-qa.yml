@@ -30,6 +30,17 @@ jobs:
           # index.html explicitly declares <base href="/humamap-preview/augustkring/">.
           # Serve assets at THAT path; otherwise the stylesheet and JS 404 and
           # falsely resemble a browser rendering failure.
+          # Serve a second HTML document with its AVIF <source> removed,
+          # so browsers genuinely select WebP at initial load rather than
+          # racing against an artificial source swap during decode.
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('/tmp/ak-engine-local/humamap-preview/augustkring')
+          html=(root/'index.html').read_text()
+          needle='<source type="image/avif" srcset="assets/waymaking-editorial-ink.avif">'
+          assert needle in html
+          (root/'no-avif.html').write_text(html.replace(needle,''))
+          PY
           python3 -m http.server 8766 --directory /tmp/ak-engine-local >/tmp/waymaking-cross-browser.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
@@ -169,6 +180,33 @@ jobs:
                   assert.equal(await changedPixels(page),0,engineName+' hidden ink still physically painted');
                   assert.deepEqual(errors,[],engineName+' JavaScript errors');
                   await page.close();
+
+                  // Independent first-load WebP fallback, not a dynamic format
+                  // swap of an already loaded hidden <picture>.
+                  const noAvif=await browser.newPage({viewport:{width,height:900}});
+                  await noAvif.goto(root+'no-avif.html',{waitUntil:'networkidle'});
+                  await visit(noAvif,middle);
+                  const webpState=await noAvif.evaluate(()=>{
+                    const road=document.querySelector('.waymaking-road-wrap');
+                    const img=document.querySelector('.waymaking-road-art img');
+                    return {
+                      src:img.currentSrc,
+                      painted:road.dataset.waymakingPainted,
+                      pin:road.getBoundingClientRect().top,
+                      mask:getComputedStyle(document.querySelector('.waymaking-paint-art')).display
+                    };
+                  });
+                  assert.ok(webpState.src.includes('.webp'),
+                    engineName+' did not select actual WebP fallback');
+                  assert.equal(webpState.painted,'true',
+                    engineName+' silently disabled scroll painting for WebP');
+                  assert.ok(Math.abs(webpState.pin-16)<1);
+                  assert.notEqual(webpState.mask,'none');
+                  const webpPixels=await changedPixels(noAvif);
+                  assert.ok(webpPixels>180,engineName+' SVG pigment disappeared in WebP-only page');
+                  await noAvif.screenshot({path:'artifacts/'+engineName+'-'+width+'-forced-WebP.png'});
+                  console.log('WEBP_ONLY',engineName,width,webpPixels,webpState);
+                  await noAvif.close();
                 }
               } finally {await browser.close();}
             }
