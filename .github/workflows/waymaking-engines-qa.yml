@@ -25,19 +25,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifacts
-          python3 -m http.server 8766 --directory . >/tmp/waymaking-cross-browser.log 2>&1 &
+          mkdir -p artifacts /tmp/ak-engine-local/humamap-preview
+          cp -R augustkring /tmp/ak-engine-local/humamap-preview/augustkring
+          # index.html explicitly declares <base href="/humamap-preview/augustkring/">.
+          # Serve assets at THAT path; otherwise the stylesheet and JS 404 and
+          # falsely resemble a browser rendering failure.
+          python3 -m http.server 8766 --directory /tmp/ak-engine-local >/tmp/waymaking-cross-browser.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
           for i in $(seq 1 30); do
-            curl -fsS 'http://127.0.0.1:8766/augustkring/' >/dev/null && break
+            curl -fsS 'http://127.0.0.1:8766/humamap-preview/augustkring/' >/dev/null && break
             sleep 1
           done
           NODE_PATH=/tmp/ak-engines/node_modules node <<'NODE'
           const assert=require('node:assert/strict');
           const {firefox,webkit}=require('playwright');
           const {PNG}=require('pngjs');
-          const root='http://127.0.0.1:8766/augustkring/';
+          const root='http://127.0.0.1:8766/humamap-preview/augustkring/';
           const nap=ms=>new Promise(r=>setTimeout(r,ms));
           async function visit(page,y){
             await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),y);
