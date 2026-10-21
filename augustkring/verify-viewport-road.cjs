@@ -51,6 +51,7 @@ async function checkpoint(page) {
    dashOffset:parseFloat(mask.style.strokeDashoffset),
    rawOffset:mask.style.strokeDashoffset,
    length:mask.getTotalLength(),
+   featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
    scrollY:window.scrollY,road:box(road),art:box(art),scene:box(qs('.waymaking-scene')),
    intro:box(qs('.thread-summary')),
    texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
@@ -142,10 +143,13 @@ async function runOne(browser,engine,width) {
    assert.equal(state.roadOpacity,1,'Road cannot fade while any of the five chapters are being read');
    assert.ok(Number.isFinite(state.fraction),'Progress missing');
    assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
-   assert.ok(Math.abs(state.dashOffset-state.length*(1-state.fraction))<state.length*.006,
+   const frontLength=Math.min(state.fraction,.055,(1-state.fraction)*.55);
+   const expectedOffset=state.length*(1-(state.fraction-frontLength));
+   assert.equal(state.featherCount,7,'The leading road brush must have seven feather layers');
+   assert.ok(Math.abs(state.dashOffset-expectedOffset)<state.length*.006,
      'Stroke mask progress mismatch at '+labels[i]+': '+JSON.stringify({
        rawOffset:state.rawOffset,dashOffset:state.dashOffset,length:state.length,
-       fraction:state.fraction,expected:state.length*(1-state.fraction)}));
+       fraction:state.fraction,expected:expectedOffset}));
    assert.equal(state.opaqueRect,false,'Vector drawing must not contain framed image/card');
    assert.equal(state.roadParent,true);
    assert.equal(state.sticky,true);

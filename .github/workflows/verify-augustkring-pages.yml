@@ -301,6 +301,7 @@ jobs:
                       intro:box(document.querySelector('.thread-summary')),
                       texts:beatCopies.map(box),
                       maskLength:mask.getTotalLength(),
+                      featherCount:svg.querySelectorAll('[data-waymaking-feather]').length,
                       maskOffset:parseFloat(mask.style.strokeDashoffset),
                       animated:story.dataset.waymakingAnimated==='true',
                       sticky:getComputedStyle(road).position==='sticky',
@@ -318,8 +319,11 @@ jobs:
                   assert.equal(state.animated,true,'Progressive scroll controller failed');
                   assert.ok(state.fraction>=.09&&state.fraction<=1,
                     'Path did not reach correct drawing stage');
-                  assert.ok(Math.abs(state.maskOffset-state.maskLength*(1-state.fraction))<
-                    state.maskLength*.008,'Visible SVG does not reflect actual path progress');
+                  const brushFront=Math.min(state.fraction,.055,(1-state.fraction)*.55);
+                  const maskExpected=state.maskLength*(1-(state.fraction-brushFront));
+                  assert.equal(state.featherCount,7,'Feathered organic route must have seven brush layers');
+                  assert.ok(Math.abs(state.maskOffset-maskExpected)<state.maskLength*.008,
+                    'Visible SVG does not reflect actual feathered path progress');
                   if(index>0){
                     assert.ok(state.fraction>stages[index-1].fraction+.10,
                       'Road did not grow when chapter changed');

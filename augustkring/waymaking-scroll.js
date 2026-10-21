@@ -13,9 +13,13 @@
   if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 2) return;
   const strokes = revealPaths.map(path => {
     const length = path.getTotalLength();
-    if (!(length > 0)) return null;
+    const feathers = [...path.parentElement.querySelectorAll('[data-waymaking-feather]')];
+    if (!(length > 0) || feathers.length !== 7) return null;
     path.style.strokeDasharray = length + ' ' + length;
-    return {path,length};
+    for (const feather of feathers) {
+      feather.style.strokeDasharray = length + ' ' + length;
+    }
+    return {path,length,feathers};
   }).filter(Boolean);
   if (strokes.length !== 2) return;
   story.dataset.waymakingAnimated = 'true';
@@ -91,7 +95,10 @@
     frame = 0;
     if (reduced.matches) {
       road.style.opacity = '1';
-      for (const {path} of strokes) path.style.strokeDashoffset = '0';
+      for (const {path,feathers} of strokes) {
+        path.style.strokeDashoffset = '0';
+        for (const feather of feathers) feather.style.strokeDashoffset = '0';
+      }
       story.dataset.waymakingProgress = '1.000';
       previousFraction = 1;
       resetText();
@@ -139,8 +146,17 @@
     road.style.opacity = String(1 - farewell);
 
     if (Math.abs(fraction - previousFraction) > 0.00025) {
-      for (const {path,length} of strokes) {
-        path.style.strokeDashoffset = String(length * (1 - fraction));
+      // Seven translucent brush layers feather the leading ink tip. The
+      // geometric mask travels continuously, not in five jumped pieces.
+      // Narrow the tip to zero at completion so the full road is crisp.
+      const frontLength = Math.min(fraction, 0.055, (1 - fraction) * 0.55);
+      const solid = fraction - frontLength;
+      for (const {path,length,feathers} of strokes) {
+        path.style.strokeDashoffset = String(length * (1 - solid));
+        feathers.forEach((feather,index) => {
+          const tip = solid + frontLength * ((index + 1) / feathers.length);
+          feather.style.strokeDashoffset = String(length * (1 - tip));
+        });
       }
       previousFraction = fraction;
       story.dataset.waymakingProgress = fraction.toFixed(3);
