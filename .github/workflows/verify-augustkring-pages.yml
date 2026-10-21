@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261021-fixed-compact-v17"
-          expected_road_js="waymaking-scroll.js?v=20261021-fixed-compact-v17"
+          expected_home="styles.css?v=20261021-fixed-original-extended-v18"
+          expected_road_js="waymaking-scroll.js?v=20261021-fixed-original-extended-v18"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,7 +73,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261021-fixed-compact-v17' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261021-fixed-original-extended-v18' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -115,7 +115,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-fixed-compact-v17" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-fixed-original-extended-v18" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
@@ -280,7 +280,7 @@ jobs:
                 const stages=[];
                 for(let index=0;index<5;index++){
                   await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
-                    positions.centers[index]-900*.49);
+                    positions.centers[index]-900*.16);
                   await page.waitForTimeout(170);
                   const state=await page.evaluate(()=>{
                     const story=document.querySelector('[data-waymaking-story]');
@@ -317,7 +317,8 @@ jobs:
                   });
                   assert.equal(state.sticky,false,'Road must not be sticky');
                   assert.equal(state.fixed,true,'Road must be fixed on screen');
-                  assert.ok(Math.abs(state.route.top-225)<2,'Road is moving during native scrolling');
+                  assert.ok(Math.abs(state.route.top-16)<1,'Fixed road is moving during native scrolling');
+                  assert.equal(state.opacity,1,'Whole-road fade is forbidden');
                   assert.equal(state.parent,true,'Road must be portaled to document.body');
                   assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
                   assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
@@ -333,7 +334,7 @@ jobs:
                   if(index>0){
                     assert.ok(state.fraction>stages[index-1].fraction+.10,
                       'Road did not grow when chapter changed');
-                    assert.ok(Math.abs(state.route.top-225)<2,'Road is not stationary while chapters pass');
+                    assert.ok(Math.abs(state.route.top-16)<1,'Road is not stationary while chapters pass');
                   } else {
                     assert.ok(Math.abs(state.firstHeading.top-state.scene.top)<110,
                       'Creative Thinking starts too far below the beginning of the story');
@@ -346,8 +347,8 @@ jobs:
                     assert.equal(overlap(state.route,copy),0,'Road overlaps readable copy');
                   }
                   if(overlap(state.route,state.intro)>0){
-                    assert.ok(state.route.top+state.clipTop>=state.intro.bottom+10,
-                      'Clipped visible ink overlaps the introduction');
+                    assert.ok(state.intro.bottom<=state.route.top+1,
+                      'Road activated before preceding introduction had cleared');
                   }
                   assert.equal(state.overflow,false,'Horizontal overflow');
                   stages.push(state);

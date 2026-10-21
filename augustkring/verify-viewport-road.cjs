@@ -64,6 +64,10 @@ async function checkpoint(page) {
    clipBottom:Number.parseFloat(road.style.getPropertyValue('--waymaking-safe-bottom'))||0,
    topCSS:getComputedStyle(road).top,
    background:surface.backgroundColor,
+   fixed:getComputedStyle(road).position==='fixed',
+   visible:getComputedStyle(road).display!=='none'&&getComputedStyle(road).visibility==='visible',
+   imagePieces:art.querySelectorAll('image').length,
+   sourceViewHeight:art.viewBox.baseVal.height,
    opaqueRect:!!art.querySelector('rect,foreignObject'),
    imageSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
    animatedOriginal:art.querySelector('image')?.getAttribute('href'),
@@ -135,6 +139,9 @@ async function runOne(browser,engine,width) {
   assert.equal(first.background,'rgba(0, 0, 0, 0)','Artwork SVG background must be transparent');
   assert.equal(first.roadParent,true,'Road must be portaled to viewport body');
   assert.equal(first.sticky,false,'Road must be FIXED, never sticky');
+  assert.equal(first.fixed,true,'Road is not CSS fixed to viewport');
+  assert.equal(first.sourceViewHeight,2148,'Artwork must be the extended original, not its old short copy');
+  assert.equal(first.imagePieces,1,'Must be exactly ONE unbroken original ink image, not a repeated seam');
   assert.equal(first.overflow,false,'No horizontal scrollbar');
   const chapterSpacing=await page.locator('.waymaking-copy-column').evaluate(el=>({
     direction:getComputedStyle(el).flexDirection,
@@ -147,14 +154,17 @@ async function runOne(browser,engine,width) {
   // make short and long copy awkward, while CSS gap stays exactly uniform.
   assert.ok(first.textWidth>=145,'Mobile text is too narrow');
   const storyGap=first.endTop-first.lastCopyBottom;
+  // The original artwork remains completely hidden while introductory text
+  // is being read. No opacity/fade should affect its five-chapter visibility.
   assert.ok(storyGap>10&&storyGap<340,
     'Too much blank space before Waymaker conclusion: '+storyGap+'px');
   const stages=[];
   for(let i=0;i<5;i++) {
-   await scroll(page,middles[i]-900*.49);
+   await scroll(page,middles[i]-900*.16);
    const state=await checkpoint(page);
    assert.equal(state.animated,true,'No working motion controller');
-   assert.equal(state.roadOpacity,1,'Road cannot fade while any of the five chapters are being read');
+   assert.equal(state.roadOpacity,1,'Road opacity MUST remain 1 during all five chapters');
+   assert.equal(state.visible,true,'The ORIGINAL road is not visible with '+labels[i]);
    assert.ok(Number.isFinite(state.fraction),'Progress missing');
    assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
    const frontLength=Math.min(state.fraction,.055,(1-state.fraction)*.55);
@@ -168,18 +178,13 @@ async function runOne(browser,engine,width) {
    assert.equal(state.imageSource,'assets/waymaking-editorial-ink.webp','Wrong original asset');
    assert.equal(state.roadParent,true);
    assert.equal(state.sticky,false,'Road may not move with the narrative container');
-   assert.ok(Math.abs(state.road.top-225)<2,'Road drifted while scrolling: '+state.road.top);
+   assert.ok(Math.abs(state.road.top-16)<1,'Fixed road moved away from viewport top: '+state.road.top);
    assert.equal(state.overflow,false);
    for(const [index,text] of state.texts.entries()) {
     const collision=overlap(state.road,text);
     assert.equal(collision,0,'Road overlays paragraph '+labels[index]+' at '+width+'px');
    }
-   // The physical viewport fixture can share a bounding box with an intro
-   // that is still exiting; the actual ink is clipped BELOW introBottom.
-   if(overlap(state.road,state.intro)>0){
-     assert.ok(state.road.top+state.clipTop>=state.intro.bottom+10,
-       'Visually revealed ink overlaps intro despite safe clip');
-   }
+   assert.ok(state.intro.bottom<=state.road.top+1,'Road activated while introduction remains visible');
    if(i>0)assert.ok(state.fraction>stages[i-1].fraction+.10,
      'Road did NOT grow into '+labels[i]+', previous '+stages[i-1].fraction+' next '+state.fraction);
    const pixels=await paintedPixels(page);
@@ -192,15 +197,15 @@ async function runOne(browser,engine,width) {
   // The mask MUST grow visible black painted pixels, not merely change a number.
   // This comparison is taken while the SVG geometry is pinned on screen.
   const earlier=stages[0].pixels,later=stages[3].pixels;
-  // Screen pixels vary with intro-safe clipping; this cannot stand in for
-  // proper SVG mask-progress validation through each chapter.
-  assert.ok(later>1500,'Original source image is not materially painted in AI-Native Building: '+later);
+  // Real pixels (not just dash attribute values) must increase substantially
+  // while artwork geometry remains fixed in viewport.
+  assert.ok(later>earlier*1.35,'Road is NOT becoming visibly longer: '+earlier+' -> '+later);
   // Reverse scrub: revisit previous chapters and measure actual mask rewind.
-  await scroll(page,middles[1]-900*.49);
+  await scroll(page,middles[1]-900*.16);
   const rewind=await checkpoint(page);
   assert.ok(Math.abs(rewind.fraction-stages[1].fraction)<.008,
     'Reverse scrolling must deterministically redraw same path fraction');
-  await scroll(page,middles[4]-900*.49);
+  await scroll(page,middles[4]-900*.16);
   // Following sections MUST be clean; crop test to on-screen road region only.
   for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']) {
    const pos=await page.locator(selector).first().evaluate(el=>
@@ -217,7 +222,7 @@ async function runOne(browser,engine,width) {
   }
   // A real visitor can scroll BACK from later sections; mask and road
   // must return to their exact previous state, not remain faded or hidden.
-  await scroll(page,middles[2]-900*.49);
+  await scroll(page,middles[2]-900*.16);
   const restored=await checkpoint(page);
   assert.ok(restored.roadOpacity>.99,'Road did not reappear after reverse scroll from later content');
   assert.ok(Math.abs(restored.fraction-stages[2].fraction)<.008,

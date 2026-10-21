@@ -572,16 +572,27 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
   z-index: 10;
-  top: clamp(200px, 25svh, 245px);
+  top: 16px;
   left: 50%;
   width: min(31vw, 350px);
-  height: min(66svh, 650px);
+  height: min(86svh, 800px);
   transform: translateX(-50%);
   margin: 0;
   display: none;
   visibility: hidden;
   pointer-events: none;
-  clip-path: inset(var(--waymaking-safe-top, 0px) 0 var(--waymaking-safe-bottom, 0px) 0);
+  /* The road does not fade as a whole. Feather ONLY the final 28px of
+     the conclusion crop, matching the original ink's irregular tip. */
+  clip-path: inset(0 0 var(--waymaking-conclusion-cut, 0px) 0);
+  -webkit-mask-image: linear-gradient(to bottom,
+    #000 0,
+    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
+    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
+  mask-image: linear-gradient(to bottom,
+    #000 0,
+    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
+    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
+  opacity: 1;
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: block;
@@ -612,8 +623,8 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   height: 100%;
   display: none;
   background: transparent;
-  overflow: visible;
-  mix-blend-mode: multiply;
+  overflow: hidden;
+  mix-blend-mode: normal;
 }
 .waymaking-narrative[data-waymaking-animated="true"] .waymaking-original-source { display: none; }
 .waymaking-narrative[data-waymaking-animated="true"] .waymaking-original-reveal { display: block; }
@@ -1721,8 +1732,8 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     left: var(--gutter, 20px);
-    width: min(27vw, 125px);
-    height: min(68svh, 620px);
+    width: min(34vw, 180px);
+    height: min(86svh, 780px);
     transform: none;
   }
   /* Preserve the exact same source image on mobile and desktop. */
@@ -1750,16 +1761,17 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
 @media (max-width: 600px) {
   .waymaking-narrative { margin-top: 26px; }
   .waymaking-scene {
-    grid-template-columns: minmax(77px, 26%) minmax(0, 1fr);
-    column-gap: 13px;
+    grid-template-columns: minmax(100px, 36%) minmax(0, 1fr);
+    column-gap: 10px;
   }
   .waymaking-road-wrap {
     width: 100%;
     height: min(67svh, 575px);
   }
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
-    width: min(26vw, 96px);
-    height: min(67svh, 575px);
+    left: 0;
+    width: min(40vw, 150px);
+    height: min(83svh, 745px);
   }
   .waymaking-beat {
     min-height: clamp(176px, 27svh, 238px);
