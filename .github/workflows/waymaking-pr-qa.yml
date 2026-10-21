@@ -121,8 +121,12 @@ jobs:
                 await page.evaluate(()=>document.fonts.ready);
                 await page.locator('.waymaking-road-art img').evaluate(img=>img.decode());
                 const firstDocY=await page.evaluate(()=>{
-                  const title=document.querySelector('.waymaking-beat h3');
-                  return scrollY+title.getBoundingClientRect().top - 32;
+                  const beat=document.querySelector('.waymaking-beat');
+                  return scrollY+beat.getBoundingClientRect().top-innerHeight*.88;
+                });
+                const finalCopyDocY=await page.evaluate(()=>{
+                  const copy=document.querySelector('.waymaking-beat:last-child .waymaking-copy');
+                  return scrollY+copy.getBoundingClientRect().bottom;
                 });
                 const lastDocY=await page.evaluate(()=>{
                   const title=document.querySelector('.waymaking-beat:last-child h3');
@@ -142,16 +146,37 @@ jobs:
                 await assertNoRenderedRoad(page,'Before Creative',width);
                 await page.screenshot({path:'artifacts/before-Creative-'+width+'.png'});
 
-                await jump(page,firstDocY+12);
+                // Check genuine early pixels before Creative Thinking is halfway
+                // up the screen, not an artificially late 32px heading trigger.
+                await jump(page,firstDocY+48);
+                const early=await snap(page);
+                assert.equal(early.bodyActive,'true');
+                assert.equal(early.roadMode,'fixed');
+                assert.ok(early.roadOpacity>0&&early.roadOpacity<1,'Road must smoothly arrive as first beat enters');
+                assert.equal(await page.locator('.waymaking-road-art').evaluate(el=>getComputedStyle(el).visibility),
+                  'visible','Original image must remain present during brush painting');
+                const withInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+                await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.display='none');
+                const withoutInk=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+                await page.locator('.waymaking-road-wrap').evaluate(el=>el.style.removeProperty('display'));
+                let inkPixels=0;
+                for(let i=0;i<withInk.data.length;i+=4){
+                  const diff=Math.abs(withInk.data[i]-withoutInk.data[i])
+                    +Math.abs(withInk.data[i+1]-withoutInk.data[i+1])
+                    +Math.abs(withInk.data[i+2]-withoutInk.data[i+2]);
+                  if(diff>8) inkPixels++;
+                }
+                assert.ok(inkPixels>180,'No visible original road pixels while first story beat enters ('+inkPixels+')');
+                await jump(page,firstDocY+Math.max(160,h*.21));
                 const entering=await snap(page);
                 assert.equal(entering.roadMode,'fixed');
                 assert.equal(entering.bodyActive,'true','Road must appear at Creative Thinking');
                 assert.equal(entering.roadVisibility,'visible');
                 assert.equal(entering.roadBodyChild,true);
-                assert.equal(entering.roadOpacity,1,'Ink starts fully opaque, without a global fade-in');
-                assert.ok(Math.abs(entering.firstHeading.top-20)<2,'Creative Thinking must reach fixed trigger line');
+                assert.equal(entering.roadOpacity,1,'Ink must already be fully visible by first heading');
+                assert.ok(entering.firstHeading.top>=0&&entering.firstHeading.top<h,'Road must already be visible while Creative Thinking is still onscreen');
                 assert.ok(Math.abs(entering.road.top-16)<1,'Road must already be pinned from first frame');
-                assert.equal(entering.roadOpacity,1,'Road must not fade in when it starts');
+                assert.equal(entering.roadOpacity,1,'Road stays continuously present during all five beats');
                 assert.deepEqual(entering.titleNames,labels);
                 assert.equal(entering.wrongLogoClass,false,'Animated letters must not inherit Ventures logo font rules');
                 assert.ok(entering.titleSizes.every((size,i)=>Math.abs(size-entering.wordSizes[i])<.2),
@@ -165,7 +190,7 @@ jobs:
                 console.log('START '+width,JSON.stringify({title:entering.firstHeading.top,road:entering.road.top,opacity:entering.roadOpacity}));
 
                 const recorded=[];
-                const first=firstDocY+55,finish=lastDocY;
+                const first=firstDocY+Math.max(160,h*.21),finish=lastDocY;
                 for(let n=0;n<=12;n++){
                   await jump(page,first+(finish-first)*n/12);
                   const state=await snap(page);
@@ -202,7 +227,9 @@ jobs:
 
                 // Road is anchored while finishing but leaves in blank space
                 // before the centered Waymaker close, NOT under later sections.
-                await jump(page,conclusionY-h*.82);
+                await jump(page,finalCopyDocY-36);
+                assert.equal((await snap(page)).roadOpacity,1,'Painting may not disappear while last Purpose Driven copy is still visible');
+                await jump(page,finalCopyDocY+h*.08);
                 const handoff=await snap(page);
                 assert.equal(handoff.roadMode,'fixed','Road cannot slide during exit');
                 assert.ok(Math.abs(handoff.road.top-16)<1,'Road slid during the exit transition');
@@ -210,7 +237,7 @@ jobs:
                 assert.ok(handoff.roadOpacity>0&&handoff.roadOpacity<1,'Transition should happen only in blank handoff');
                 await page.screenshot({path:'artifacts/handoff-'+width+'.png'});
 
-                await jump(page,conclusionY-h*.68);
+                await jump(page,finalCopyDocY+h*.2);
                 const signoff=await snap(page);
                 assert.equal(signoff.roadVisibility,'hidden','Painting should be finished and gone before Waymaker line');
                 assert.equal(signoff.roadOpacity,0,'Ink child artwork must not render behind the signoff');
