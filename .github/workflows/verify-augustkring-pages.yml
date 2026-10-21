@@ -45,7 +45,7 @@ jobs:
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected_home="styles.css?v=20261021-immutable-pin-v11"
-          expected_road_js="waymaking-scroll.js?v=20261021-immutable-pin-v11"
+          expected_road_js="waymaking-scroll.js?v=20261021-signoff-handoff-v11-1"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -70,7 +70,7 @@ jobs:
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
           grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261021-immutable-pin-v11' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261021-signoff-handoff-v11-1' /tmp/augustkring.html
           grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'data-waymaking-feather="7"' /tmp/augustkring.html
@@ -112,11 +112,11 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-immutable-pin-v11" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-signoff-handoff-v11-1" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const updatePin = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
-          grep -Fq 'const withinStory = startReached && lastBeatBottom > fadeEnd' /tmp/waymaking-scroll.js
+          grep -Fq 'const withinStory = startReached && signoffTop > fadeEnd' /tmp/waymaking-scroll.js
           grep -Fq 'const startLine = () => PIN_TOP + 16;' /tmp/waymaking-scroll.js
           ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
           ! grep -Fq "!picture.currentSrc.endsWith('.avif')" /tmp/waymaking-scroll.js

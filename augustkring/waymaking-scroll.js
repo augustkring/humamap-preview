@@ -116,17 +116,19 @@
   // physically fixed during Waymaking. Only the separate pigment mask moves.
   const updatePin = () => {
     const titleTop = firstHeading.getBoundingClientRect().top;
-    const lastBeatBottom = beats[beats.length - 1].getBoundingClientRect().bottom;
     const startReached = titleTop <= startLine();
+    const signoffTop = conclusion.getBoundingClientRect().top;
 
-    // The end handoff starts only once the final chapter is leaving. A
-    // stationary fade finishes in whitespace before the Waymaker signoff.
-    const fadeStart = window.innerHeight * 0.54;
-    const fadeEnd = window.innerHeight * 0.27;
-    const departure = smooth((fadeStart - lastBeatBottom) /
+    // End in the actual blank space before the centered Waymaker sentence.
+    // Measuring the signoff itself avoids viewport- and browser-dependent
+    // guesses based on the bottom of Purpose Driven. This DOES NOT change
+    // the artwork position: it only controls its opacity at the end.
+    const fadeStart = window.innerHeight * 0.94;
+    const fadeEnd = window.innerHeight * 0.73;
+    const departure = smooth((fadeStart - signoffTop) /
       Math.max(1, fadeStart - fadeEnd));
     const opacity = 1 - departure;
-    const withinStory = startReached && lastBeatBottom > fadeEnd;
+    const withinStory = startReached && signoffTop > fadeEnd;
 
     if (withinStory) {
       story.dataset.waymakingPinned = 'true';

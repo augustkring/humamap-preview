@@ -202,11 +202,7 @@ jobs:
 
                 // Road is anchored while finishing but leaves in blank space
                 // before the centered Waymaker close, NOT under later sections.
-                const finalBeatBottom=await page.evaluate(()=>{
-                  const beat=document.querySelector('.waymaking-beat:last-child');
-                  return scrollY+beat.getBoundingClientRect().bottom;
-                });
-                await jump(page,finalBeatBottom-h*.31);
+                await jump(page,conclusionY-h*.82);
                 const handoff=await snap(page);
                 assert.equal(handoff.roadMode,'fixed','Road cannot slide during exit');
                 assert.ok(Math.abs(handoff.road.top-16)<1,'Road slid during the exit transition');
@@ -214,7 +210,7 @@ jobs:
                 assert.ok(handoff.roadOpacity>0&&handoff.roadOpacity<1,'Transition should happen only in blank handoff');
                 await page.screenshot({path:'artifacts/handoff-'+width+'.png'});
 
-                await jump(page,finalBeatBottom-h*.18);
+                await jump(page,conclusionY-h*.68);
                 const signoff=await snap(page);
                 assert.equal(signoff.roadVisibility,'hidden','Painting should be finished and gone before Waymaker line');
                 assert.equal(signoff.roadOpacity,0,'Ink child artwork must not render behind the signoff');
