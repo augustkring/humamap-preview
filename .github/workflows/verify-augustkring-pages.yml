@@ -42,6 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
           expected_home="styles.css?v=20261021-immutable-pin-v11"
           expected_road_js="waymaking-scroll.js?v=20261021-immutable-pin-v11"
