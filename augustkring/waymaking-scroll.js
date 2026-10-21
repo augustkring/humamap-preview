@@ -1,7 +1,9 @@
 /*
- * Waymaking V16: the exact approved original image is back.
- * Its OWN original mask path from V12 reveals its paint progressively.
- * No substitute vector road, no raster resampling or page-scroll hijacking.
+ * Waymaking V18: preserve original road pixels and mirror a second segment
+ * to extend the original ink illustration. CSS fixes the graphic at top:16px
+ * for the entire five-chapter reading interval. Scroll updates ONLY the
+ * expanding SVG path reveal and foreground text focus, NEVER image position,
+ * opacity or a late-stage fade.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
@@ -10,8 +12,10 @@
   const signoff = story?.querySelector('.waymaking-resolution p');
   const firstHeading = beats[0]?.querySelector('h3');
   const summary = story?.previousElementSibling;
+  const finalCopy = beats[4]?.querySelector('.waymaking-copy');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
-  if (!story || !road || !signoff || !firstHeading || beats.length !== 5 || revealPaths.length !== 1) return;
+  if (!story || !road || !signoff || !summary || !firstHeading ||
+      !finalCopy || beats.length !== 5 || revealPaths.length !== 1) return;
   // The original artwork is fixed to the viewport. Only the SVG reveal
   // mask progresses with scroll; the picture never changes screen position.
   road.dataset.waymakingViewport = 'true';
@@ -99,15 +103,9 @@
   const update = () => {
     frame = 0;
     if (reduced.matches) {
-      road.style.opacity = '1';
-      const current = road.getBoundingClientRect();
-      const introBottom = summary?.getBoundingClientRect().bottom ?? 0;
-      road.style.setProperty('--waymaking-safe-top',
-        Math.max(0, Math.min(current.height,introBottom+12-current.top)).toFixed(2)+'px');
       document.body.dataset.waymakingRoadActive =
-        story.querySelector('.waymaking-scene').getBoundingClientRect().bottom > 0 &&
-        firstHeading.getBoundingClientRect().top < window.innerHeight*.92 &&
-        signoff.getBoundingClientRect().top > 0 ? 'true' : 'false';
+        summary.getBoundingClientRect().bottom <= 16 &&
+        finalCopy.getBoundingClientRect().bottom > 16 ? 'true' : 'false';
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
         for (const feather of feathers) feather.style.strokeDashoffset = '0';
@@ -119,17 +117,13 @@
     }
     prepareText();
 
-    const sceneRect = story.querySelector('.waymaking-scene').getBoundingClientRect();
-    const box = road.getBoundingClientRect();
-    const introBottom = summary?.getBoundingClientRect().bottom ?? 0;
-    const safeTop = Math.max(0, Math.min(box.height, introBottom + 12 - box.top));
-    road.style.setProperty('--waymaking-safe-top',safeTop.toFixed(2)+'px');
-    road.style.setProperty('--waymaking-safe-bottom','0px');
-    const entry = firstHeading.getBoundingClientRect().top;
-    const active = sceneRect.bottom > 0 && entry < window.innerHeight * .92 &&
-      signoff.getBoundingClientRect().top > 0;
+    // No opacity fade-in or fade-out. The full-strength road is visible
+    // only after the preceding editorial intro has left the reading area,
+    // and until the final competency has passed the fixed top position.
+    const active = summary.getBoundingClientRect().bottom <= 16 &&
+      finalCopy.getBoundingClientRect().bottom > 16;
     document.body.dataset.waymakingRoadActive = active ? 'true' : 'false';
-    const focus = window.innerHeight * 0.51;
+    const focus = window.innerHeight * 0.16;
     const centers = beats.map(beat => {
       const bounds = beat.getBoundingClientRect();
       return bounds.top + bounds.height * 0.5;
@@ -158,16 +152,8 @@
         }
       }
     }
-    // After Purpose Driven passes, hand the completed road off to the
-    // Waymaker conclusion; this never fades the ink during any of the five
-    // chapter reading positions, and prevents its tail entering the next section.
-    const lastCopyBottom = beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
-    const signoffTop = signoff.getBoundingClientRect().top;
-    const farewell = lastCopyBottom < window.innerHeight * .48
-      ? smooth((window.innerHeight * .83 - signoffTop) /
-          Math.max(1, window.innerHeight * .32)) : 0;
-    road.style.opacity = String(1 - farewell);
-
+    // The extended ink never fades while any chapter is being read.
+    // Offstage display is scoped by the story boundaries above, not alpha.
     if (Math.abs(fraction - previousFraction) > 0.00025) {
       // Seven translucent brush layers feather the leading ink tip. The
       // geometric mask travels continuously, not in five jumped pieces.
