@@ -34,7 +34,8 @@ async function checkpoint(page) {
   return {
    fraction:Number(story.dataset.waymakingProgress),
    animated:story.dataset.waymakingAnimated==='true',
-   dashOffset:Number(mask.style.strokeDashoffset),
+   dashOffset:parseFloat(mask.style.strokeDashoffset),
+   rawOffset:mask.style.strokeDashoffset,
    length:mask.getTotalLength(),
    road:box(road),art:box(art),scene:box(qs('.waymaking-scene')),
    intro:box(qs('.thread-summary')),
@@ -128,7 +129,9 @@ async function runOne(browser,engine,width) {
    assert.ok(Number.isFinite(state.fraction),'Progress missing');
    assert.ok(state.fraction>.035&&state.fraction<=1,'Invalid road progress '+state.fraction);
    assert.ok(Math.abs(state.dashOffset-state.length*(1-state.fraction))<state.length*.006,
-     'Stroke mask progress does not match scroll state at '+labels[i]);
+     'Stroke mask progress mismatch at '+labels[i]+': '+JSON.stringify({
+       rawOffset:state.rawOffset,dashOffset:state.dashOffset,length:state.length,
+       fraction:state.fraction,expected:state.length*(1-state.fraction)}));
    assert.equal(state.opaqueRect,false,'Vector drawing must not contain framed image/card');
    assert.equal(state.roadParent,true);
    assert.equal(state.sticky,true);
