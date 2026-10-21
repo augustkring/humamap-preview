@@ -581,6 +581,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: none;
   visibility: hidden;
   pointer-events: none;
+  clip-path: inset(var(--waymaking-safe-top, 0px) 0 var(--waymaking-safe-bottom, 0px) 0);
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: block;

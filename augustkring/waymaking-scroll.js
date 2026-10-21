@@ -9,6 +9,7 @@
   const road = story?.querySelector('.waymaking-road-wrap');
   const signoff = story?.querySelector('.waymaking-resolution p');
   const firstHeading = beats[0]?.querySelector('h3');
+  const summary = story?.previousElementSibling;
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
   if (!story || !road || !signoff || !firstHeading || beats.length !== 5 || revealPaths.length !== 1) return;
   // The original artwork is fixed to the viewport. Only the SVG reveal
@@ -99,6 +100,10 @@
     frame = 0;
     if (reduced.matches) {
       road.style.opacity = '1';
+      const current = road.getBoundingClientRect();
+      const introBottom = summary?.getBoundingClientRect().bottom ?? 0;
+      road.style.setProperty('--waymaking-safe-top',
+        Math.max(0, Math.min(current.height,introBottom+12-current.top)).toFixed(2)+'px');
       document.body.dataset.waymakingRoadActive =
         story.querySelector('.waymaking-scene').getBoundingClientRect().bottom > 0 &&
         firstHeading.getBoundingClientRect().top < window.innerHeight*.92 &&
@@ -115,6 +120,13 @@
     prepareText();
 
     const sceneRect = story.querySelector('.waymaking-scene').getBoundingClientRect();
+    const box = road.getBoundingClientRect();
+    const introBottom = summary?.getBoundingClientRect().bottom ?? 0;
+    const nextTop = document.querySelector('#work')?.getBoundingClientRect().top ?? window.innerHeight;
+    const safeTop = Math.max(0, Math.min(box.height, introBottom + 12 - box.top));
+    const safeBottom = Math.max(0, Math.min(box.height, box.bottom - (nextTop - window.innerHeight*.9)));
+    road.style.setProperty('--waymaking-safe-top',safeTop.toFixed(2)+'px');
+    road.style.setProperty('--waymaking-safe-bottom',safeBottom.toFixed(2)+'px');
     const entry = firstHeading.getBoundingClientRect().top;
     const active = sceneRect.bottom > 0 && entry < window.innerHeight * .92 &&
       signoff.getBoundingClientRect().top > 0;
