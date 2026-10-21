@@ -569,7 +569,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-resolution {
   width: min(100%, 840px);
   /* Give the fixed ink space to finish and disappear before the conclusion. */
-  margin: clamp(180px, 22svh, 215px) auto 0;
+  margin: clamp(280px, 34svh, 320px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
