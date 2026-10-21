@@ -1,6 +1,7 @@
 // Approved 2026-10-10 site baseline. Update digests only with user approval.
 import { readFileSync } from 'node:fs';
 import { strict as assert } from 'node:assert';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 const root=dirname(fileURLToPath(import.meta.url));
@@ -16,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"5d3247ab","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"bb0a2b77","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -54,16 +55,23 @@ for(const label of ['Creative Thinking','Commercial Understanding','Strategic Ju
  previous=offset;
 }
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
-assert.ok(thread.includes('data-waymaking-vector="desktop"') && thread.includes('data-waymaking-vector="mobile"'),'Independent authored desktop/mobile vector roads are required');
-assert.equal((thread.match(/<path data-waymaking-reveal /g)||[]).length,2,'SVG brush reveal paths missing');
-assert.equal((thread.match(/data-waymaking-feather=/g)||[]).length,14,'Seven vector feather layers per route required');
-assert.ok(!thread.includes('assets/waymaking-editorial-ink.webp'),'No low-resolution raster image may be used for Waymaking');
-for(const name of ['waymaking-vector-road-desktop-v15.svg','waymaking-vector-road-mobile-v15.svg']) {
- const vector=readFileSync(join(root,'assets',name),'utf8');
- assert.ok(vector.includes('viewBox=') && vector.includes('<mask') && vector.includes('data-waymaking-reveal'),'Authored scalable vector missing: '+name);
- assert.ok(!vector.includes('<image') && !vector.includes('<rect fill='),'No raster or rectangular photo background allowed: '+name);
+assert.ok(thread.includes('class="waymaking-original-source"'),'Approved original artwork picture missing');
+assert.ok(thread.includes('srcset="assets/waymaking-editorial-ink.avif"'),'Approved original AVIF fallback missing');
+assert.ok(thread.includes('src="assets/waymaking-editorial-ink.webp"'),'Approved original WebP fallback missing');
+assert.ok(thread.includes('href="assets/waymaking-editorial-ink.webp"'),'Animated SVG must reveal original WebP pixels');
+assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
+assert.equal((thread.match(/<path data-waymaking-reveal /g)||[]).length,1,'Exactly one original painting curve required');
+assert.equal((thread.match(/data-waymaking-feather=/g)||[]).length,7,'Seven original brush feathers required');
+assert.ok(thread.includes('id="waymaking-brush-trail"')&&thread.includes('feTurbulence'),'Original authored mask missing');
+for(const [filename,sha] of [
+ ['waymaking-editorial-ink.webp','1f728a4ba55dbedb9b559257f906b841dc660496'],
+ ['waymaking-editorial-ink.avif','059fc49e35ff5a6fb6e0263a205dcf0e3bbb7dcb']
+]) {
+ const bytes=readFileSync(join(root,'assets',filename));
+ const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
+ assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15'),'New scroll drawing controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261021-restore-approved-original-v16'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -72,9 +80,10 @@ assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My curre
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate copy layout missing');
-assert.ok(css.includes('waymaking-vector--mobile'),'Responsive vector art direction missing');
+assert.ok(css.includes('.waymaking-original-source')&&css.includes('.waymaking-original-reveal'),'Restored source/fallback styling missing');
 assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.waymaking-copy-column::after'),'Wrong pre/post viewport spacers returned');
 assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) auto 0;'),'Waymaker transition must not be a blank viewport');
+assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('paintStages = [0.16, 0.37, 0.59, 0.80, 1]'),'Progressive drawing must track five chapter checkpoints');
 assert.ok(scrollController.includes('getTotalLength()') && scrollController.includes('strokeDashoffset'),'SVG drawing must track real path distances');
@@ -99,7 +108,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261021-waymaking-drawn-vector-v15':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261021-restore-approved-original-v16':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

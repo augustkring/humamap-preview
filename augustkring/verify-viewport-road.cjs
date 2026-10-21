@@ -40,8 +40,7 @@ async function checkpoint(page) {
   const road=qs('.waymaking-road-wrap');
   const story=qs('[data-waymaking-story]');
   const beats=[...document.querySelectorAll('.waymaking-beat')];
-  const actual=window.innerWidth<=900?'mobile':'desktop';
-  const art=qs('.waymaking-vector--'+actual);
+  const art=qs('.waymaking-original-reveal');
   const mask=art.querySelector('[data-waymaking-reveal]');
   const surface=getComputedStyle(art);
   const end=qs('.waymaking-resolution');
@@ -63,7 +62,9 @@ async function checkpoint(page) {
    roadOpacity:Number(getComputedStyle(road).opacity),
    topCSS:getComputedStyle(road).top,
    background:surface.backgroundColor,
-   opaqueRect:!!art.querySelector('rect, image, foreignObject'),
+   opaqueRect:!!art.querySelector('rect,foreignObject'),
+   imageSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
+   animatedOriginal:art.querySelector('image')?.getAttribute('href'),
    bitmap:!!road.querySelector('img,picture,canvas'),
    roadParent:road.parentElement.classList.contains('waymaking-artspace'),
    overflow:document.documentElement.scrollWidth>innerWidth+1,
@@ -125,8 +126,10 @@ async function runOne(browser,engine,width) {
   assert.deepEqual(first.titles,labels);
   assert.ok(first.headings[0].top-first.scene.top<=95,
     'Creative Thinking starts too far BELOW the route ('+(first.headings[0].top-first.scene.top)+'px)');
-  assert.equal(first.opaqueRect,false,'SVG MUST NOT contain an opaque background rectangle');
-  assert.equal(first.bitmap,false,'No bitmap image/canvas allowed: scalable artwork only');
+  assert.equal(first.opaqueRect,false,'Original ink must have no rectangular background');
+  assert.equal(first.bitmap,true,'Original picture element missing');
+  assert.equal(first.imageSource,'assets/waymaking-editorial-ink.webp','Approved original not restored');
+  assert.equal(first.animatedOriginal,'assets/waymaking-editorial-ink.webp','Progressive mask paints wrong artwork');
   assert.equal(first.background,'rgba(0, 0, 0, 0)','Artwork SVG background must be transparent');
   assert.equal(first.roadParent,true,'Route must remain within sticky scene');
   assert.equal(first.sticky,true,'Native sticky positioning required');
@@ -150,7 +153,8 @@ async function runOne(browser,engine,width) {
      'Stroke mask progress mismatch at '+labels[i]+': '+JSON.stringify({
        rawOffset:state.rawOffset,dashOffset:state.dashOffset,length:state.length,
        fraction:state.fraction,expected:expectedOffset}));
-   assert.equal(state.opaqueRect,false,'Vector drawing must not contain framed image/card');
+   assert.equal(state.opaqueRect,false,'Restored art has a rectangular backing');
+   assert.equal(state.imageSource,'assets/waymaking-editorial-ink.webp','Wrong original asset');
    assert.equal(state.roadParent,true);
    assert.equal(state.sticky,true);
    assert.equal(state.overflow,false);
@@ -224,15 +228,15 @@ async function runOne(browser,engine,width) {
     const resized=await checkpoint(page);
     assert.equal(resized.overflow,false,'Responsive resize introduced horizontal overflow');
     assert.ok(resized.fraction>.10&&resized.fraction<=1,'Road stopped drawing after responsive resize');
-    assert.ok(resized.length>100,'The desktop vector path was not selected');
-    assert.equal(resized.bitmap,false,'Responsive resize restored raster assets');
+    assert.ok(resized.length>100,'Original winding mask should remain valid');
+    assert.equal(resized.animatedOriginal,'assets/waymaking-editorial-ink.webp','Resize must preserve exact original art');
     for(const text of resized.texts){
       assert.equal(overlap(resized.road,text),0,'Road obscures copy after 390→1024 resizing');
     }
   }
 
   assert.deepEqual(problems,[],'Browser JS errors');
-  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:false,opaqueRect:false,overlaps:0,noLaterInk:true,reverseFromExit:true}));
+  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:'approved-original',opaqueRect:false,overlaps:0,noLaterInk:true,reverseFromExit:true}));
  }finally {await page.close();}
 }
 (async()=>{
@@ -256,7 +260,7 @@ async function runOne(browser,engine,width) {
    const nojs=await browser.newPage({viewport:{width:390,height:900},javaScriptEnabled:false});
    await nojs.goto(base,{waitUntil:'load'});
    assert.deepEqual(await nojs.locator('.waymaking-beat h3').allTextContents(),labels);
-   assert.equal(await nojs.locator('.waymaking-vector--mobile').isVisible(),true);
+   assert.equal(await nojs.locator('.waymaking-original-source').isVisible(),true);
    await nojs.close();
    console.log('PASS '+engine+' no-JS, reduced motion, semantic content');
   }finally {await browser.close();}

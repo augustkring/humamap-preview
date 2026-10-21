@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261021-waymaking-drawn-vector-v15"
-          expected_road_js="waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15"
+          expected_home="styles.css?v=20261021-restore-approved-original-v16"
+          expected_road_js="waymaking-scroll.js?v=20261021-restore-approved-original-v16"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -70,10 +70,10 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq 'aria-label="Waymaking" data-waymaking-story' /tmp/augustkring.html
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-vector="desktop"' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-vector="mobile"' /tmp/augustkring.html
-          ! grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
+          grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261021-restore-approved-original-v16' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskContentUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -94,9 +94,9 @@ jobs:
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           grep -Fq 'position: sticky;' /tmp/augustkring.css
-          grep -Fq '.waymaking-vector' /tmp/augustkring.css
+          grep -Fq '.waymaking-original-source' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
-          grep -Fq '.waymaking-vector--mobile' /tmp/augustkring.css
+          grep -Fq '.waymaking-original-reveal' /tmp/augustkring.css
           grep -Fq 'grid-template-columns: minmax(77px, 26%) minmax(0, 1fr);' /tmp/augustkring.css
           ! grep -Fq '.waymaking-copy-column::before' /tmp/augustkring.css
           ! grep -Fq '.waymaking-copy-column::after' /tmp/augustkring.css
@@ -115,7 +115,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-restore-approved-original-v16" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
@@ -285,7 +285,7 @@ jobs:
                   const state=await page.evaluate(()=>{
                     const story=document.querySelector('[data-waymaking-story]');
                     const road=story.querySelector('.waymaking-road-wrap');
-                    const svg=story.querySelector('.waymaking-vector--'+(innerWidth<=900?'mobile':'desktop'));
+                    const svg=story.querySelector('.waymaking-original-reveal');
                     const mask=svg.querySelector('[data-waymaking-reveal]');
                     const beatCopies=[...story.querySelectorAll('.waymaking-copy')];
                     const box=x=>{
@@ -306,15 +306,17 @@ jobs:
                       animated:story.dataset.waymakingAnimated==='true',
                       sticky:getComputedStyle(road).position==='sticky',
                       parent:road.parentElement.classList.contains('waymaking-artspace'),
-                      noImage:!road.querySelector('img,picture,canvas'),
-                      opaqueBacking:!!svg.querySelector('rect,image,foreignObject'),
+                      approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
+                      approvedPaint:svg.querySelector('image')?.getAttribute('href'),
+                      opaqueBacking:!!svg.querySelector('rect,foreignObject'),
                       overflow:document.documentElement.scrollWidth>innerWidth+1,
                       opacity:Number(getComputedStyle(road).opacity)
                     };
                   });
                   assert.equal(state.sticky,true,'Road must use native sticky layout');
                   assert.equal(state.parent,true,'Road must stay in its actual scene');
-                  assert.equal(state.noImage,true,'Road must remain resolution-independent vector');
+                  assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
+                  assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
                   assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
                   assert.equal(state.animated,true,'Progressive scroll controller failed');
                   assert.ok(state.fraction>=.09&&state.fraction<=1,
