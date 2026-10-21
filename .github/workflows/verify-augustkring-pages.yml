@@ -7,6 +7,8 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
+      - "augustkring/assets/waymaking-vector-road-desktop-v15.svg"
+      - "augustkring/assets/waymaking-vector-road-mobile-v15.svg"
       - "augustkring/assets/waymaking-ink-road-brush.png"
       - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
       - "augustkring/assets/waymaking-editorial-ink.avif"
@@ -44,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261021-waymaking-sticky-layout-v14"
-          expected_road_js="waymaking-scroll.js?v=20261021-waymaking-sticky-layout-v14"
+          expected_home="styles.css?v=20261021-waymaking-drawn-vector-v15"
+          expected_road_js="waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -68,13 +70,13 @@ jobs:
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq 'aria-label="Waymaking" data-waymaking-story' /tmp/augustkring.html
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-editorial-ink.webp' /tmp/augustkring.html
-          grep -Fq 'assets/waymaking-editorial-ink.avif' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261021-waymaking-sticky-layout-v14' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-paint-path' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-vector="desktop"' /tmp/augustkring.html
+          grep -Fq 'data-waymaking-vector="mobile"' /tmp/augustkring.html
+          ! grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15' /tmp/augustkring.html
+          grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
-          grep -Fq 'data-waymaking-feather="7"' /tmp/augustkring.html
-          grep -Fq 'filterUnits="userSpaceOnUse" x="-180"' /tmp/augustkring.html
+          grep -Fq 'maskContentUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
@@ -92,11 +94,12 @@ jobs:
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
           grep -Fq 'position: sticky;' /tmp/augustkring.css
-          grep -Fq '.waymaking-road-art' /tmp/augustkring.css
+          grep -Fq '.waymaking-vector' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
-          grep -Fq '.waymaking-paint-art' /tmp/augustkring.css
+          grep -Fq '.waymaking-vector--mobile' /tmp/augustkring.css
           grep -Fq 'grid-template-columns: minmax(78px, 27%) minmax(0, 1fr);' /tmp/augustkring.css
-          grep -Fq '.waymaking-copy-column::before' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-copy-column::before' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-copy-column::after' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:nth-child(odd)' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:nth-child(even)' /tmp/augustkring.css
           ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
@@ -112,9 +115,12 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-waymaking-sticky-layout-v14" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-waymaking-drawn-vector-v15" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
+          grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
+          grep -Fq 'getTotalLength()' /tmp/waymaking-scroll.js
+          grep -Fq 'paintStages = [0.16, 0.37, 0.59, 0.80, 1]' /tmp/waymaking-scroll.js
           ! grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
           ! grep -Fq 'updateBackdropClip' /tmp/waymaking-scroll.js
           ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
@@ -256,51 +262,110 @@ jobs:
                 assert.equal(editorial.waymakerDefinition,"For me, that's what it means to be a waymaker.");
                 assert.equal(editorial.waymakingBeatCount,5);
                 assert.equal(editorial.hasHomepageStory,false);
-                await page.locator('.waymaking-road-art img').evaluate(img => img.decode());
-                const centers=await page.evaluate(()=>[...document.querySelectorAll('.waymaking-beat')].map(beat=>{
-                  const r=beat.getBoundingClientRect();
-                  return scrollY+r.top+r.height/2;
-                }));
-                assert.equal(centers.length,5,'All five competency chapters must remain');
-                for(let index=0;index<centers.length;index++){
-                  await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),centers[index]-450);
-                  await page.waitForTimeout(150);
+                const positions=await page.evaluate(()=>{
+                  const beats=[...document.querySelectorAll('.waymaking-beat')];
+                  return {
+                    titles:beats.map(x=>x.querySelector('h3').getAttribute('aria-label')||
+                      x.querySelector('h3').textContent.trim()),
+                    centers:beats.map(x=>{
+                      const b=x.getBoundingClientRect();
+                      return scrollY+b.top+b.height*.5;
+                    })
+                  };
+                });
+                assert.deepEqual(positions.titles,[
+                  'Creative Thinking','Commercial Understanding','Strategic Judgment',
+                  'AI-Native Building','Purpose Driven'
+                ]);
+                const stages=[];
+                for(let index=0;index<5;index++){
+                  await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
+                    positions.centers[index]-900*.49);
+                  await page.waitForTimeout(170);
                   const state=await page.evaluate(()=>{
-                    const el=document.querySelector('.waymaking-road-wrap');
-                    const img=el.querySelector('.waymaking-road-art');
-                    const rect=item=>item.getBoundingClientRect().toJSON();
+                    const story=document.querySelector('[data-waymaking-story]');
+                    const road=story.querySelector('.waymaking-road-wrap');
+                    const svg=story.querySelector('.waymaking-vector--'+(innerWidth<=900?'mobile':'desktop'));
+                    const mask=svg.querySelector('[data-waymaking-reveal]');
+                    const beatCopies=[...story.querySelectorAll('.waymaking-copy')];
+                    const box=x=>{
+                      const b=x.getBoundingClientRect();
+                      return {top:b.top,left:b.left,right:b.right,bottom:b.bottom,
+                        width:b.width,height:b.height};
+                    };
                     return {
-                      top:rect(el).top, road:rect(el),
-                      sticky:getComputedStyle(el).position==='sticky',
-                      inScene:el.parentElement.classList.contains('waymaking-artspace'),
-                      opacity:Number(getComputedStyle(img).opacity),
-                      svgHidden:getComputedStyle(el.querySelector('.waymaking-paint-art')).display==='none',
-                      copy:[...document.querySelectorAll('.waymaking-copy')].map(rect),
-                      intro:rect(document.querySelector('.thread-summary')),
-                      overflow:document.documentElement.scrollWidth>innerWidth+1
+                      fraction:Number(story.dataset.waymakingProgress),
+                      route:box(road),
+                      firstHeading:box(story.querySelector('.waymaking-beat h3')),
+                      scene:box(story.querySelector('.waymaking-scene')),
+                      intro:box(document.querySelector('.thread-summary')),
+                      texts:beatCopies.map(box),
+                      maskLength:mask.getTotalLength(),
+                      featherCount:svg.querySelectorAll('[data-waymaking-feather]').length,
+                      maskOffset:parseFloat(mask.style.strokeDashoffset),
+                      animated:story.dataset.waymakingAnimated==='true',
+                      sticky:getComputedStyle(road).position==='sticky',
+                      parent:road.parentElement.classList.contains('waymaking-artspace'),
+                      noImage:!road.querySelector('img,picture,canvas'),
+                      opaqueBacking:!!svg.querySelector('rect,image,foreignObject'),
+                      overflow:document.documentElement.scrollWidth>innerWidth+1,
+                      opacity:Number(getComputedStyle(road).opacity)
                     };
                   });
-                  assert.equal(state.sticky,true,'Road must use native sticky positioning');
-                  assert.equal(state.inScene,true,'Road must not be portaled to body');
-                  assert.ok(Math.abs(state.top-16)<1.3,'Road should already be stationary in first chapter');
-                  assert.equal(state.opacity,1,'Mobile road source must not fade');
-                  assert.equal(state.svgHidden,true,'Moving SVG drawing must remain disabled');
-                  assert.equal(state.overflow,false,'Page must not horizontally overflow');
-                  const intersection=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*
-                    Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
-                  for(const copy of state.copy)assert.equal(intersection(state.road,copy),0,'Road obscures text');
-                  assert.equal(intersection(state.road,state.intro),0,'Road obscures introduction');
-                  if([320,390,1440].includes(width)&&[0,2,4].includes(index)){
-                    await page.screenshot({path:'/tmp/ak-browser-check/waymaking-sticky-'+width+'-'+index+'.png'});
+                  assert.equal(state.sticky,true,'Road must use native sticky layout');
+                  assert.equal(state.parent,true,'Road must stay in its actual scene');
+                  assert.equal(state.noImage,true,'Road must remain resolution-independent vector');
+                  assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
+                  assert.equal(state.animated,true,'Progressive scroll controller failed');
+                  assert.ok(state.fraction>=.09&&state.fraction<=1,
+                    'Path did not reach correct drawing stage');
+                  const brushFront=Math.min(state.fraction,.055,(1-state.fraction)*.55);
+                  const maskExpected=state.maskLength*(1-(state.fraction-brushFront));
+                  assert.equal(state.featherCount,7,'Feathered organic route must have seven brush layers');
+                  assert.ok(Math.abs(state.maskOffset-maskExpected)<state.maskLength*.008,
+                    'Visible SVG does not reflect actual feathered path progress');
+                  if(index>0){
+                    assert.ok(state.fraction>stages[index-1].fraction+.10,
+                      'Road did not grow when chapter changed');
+                    assert.ok(Math.abs(state.route.top-16)<1.5,'Road is not stationary while chapters pass');
+                  } else {
+                    assert.ok(Math.abs(state.firstHeading.top-state.route.top)<110,
+                      'Creative Thinking does not start alongside the initial route');
+                  }
+                  assert.ok(state.opacity>.99,'The artwork must not fade under the chapter text');
+                  const overlap=(x,y)=>
+                    Math.max(0,Math.min(x.right,y.right)-Math.max(x.left,y.left))*
+                    Math.max(0,Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top));
+                  for(const copy of state.texts){
+                    assert.equal(overlap(state.route,copy),0,'Road overlaps readable copy');
+                  }
+                  assert.equal(overlap(state.route,state.intro),0,'Road overlaps introductory copy');
+                  assert.equal(state.overflow,false,'Horizontal overflow');
+                  stages.push(state);
+                  if((width===320||width===390||width===1440)){
+                    await page.screenshot({path:'/tmp/ak-browser-check/waymaking-progressive-'+width+'-'+index+'.png'});
                   }
                 }
+                assert.ok(stages.at(-1).fraction-stages[0].fraction>.80,
+                  'Road is not visibly expanding across the five chapters');
+                const conclusionGap=await page.evaluate(()=>{
+                  const last=document.querySelector('.waymaking-purpose .waymaking-copy').getBoundingClientRect();
+                  const signoff=document.querySelector('.waymaking-resolution').getBoundingClientRect();
+                  return signoff.top-last.bottom;
+                });
+                assert.ok(conclusionGap>10&&conclusionGap<475,
+                  'Waymaker conclusion has an artificial empty screen: '+conclusionGap);
                 for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
                   const y=await page.locator(selector).first().evaluate(el=>
-                    scrollY+el.getBoundingClientRect().top-innerHeight*.4);
+                    scrollY+el.getBoundingClientRect().top-innerHeight*.42);
                   await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),y);
                   await page.waitForTimeout(130);
-                  const bottom=await page.locator('.waymaking-road-wrap').evaluate(el=>el.getBoundingClientRect().bottom);
-                  assert.ok(bottom<=0,'Road should have left viewport before '+selector);
+                  const aftermath=await page.locator('.waymaking-road-wrap').evaluate(el=>({
+                    bottom:el.getBoundingClientRect().bottom,
+                    opacity:Number(getComputedStyle(el).opacity)
+                  }));
+                  assert.ok(aftermath.bottom<=0||aftermath.opacity<.02,
+                    'Completed road must exit before reading '+selector);
                 }
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');

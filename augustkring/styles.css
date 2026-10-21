@@ -491,28 +491,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 /* Enter with room for the approved full image to settle at top:16px
    BEFORE Creative Thinking is first read, without overlap or a JS pop. */
-.waymaking-copy-column::before {
-  content: '';
-  display: block;
-  height: clamp(285px, 42svh, 410px);
-  pointer-events: none;
-}
-/* The spacer extends the real sticky containing block beyond the final beat;
-   the art may leave naturally only after the last text has passed. */
-.waymaking-copy-column::after {
-  content: '';
-  display: block;
-  height: min(82svh, 770px);
-  pointer-events: none;
-}
+/* The first heading begins beside the visible start of the SVG.
+   No pre-chapter or full-viewport conclusion spacers. */
 .waymaking-beat {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(270px, 34%) minmax(0, 1fr);
   column-gap: clamp(12px, 1.5vw, 24px);
   align-items: center;
-  min-height: clamp(240px, 38svh, 358px);
-  padding: 25px 0;
+  min-height: clamp(310px, 46svh, 450px);
+  padding: 22px 0;
+}
+.waymaking-beat:first-child {
+  align-items: start;
+  padding-top: 34px;
 }
 .waymaking-copy {
   width: 100%;
@@ -537,16 +529,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -.034em;
+  overflow-wrap: anywhere;
 }
 .waymaking-copy p {
   margin: 0;
   color: var(--copy);
   font-size: var(--body-copy-size);
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 .waymaking-copy .waymaking-heading-word {
   display: inline-block;
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font-size: inherit;
   line-height: inherit;
   letter-spacing: inherit;
@@ -565,33 +561,28 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-road-wrap {
   position: sticky;
   top: 16px;
-  width: min(33.5%, 390px);
-  height: min(82svh, 770px);
+  width: min(35%, 390px);
+  height: min(66svh, 650px);
   margin-inline: auto;
   pointer-events: none;
 }
-.waymaking-road-art,
-.waymaking-road-art img {
+.waymaking-vector {
   display: block;
   width: 100%;
   height: 100%;
-}
-.waymaking-road-art img {
-  object-fit: contain;
-  object-position: center top;
-}
-.waymaking-paint-art {
-  position: absolute;
-  inset: 0;
-  display: none;
-  width: 100%;
-  height: 100%;
+  background: none;
   overflow: visible;
+  /* Feather the physically ending brush into white paper, preventing the
+     dead-flat crop at the edge of SVG's viewBox. No opaque matte or rectangle. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 90%, transparent 100%);
 }
+.waymaking-vector--desktop { display: block; }
+.waymaking-vector--mobile { display: none; }
 .waymaking-resolution {
   width: min(100%, 840px);
-  /* Give the fixed ink space to finish and disappear before the conclusion. */
-  margin: clamp(190px, 28svh, 300px) auto 0;
+  /* No oversized white handoff. Story → conclusion remains connected. */
+  margin: clamp(30px, 5svh, 70px) auto 0;
   padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
   text-align: center;
 }
@@ -1664,89 +1655,78 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     gap: 24px;
   }
   .home-main .thread-copy { max-width: 680px; }
-  .waymaking-narrative { margin-top: 38px; }
+  .waymaking-narrative { margin-top: 29px; }
   .waymaking-scene {
-    grid-template-columns: minmax(104px, 30%) minmax(0, 1fr);
-    gap: clamp(14px, 2.8vw, 28px);
+    grid-template-columns: minmax(93px, 28%) minmax(0, 1fr);
+    column-gap: clamp(14px, 2.6vw, 24px);
   }
   .waymaking-artspace {
-    position: relative;
     grid-column: 1;
     grid-row: 1;
-    inset: auto;
     align-self: stretch;
   }
   .waymaking-copy-column {
-    position: relative;
     grid-column: 2;
     grid-row: 1;
     min-width: 0;
   }
-  .waymaking-copy-column::after { height: min(76svh, 630px); }
   .waymaking-road-wrap {
     position: sticky;
     top: 16px;
-    width: 100%;
-    height: min(76svh, 630px);
-    margin: 0;
+    width: min(100%, 125px);
+    height: min(68svh, 620px);
+    margin: 0 auto;
   }
-  .waymaking-road-art {
-    position: relative;
-    overflow: hidden;
-    opacity: 1;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-  /* Responsive art direction: crop only the empty left/right margin of the
-     unchanged ink illustration, increasing its visible vertical scale. */
-  .waymaking-road-art img {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 175%;
-    max-width: none;
-    height: auto;
-    transform: translateX(-50%);
-    object-fit: contain;
-  }
+  .waymaking-vector--desktop { display: none; }
+  .waymaking-vector--mobile { display: block; }
   .waymaking-beat {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: clamp(245px, 37svh, 345px);
-    padding: 28px 0;
+    min-height: clamp(280px, 43svh, 410px);
+    padding: 18px 0;
+  }
+  .waymaking-beat:first-child {
+    align-items: start;
+    padding-top: 28px;
   }
   .waymaking-beat:nth-child(odd) .waymaking-copy,
   .waymaking-beat:nth-child(even) .waymaking-copy {
     width: 100%;
     max-width: 100%;
-    min-width: 0;
     text-align: left;
   }
-  .waymaking-copy h3 { font-size: 26px; }
+  .waymaking-copy h3 { font-size: 24px; }
   .waymaking-copy p { font-size: 18px; }
   .waymaking-resolution { padding-top: 38px; }
 }
 @media (max-width: 600px) {
-  .waymaking-narrative { margin-top: 30px; }
+  .waymaking-narrative { margin-top: 26px; }
   .waymaking-scene {
-    grid-template-columns: minmax(78px, 27%) minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: minmax(77px, 26%) minmax(0, 1fr);
+    column-gap: 13px;
   }
-  .waymaking-road-wrap,
-  .waymaking-copy-column::after { height: min(72svh, 580px); }
-  .waymaking-beat { min-height: clamp(275px, 42svh, 360px); padding: 25px 0; }
+  .waymaking-road-wrap {
+    width: 100%;
+    height: min(67svh, 575px);
+  }
+  .waymaking-beat {
+    min-height: clamp(270px, 42svh, 366px);
+    padding: 15px 0;
+  }
+  .waymaking-beat:first-child { padding-top: 24px; }
   .waymaking-copy h3 { font-size: clamp(21px, 5.6vw, 24px); }
-  .waymaking-copy p { font-size: 16px; line-height: 1.55; }
-  .waymaking-resolution { padding: 42px 0 68px; }
+  .waymaking-copy p { font-size: 16px; line-height: 1.58; }
+  .waymaking-resolution {
+    margin-top: clamp(28px, 4svh, 42px);
+    padding: 38px 0 68px;
+  }
   .waymaking-resolution p { font-size: 26px; }
   .work-section--waymaking-output { padding-top: 54px; }
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* V14: the illustration remains in its semantic grid column. Native
-   sticky positioning supplies the fixed-on-screen reading experience,
-   with no JavaScript portal, dynamic clip-path, fade or moving pigment. */
+/* V15: no raster assets; static SVG if scripting or motion preference disallows animation. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

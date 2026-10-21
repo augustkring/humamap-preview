@@ -1,12 +1,28 @@
 /*
- * Waymaking V14: the complete approved road is a native CSS sticky illustration
- * within a tall grid row. Only letter/paragraph focus is enhanced with JS.
- * No JavaScript writes to the road, masks, clipping or visibility.
+ * Waymaking V15. The authored SVG road is pinned by native CSS sticky. A
+ * continuous reveal stroke travels along its actual Bézier path as the five
+ * chapters scroll. Reverse scrolling reverses the drawing. No image raster,
+ * portal, arbitrary show/hide thresholds or scroll interception.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
-  if (!story || beats.length !== 5) return;
+  const road = story?.querySelector('.waymaking-road-wrap');
+  const signoff = story?.querySelector('.waymaking-resolution p');
+  const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
+  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 2) return;
+  const strokes = revealPaths.map(path => {
+    const length = path.getTotalLength();
+    const feathers = [...path.parentElement.querySelectorAll('[data-waymaking-feather]')];
+    if (!(length > 0) || feathers.length !== 7) return null;
+    path.style.strokeDasharray = length + ' ' + length;
+    for (const feather of feathers) {
+      feather.style.strokeDasharray = length + ' ' + length;
+    }
+    return {path,length,feathers};
+  }).filter(Boolean);
+  if (strokes.length !== 2) return;
+  story.dataset.waymakingAnimated = 'true';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
@@ -21,6 +37,8 @@
 
   let frame = 0;
   let labels = [];
+  let previousFraction = -1;
+  const paintStages = [0.16, 0.37, 0.59, 0.80, 1];
 
   const resetText = () => {
     for (const item of labels) {
@@ -76,6 +94,13 @@
   const update = () => {
     frame = 0;
     if (reduced.matches) {
+      road.style.opacity = '1';
+      for (const {path,feathers} of strokes) {
+        path.style.strokeDashoffset = '0';
+        for (const feather of feathers) feather.style.strokeDashoffset = '0';
+      }
+      story.dataset.waymakingProgress = '1.000';
+      previousFraction = 1;
       resetText();
       return;
     }
@@ -88,15 +113,53 @@
     });
 
     let phase = 0;
-    if (focus >= centers[centers.length - 1]) {
+    let fraction = 0;
+    if (focus <= centers[0]) {
+      // Start the ink as Creative Thinking ENTERS the viewport. Do not wait
+      // until the heading is near the top and do not paint the completed road.
+      const top = beats[0].getBoundingClientRect().top;
+      const entry = smooth((window.innerHeight * 0.94 - top) /
+        Math.max(1, window.innerHeight * 0.70));
+      fraction = entry * paintStages[0];
+    } else if (focus >= centers[centers.length - 1]) {
       phase = beats.length - 1;
-    } else if (focus > centers[0]) {
+      fraction = 1;
+    } else {
       for (let i = 0; i < centers.length - 1; i++) {
         if (focus <= centers[i + 1]) {
-          phase = i + (focus - centers[i]) / Math.max(1, centers[i + 1] - centers[i]);
+          const local = clamp((focus - centers[i]) /
+            Math.max(1, centers[i + 1] - centers[i]));
+          phase = i + local;
+          fraction = paintStages[i] + (paintStages[i + 1] - paintStages[i]) * local;
           break;
         }
       }
+    }
+    // After Purpose Driven passes, hand the completed road off to the
+    // Waymaker conclusion; this never fades the ink during any of the five
+    // chapter reading positions, and prevents its tail entering the next section.
+    const lastCopyBottom = beats[4].querySelector('.waymaking-copy').getBoundingClientRect().bottom;
+    const signoffTop = signoff.getBoundingClientRect().top;
+    const farewell = lastCopyBottom < window.innerHeight * .48
+      ? smooth((window.innerHeight * .83 - signoffTop) /
+          Math.max(1, window.innerHeight * .32)) : 0;
+    road.style.opacity = String(1 - farewell);
+
+    if (Math.abs(fraction - previousFraction) > 0.00025) {
+      // Seven translucent brush layers feather the leading ink tip. The
+      // geometric mask travels continuously, not in five jumped pieces.
+      // Narrow the tip to zero at completion so the full road is crisp.
+      const frontLength = Math.min(fraction, 0.055, (1 - fraction) * 0.55);
+      const solid = fraction - frontLength;
+      for (const {path,length,feathers} of strokes) {
+        path.style.strokeDashoffset = String(length * (1 - solid));
+        feathers.forEach((feather,index) => {
+          const tip = solid + frontLength * ((index + 1) / feathers.length);
+          feather.style.strokeDashoffset = String(length * (1 - tip));
+        });
+      }
+      previousFraction = fraction;
+      story.dataset.waymakingProgress = fraction.toFixed(3);
     }
 
     const fromTitle = narrow.matches ? [55, 75, 94] : titleDim;
@@ -122,5 +185,6 @@
   addEventListener('pageshow', schedule);
   reduced.addEventListener('change', schedule);
   narrow.addEventListener('change', schedule);
-  schedule();
+  // The mask is in the correct position from the first enhanced frame.
+  update();
 })();
