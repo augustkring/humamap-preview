@@ -1,12 +1,22 @@
 /*
- * Waymaking V14: the complete approved road is a native CSS sticky illustration
- * within a tall grid row. Only letter/paragraph focus is enhanced with JS.
- * No JavaScript writes to the road, masks, clipping or visibility.
+ * Waymaking V15. The authored SVG road is pinned by native CSS sticky. A
+ * continuous reveal stroke travels along its actual Bézier path as the five
+ * chapters scroll. Reverse scrolling reverses the drawing. No image raster,
+ * portal, arbitrary show/hide thresholds or scroll interception.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
-  if (!story || beats.length !== 5) return;
+  const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
+  if (!story || beats.length !== 5 || revealPaths.length !== 2) return;
+  const strokes = revealPaths.map(path => {
+    const length = path.getTotalLength();
+    if (!(length > 0)) return null;
+    path.style.strokeDasharray = length + ' ' + length;
+    return {path,length};
+  }).filter(Boolean);
+  if (strokes.length !== 2) return;
+  story.dataset.waymakingAnimated = 'true';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
@@ -21,6 +31,8 @@
 
   let frame = 0;
   let labels = [];
+  let previousFraction = -1;
+  const paintStages = [0.16, 0.37, 0.59, 0.80, 1];
 
   const resetText = () => {
     for (const item of labels) {
@@ -76,6 +88,9 @@
   const update = () => {
     frame = 0;
     if (reduced.matches) {
+      for (const {path} of strokes) path.style.strokeDashoffset = '0';
+      story.dataset.waymakingProgress = '1.000';
+      previousFraction = 1;
       resetText();
       return;
     }
@@ -88,15 +103,34 @@
     });
 
     let phase = 0;
-    if (focus >= centers[centers.length - 1]) {
+    let fraction = 0;
+    if (focus <= centers[0]) {
+      // Start the ink as Creative Thinking ENTERS the viewport. Do not wait
+      // until the heading is near the top and do not paint the completed road.
+      const top = beats[0].getBoundingClientRect().top;
+      const entry = smooth((window.innerHeight * 0.94 - top) /
+        Math.max(1, window.innerHeight * 0.70));
+      fraction = entry * paintStages[0];
+    } else if (focus >= centers[centers.length - 1]) {
       phase = beats.length - 1;
-    } else if (focus > centers[0]) {
+      fraction = 1;
+    } else {
       for (let i = 0; i < centers.length - 1; i++) {
         if (focus <= centers[i + 1]) {
-          phase = i + (focus - centers[i]) / Math.max(1, centers[i + 1] - centers[i]);
+          const local = clamp((focus - centers[i]) /
+            Math.max(1, centers[i + 1] - centers[i]));
+          phase = i + local;
+          fraction = paintStages[i] + (paintStages[i + 1] - paintStages[i]) * local;
           break;
         }
       }
+    }
+    if (Math.abs(fraction - previousFraction) > 0.00025) {
+      for (const {path,length} of strokes) {
+        path.style.strokeDashoffset = String(length * (1 - fraction));
+      }
+      previousFraction = fraction;
+      story.dataset.waymakingProgress = fraction.toFixed(3);
     }
 
     const fromTitle = narrow.matches ? [55, 75, 94] : titleDim;
@@ -122,5 +156,6 @@
   addEventListener('pageshow', schedule);
   reduced.addEventListener('change', schedule);
   narrow.addEventListener('change', schedule);
-  schedule();
+  // The mask is in the correct position from the first enhanced frame.
+  update();
 })();
