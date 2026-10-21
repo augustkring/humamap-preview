@@ -1,9 +1,9 @@
 /*
  * Waymaking V5: native-scroll, centered editorial chapters and painted road.
- * The ink begins IN FLOW beside Creative Thinking, travels upward with the
- * opening chapter, then pins to the TOP of the viewport for the remaining
- * Waymaking chapters. Once pinned, ONLY pigment reveal and text focus change.
- * The road exits in the blank handoff before the Waymaker conclusion.
+ * The ink is in a SINGLE immutable viewport-fixed position from its first
+ * visible frame. Its top coordinate is NEVER updated during scrolling.
+ * Native scroll controls only SVG pigment-mask progress and text emphasis.
+ * The road is confined to the five Waymaking chapters.
  * Reduced-motion and no-JavaScript visitors see the complete illustration and
  * ordinary semantic headings. The artwork retains its original pixels.
  */
@@ -22,13 +22,11 @@
       !lastHeading || !conclusion || beats.length !== 5 ||
       featherPaths.length !== 7) return;
 
-  // A true top pin, not the old center-of-screen teleport. The painting
-  // first sits 16px above Creative Thinking, scrolls UP with that title and
-  // stops at 16px from the viewport top. There is NO pin release during the
-  // five chapters. Desktop and mobile use the same viewport coordinates.
+  // A real fixed position is a CONST. Positioning an element with
+  // position:fixed while writing a new `top` on every scroll is still MOVING it.
+  // Ink begins exactly as Creative Thinking reaches this fixed screen line.
   const PIN_TOP = 16;
-  const ABOVE_TITLE = 16;
-  const startLine = () => Math.min(window.innerHeight * 0.38, 360);
+  const startLine = () => PIN_TOP + 16;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
@@ -114,42 +112,41 @@
   road.dataset.waymakingViewport = 'true';
   document.body.appendChild(road);
 
-  // Three explicit phases: hidden -> rising to the top -> pinned.
-  // A stationary fade happens only in the blank handoff before the signoff.
+  // Two states, no animated positioning: absent outside Waymaking, and
+  // physically fixed during Waymaking. Only the separate pigment mask moves.
   const updatePin = () => {
-    const height = window.innerHeight;
     const titleTop = firstHeading.getBoundingClientRect().top;
+    const lastBeatBottom = beats[beats.length - 1].getBoundingClientRect().bottom;
     const startReached = titleTop <= startLine();
 
-    const conclusionTop = conclusion.getBoundingClientRect().top;
-    const fadeStart = height * 0.88;
-    const fadeEnd = height * 0.74;
-    const departure = smooth((fadeStart - conclusionTop) /
+    // The end handoff starts only once the final chapter is leaving. A
+    // stationary fade finishes in whitespace before the Waymaker signoff.
+    const fadeStart = window.innerHeight * 0.40;
+    const fadeEnd = window.innerHeight * 0.21;
+    const departure = smooth((fadeStart - lastBeatBottom) /
       Math.max(1, fadeStart - fadeEnd));
     const opacity = 1 - departure;
-    const withinStory = startReached && conclusionTop > fadeEnd;
+    const withinStory = startReached && lastBeatBottom > fadeEnd;
 
     if (withinStory) {
-      const position = Math.max(PIN_TOP, titleTop - ABOVE_TITLE);
-      road.style.setProperty('--waymaking-viewport-top', position.toFixed(2) + 'px');
-      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
       story.dataset.waymakingPinned = 'true';
       document.body.dataset.waymakingRoadActive = 'true';
-      if (position <= PIN_TOP + 0.5) road.dataset.waymakingTopPinned = 'true';
-      else delete road.dataset.waymakingTopPinned;
+      road.style.setProperty('--waymaking-handoff-opacity', opacity.toFixed(4));
+      road.dataset.waymakingTopPinned = 'true';
     } else {
       delete story.dataset.waymakingPinned;
       delete document.body.dataset.waymakingRoadActive;
       delete road.dataset.waymakingTopPinned;
-      road.style.removeProperty('--waymaking-viewport-top');
       road.style.removeProperty('--waymaking-handoff-opacity');
     }
   };
   const update = () => {
     frame = 0;
     updatePin();
-    // If AVIF cannot load inside SVG, preserve the static matching WebP.
-    if (reduced.matches || !picture.currentSrc.endsWith('.avif')) {
+    // AVIF and WebP are both legitimate image sources. The old guard
+    // silently DISABLED painting on browsers that select the WebP fallback.
+    // The SVG's image source uses WebP for cross-browser consistency.
+    if (reduced.matches) {
       clearEnhancement();
       return;
     }
