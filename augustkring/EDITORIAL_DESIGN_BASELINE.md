@@ -1,3 +1,5 @@
+**V17 candidate (2026-10-21):** Original unchanged image sources are retained and extended into a two-part winding road using the original pixel texture and its matched painting path. Graphics stage is a BODY child using position:fixed at top:16px; scrolling updates only the SVG paint length and opacity of the entrance/exit. All five chapter min-height values are compact and consistent (~65% desktop and ~70-75% mobile of previous), with no oversized artificial gaps. Three image-generation trials produced irrelevant mockups and were rejected, not inserted. New real-browser QA must sample intermediate scroll frames and prove the artwork does not move in viewport coordinates; do not assume sticky == fixed. The route must exit before following sections.
+
 # August Kring — Approved Website Baseline
 
 Approved 2026-10-10. Tested by `node augustkring/verify-baseline.mjs`.

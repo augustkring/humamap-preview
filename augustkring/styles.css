@@ -499,12 +499,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   grid-template-columns: minmax(0, 1fr) minmax(270px, 34%) minmax(0, 1fr);
   column-gap: clamp(12px, 1.5vw, 24px);
   align-items: center;
-  min-height: clamp(310px, 46svh, 450px);
-  padding: 22px 0;
+  min-height: clamp(210px, 30svh, 298px);
+  padding: 12px 0;
 }
 .waymaking-beat:first-child {
   align-items: start;
-  padding-top: 34px;
+  padding-top: 18px;
 }
 .waymaking-copy {
   width: 100%;
@@ -553,12 +553,40 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 .waymaking-artspace {
   position: relative;
   grid-area: 1 / 1;
-  align-self: stretch;
   z-index: 0;
   min-height: 0;
   pointer-events: none;
 }
-.waymaking-road-wrap {
+/* The long original brush stays physically FIXED to one viewport coordinate.
+   Scrolling may draw the mask but NEVER update top/left/transform/size. */
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  position: fixed;
+  z-index: 0;
+  top: min(30svh, 270px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(30vw, 360px);
+  height: min(69svh, 630px);
+  clip-path: inset(var(--waymaking-entrance-clip, 0px) 0 var(--waymaking-conclusion-clip, 0px) 0);
+  margin: 0;
+  pointer-events: none;
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  display: block;
+  visibility: visible;
+  opacity: var(--waymaking-visibility-opacity, 1);
+}
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source { display: none; }
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal { display: block; }
+.home-main, .home-footer {
+  position: relative;
+  z-index: 1;
+}
+/* Progressive enhancement: original static picture remains visible with JS off. */
+.waymaking-road-wrap:not([data-waymaking-viewport="true"]) {
   position: sticky;
   top: 16px;
   width: min(35%, 390px);
@@ -587,8 +615,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   overflow: visible;
   mix-blend-mode: multiply;
 }
-.waymaking-narrative[data-waymaking-animated="true"] .waymaking-original-source { display: none; }
-.waymaking-narrative[data-waymaking-animated="true"] .waymaking-original-reveal { display: block; }
+/* The fixed-body viewport selector above selects the painted SVG. */
 @media (prefers-reduced-motion: reduce) {
   .waymaking-narrative .waymaking-original-source { display: block !important; }
   .waymaking-narrative .waymaking-original-reveal { display: none !important; }
@@ -1684,24 +1711,23 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     grid-row: 1;
     min-width: 0;
   }
-  .waymaking-road-wrap {
-    position: sticky;
-    top: 16px;
-    width: min(100%, 125px);
-    height: min(68svh, 620px);
-    margin: 0 auto;
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    left: max(var(--gutter), calc((100vw - var(--max)) / 2));
+    transform: none;
+    width: min(26vw, 235px);
+    height: min(69svh, 630px);
   }
   /* Preserve the exact same source image on mobile and desktop. */
   .waymaking-beat {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: clamp(280px, 43svh, 410px);
-    padding: 18px 0;
+    min-height: clamp(230px, 32svh, 295px);
+    padding: 10px 0;
   }
   .waymaking-beat:first-child {
     align-items: start;
-    padding-top: 28px;
+    padding-top: 14px;
   }
   .waymaking-beat:nth-child(odd) .waymaking-copy,
   .waymaking-beat:nth-child(even) .waymaking-copy {
@@ -1719,19 +1745,19 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     grid-template-columns: minmax(77px, 26%) minmax(0, 1fr);
     column-gap: 13px;
   }
-  .waymaking-road-wrap {
-    width: 100%;
-    height: min(67svh, 575px);
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    width: 25vw;
+    height: min(69svh, 630px);
   }
   .waymaking-beat {
-    min-height: clamp(270px, 42svh, 366px);
-    padding: 15px 0;
+    min-height: clamp(215px, 30svh, 275px);
+    padding: 10px 0;
   }
-  .waymaking-beat:first-child { padding-top: 24px; }
+  .waymaking-beat:first-child { padding-top: 12px; }
   .waymaking-copy h3 { font-size: clamp(21px, 5.6vw, 24px); }
-  .waymaking-copy p { font-size: 16px; line-height: 1.58; }
+  .waymaking-copy p { font-size: 16px; line-height: 1.52; }
   .waymaking-resolution {
-    margin-top: clamp(28px, 4svh, 42px);
+    margin-top: clamp(22px, 3svh, 34px);
     padding: 38px 0 68px;
   }
   .waymaking-resolution p { font-size: 26px; }
@@ -1739,7 +1765,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
-/* V16: restored exact authored raster source, SVG mask paints it progressively. */
+/* V17: original brush is long, fixed to viewport, chapters have uniform compact heights. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
