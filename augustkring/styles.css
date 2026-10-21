@@ -499,7 +499,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   grid-template-columns: minmax(0, 1fr) minmax(270px, 34%) minmax(0, 1fr);
   column-gap: clamp(12px, 1.5vw, 24px);
   align-items: center;
-  min-height: clamp(310px, 46svh, 450px);
+  min-height: clamp(202px, 30svh, 293px);
   padding: 22px 0;
 }
 .waymaking-beat:first-child {
@@ -566,6 +566,24 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   margin-inline: auto;
   pointer-events: none;
 }
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  position: fixed;
+  z-index: 0;
+  top: 16px;
+  left: 50%;
+  width: min(35vw, 390px);
+  height: min(66svh, 650px);
+  transform: translateX(-50%);
+  margin: 0;
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+}
+body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+  display: block;
+  visibility: visible;
+}
+.home-main, .home-footer { position: relative; z-index: 1; }
 /* Exact V12 source art; one original illustration, scroll-revealed. */
 .waymaking-original-source,
 .waymaking-original-source img {
@@ -1691,12 +1709,18 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     height: min(68svh, 620px);
     margin: 0 auto;
   }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    left: max(var(--gutter), calc((100vw - var(--page-width)) / 2));
+    width: min(27vw, 125px);
+    height: min(68svh, 620px);
+    transform: none;
+  }
   /* Preserve the exact same source image on mobile and desktop. */
   .waymaking-beat {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: clamp(280px, 43svh, 410px);
+    min-height: clamp(182px, 28svh, 267px);
     padding: 18px 0;
   }
   .waymaking-beat:first-child {
@@ -1723,8 +1747,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     width: 100%;
     height: min(67svh, 575px);
   }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
+    width: min(26vw, 96px);
+    height: min(67svh, 575px);
+  }
   .waymaking-beat {
-    min-height: clamp(270px, 42svh, 366px);
+    min-height: clamp(176px, 27svh, 238px);
     padding: 15px 0;
   }
   .waymaking-beat:first-child { padding-top: 24px; }

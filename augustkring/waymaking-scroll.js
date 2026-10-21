@@ -8,8 +8,13 @@
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
   const road = story?.querySelector('.waymaking-road-wrap');
   const signoff = story?.querySelector('.waymaking-resolution p');
+  const firstHeading = beats[0]?.querySelector('h3');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
-  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 1) return;
+  if (!story || !road || !signoff || !firstHeading || beats.length !== 5 || revealPaths.length !== 1) return;
+  // The original artwork is fixed to the viewport. Only the SVG reveal
+  // mask progresses with scroll; the picture never changes screen position.
+  road.dataset.waymakingViewport = 'true';
+  document.body.appendChild(road);
   const strokes = revealPaths.map(path => {
     const length = path.getTotalLength();
     const feathers = [...path.parentElement.querySelectorAll('[data-waymaking-feather]')];
@@ -94,6 +99,10 @@
     frame = 0;
     if (reduced.matches) {
       road.style.opacity = '1';
+      document.body.dataset.waymakingRoadActive =
+        story.querySelector('.waymaking-scene').getBoundingClientRect().bottom > 0 &&
+        firstHeading.getBoundingClientRect().top < window.innerHeight*.92 &&
+        signoff.getBoundingClientRect().top > 0 ? 'true' : 'false';
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
         for (const feather of feathers) feather.style.strokeDashoffset = '0';
@@ -105,6 +114,11 @@
     }
     prepareText();
 
+    const sceneRect = story.querySelector('.waymaking-scene').getBoundingClientRect();
+    const entry = firstHeading.getBoundingClientRect().top;
+    const active = sceneRect.bottom > 0 && entry < window.innerHeight * .92 &&
+      signoff.getBoundingClientRect().top > 0;
+    document.body.dataset.waymakingRoadActive = active ? 'true' : 'false';
     const focus = window.innerHeight * 0.51;
     const centers = beats.map(beat => {
       const bounds = beat.getBoundingClientRect();
