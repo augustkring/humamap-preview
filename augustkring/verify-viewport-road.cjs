@@ -169,10 +169,19 @@ async function verifyViewport(browser,engine,width){
     });
     // No image should remain physically visible once later content begins.
     for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
-      await page.locator(selector).scrollIntoViewIfNeeded();
-      await page.waitForTimeout(150);
+      const readPosition=await page.locator(selector).evaluate(element=>
+        scrollY+element.getBoundingClientRect().top-innerHeight*0.4);
+      await jump(page,readPosition);
       const visible=await paintedPixels(page);
-      assert.equal(visible,0,'Road still visible behind '+selector+' ('+visible+' pixels)');
+      if(visible>0){
+        const diagnostic=await geometry(page);
+        console.log('EXIT_DIAGNOSTIC',engine,width,selector,JSON.stringify({
+          visible,road:diagnostic.road,scene:diagnostic.scene,
+          viewportHeight:900,readingY:readPosition
+        }));
+        await page.screenshot({path:join(output,engine+'-'+width+'-exit-failed.png')});
+      }
+      assert.equal(visible,0,'Road still visible while reading '+selector+' ('+visible+' pixels)');
     }
     // Backwards scrolling restores the same art without a fade.
     await jump(page,centers[2]-450);
