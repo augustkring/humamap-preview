@@ -122,11 +122,9 @@
     const sceneRect = story.querySelector('.waymaking-scene').getBoundingClientRect();
     const box = road.getBoundingClientRect();
     const introBottom = summary?.getBoundingClientRect().bottom ?? 0;
-    const nextTop = document.querySelector('#work')?.getBoundingClientRect().top ?? window.innerHeight;
     const safeTop = Math.max(0, Math.min(box.height, introBottom + 12 - box.top));
-    const safeBottom = Math.max(0, Math.min(box.height, box.bottom - (nextTop - window.innerHeight*.9)));
     road.style.setProperty('--waymaking-safe-top',safeTop.toFixed(2)+'px');
-    road.style.setProperty('--waymaking-safe-bottom',safeBottom.toFixed(2)+'px');
+    road.style.setProperty('--waymaking-safe-bottom','0px');
     const entry = firstHeading.getBoundingClientRect().top;
     const active = sceneRect.bottom > 0 && entry < window.innerHeight * .92 &&
       signoff.getBoundingClientRect().top > 0;
