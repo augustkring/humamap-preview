@@ -55,7 +55,7 @@ for(const label of ['Creative Thinking','Commercial Understanding','Strategic Ju
 }
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 assert.ok(thread.includes('data-waymaking-vector="desktop"') && thread.includes('data-waymaking-vector="mobile"'),'Independent authored desktop/mobile vector roads are required');
-assert.equal((thread.match(/data-waymaking-reveal=/g)||[]).length,2,'SVG brush reveal paths missing');
+assert.equal((thread.match(/<path data-waymaking-reveal /g)||[]).length,2,'SVG brush reveal paths missing');
 assert.ok(!thread.includes('assets/waymaking-editorial-ink.webp'),'No low-resolution raster image may be used for Waymaking');
 for(const name of ['waymaking-vector-road-desktop-v15.svg','waymaking-vector-road-mobile-v15.svg']) {
  const vector=readFileSync(join(root,'assets',name),'utf8');
