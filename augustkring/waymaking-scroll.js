@@ -1,8 +1,7 @@
 /*
- * Waymaking V15. The authored SVG road is pinned by native CSS sticky. A
- * continuous reveal stroke travels along its actual Bézier path as the five
- * chapters scroll. Reverse scrolling reverses the drawing. No image raster,
- * portal, arbitrary show/hide thresholds or scroll interception.
+ * Waymaking V16: the exact approved original image is back.
+ * Its OWN original mask path from V12 reveals its paint progressively.
+ * No substitute vector road, no raster resampling or page-scroll hijacking.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
@@ -10,7 +9,7 @@
   const road = story?.querySelector('.waymaking-road-wrap');
   const signoff = story?.querySelector('.waymaking-resolution p');
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
-  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 2) return;
+  if (!story || !road || !signoff || beats.length !== 5 || revealPaths.length !== 1) return;
   const strokes = revealPaths.map(path => {
     const length = path.getTotalLength();
     const feathers = [...path.parentElement.querySelectorAll('[data-waymaking-feather]')];
@@ -21,7 +20,7 @@
     }
     return {path,length,feathers};
   }).filter(Boolean);
-  if (strokes.length !== 2) return;
+  if (strokes.length !== 1) return;
   story.dataset.waymakingAnimated = 'true';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
