@@ -571,7 +571,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
-  z-index: 0;
+  z-index: 10;
   top: 16px;
   left: 50%;
   width: min(35vw, 390px);
@@ -586,6 +586,12 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: block;
   visibility: visible;
+}
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source { display: none; }
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal { display: block; }
+@media (prefers-reduced-motion: reduce) {
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source { display: block; }
+  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal { display: none; }
 }
 .home-main, .home-footer { position: relative; z-index: 1; }
 /* Exact V12 source art; one original illustration, scroll-revealed. */
