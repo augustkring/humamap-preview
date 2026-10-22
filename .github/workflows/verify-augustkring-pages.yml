@@ -48,8 +48,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-path-painted-ink-v25"
-          expected_road_js="waymaking-scroll.js?v=20261022-path-painted-ink-v25"
+          expected_home="styles.css?v=20261022-path-painted-ink-v25b"
+          expected_road_js="waymaking-scroll.js?v=20261022-path-painted-ink-v25b"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -75,7 +75,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-ink-v25.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-path-painted-ink-v25' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-path-painted-ink-v25b' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal-path' /tmp/augustkring.html
           grep -Fq 'pathLength="1"' /tmp/augustkring.html
           grep -Fq 'mask-type="alpha"' /tmp/augustkring.html
@@ -125,10 +125,10 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-ink-v25.webp" -o /tmp/waymaking-ink-v25.webp
           test "$(xxd -p -l 4 /tmp/waymaking-ink-v25.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-ink-v25.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-path-painted-ink-v25" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-path-painted-ink-v25b" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
-          grep -Fq 'revealPath.style.strokeDashoffset' /tmp/waymaking-scroll.js
+          grep -Fq "revealPath.setAttribute('stroke-dashoffset'" /tmp/waymaking-scroll.js
           grep -Fq 'getPointAtLength' /tmp/waymaking-scroll.js
           grep -Fq "completedMask.setAttribute('opacity'" /tmp/waymaking-scroll.js
           grep -Fq 'Math.exp(-elapsed / 72)' /tmp/waymaking-scroll.js

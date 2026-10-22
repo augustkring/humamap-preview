@@ -87,7 +87,9 @@
 
     // The reveal follows the actual winding brush centreline.
     // The radial alpha tip can only add ink: it never erases prior paint.
-    revealPath.style.strokeDashoffset = String(1 - fraction);
+    // Use SVG's unitless presentation attribute: unitless CSS lengths are
+    // rejected by Firefox and can silently freeze the reveal.
+    revealPath.setAttribute('stroke-dashoffset', String(1 - fraction));
     if (fraction > 0 && fraction < 1) {
       const point = revealPath.getPointAtLength(routeLength * fraction);
       brushTip.setAttribute('cx', point.x.toFixed(2));
