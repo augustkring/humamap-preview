@@ -218,7 +218,18 @@ async function runOne(browser,engine,width) {
        const r=el.getBoundingClientRect();
        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
      });
-     assert.equal(overlap(state.road,heading),0,'Fixed ink obscures My current focus heading');
+     const collision=overlap(state.road,heading);
+     if(collision>0){
+       const details=await page.evaluate(()=>({
+         heading:document.querySelector('#work-title').getBoundingClientRect().toJSON(),
+         next:document.querySelector('#work').getBoundingClientRect().toJSON(),
+         signoff:document.querySelector('.waymaking-resolution p').getBoundingClientRect().toJSON(),
+         purpose:document.querySelector('.waymaking-purpose .waymaking-copy').getBoundingClientRect().toJSON()
+       }));
+       console.log('LAST_CHAPTER_LAYOUT_COLLISION',engine,width,JSON.stringify({road:state.road,collision,details}));
+       await page.screenshot({path:join(output,engine+'-'+width+'-collision-debug.png')});
+     }
+     assert.equal(collision,0,'Fixed ink obscures My current focus heading');
    }
    if(i>0)assert.ok(state.fraction>stages[i-1].fraction+.10,
      'Road did NOT grow into '+labels[i]+', previous '+stages[i-1].fraction+' next '+state.fraction);
