@@ -13,6 +13,7 @@ on:
       - "augustkring/assets/waymaking-ink-road-brush-mobile.png"
       - "augustkring/assets/waymaking-editorial-ink.avif"
       - "augustkring/assets/waymaking-editorial-ink.webp"
+      - "augustkring/assets/waymaking-brush-head-v24.png"
       - "augustkring/waymaking-scroll.js"
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
@@ -46,8 +47,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-organic-waymaking-v23"
-          expected_road_js="waymaking-scroll.js?v=20261022-organic-waymaking-v23"
+          expected_home="styles.css?v=20261022-textured-brush-v24"
+          expected_road_js="waymaking-scroll.js?v=20261022-textured-brush-v24"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,8 +74,9 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-ink-v22.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-organic-waymaking-v23' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-textured-brush-v24' /tmp/augustkring.html
           grep -Fq '<g data-waymaking-brush-front' /tmp/augustkring.html
+          grep -Fq 'waymaking-brush-head-v24.png' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
@@ -114,10 +116,13 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.avif" -o /tmp/waymaking-editorial-ink.avif
           test "$(xxd -p -s 4 -l 8 /tmp/waymaking-editorial-ink.avif)" = "6674797061766966"
           test "$(wc -c < /tmp/waymaking-editorial-ink.avif)" -gt 4000
+          curl -fsSL --max-time 20 "${base}assets/waymaking-brush-head-v24.png" -o /tmp/waymaking-brush-head-v24.png
+          test "$(xxd -p -l 8 /tmp/waymaking-brush-head-v24.png)" = "89504e470d0a1a0a"
+          test "$(wc -c < /tmp/waymaking-brush-head-v24.png)" -gt 20000
           curl -fsSL --max-time 20 "${base}assets/waymaking-ink-v22.webp" -o /tmp/waymaking-ink-v22.webp
           test "$(xxd -p -l 4 /tmp/waymaking-ink-v22.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-ink-v22.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-organic-waymaking-v23" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-textured-brush-v24" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq "maskBody.setAttribute('height'" /tmp/waymaking-scroll.js
@@ -325,7 +330,7 @@ jobs:
                       artspaceDocumentTop:scrollY+art.top,
                       texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
                       solid:parseFloat(body.getAttribute('height')),
-                      brushLength:numbers?Number(numbers[2])*210:NaN,
+                      brushLength:numbers?Number(numbers[2])*260:NaN,
                       brushStart:numbers?Number(numbers[1]):NaN,
                       animated:story.dataset.waymakingAnimated==='true',
                       position:getComputedStyle(road).position,

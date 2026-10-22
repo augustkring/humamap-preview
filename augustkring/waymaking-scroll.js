@@ -1,6 +1,6 @@
 /*
  * Waymaking V22. The ink remains in its document-anchored artspace.
- * A lightweight irregular brush-head mask follows a continuous scroll coordinate.
+ * A pre-rendered transparent dry-brush texture reveals continuously along the scroll.
  * Text becomes legible near the middle of the reading viewport and never
  * dims after being passed. State follows scroll in either direction.
  */
@@ -79,9 +79,12 @@
   };
 
   const paintRoad = progress => {
-    if (Math.abs(progress - renderedProgress) < 0.00025) return;
+    // Always commit terminal 0/1 states: tiny interpolation differences must
+    // not leave a supposedly completed road permanently at 99.99%.
+    if (progress > 0 && progress < 1 &&
+        Math.abs(progress - renderedProgress) < 0.00025) return;
     const reveal = clamp(progress) * ROAD_VIEWBOX_HEIGHT;
-    const feather = Math.min(210, reveal, ROAD_VIEWBOX_HEIGHT - reveal);
+    const feather = Math.min(260, reveal, ROAD_VIEWBOX_HEIGHT - reveal);
     const solid = reveal - feather;
 
     // The solid ink meets a soft, irregular brush silhouette with no
@@ -90,7 +93,7 @@
     maskFront.setAttribute(
       'transform',
       'translate(0 ' + solid.toFixed(2) + ') scale(1 ' +
-        (feather / 210).toFixed(5) + ')'
+        (feather / 260).toFixed(5) + ')'
     );
 
     renderedProgress = progress;

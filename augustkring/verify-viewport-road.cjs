@@ -54,7 +54,7 @@ async function checkpoint(page) {
       animated:story.dataset.waymakingAnimated==='true',
       maskSolid:parseFloat(mask.getAttribute('height')),
       brushHeadTop:numbers?Number(numbers[1]):NaN,
-      brushHeadLength:numbers?Number(numbers[2])*210:NaN,
+      brushHeadLength:numbers?Number(numbers[2])*260:NaN,
       featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
       emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
       headingColors:beats.map(x=>getComputedStyle(x.querySelector('h3')).color),
@@ -148,7 +148,7 @@ async function runOne(browser,engine,width) {
     assert.equal(initial.roadParent,true,'Road must stay inside .waymaking-artspace');
     assert.equal(initial.sourceViewHeight,2148,'Extended original artwork changed');
     assert.equal(initial.scaling,1,'SVG must use preserveAspectRatio="none"');
-    assert.equal(initial.imagePieces,1,'Road must use one unbroken generated image');
+    assert.equal(initial.imagePieces,2,'One original ink image and one organic brush-mask image are required');
     assert.equal(initial.imageSource,'assets/waymaking-ink-v22.webp');
     assert.equal(initial.animatedOriginal,'assets/waymaking-ink-v22.webp');
     assert.equal(initial.opaqueRect,false,'Road may not have a rectangular backing');
@@ -258,7 +258,7 @@ async function runOne(browser,engine,width) {
     await page.waitForTimeout(400);
     const after=await checkpoint(page);
     assert.equal(after.position,'absolute');
-    assert.equal(after.fraction,1,'Completed road must stay at 100%');
+    assert.equal(after.fraction,1,'Completed road must commit the exact 100% state');
     const workTitleTop=await page.locator('#work-title').evaluate(el=>el.getBoundingClientRect().top);
     assert.ok(after.road.bottom<=workTitleTop-24,
       'Ink overlaps My current focus instead of ending above its heading');
