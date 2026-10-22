@@ -1750,6 +1750,10 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   .waymaking-copy h3 { font-size: 24px; }
   .waymaking-copy p { font-size: 18px; }
   .waymaking-resolution { padding-top: 38px; width: min(100%, 290px); }
+  /* At tablet widths the next page heading shares the left rail with
+     the fixed ink. Give it enough post-conclusion breathing space to
+     enter AFTER the visual ink area, without adding space before Waymaker. */
+  .work-section--waymaking-output { padding-top: clamp(112px, 14svh, 152px); }
 }
 @media (max-width: 600px) {
   .waymaking-narrative { margin-top: 26px; }
