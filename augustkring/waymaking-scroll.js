@@ -130,8 +130,8 @@
     // Complete while the fifth Waymaking chapter is still being read.
     // Beyond this point progress is clamped at 1 and never changes again.
     const end = Math.max(
-      start + Math.max(720, viewportHeight * 1.35),
-      finalCenter - viewportHeight * 0.18,
+      start + Math.max(480, viewportHeight * 0.72),
+      finalCenter - viewportHeight * 0.28,
     );
 
     range = { start, end };
