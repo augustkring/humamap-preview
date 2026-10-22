@@ -549,13 +549,19 @@ jobs:
                   const focus = await page.evaluate(() => {
                     const button=document.querySelector('[data-mobile-nav-close]');
                     const style=getComputedStyle(button);
-                    return {onClose:document.activeElement===button,outline:style.outlineStyle,shadow:style.boxShadow,fill:style.backgroundColor};
+                    const marker=document.createElement('span');
+                    marker.style.color='var(--red)';
+                    document.body.append(marker);
+                    const red=getComputedStyle(marker).color;
+                    marker.remove();
+                    return {onClose:document.activeElement===button,outline:style.outlineStyle,outlineColor:style.outlineColor,shadow:style.boxShadow,fill:style.backgroundColor,red};
                   });
                   console.log('Mobile menu keyboard focus',width,focus);
                   assert.equal(focus.onClose,true,'Keyboard navigation focuses close control');
-                  assert.equal(focus.outline,'none','Keyboard focus never draws a frame');
-                  assert.equal(focus.shadow,'none','Keyboard focus never draws a shadow ring');
-                  assert.notEqual(focus.fill,'rgba(0, 0, 0, 0)','Keyboard focus remains visibly indicated by a soft fill');
+                  assert.equal(focus.outline,'solid','Keyboard focus must remain visibly accessible');
+                  assert.equal(focus.outlineColor,focus.red,'Keyboard focus indicator must be red, never navy');
+                  assert.equal(focus.shadow,'none','Keyboard focus must not create a shadow ring');
+                  assert.equal(focus.fill,'rgba(0, 0, 0, 0)','Keyboard focus must not create a dark fill');
                   await page.keyboard.press('Escape');
                   await page.waitForFunction(() => !document.querySelector('#mobile-menu').open && document.querySelector('[data-mobile-nav-open]').getAttribute('aria-expanded') === 'false');
                   assert.equal(await page.locator('[data-mobile-nav-open]').getAttribute('aria-expanded'),'false');
