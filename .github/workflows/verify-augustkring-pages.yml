@@ -328,6 +328,14 @@ jobs:
                   assert.equal(state.fullHeight,1,'Extended original is not using full fixed viewport height');
                   assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
                   assert.equal(state.animated,true,'Progressive scroll controller failed');
+                  console.log('Waymaking stage', width, index, {
+                    fraction:state.fraction,
+                    scrollY:await page.evaluate(()=>window.scrollY),
+                    introBottom:state.intro.bottom,
+                    firstHeadingTop:state.firstHeading.top,
+                    sceneTop:state.scene.top,
+                    routeTop:state.route.top
+                  });
                   assert.ok(state.fraction>=.09&&state.fraction<=1,
                     'Path did not reach correct drawing stage');
                   const brushFront=Math.min(state.fraction,.055,(1-state.fraction)*.55);
