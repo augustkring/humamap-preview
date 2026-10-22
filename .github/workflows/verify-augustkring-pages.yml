@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-fixed-persistent-road-v20e"
-          expected_road_js="waymaking-scroll.js?v=20261022-fixed-persistent-road-v20e"
+          expected_home="styles.css?v=20261022-document-anchored-road-v21"
+          expected_road_js="waymaking-scroll.js?v=20261022-document-anchored-road-v21"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,7 +73,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-fixed-persistent-road-v20e' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-document-anchored-road-v21' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -93,7 +93,9 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'position: fixed;' /tmp/augustkring.css
+          grep -Fq '.waymaking-road-wrap {' /tmp/augustkring.css
+          grep -Fq 'position: absolute;' /tmp/augustkring.css
+          ! grep -Fq 'body > .waymaking-road-wrap' /tmp/augustkring.css
           grep -Fq '.waymaking-original-source' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
           grep -Fq '.waymaking-original-reveal' /tmp/augustkring.css
@@ -115,18 +117,20 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-fixed-persistent-road-v20e" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-document-anchored-road-v21" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const scheduleUpdate = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
           grep -Fq 'getTotalLength()' /tmp/waymaking-scroll.js
           grep -Fq 'paintStages = [0.16, 0.37, 0.59, 0.80, 1]' /tmp/waymaking-scroll.js
           grep -Fq 'const progressState = () =>' /tmp/waymaking-scroll.js
-          grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
+          ! grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
+          grep -Fq 'road.dataset.waymakingDocument' /tmp/waymaking-scroll.js
           ! grep -Fq 'updateBackdropClip' /tmp/waymaking-scroll.js
           ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
           ! grep -Fq "!picture.currentSrc.endsWith('.avif')" /tmp/waymaking-scroll.js
           ! grep -Fq 'waymakingRoadActive' /tmp/waymaking-scroll.js
+          ! grep -Fq 'data-waymaking-viewport' /tmp/waymaking-scroll.js
           ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
           ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
@@ -278,39 +282,43 @@ jobs:
                   'Creative Thinking','Commercial Understanding','Strategic Judgment',
                   'AI-Native Building','Purpose Driven'
                 ]);
+                const expectedStages=[.16,.37,.59,.80,1];
                 const stages=[];
+                let documentTop=null;
+                let previousTop=null;
+                let previousScroll=null;
                 for(let index=0;index<5;index++){
                   await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
                     positions.centers[index]-900*.16);
                   await page.waitForTimeout(170);
                   const state=await page.evaluate(()=>{
                     const story=document.querySelector('[data-waymaking-story]');
-                    const road=document.querySelector('body > .waymaking-road-wrap[data-waymaking-viewport="true"]');
+                    const road=document.querySelector('.waymaking-artspace > .waymaking-road-wrap');
+                    const artspace=document.querySelector('.waymaking-artspace');
                     const svg=road.querySelector('.waymaking-original-reveal');
                     const mask=svg.querySelector('[data-waymaking-reveal]');
-                  const fullHeight=svg.preserveAspectRatio.baseVal.align;
                     const beatCopies=[...story.querySelectorAll('.waymaking-copy')];
                     const box=x=>{
                       const b=x.getBoundingClientRect();
                       return {top:b.top,left:b.left,right:b.right,bottom:b.bottom,
                         width:b.width,height:b.height};
                     };
+                    const route=box(road);
+                    const art=box(artspace);
                     return {
                       fraction:Number(story.dataset.waymakingProgress),
-                      route:box(road),
-                      firstHeading:box(story.querySelector('.waymaking-beat h3')),
-                      scene:box(story.querySelector('.waymaking-scene')),
-                      intro:box(document.querySelector('.thread-summary')),
+                      scrollY,
+                      route,
+                      artspace:art,
+                      routeDocumentTop:scrollY+route.top,
+                      artspaceDocumentTop:scrollY+art.top,
                       texts:beatCopies.map(box),
                       maskLength:mask.getTotalLength(),
-                      fullHeight,
                       featherCount:svg.querySelectorAll('[data-waymaking-feather]').length,
                       maskOffset:parseFloat(mask.style.strokeDashoffset),
                       animated:story.dataset.waymakingAnimated==='true',
-                      sticky:getComputedStyle(road).position==='sticky',
-                      fixed:getComputedStyle(road).position==='fixed',
-                      clipTop:parseFloat(road.style.getPropertyValue('--waymaking-intro-clip'))||0,
-                      parent:road.parentElement===document.body,
+                      position:getComputedStyle(road).position,
+                      parent:road.parentElement===artspace,
                       approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
                       approvedPaint:svg.querySelector('image')?.getAttribute('href'),
                       opaqueBacking:!!svg.querySelector('rect,foreignObject'),
@@ -318,49 +326,37 @@ jobs:
                       opacity:Number(getComputedStyle(road).opacity)
                     };
                   });
-                  assert.equal(state.sticky,false,'Road must not be sticky');
-                  assert.equal(state.fixed,true,'Road must be fixed on screen');
-                  assert.ok(Math.abs(state.route.top-16)<1,'Fixed road is moving during native scrolling');
+                  assert.equal(state.position,'absolute','Road must be document-anchored, never viewport-fixed');
+                  assert.equal(state.parent,true,'Road must stay inside the Waymaking artspace');
                   assert.equal(state.opacity,1,'Whole-road fade is forbidden');
-                  assert.equal(state.parent,true,'Road must be portaled to document.body');
                   assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
                   assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
-                  assert.equal(state.fullHeight,1,'Extended original is not using full fixed viewport height');
                   assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
                   assert.equal(state.animated,true,'Progressive scroll controller failed');
-                  console.log('Waymaking stage', width, index, {
-                    fraction:state.fraction,
-                    scrollY:await page.evaluate(()=>window.scrollY),
-                    introBottom:state.intro.bottom,
-                    firstHeadingTop:state.firstHeading.top,
-                    sceneTop:state.scene.top,
-                    routeTop:state.route.top
-                  });
-                  assert.ok(state.fraction>=.09&&state.fraction<=1,
-                    'Path did not reach correct drawing stage');
+                  assert.ok(Math.abs(state.fraction-expectedStages[index])<.035,
+                    'Wrong road drawing stage at '+positions.titles[index]+': '+state.fraction);
                   const brushFront=Math.min(state.fraction,.055,(1-state.fraction)*.55);
                   const maskExpected=state.maskLength*(1-(state.fraction-brushFront));
                   assert.equal(state.featherCount,7,'Feathered organic route must have seven brush layers');
                   assert.ok(Math.abs(state.maskOffset-maskExpected)<state.maskLength*.008,
-                    'Visible SVG does not reflect actual feathered path progress');
-                  if(index>0){
-                    assert.ok(state.fraction>stages[index-1].fraction+.10,
-                      'Road did not grow when chapter changed');
-                    assert.ok(Math.abs(state.route.top-16)<1,'Road is not stationary while chapters pass');
-                  } else {
-                    assert.ok(Math.abs(state.firstHeading.top-state.scene.top)<110,
-                      'Creative Thinking starts too far below the beginning of the story');
+                    'Visible SVG does not reflect actual path progress');
+                  if(documentTop===null) documentTop=state.routeDocumentTop;
+                  assert.ok(Math.abs(state.routeDocumentTop-documentTop)<1,
+                    'Road changed its document position while scrolling');
+                  assert.ok(Math.abs(state.routeDocumentTop-state.artspaceDocumentTop)<1,
+                    'Road drifted away from its Waymaking background anchor');
+                  if(previousTop!==null){
+                    assert.ok(state.scrollY>previousScroll,'Scroll did not advance');
+                    assert.ok(state.route.top<previousTop-40,
+                      'Road is still pinned to the viewport instead of scrolling with the page');
                   }
-                  assert.ok(state.opacity>.99,'The artwork must not fade under the chapter text');
+                  previousTop=state.route.top;
+                  previousScroll=state.scrollY;
                   const overlap=(x,y)=>
                     Math.max(0,Math.min(x.right,y.right)-Math.max(x.left,y.left))*
                     Math.max(0,Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top));
                   for(const copy of state.texts){
                     assert.equal(overlap(state.route,copy),0,'Road overlaps readable copy');
-                  }
-                  if(overlap(state.route,state.intro)>0){
-                    assert.ok(state.intro.bottom<=state.route.top+1,
-                      'Road activated before preceding introduction had cleared');
                   }
                   assert.equal(state.overflow,false,'Horizontal overflow');
                   stages.push(state);
@@ -370,33 +366,20 @@ jobs:
                 }
                 assert.ok(stages.at(-1).fraction-stages[0].fraction>.80,
                   'Road is not visibly expanding across the five chapters');
-                const conclusionGap=await page.evaluate(()=>{
-                  const last=document.querySelector('.waymaking-purpose .waymaking-copy').getBoundingClientRect();
-                  const signoff=document.querySelector('.waymaking-resolution').getBoundingClientRect();
-                  return signoff.top-last.bottom;
-                });
-                assert.ok(conclusionGap>10&&conclusionGap<475,
-                  'Waymaker conclusion has an artificial empty screen: '+conclusionGap);
-                for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']){
-                  const y=await page.locator(selector).first().evaluate(el=>
-                    scrollY+el.getBoundingClientRect().top-innerHeight*.42);
-                  await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),y);
-                  await page.waitForTimeout(130);
-                  const aftermath=await page.locator('.waymaking-road-wrap').evaluate(el=>({
-                    top:el.getBoundingClientRect().top,
-                    opacity:Number(getComputedStyle(el).opacity),
-                    display:getComputedStyle(el).display,
-                    visibility:getComputedStyle(el).visibility,
-                    fixed:getComputedStyle(el).position==='fixed',
-                    progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress)
-                  }));
-                  assert.equal(aftermath.display,'block','Completed road disappeared before '+selector);
-                  assert.equal(aftermath.visibility,'visible','Completed road became hidden before '+selector);
-                  assert.equal(aftermath.fixed,true,'Completed road stopped being fixed before '+selector);
-                  assert.ok(Math.abs(aftermath.top-16)<1,'Completed road moved before '+selector);
-                  assert.equal(aftermath.opacity,1,'Completed road faded before '+selector);
-                  assert.equal(aftermath.progress,1,'Completed road no longer stays at 100% before '+selector);
-                }
+
+                const workY=await page.locator('#work-title').evaluate(el=>
+                  scrollY+el.getBoundingClientRect().top-innerHeight*.30);
+                await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),workY);
+                await page.waitForTimeout(130);
+                const aftermath=await page.locator('.waymaking-road-wrap').evaluate(el=>({
+                  bottom:el.getBoundingClientRect().bottom,
+                  position:getComputedStyle(el).position,
+                  progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress)
+                }));
+                assert.equal(aftermath.position,'absolute','Road changed positioning after Waymaking');
+                assert.equal(aftermath.progress,1,'Completed road must remain at 100%');
+                assert.ok(aftermath.bottom<=1,'Road leaked into My current focus instead of scrolling away');
+
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
                 assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
