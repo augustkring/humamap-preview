@@ -1,5 +1,5 @@
 /*
- * Waymaking V25. The ink remains in its document-anchored artspace.
+ * Waymaking V26. The ink remains in its document-anchored artspace.
  * One high-resolution tapered ink source is revealed along its own curved midline.
  * Text becomes legible near the middle of the reading viewport and never
  * dims after being passed. State follows scroll in either direction.
@@ -53,22 +53,24 @@
     }
     const viewportHeight = Math.max(1, window.innerHeight);
     const roadBounds = road.getBoundingClientRect();
-    const lastBounds = beats[beats.length - 1].getBoundingClientRect();
     if (roadBounds.height <= 0) return 0;
 
-    // The artwork is anchored to the document. Start just before Creative
-    // Thinking, paint continuously with scroll and complete while Purpose
-    // Driven is still at the natural reading position (not below the fold).
-    const origin = window.scrollY + roadBounds.top;
-    const finalChapterCentre =
-      window.scrollY + lastBounds.top + lastBounds.height * 0.5;
-    const startScroll = origin - viewportHeight * 0.64;
+    // Enter at zero ink when Creative Thinking reaches the lower reading area,
+    // and finish only once the final paragraph has been read. The anchors
+    // adapt to copy length, viewport height, font reflow and mobile spacing.
+    const firstHeadingTop =
+      window.scrollY + content[0].heading.getBoundingClientRect().top;
+    const lastParagraphBottom =
+      window.scrollY + content[content.length - 1].paragraph.getBoundingClientRect().bottom;
+    const startScroll = firstHeadingTop -
+      viewportHeight * (narrow.matches ? 0.76 : 0.82);
     const finishScroll = Math.max(
-      startScroll + viewportHeight * 0.75,
-      finalChapterCentre - viewportHeight * 0.58
+      startScroll + viewportHeight * 1.2,
+      lastParagraphBottom - viewportHeight * (narrow.matches ? 0.36 : 0.43)
     );
-    return clamp((window.scrollY - startScroll) /
+    const raw = clamp((window.scrollY - startScroll) /
       Math.max(1, finishScroll - startScroll));
+    return easing(raw);
   };
 
   const textTarget = heading => {
@@ -94,7 +96,10 @@
       const point = revealPath.getPointAtLength(routeLength * fraction);
       brushTip.setAttribute('cx', point.x.toFixed(2));
       brushTip.setAttribute('cy', point.y.toFixed(2));
-      brushTip.setAttribute('opacity', '1');
+      // Avoid the instant large circle caused by a round 148px brush tip.
+      // Start with a thin ink fibre and gradually introduce the soft tip.
+      const tipWeight = easing((fraction - 0.012) / 0.065);
+      brushTip.setAttribute('opacity', (tipWeight * 0.52).toFixed(3));
     } else {
       brushTip.setAttribute('opacity', '0');
     }

@@ -1754,7 +1754,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-copy-column {
     z-index: 1;
-    padding-bottom: clamp(52px, 6svh, 76px);
+    padding-bottom: clamp(44px, 5svh, 60px);
   }
   .waymaking-artspace { z-index: 0; }
   .waymaking-road-wrap {
@@ -1774,8 +1774,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     align-items: center;
     justify-content: stretch;
     width: 100%;
-    min-height: clamp(192px, 30svh, 264px);
-    padding: 24px 0;
+    min-height: clamp(174px, 26svh, 234px);
+    padding: 19px 0;
   }
   .waymaking-beat:nth-child(odd) .waymaking-copy,
   .waymaking-beat:nth-child(even) .waymaking-copy {
@@ -1796,8 +1796,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   .waymaking-road-wrap { width: min(48%, 205px); opacity: .21; }
   .waymaking-beat,
   .waymaking-beat:first-child {
-    min-height: clamp(205px, 33svh, 280px);
-    padding: 24px 0;
+    min-height: clamp(170px, 25svh, 220px);
+    padding: 18px 0;
   }
 }
 /* V25 ink reveal: one lightweight path-dash mask and one feathered brush tip.

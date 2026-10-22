@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"1ca4ad73","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"11ec6d6a","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -78,7 +78,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261022-path-painted-ink-v25b'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v26'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -95,7 +95,7 @@ assert.ok(css.includes('-webkit-tap-highlight-color: transparent;') && css.inclu
 assert.ok(!css.includes('.waymaking-resolution'),'Deleted Waymaker conclusion must not reserve spacing');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
-assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('finishScroll'),'One continuous scroll-coordinate reveal must complete beside Purpose Driven');
+assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('lastParagraphBottom') && scrollController.includes('return easing(raw)'),'Continuous painted route must begin gradually and finish after the final paragraph');
 assert.ok(scrollController.includes("revealPath.setAttribute('stroke-dashoffset'") && scrollController.includes('getPointAtLength'),'Path-following paint must use one stroke and its true arc distance');
 assert.ok(scrollController.includes("completedMask.setAttribute('opacity'"),'Complete state must preserve all bottom ink fibres');
 assert.ok(scrollController.includes('Math.exp(-elapsed / 72)') && scrollController.includes('Math.exp(-elapsed / 58)'),'Frame-time road and text smoothing must be present');
