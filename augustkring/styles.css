@@ -1764,7 +1764,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     left: 0;
     width: min(40vw, 150px);
-    height: min(65svh, 585px);
+    height: min(62svh, 558px);
   }
   .waymaking-beat {
     min-height: clamp(176px, 27svh, 238px);
@@ -1785,7 +1785,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
     line-height: 1.22;
     overflow-wrap: anywhere;
   }
-  .work-section--waymaking-output { padding-top: 90px; }
+  .work-section--waymaking-output { padding-top: 120px; }
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
