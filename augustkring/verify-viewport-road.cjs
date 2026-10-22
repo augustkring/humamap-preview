@@ -264,7 +264,15 @@ async function runOne(browser,engine,width) {
    if(pixels>0){
     const state=await checkpoint(page);
     const coords=await page.evaluate(()=>({scrollY,viewportHeight:innerHeight}));
-    console.log('EXIT_FAIL_DIAGNOSTIC',engine,width,selector,JSON.stringify({pixels,road:state.road,scene:state.scene,intro:state.intro,coords,storyGap:state.endTop-state.lastCopyBottom}));
+    const bounds=await page.evaluate(()=>{
+      const r=x=>document.querySelector(x).getBoundingClientRect();
+      return {finalCopyBottom:r('.waymaking-purpose .waymaking-copy').bottom,
+        signoffTop:r('.waymaking-resolution p').top,
+        workTop:r('#work').top,workHeadingTop:r('#work-title').top,
+        introBottom:r('.thread-summary').bottom,
+        isActive:document.body.dataset.waymakingRoadActive};
+    });
+    console.log('EXIT_FAIL_DIAGNOSTIC',engine,width,selector,JSON.stringify({pixels,road:state.road,scene:state.scene,intro:state.intro,coords,storyGap:state.endTop-state.lastCopyBottom,bounds}));
     await page.screenshot({path:join(output,engine+'-'+width+'-exit-debug.png'),animations:'disabled'});
    }
    assert.equal(pixels,0,'Road continued under '+selector+': '+pixels+' rendered pixels');
