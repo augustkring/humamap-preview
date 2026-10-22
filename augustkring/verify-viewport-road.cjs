@@ -173,7 +173,7 @@ async function runOne(browser,engine,width) {
     let previousScrollY=null;
 
     for(let i=0;i<5;i++) {
-      await scroll(page,middles[i]-900*.16);
+      await scroll(page,middles[i]-900*.52);
       await page.waitForTimeout(400);
       const state=await checkpoint(page);
       assert.equal(state.animated,true,'No working motion controller');
@@ -184,6 +184,7 @@ async function runOne(browser,engine,width) {
       assert.equal(state.overflow,false);
       assert.ok(state.fraction>=0&&state.fraction<=1,'Road must remain clamped');
       if(i===0) assert.ok(state.fraction>.015,'First brush segment missing at Creative Thinking');
+      console.log('Waymaking reading stage',engine,width,i,state.fraction,state.emphasis);
       if(i>0) assert.ok(state.fraction>stages[i-1].fraction+.045,
         'Road is stalling between chapters instead of painting continuously');
       assert.equal(state.featherCount,0,'Expensive legacy feather paths returned');
@@ -250,7 +251,7 @@ async function runOne(browser,engine,width) {
 
     // Reverse scrolling restores the same chapter fraction while the road
     // remains anchored to the exact same document coordinates.
-    await scroll(page,middles[2]-900*.16);
+    await scroll(page,middles[2]-900*.52);
     await page.waitForTimeout(400);
     const restored=await checkpoint(page);
     assert.ok(Math.abs(restored.fraction-stages[2].fraction)<0.018);
@@ -263,8 +264,8 @@ async function runOne(browser,engine,width) {
     // Sample between the named chapters. The old implementation looked jerky
     // because it was gated to five discrete waypoints.
     const inBetween=[];
-    const from=middles[0]-900*.16;
-    const to=middles[4]-900*.16;
+    const from=middles[0]-900*.52;
+    const to=middles[4]-900*.52;
     for(let step=0;step<=16;step++) {
       await scroll(page,from+(to-from)*step/16);
       await page.waitForTimeout(215);
@@ -280,7 +281,7 @@ async function runOne(browser,engine,width) {
     assert.ok(new Set(inBetween.map(x=>x.toFixed(3))).size>=14,
       'Road is still appearing in discrete steps');
     // Scroll back through the chapters without losing the document anchor.
-    await scroll(page,middles[2]-900*.16);
+    await scroll(page,middles[2]-900*.52);
     await page.waitForTimeout(350);
     if(width===320) {
       await page.evaluate(()=>{
