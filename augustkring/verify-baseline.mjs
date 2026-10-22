@@ -81,7 +81,7 @@ assert.ok(license.includes('MIT License'),'Existing original artwork license att
 assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
-assert.ok(css.includes('.waymaking-scene') && css.includes('position: sticky;'),'Editorial sticky image composition missing');
+assert.ok(css.includes('.waymaking-scene') && css.includes('.waymaking-artspace') && css.includes('.waymaking-road-wrap {\n  position: absolute;'),'Document-anchored Waymaking composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate copy layout missing');
 assert.ok(css.includes('.waymaking-original-source')&&css.includes('.waymaking-original-reveal'),'Restored source/fallback styling missing');
 assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.includes('top: 0;\n  bottom: 0;'),'Road must be document-anchored inside the Waymaking artspace');
