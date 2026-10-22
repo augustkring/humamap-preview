@@ -42,7 +42,6 @@
     const v = clamp(value);
     return v * v * (3 - 2 * v);
   };
-  const pageTop = element => window.scrollY + element.getBoundingClientRect().top;
 
   const titleDim = [92, 107, 122];
   const titleActive = [11, 34, 61];
@@ -55,7 +54,7 @@
   let frame = 0;
   let labels = [];
   let previousFraction = -1;
-  let range = { start: 0, end: 1 };
+  const paintStages = [0.16, 0.37, 0.59, 0.80, 1];
 
   const resetText = () => {
     for (const item of labels) {
@@ -110,44 +109,47 @@
     return Math.min(entering, leaving);
   };
 
-  const measure = () => {
+  const progressState = () => {
     const viewportHeight = Math.max(1, window.innerHeight);
-    const introBounds = summary.getBoundingClientRect();
-    const firstBounds = firstHeading.getBoundingClientRect();
-    const finalBounds = finalCopy.getBoundingClientRect();
+    const focus = viewportHeight * 0.16;
+    const summaryBottom = summary.getBoundingClientRect().bottom;
+    const centers = beats.map(beat => {
+      const bounds = beat.getBoundingClientRect();
+      return bounds.top + bounds.height * 0.5;
+    });
 
-    const introBottom = window.scrollY + introBounds.bottom;
-    const firstTop = window.scrollY + firstBounds.top;
-    const finalCenter = window.scrollY + finalBounds.top + finalBounds.height * 0.5;
+    // The ink can only begin once the preceding "Where I add value" copy has
+    // cleared the fixed 16px road origin. Fade-in is not used: a short
+    // clearance ramp grows the mask itself from zero, so there is no pop.
+    const clearance = smooth((16 - summaryBottom) /
+      Math.max(56, viewportHeight * 0.08));
+    if (clearance <= 0) return { fraction: 0, phase: 0 };
 
-    // Do not reveal ink while "Where I add value" can still occupy the
-    // fixed road origin. With the current rhythm this places the first ink
-    // just above Creative Thinking rather than over the preceding copy.
-    const introClearStart = introBottom - 16 + 12;
-    const creativeStart = firstTop - Math.min(116, Math.max(72, viewportHeight * 0.11));
-    const start = Math.max(0, introClearStart, creativeStart);
+    let phase = 0;
+    let fraction = 0;
 
-    // Complete while the fifth Waymaking chapter is still being read.
-    // Beyond this point progress is clamped at 1 and never changes again.
-    const end = Math.max(
-      start + Math.max(480, viewportHeight * 0.72),
-      finalCenter - viewportHeight * 0.28,
-    );
+    if (focus <= centers[0]) {
+      const firstTop = beats[0].getBoundingClientRect().top;
+      const entry = smooth((viewportHeight * 0.94 - firstTop) /
+        Math.max(1, viewportHeight * 0.70));
+      fraction = entry * paintStages[0] * clearance;
+    } else if (focus >= centers[centers.length - 1]) {
+      phase = beats.length - 1;
+      fraction = 1;
+    } else {
+      for (let index = 0; index < centers.length - 1; index += 1) {
+        if (focus <= centers[index + 1]) {
+          const local = clamp((focus - centers[index]) /
+            Math.max(1, centers[index + 1] - centers[index]));
+          phase = index + local;
+          fraction = paintStages[index] +
+            (paintStages[index + 1] - paintStages[index]) * local;
+          break;
+        }
+      }
+    }
 
-    range = { start, end };
-    road.dataset.waymakingStart = start.toFixed(2);
-    road.dataset.waymakingEnd = end.toFixed(2);
-  };
-
-  const roadFraction = () => {
-    if (reduced.matches) return window.scrollY >= range.start ? 1 : 0;
-    const raw = clamp((window.scrollY - range.start) /
-      Math.max(1, range.end - range.start));
-    if (raw <= 0 || raw >= 1) return raw;
-    // A brush mark should become legible early, then keep growing rather than
-    // appearing as a late linear sliver. This easing changes reveal speed only;
-    // start/end coordinates and the fixed artwork position remain unchanged.
-    return Math.pow(raw, 0.75);
+    return { fraction: clamp(fraction), phase };
   };
 
   const paint = fraction => {
@@ -170,37 +172,19 @@
       fraction <= 0 ? 'before' : fraction >= 1 ? 'complete' : 'drawing';
   };
 
-  const textPhase = () => {
-    const focus = window.innerHeight * 0.16;
-    const centers = beats.map(beat => {
-      const bounds = beat.getBoundingClientRect();
-      return bounds.top + bounds.height * 0.5;
-    });
-
-    if (focus <= centers[0]) return 0;
-    if (focus >= centers[centers.length - 1]) return beats.length - 1;
-
-    for (let index = 0; index < centers.length - 1; index += 1) {
-      if (focus <= centers[index + 1]) {
-        const local = clamp((focus - centers[index]) /
-          Math.max(1, centers[index + 1] - centers[index]));
-        return index + local;
-      }
-    }
-    return beats.length - 1;
-  };
-
   const update = () => {
     frame = 0;
-    paint(roadFraction());
+    const state = progressState();
 
     if (reduced.matches) {
+      paint(state.fraction > 0 ? 1 : 0);
       resetText();
       return;
     }
 
+    paint(state.fraction);
     prepareText();
-    const phase = textPhase();
+    const phase = state.phase;
     const fromTitle = narrow.matches ? [55, 75, 94] : titleDim;
     const fromBody = narrow.matches ? [45, 63, 83] : bodyDim;
 
@@ -231,7 +215,6 @@
   };
 
   const measureAndUpdate = () => {
-    measure();
     previousFraction = -1;
     update();
   };
