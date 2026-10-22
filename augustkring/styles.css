@@ -571,33 +571,31 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
 }
 body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   position: fixed;
-  z-index: 10;
+  z-index: 0;
   top: 16px;
   left: 50%;
   width: min(31vw, 350px);
   height: min(61svh, 560px);
   transform: translateX(-50%);
   margin: 0;
-  display: none;
-  visibility: hidden;
-  pointer-events: none;
-  /* Only protect the INTRO above the first story beat. Throughout the five
-     competency stages the full unchanged route remains in view, not clipped
-     from the bottom and never faded. */
-  clip-path: inset(var(--waymaking-intro-clip, 0px) 0 0 0);
-  opacity: 1;
-}
-body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: block;
   visibility: visible;
+  pointer-events: none;
+  clip-path: none;
+  opacity: 1;
 }
-body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source { display: none; }
-body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal { display: block; }
-@media (prefers-reduced-motion: reduce) {
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source { display: block; }
-  body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal { display: none; }
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-source {
+  display: none;
 }
-.home-main, .home-footer { position: relative; z-index: 1; }
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-reveal {
+  display: block;
+}
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] [data-waymaking-reveal],
+body > .waymaking-road-wrap[data-waymaking-viewport="true"] [data-waymaking-feather] {
+  stroke-dasharray: 10000 10000;
+  stroke-dashoffset: 10000;
+}
+.home-header, .home-main, .home-footer { position: relative; z-index: 1; }
 /* Exact V12 source art; one original illustration, scroll-revealed. */
 .waymaking-original-source,
 .waymaking-original-source img {
