@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"eb79b09b","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"35020c5c","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -40,7 +40,7 @@ for(const sentence of [
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
 assert.ok(thread.includes('aria-label="Waymaking"') && !thread.includes('id="waymaking-title"'),'Waymaking should continue without a visible section title');
-assert.ok(thread.includes("For me, that's what it means to be a <span>waymaker"),'Waymaker definition missing');
+assert.ok(!thread.includes("For me, that's what it means to be a") && !thread.includes('class="waymaking-resolution"'),'Redundant Waymaker conclusion must remain removed');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
@@ -49,7 +49,7 @@ for(const label of ['Creative Thinking','Commercial Understanding','Strategic Ju
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven',"For me, that's what it means to be a"]){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -61,7 +61,8 @@ assert.ok(thread.includes('src="assets/waymaking-ink-v22.webp"'),'High-resolutio
 assert.ok(thread.includes('href="assets/waymaking-ink-v22.webp"'),'SVG mask must reveal new generated WebP');
 assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
 assert.equal((thread.match(/<rect data-waymaking-reveal /g)||[]).length,1,'Exactly one continuous mask body required');
-assert.equal((thread.match(/<rect data-waymaking-reveal-edge /g)||[]).length,1,'Exactly one soft brush edge required');
+assert.equal((thread.match(/<g data-waymaking-brush-front /g)||[]).length,1,'Exactly one irregular moving brush front required');
+assert.ok(thread.includes('waymaking-ink-brush-falloff'),'Organic brush-head gradient missing');
 assert.ok(thread.includes('viewBox="0 0 720 2148"'),'Full-height artwork viewBox missing');
 assert.ok(thread.includes('maskUnits="userSpaceOnUse"'),'Native SVG mask missing');
 assert.ok(!thread.includes('feTurbulence') && !thread.includes('data-waymaking-feather'),'Expensive legacy SVG filters must be absent');
@@ -73,7 +74,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261022-continuous-ink-v22b'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-organic-waymaking-v23'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -83,13 +84,15 @@ assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My stor
 assert.ok(css.includes('.waymaking-scene') && css.includes('.waymaking-artspace') && css.includes('.waymaking-road-wrap {\n  position: absolute;'),'Document-anchored Waymaking composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate copy layout missing');
 assert.ok(css.includes('.waymaking-original-source')&&css.includes('.waymaking-original-reveal'),'Restored source/fallback styling missing');
-assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.includes('top: 0;\n  bottom: clamp(24px, 2vw, 36px);'),'Road must be document-anchored inside the Waymaking artspace with a clean handoff before the next section');
+assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.includes('top: 0;\n  bottom: 0;'),'Road must be document-anchored and show its complete tail');
 assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.waymaking-copy-column::after'),'Wrong pre/post viewport spacers returned');
-assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) 0 0 auto;'),'Waymaker transition must remain compact, in its own text column');
+assert.ok(css.includes('/* V23: a single reading column;') && css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile must use full-width reading column with centered background road');
+assert.ok(css.includes('-webkit-tap-highlight-color: transparent;') && css.includes('mobile-navigation-panel a:active'),'Mobile menu must use red-only navigation feedback');
+assert.ok(!css.includes('.waymaking-resolution'),'Deleted Waymaker conclusion must not reserve spacing');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
-assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('readingLine'),'One continuous scroll-coordinate reveal required');
-assert.ok(scrollController.includes("maskBody.setAttribute('height'") && scrollController.includes("maskEdge.setAttribute('y'"),'Cheap two-rectangle SVG reveal required');
+assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('finishScroll'),'One continuous scroll-coordinate reveal must complete beside Purpose Driven');
+assert.ok(scrollController.includes("maskBody.setAttribute('height'") && scrollController.includes("maskFront.setAttribute("),'Lightweight moving organic brush reveal required');
 assert.ok(scrollController.includes('Math.exp(-elapsed / 72)') && scrollController.includes('Math.exp(-elapsed / 58)'),'Frame-time road and text smoothing must be present');
 assert.ok(scrollController.includes('const textTarget = heading =>') && scrollController.includes('const complete = height * 0.48'),'Reading activation must happen near the viewport middle');
 assert.ok(!scrollController.includes('glyphWeight') && !scrollController.includes('replaceChildren'),'Per-letter fade-out and DOM rewrites must not return');
@@ -119,7 +122,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261022-continuous-ink-v22b':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261022-organic-waymaking-v23':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

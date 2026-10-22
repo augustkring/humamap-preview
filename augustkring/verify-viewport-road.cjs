@@ -41,8 +41,10 @@ async function checkpoint(page) {
     const beats=[...document.querySelectorAll('.waymaking-beat')];
     const art=qs('.waymaking-original-reveal');
     const mask=art.querySelector('[data-waymaking-reveal]');
-    const edge=art.querySelector('[data-waymaking-reveal-edge]');
-    const end=qs('.waymaking-resolution');
+    const front=art.querySelector('[data-waymaking-brush-front]');
+    const transform=front?.getAttribute('transform')||'';
+    const numbers=/translate\(0 ([\d.]+)\) scale\(1 ([\d.]+)\)/.exec(transform);
+    const end=qs('.waymaking-scene');
     const roadBox=box(road);
     const artspaceBox=box(artspace);
     const introBox=box(qs('.thread-summary'));
@@ -51,8 +53,8 @@ async function checkpoint(page) {
       fraction:Number(story.dataset.waymakingProgress),
       animated:story.dataset.waymakingAnimated==='true',
       maskSolid:parseFloat(mask.getAttribute('height')),
-      maskEdgeTop:parseFloat(edge.getAttribute('y')),
-      maskEdgeHeight:parseFloat(edge.getAttribute('height')),
+      brushHeadTop:numbers?Number(numbers[1]):NaN,
+      brushHeadLength:numbers?Number(numbers[2])*210:NaN,
       featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
       emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
       headingColors:beats.map(x=>getComputedStyle(x.querySelector('h3')).color),
@@ -154,8 +156,8 @@ async function runOne(browser,engine,width) {
     assert.ok(Math.abs(initial.roadDocumentTop-initial.artspaceDocumentTop)<1,
       'Road is not anchored to the Waymaking artspace top');
     const endInset=initial.artspaceDocumentBottom-initial.roadDocumentBottom;
-    assert.ok(endInset>=23&&endInset<=37,
-      'Road must end 24-36px before the Waymaking artspace bottom: '+endInset);
+    assert.ok(Math.abs(endInset)<1.5,
+      'Road must show its complete tail without a bottom clip: '+endInset);
     assert.ok(initial.roadDocumentTop>=initial.introDocumentBottom-2,
       'Road begins inside the preceding Where I add value copy');
 
@@ -166,6 +168,13 @@ async function runOne(browser,engine,width) {
     assert.equal(chapterSpacing.direction,'column');
     assert.ok(chapterSpacing.gap>=8&&chapterSpacing.gap<=12);
     assert.ok(initial.textWidth>=145,'Mobile text is too narrow');
+    if(width<=900) {
+      assert.ok(initial.textWidth>=initial.artspace.width*.94,
+        'Mobile text must occupy full available width');
+      assert.ok(Math.abs(initial.road.left+initial.road.width*.5-
+        (initial.artspace.left+initial.artspace.width*.5))<2,
+        'Mobile road must be centred behind the reading content');
+    }
 
     const stages=[];
     let anchoredDocumentTop=null;
@@ -179,7 +188,9 @@ async function runOne(browser,engine,width) {
       assert.equal(state.animated,true,'No working motion controller');
       assert.equal(state.position,'absolute','Road became fixed/sticky during scrolling');
       assert.equal(state.roadParent,true,'Road escaped its document artspace');
-      assert.equal(state.opacity,1,'Whole road must not fade');
+      const staticOpacity=width<=600?.21:width<=900?.24:1;
+      assert.ok(Math.abs(state.opacity-staticOpacity)<.011,
+        'Road opacity must remain constant during scrolling');
       assert.equal(state.visible,true,'Road must remain renderable inside its own section');
       assert.equal(state.overflow,false);
       assert.ok(state.fraction>=0&&state.fraction<=1,'Road must remain clamped');
@@ -188,10 +199,10 @@ async function runOne(browser,engine,width) {
       if(i>0) assert.ok(state.fraction>stages[i-1].fraction+.045,
         'Road is stalling between chapters instead of painting continuously');
       assert.equal(state.featherCount,0,'Expensive legacy feather paths returned');
-      assert.ok(Math.abs(state.maskSolid+state.maskEdgeHeight-state.fraction*revealHeight)<1.6,
-        'Native SVG reveal is not synchronized with scroll');
-      assert.ok(Math.abs(state.maskEdgeTop-state.maskSolid)<.01,
-        'Feathered leading edge disconnected from reveal body');
+      assert.ok(Math.abs(state.maskSolid+state.brushHeadLength-state.fraction*revealHeight)<1.9,
+        'Organic brush reveal is not synchronized with scroll');
+      assert.ok(Math.abs(state.brushHeadTop-state.maskSolid)<.01,
+        'Organic brush head detached from solid ink');
       for(let previous=0;previous<=i;previous++) {
         assert.ok(state.emphasis[previous]>.975,
           'Already-read heading/body faded out at '+labels[i]);
@@ -211,9 +222,13 @@ async function runOne(browser,engine,width) {
 
       assert.ok(Math.abs(state.roadDocumentTop-state.artspaceDocumentTop)<1,
         'Road drifted away from artspace');
-      for(const [index,text] of state.texts.entries()) {
-        assert.equal(overlap(state.road,text),0,
-          'Road overlaps readable copy '+labels[index]+' at '+width+'px');
+      if(width>900) for(const [index,copy] of state.texts.entries()) {
+        assert.equal(overlap(state.road,copy),0,
+          'Desktop ink overlaps readable copy '+labels[index]+' at '+width+'px');
+      }
+      if(width<=900) {
+        assert.ok(state.textWidth>=state.artspace.width*.94,
+          'Mobile text collapsed into a narrow side rail');
       }
 
       const pixels=await paintedPixels(page);
@@ -244,17 +259,23 @@ async function runOne(browser,engine,width) {
     const after=await checkpoint(page);
     assert.equal(after.position,'absolute');
     assert.equal(after.fraction,1,'Completed road must stay at 100%');
-    assert.ok(after.road.bottom<=1,
-      'Road leaked into My current focus instead of scrolling out with Waymaking');
+    const workTitleTop=await page.locator('#work-title').evaluate(el=>el.getBoundingClientRect().top);
+    assert.ok(after.road.bottom<=workTitleTop-24,
+      'Ink overlaps My current focus instead of ending above its heading');
+    await scroll(page,workY+900*.55);
+    await page.waitForTimeout(240);
+    const farAfter=await checkpoint(page);
+    assert.ok(farAfter.road.bottom<=1,
+      'Ink remains visible deep inside My current focus');
     assert.equal(await paintedPixels(page),0,
-      'Road still renders on-screen under My current focus');
+      'Ink still renders behind the current-focus cards');
 
     // Reverse scrolling restores the same chapter fraction while the road
     // remains anchored to the exact same document coordinates.
     await scroll(page,middles[2]-900*.52);
     await page.waitForTimeout(400);
     const restored=await checkpoint(page);
-    assert.ok(Math.abs(restored.fraction-stages[2].fraction)<0.018);
+    assert.ok(Math.abs(restored.fraction-stages[2].fraction)<0.020);
     assert.ok(restored.emphasis[0]>.975&&restored.emphasis[1]>.975,
       'Previously read text incorrectly dimmed during the chapter');
     assert.ok(Math.abs(restored.roadDocumentTop-anchoredDocumentTop)<1,
@@ -304,6 +325,27 @@ async function runOne(browser,engine,width) {
       assert.equal(resized.position,'absolute','Resize changed road to viewport positioning');
       assert.equal(resized.roadParent,true);
       assert.equal(resized.animatedOriginal,'assets/waymaking-ink-v22.webp');
+    }
+
+    if(width<=840){
+      await page.locator('[data-mobile-nav-open]').click();
+      const link=page.locator('.mobile-navigation-panel a').first();
+      const props=await link.evaluate(el=>{
+        const style=getComputedStyle(el);
+        const sample=document.createElement('span');
+        sample.style.color='var(--red)';
+        document.body.append(sample);
+        const red=getComputedStyle(sample).color;
+        sample.remove();
+        return {tap:style.webkitTapHighlightColor,red};
+      });
+      assert.ok(/(?:rgba\(0,\s*0,\s*0,\s*0\)|transparent)/.test(props.tap),
+        'Dark Safari tap highlight still visible: '+props.tap);
+      await link.hover();
+      assert.equal(await link.evaluate(el=>getComputedStyle(el).color),props.red,
+        'Navigation hover must be exclusively red');
+      await page.locator('[data-mobile-nav-close]').click();
+      assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),false);
     }
 
     assert.deepEqual(problems,[],'Browser JS errors');

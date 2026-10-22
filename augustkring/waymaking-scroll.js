@@ -1,6 +1,6 @@
 /*
  * Waymaking V22. The ink remains in its document-anchored artspace.
- * One lightweight vertical alpha mask follows a continuous scroll coordinate.
+ * A lightweight irregular brush-head mask follows a continuous scroll coordinate.
  * Text becomes legible near the middle of the reading viewport and never
  * dims after being passed. State follows scroll in either direction.
  */
@@ -10,10 +10,10 @@
   const story = document.querySelector('[data-waymaking-story]');
   const road = story?.querySelector('.waymaking-road-wrap');
   const maskBody = road?.querySelector('[data-waymaking-reveal]');
-  const maskEdge = road?.querySelector('[data-waymaking-reveal-edge]');
+  const maskFront = road?.querySelector('[data-waymaking-brush-front]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
 
-  if (!story || !road || !maskBody || !maskEdge || beats.length !== 5) return;
+  if (!story || !road || !maskBody || !maskFront || beats.length !== 5) return;
 
   const content = beats.map(beat => ({
     beat,
@@ -49,10 +49,24 @@
     if (reducedMotion.matches) {
       return beats[0].getBoundingClientRect().top < window.innerHeight * 0.84 ? 1 : 0;
     }
-    const bounds = road.getBoundingClientRect();
-    if (bounds.height <= 0) return 0;
-    const readingLine = window.innerHeight * 0.54;
-    return clamp((readingLine - bounds.top) / bounds.height);
+    const viewportHeight = Math.max(1, window.innerHeight);
+    const roadBounds = road.getBoundingClientRect();
+    const lastBounds = beats[beats.length - 1].getBoundingClientRect();
+    if (roadBounds.height <= 0) return 0;
+
+    // The artwork is anchored to the document. Start just before Creative
+    // Thinking, paint continuously with scroll and complete while Purpose
+    // Driven is still at the natural reading position (not below the fold).
+    const origin = window.scrollY + roadBounds.top;
+    const finalChapterCentre =
+      window.scrollY + lastBounds.top + lastBounds.height * 0.5;
+    const startScroll = origin - viewportHeight * 0.64;
+    const finishScroll = Math.max(
+      startScroll + viewportHeight * 0.75,
+      finalChapterCentre - viewportHeight * 0.58
+    );
+    return clamp((window.scrollY - startScroll) /
+      Math.max(1, finishScroll - startScroll));
   };
 
   const textTarget = heading => {
@@ -67,12 +81,17 @@
   const paintRoad = progress => {
     if (Math.abs(progress - renderedProgress) < 0.00025) return;
     const reveal = clamp(progress) * ROAD_VIEWBOX_HEIGHT;
-    const feather = Math.min(56, reveal, ROAD_VIEWBOX_HEIGHT - reveal);
+    const feather = Math.min(210, reveal, ROAD_VIEWBOX_HEIGHT - reveal);
     const solid = reveal - feather;
 
+    // The solid ink meets a soft, irregular brush silhouette with no
+    // horizontal clipping edge, no turbulence filter and no raster redraw.
     maskBody.setAttribute('height', solid.toFixed(2));
-    maskEdge.setAttribute('y', solid.toFixed(2));
-    maskEdge.setAttribute('height', feather.toFixed(2));
+    maskFront.setAttribute(
+      'transform',
+      'translate(0 ' + solid.toFixed(2) + ') scale(1 ' +
+        (feather / 210).toFixed(5) + ')'
+    );
 
     renderedProgress = progress;
     story.dataset.waymakingProgress = progress.toFixed(4);
@@ -109,7 +128,7 @@
       }
       const weight = item.progress;
       const dimTitle = narrow.matches ? [90, 106, 123] : TITLE_MUTED;
-      const dimBody = narrow.matches ? [87, 103, 120] : BODY_MUTED;
+      const dimBody = narrow.matches ? [78, 94, 112] : BODY_MUTED;
       const titleColor = mix(dimTitle, TITLE_ACTIVE, weight);
       const bodyColor = mix(dimBody, BODY_ACTIVE, weight);
       if (item.heading.style.color !== titleColor) item.heading.style.color = titleColor;
