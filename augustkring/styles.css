@@ -1726,7 +1726,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     left: var(--gutter, 20px);
     width: min(34vw, 180px);
-    height: min(67svh, 650px);
+    height: min(61svh, 555px);
     transform: none;
   }
   /* Preserve the exact same source image on mobile and desktop. */
