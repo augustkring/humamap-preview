@@ -1,25 +1,17 @@
 /*
- * Waymaking V20: one viewport-fixed original ink road.
- * The road is never toggled in/out while scrolling. The only scroll-driven
- * visual mutation is the SVG mask reveal (plus foreground copy emphasis).
- * It starts after "Where I add value" has cleared the fixed road origin,
- * draws continuously through the five Waymaking chapters, clamps at 100%,
- * and then remains fully painted at the same viewport position.
+ * Waymaking V21: document-anchored progressive road.
+ * The artwork belongs to the Waymaking scene itself. It is never portaled to
+ * <body>, never position:fixed, and never follows the browser viewport.
+ * Natural page scrolling moves the entire road with the section; scrolling
+ * only changes how much of its SVG mask has been painted.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
   const road = story?.querySelector('.waymaking-road-wrap');
-  const firstHeading = beats[0]?.querySelector('h3');
-  const summary = story?.previousElementSibling;
-  const finalCopy = beats[4]?.querySelector('.waymaking-copy');
   const revealPath = road?.querySelector('[data-waymaking-reveal]');
 
-  if (!story || !road || !firstHeading || !summary || !finalCopy ||
-      beats.length !== 5 || !revealPath) return;
-
-  road.dataset.waymakingViewport = 'true';
-  document.body.appendChild(road);
+  if (!story || !road || beats.length !== 5 || !revealPath) return;
 
   const length = revealPath.getTotalLength();
   const feathers = [...revealPath.parentElement.querySelectorAll('[data-waymaking-feather]')];
@@ -33,7 +25,7 @@
   }
 
   story.dataset.waymakingAnimated = 'true';
-  road.dataset.waymakingReady = 'true';
+  road.dataset.waymakingDocument = 'true';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrow = window.matchMedia('(max-width: 900px)');
@@ -112,29 +104,21 @@
   const progressState = () => {
     const viewportHeight = Math.max(1, window.innerHeight);
     const focus = viewportHeight * 0.16;
-    const summaryBottom = summary.getBoundingClientRect().bottom;
     const centers = beats.map(beat => {
       const bounds = beat.getBoundingClientRect();
       return bounds.top + bounds.height * 0.5;
     });
 
-    // Start only when "Where I add value" has cleared the fixed road origin.
-    // From that exact point to the Creative Thinking checkpoint, interpolate
-    // 0 -> 16%. Both values are derived from live geometry, so the reveal is
-    // continuous and identical in intent across responsive text heights.
-    const cleared = Math.max(0, 16 - summaryBottom);
-    if (cleared <= 0) return { fraction: 0, phase: 0 };
-
     let phase = 0;
     let fraction = 0;
 
     if (focus <= centers[0]) {
-      const distanceToFirstCheckpoint = Math.max(
-        1,
-        centers[0] - focus + cleared,
-      );
-      const firstProgress = smooth(cleared / distanceToFirstCheckpoint);
-      fraction = paintStages[0] * firstProgress;
+      const firstTop = beats[0].getBoundingClientRect().top;
+      // Begin painting as the document-anchored road approaches the viewport,
+      // so a real first brush segment is already visible at Creative Thinking.
+      const entry = smooth((viewportHeight * 0.94 - firstTop) /
+        Math.max(1, viewportHeight * 0.70));
+      fraction = entry * paintStages[0];
     } else if (focus >= centers[centers.length - 1]) {
       phase = beats.length - 1;
       fraction = 1;
@@ -179,7 +163,9 @@
     const state = progressState();
 
     if (reduced.matches) {
-      paint(state.fraction > 0 ? 1 : 0);
+      // Static completed artwork once the Waymaking scene reaches the viewport.
+      const firstTop = beats[0].getBoundingClientRect().top;
+      paint(firstTop < window.innerHeight * 0.94 ? 1 : 0);
       resetText();
       return;
     }
@@ -216,21 +202,21 @@
     if (!frame) frame = requestAnimationFrame(update);
   };
 
-  const measureAndUpdate = () => {
+  const refresh = () => {
     previousFraction = -1;
     update();
   };
 
   addEventListener('scroll', scheduleUpdate, { passive: true });
-  addEventListener('resize', measureAndUpdate, { passive: true });
-  addEventListener('pageshow', measureAndUpdate);
-  addEventListener('load', measureAndUpdate, { once: true });
-  reduced.addEventListener('change', measureAndUpdate);
-  narrow.addEventListener('change', measureAndUpdate);
+  addEventListener('resize', refresh, { passive: true });
+  addEventListener('pageshow', refresh);
+  addEventListener('load', refresh, { once: true });
+  reduced.addEventListener('change', refresh);
+  narrow.addEventListener('change', refresh);
 
   if (document.fonts?.ready) {
-    document.fonts.ready.then(measureAndUpdate).catch(() => {});
+    document.fonts.ready.then(refresh).catch(() => {});
   }
 
-  measureAndUpdate();
+  refresh();
 })();
