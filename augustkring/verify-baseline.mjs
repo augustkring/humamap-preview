@@ -84,7 +84,7 @@ assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My stor
 assert.ok(css.includes('.waymaking-scene') && css.includes('.waymaking-artspace') && css.includes('.waymaking-road-wrap {\n  position: absolute;'),'Document-anchored Waymaking composition missing');
 assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.waymaking-beat:nth-child(even)'),'Alternate copy layout missing');
 assert.ok(css.includes('.waymaking-original-source')&&css.includes('.waymaking-original-reveal'),'Restored source/fallback styling missing');
-assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.includes('top: 0;\n  bottom: 0;'),'Road must be document-anchored inside the Waymaking artspace');
+assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.includes('top: 0;\n  bottom: clamp(24px, 2vw, 36px);'),'Road must be document-anchored inside the Waymaking artspace with a clean handoff before the next section');
 assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.waymaking-copy-column::after'),'Wrong pre/post viewport spacers returned');
 assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) 0 0 auto;'),'Waymaker transition must remain compact, in its own text column');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
