@@ -98,7 +98,7 @@ assert.ok(!scrollController.includes('document.body.appendChild(road)'),'Road ca
 assert.ok(!scrollController.includes('data-waymaking-viewport'),'Viewport-fixed road mode cannot return');
 assert.ok(!scrollController.includes('waymakingRoadActive'),'Road cannot be display-toggled');
 assert.ok(!scrollController.includes('--waymaking-safe-top'),'Original picture may NOT be progressively clipped behind the intro');
-assert.ok(scrollController.includes("reduced.matches"),'Reduced motion preference missing');
+assert.ok(scrollController.includes("reducedMotion.matches"),'Reduced motion preference missing');
 for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.top','brush.setAttribute']){
  assert.ok(!scrollController.includes(forbidden),'Deprecated road moving/portaling logic returned: '+forbidden);
 }
