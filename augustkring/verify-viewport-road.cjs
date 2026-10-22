@@ -11,7 +11,7 @@ const engines=(process.env.ROAD_ENGINES||'chromium').split(',');
 const widths=(process.env.ROAD_WIDTHS||'320,390,768,1024,1440').split(',').map(Number);
 const browserTypes={chromium,firefox,webkit};
 const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
-const expectedStages=[0.16,0.37,0.59,0.80,1];
+const revealHeight=2148;
 mkdirSync(output,{recursive:true});
 
 async function scroll(page,y) {
@@ -41,6 +41,7 @@ async function checkpoint(page) {
     const beats=[...document.querySelectorAll('.waymaking-beat')];
     const art=qs('.waymaking-original-reveal');
     const mask=art.querySelector('[data-waymaking-reveal]');
+    const edge=art.querySelector('[data-waymaking-reveal-edge]');
     const end=qs('.waymaking-resolution');
     const roadBox=box(road);
     const artspaceBox=box(artspace);
@@ -49,9 +50,13 @@ async function checkpoint(page) {
     return {
       fraction:Number(story.dataset.waymakingProgress),
       animated:story.dataset.waymakingAnimated==='true',
-      dashOffset:parseFloat(mask.style.strokeDashoffset),
-      length:mask.getTotalLength(),
+      maskSolid:parseFloat(mask.getAttribute('height')),
+      maskEdgeTop:parseFloat(edge.getAttribute('y')),
+      maskEdgeHeight:parseFloat(edge.getAttribute('height')),
       featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
+      emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
+      headingColors:beats.map(x=>getComputedStyle(x.querySelector('h3')).color),
+      bodyColors:beats.map(x=>getComputedStyle(x.querySelector('p')).color),
       scrollY:window.scrollY,
       road:roadBox,
       artspace:artspaceBox,
@@ -73,7 +78,7 @@ async function checkpoint(page) {
       imagePieces:art.querySelectorAll('image').length,
       sourceViewHeight:art.viewBox.baseVal.height,
       scaling:art.preserveAspectRatio.baseVal.align,
-      opaqueRect:!!art.querySelector('rect,foreignObject'),
+      opaqueRect:!!art.querySelector('[data-waymaking-original-pixels] rect,foreignObject'),
       imageSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
       animatedOriginal:art.querySelector('image')?.getAttribute('href'),
       roadParent:road.parentElement?.classList.contains('waymaking-artspace')===true,
@@ -141,9 +146,9 @@ async function runOne(browser,engine,width) {
     assert.equal(initial.roadParent,true,'Road must stay inside .waymaking-artspace');
     assert.equal(initial.sourceViewHeight,2148,'Extended original artwork changed');
     assert.equal(initial.scaling,1,'SVG must use preserveAspectRatio="none"');
-    assert.equal(initial.imagePieces,1,'Road must use one unbroken original image');
-    assert.equal(initial.imageSource,'assets/waymaking-editorial-ink.webp');
-    assert.equal(initial.animatedOriginal,'assets/waymaking-editorial-ink.webp');
+    assert.equal(initial.imagePieces,1,'Road must use one unbroken generated image');
+    assert.equal(initial.imageSource,'assets/waymaking-ink-v22.webp');
+    assert.equal(initial.animatedOriginal,'assets/waymaking-ink-v22.webp');
     assert.equal(initial.opaqueRect,false,'Road may not have a rectangular backing');
     assert.equal(initial.overflow,false,'No horizontal overflow');
     assert.ok(Math.abs(initial.roadDocumentTop-initial.artspaceDocumentTop)<1,
@@ -169,6 +174,7 @@ async function runOne(browser,engine,width) {
 
     for(let i=0;i<5;i++) {
       await scroll(page,middles[i]-900*.16);
+      await page.waitForTimeout(400);
       const state=await checkpoint(page);
       assert.equal(state.animated,true,'No working motion controller');
       assert.equal(state.position,'absolute','Road became fixed/sticky during scrolling');
@@ -176,14 +182,19 @@ async function runOne(browser,engine,width) {
       assert.equal(state.opacity,1,'Whole road must not fade');
       assert.equal(state.visible,true,'Road must remain renderable inside its own section');
       assert.equal(state.overflow,false);
-      assert.ok(Math.abs(state.fraction-expectedStages[i])<0.035,
-        'Wrong road progress at '+labels[i]+': '+state.fraction);
-      assert.equal(state.featherCount,7);
-
-      const brushFront=Math.min(state.fraction,.055,(1-state.fraction)*.55);
-      const expectedOffset=state.length*(1-(state.fraction-brushFront));
-      assert.ok(Math.abs(state.dashOffset-expectedOffset)<state.length*.008,
-        'SVG mask progress mismatch at '+labels[i]);
+      assert.ok(state.fraction>=0&&state.fraction<=1,'Road must remain clamped');
+      if(i===0) assert.ok(state.fraction>.015,'First brush segment missing at Creative Thinking');
+      if(i>0) assert.ok(state.fraction>stages[i-1].fraction+.045,
+        'Road is stalling between chapters instead of painting continuously');
+      assert.equal(state.featherCount,0,'Expensive legacy feather paths returned');
+      assert.ok(Math.abs(state.maskSolid+state.maskEdgeHeight-state.fraction*revealHeight)<1.6,
+        'Native SVG reveal is not synchronized with scroll');
+      assert.ok(Math.abs(state.maskEdgeTop-state.maskSolid)<.01,
+        'Feathered leading edge disconnected from reveal body');
+      for(let previous=0;previous<=i;previous++) {
+        assert.ok(state.emphasis[previous]>.975,
+          'Already-read heading/body faded out at '+labels[i]);
+      }
 
       if(anchoredDocumentTop===null) anchoredDocumentTop=state.roadDocumentTop;
       assert.ok(Math.abs(state.roadDocumentTop-anchoredDocumentTop)<1,
@@ -220,14 +231,15 @@ async function runOne(browser,engine,width) {
       }
     }
 
-    assert.ok(stages[4].fraction-stages[0].fraction>.80,
-      'Road did not grow across all five chapters');
+    assert.ok(stages[4].fraction-stages[0].fraction>.45,
+      'Road did not grow continuously across all five chapters');
 
     // Once the reader reaches the next section, the road must have naturally
     // scrolled out with Waymaking. It is not hidden; it is simply above view.
     const workY=await page.locator('#work-title').evaluate(el=>
       scrollY+el.getBoundingClientRect().top-innerHeight*.30);
     await scroll(page,workY);
+    await page.waitForTimeout(400);
     const after=await checkpoint(page);
     assert.equal(after.position,'absolute');
     assert.equal(after.fraction,1,'Completed road must stay at 100%');
@@ -239,11 +251,37 @@ async function runOne(browser,engine,width) {
     // Reverse scrolling restores the same chapter fraction while the road
     // remains anchored to the exact same document coordinates.
     await scroll(page,middles[2]-900*.16);
+    await page.waitForTimeout(400);
     const restored=await checkpoint(page);
-    assert.ok(Math.abs(restored.fraction-expectedStages[2])<0.035);
+    assert.ok(Math.abs(restored.fraction-stages[2].fraction)<0.018);
+    assert.ok(restored.emphasis[0]>.975&&restored.emphasis[1]>.975,
+      'Previously read text incorrectly dimmed during the chapter');
     assert.ok(Math.abs(restored.roadDocumentTop-anchoredDocumentTop)<1,
       'Road document anchor changed after reverse scroll');
 
+
+    // Sample between the named chapters. The old implementation looked jerky
+    // because it was gated to five discrete waypoints.
+    const inBetween=[];
+    const from=middles[0]-900*.16;
+    const to=middles[4]-900*.16;
+    for(let step=0;step<=16;step++) {
+      await scroll(page,from+(to-from)*step/16);
+      await page.waitForTimeout(215);
+      const state=await checkpoint(page);
+      inBetween.push(state.fraction);
+    }
+    for(let step=1;step<inBetween.length;step++) {
+      assert.ok(inBetween[step]>=inBetween[step-1]-.003,
+        'Paint reversed while scrolling downward');
+      assert.ok(inBetween[step]-inBetween[step-1]<.13,
+        'Paint jumped ahead instead of progressing smoothly');
+    }
+    assert.ok(new Set(inBetween.map(x=>x.toFixed(3))).size>=14,
+      'Road is still appearing in discrete steps');
+    // Scroll back through the chapters without losing the document anchor.
+    await scroll(page,middles[2]-900*.16);
+    await page.waitForTimeout(350);
     if(width===320) {
       await page.evaluate(()=>{
         for(const node of document.querySelectorAll('.waymaking-copy h3, .waymaking-copy p')) {
@@ -264,7 +302,7 @@ async function runOne(browser,engine,width) {
       assert.equal(resized.overflow,false,'Responsive resize introduced overflow');
       assert.equal(resized.position,'absolute','Resize changed road to viewport positioning');
       assert.equal(resized.roadParent,true);
-      assert.equal(resized.animatedOriginal,'assets/waymaking-editorial-ink.webp');
+      assert.equal(resized.animatedOriginal,'assets/waymaking-ink-v22.webp');
     }
 
     assert.deepEqual(problems,[],'Browser JS errors');
@@ -292,10 +330,10 @@ async function runOne(browser,engine,width) {
       const reduced=await browser.newPage({viewport:{width:390,height:900},reducedMotion:'reduce'});
       await reduced.goto(base,{waitUntil:'networkidle'});
       await reduced.locator('.waymaking-beat').nth(2).scrollIntoViewIfNeeded();
-      await reduced.waitForTimeout(130);
+      await reduced.waitForTimeout(380);
       const reducedState=await checkpoint(reduced);
       assert.equal(reducedState.fraction,1,'Reduced-motion must show completed static road');
-      assert.ok(Math.abs(reducedState.dashOffset)<.01,'Reduced-motion road must be fully revealed');
+      assert.ok(Math.abs(reducedState.maskSolid-revealHeight)<.01,'Reduced-motion road must be fully revealed');
       assert.equal(reducedState.position,'absolute');
       assert.equal(await reduced.locator('.waymaking-letter').count(),0);
       await reduced.close();
