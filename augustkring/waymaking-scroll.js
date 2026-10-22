@@ -141,8 +141,13 @@
 
   const roadFraction = () => {
     if (reduced.matches) return window.scrollY >= range.start ? 1 : 0;
-    return clamp((window.scrollY - range.start) /
+    const raw = clamp((window.scrollY - range.start) /
       Math.max(1, range.end - range.start));
+    if (raw <= 0 || raw >= 1) return raw;
+    // A brush mark should become legible early, then keep growing rather than
+    // appearing as a late linear sliver. This easing changes reveal speed only;
+    // start/end coordinates and the fixed artwork position remain unchanged.
+    return Math.pow(raw, 0.75);
   };
 
   const paint = fraction => {
