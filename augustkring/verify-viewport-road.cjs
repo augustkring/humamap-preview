@@ -148,8 +148,9 @@ async function runOne(browser,engine,width) {
     assert.equal(initial.overflow,false,'No horizontal overflow');
     assert.ok(Math.abs(initial.roadDocumentTop-initial.artspaceDocumentTop)<1,
       'Road is not anchored to the Waymaking artspace top');
-    assert.ok(Math.abs(initial.roadDocumentBottom-initial.artspaceDocumentBottom)<1,
-      'Road is not anchored to the Waymaking artspace bottom');
+    const endInset=initial.artspaceDocumentBottom-initial.roadDocumentBottom;
+    assert.ok(endInset>=23&&endInset<=37,
+      'Road must end 24-36px before the Waymaking artspace bottom: '+endInset);
     assert.ok(initial.roadDocumentTop>=initial.introDocumentBottom-2,
       'Road begins inside the preceding Where I add value copy');
 
