@@ -89,12 +89,12 @@ assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.way
 assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) 0 0 auto;'),'Waymaker transition must remain compact, in its own text column');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
-assert.ok(scrollController.includes('const roadFraction = () =>') && scrollController.includes('range.end - range.start'),'Progressive drawing must use one continuous clamped scroll range');
+assert.ok(scrollController.includes('paintStages = [0.16, 0.37, 0.59, 0.80, 1]'),'Progressive drawing must track all five Waymaking chapter checkpoints');
 assert.ok(scrollController.includes('getTotalLength()') && scrollController.includes('strokeDashoffset'),'SVG drawing must track real path distances');
 assert.ok(!scrollController.includes('road.style.opacity'),'Entire original road may NOT fade in/out');
 assert.ok(!scrollController.includes('waymakingRoadActive'),'Road may NOT be display-toggled by scroll position');
 assert.ok(scrollController.includes("fraction >= 1 ? 'complete' : 'drawing'"),'Road completion state must be explicit and persistent');
-assert.ok(scrollController.includes('const raw = clamp((window.scrollY - range.start)') && scrollController.includes('Math.pow(raw, 0.75)'), 'Road progress must derive from one clamped scroll range with early brush easing');
+assert.ok(scrollController.includes('const clearance = smooth((16 - summaryBottom)') && scrollController.includes('return { fraction: clamp(fraction), phase }'),'Road reveal must start only after the preceding copy clears and remain clamped');
 assert.ok(!scrollController.includes('--waymaking-safe-top'),'Original picture may NOT be progressively clipped behind the intro');
 assert.ok(scrollController.includes("reduced.matches"),'Reduced motion preference missing');
 for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.top','brush.setAttribute']){
