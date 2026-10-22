@@ -83,7 +83,7 @@ jobs:
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
           grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
           ! grep -Fq "For me, that" /tmp/augustkring.html
-          grep -Fq "waymaker" /tmp/augustkring.html
+          ! grep -Fq 'class="waymaking-resolution"' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
