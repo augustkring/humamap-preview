@@ -320,6 +320,7 @@ jobs:
                       emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
                       scrollY,
                       route,
+                      artspace:art,
                       routeDocumentTop:scrollY+route.top,
                       artspaceDocumentTop:scrollY+art.top,
                       texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
