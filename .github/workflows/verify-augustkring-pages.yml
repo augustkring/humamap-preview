@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-fixed-persistent-road-v20b"
-          expected_road_js="waymaking-scroll.js?v=20261022-fixed-persistent-road-v20b"
+          expected_home="styles.css?v=20261022-fixed-persistent-road-v20c"
+          expected_road_js="waymaking-scroll.js?v=20261022-fixed-persistent-road-v20c"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,7 +73,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-fixed-persistent-road-v20b' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-fixed-persistent-road-v20c' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -115,7 +115,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-fixed-persistent-road-v20b" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-fixed-persistent-road-v20c" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const scheduleUpdate = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
