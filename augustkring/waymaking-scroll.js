@@ -82,9 +82,10 @@
 
   const frameUpdate = timestamp => {
     frame = 0;
-    const elapsed = lastTime ? Math.min(48, Math.max(1, timestamp - lastTime)) : 16;
+    const elapsed = lastTime ? Math.max(1, timestamp - lastTime) : 16;
     lastTime = timestamp;
     const factor = reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 72);
+    const textFactor = reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 58);
     let needsAnotherFrame = false;
 
     const desiredRoad = roadTarget();
@@ -101,7 +102,7 @@
       const target = textTarget(item.heading);
       if (!Number.isFinite(item.progress)) item.progress = target;
       if (Math.abs(target - item.progress) > 0.001) {
-        item.progress += (target - item.progress) * factor;
+        item.progress += (target - item.progress) * textFactor;
         needsAnotherFrame = true;
       } else {
         item.progress = target;

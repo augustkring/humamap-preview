@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-continuous-ink-v22"
-          expected_road_js="waymaking-scroll.js?v=20261022-continuous-ink-v22"
+          expected_home="styles.css?v=20261022-continuous-ink-v22b"
+          expected_road_js="waymaking-scroll.js?v=20261022-continuous-ink-v22b"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,7 +73,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-ink-v22.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-continuous-ink-v22' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-continuous-ink-v22b' /tmp/augustkring.html
           grep -Fq '<rect data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -117,7 +117,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-ink-v22.webp" -o /tmp/waymaking-ink-v22.webp
           test "$(xxd -p -l 4 /tmp/waymaking-ink-v22.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-ink-v22.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-continuous-ink-v22" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-continuous-ink-v22b" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq "maskBody.setAttribute('height'" /tmp/waymaking-scroll.js

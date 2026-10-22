@@ -73,7 +73,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261022-continuous-ink-v22'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-continuous-ink-v22b'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -90,7 +90,7 @@ assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('readingLine'),'One continuous scroll-coordinate reveal required');
 assert.ok(scrollController.includes("maskBody.setAttribute('height'") && scrollController.includes("maskEdge.setAttribute('y'"),'Cheap two-rectangle SVG reveal required');
-assert.ok(scrollController.includes('Math.exp(-elapsed / 72)'),'Frame-time smoothing must be present');
+assert.ok(scrollController.includes('Math.exp(-elapsed / 72)') && scrollController.includes('Math.exp(-elapsed / 58)'),'Frame-time road and text smoothing must be present');
 assert.ok(scrollController.includes('const textTarget = heading =>') && scrollController.includes('const complete = height * 0.48'),'Reading activation must happen near the viewport middle');
 assert.ok(!scrollController.includes('glyphWeight') && !scrollController.includes('replaceChildren'),'Per-letter fade-out and DOM rewrites must not return');
 assert.ok(!scrollController.includes('road.style.opacity'),'Entire ink must never fade in/out');
@@ -119,7 +119,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261022-continuous-ink-v22':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261022-continuous-ink-v22b':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
