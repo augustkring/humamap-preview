@@ -68,6 +68,8 @@ async function checkpoint(page) {
    visible:getComputedStyle(road).display!=='none'&&getComputedStyle(road).visibility==='visible',
    imagePieces:art.querySelectorAll('image').length,
    sourceViewHeight:art.viewBox.baseVal.height,
+   scaling:art.preserveAspectRatio.baseVal.align,
+   visibleHeight:road.getBoundingClientRect().height,
    opaqueRect:!!art.querySelector('rect,foreignObject'),
    imageSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
    animatedOriginal:art.querySelector('image')?.getAttribute('href'),
@@ -110,6 +112,26 @@ async function paintedPixels(page) {
  await page.locator('.waymaking-road-wrap').evaluate(x=>x.style.removeProperty('visibility'));
  return changedPixels(before,after,state.road);
 }
+async function paintedCoverage(page) {
+  const s=await checkpoint(page),rect=s.road,viewport=page.viewportSize();
+  if(rect.bottom<=0||rect.top>=viewport.height||!s.visible)
+    return {count:0,minY:null,maxY:null};
+  const before=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+  await page.locator('.waymaking-road-wrap').evaluate(e=>e.style.setProperty('visibility','hidden','important'));
+  const after=PNG.sync.read(await page.screenshot({animations:'disabled'}));
+  await page.locator('.waymaking-road-wrap').evaluate(e=>e.style.removeProperty('visibility'));
+  const l=Math.max(0,Math.floor(rect.left)),r=Math.min(before.width,Math.ceil(rect.right));
+  const t=Math.max(0,Math.floor(rect.top)),b=Math.min(before.height,Math.ceil(rect.bottom));
+  let count=0,minY=Infinity,maxY=-Infinity;
+  for(let y=t;y<b;y++)for(let x=l;x<r;x++){
+    const i=(y*before.width+x)*4;
+    const delta=Math.abs(before.data[i]-after.data[i])+
+      Math.abs(before.data[i+1]-after.data[i+1])+
+      Math.abs(before.data[i+2]-after.data[i+2]);
+    if(delta>12){count++;minY=Math.min(minY,y);maxY=Math.max(maxY,y);}
+  }
+  return {count,minY:minY===Infinity?null:minY,maxY:maxY===-Infinity?null:maxY};
+}
 async function centers(page) {
  return page.evaluate(()=>[...document.querySelectorAll('.waymaking-beat')].map(beat=>{
   const r=beat.getBoundingClientRect();
@@ -141,6 +163,7 @@ async function runOne(browser,engine,width) {
   assert.equal(first.sticky,false,'Road must be FIXED, never sticky');
   assert.equal(first.fixed,true,'Road is not CSS fixed to viewport');
   assert.equal(first.sourceViewHeight,2148,'Artwork must be the extended original, not its old short copy');
+  assert.equal(first.scaling,1,'SVG must fill its full fixed viewport (SVG_PRESERVEASPECTRATIO_NONE=1)');
   assert.equal(first.imagePieces,1,'Must be exactly ONE unbroken original ink image, not a repeated seam');
   assert.equal(first.overflow,false,'No horizontal scrollbar');
   const chapterSpacing=await page.locator('.waymaking-copy-column').evaluate(el=>({
@@ -187,9 +210,21 @@ async function runOne(browser,engine,width) {
    assert.ok(state.intro.bottom<=state.road.top+1,'Road activated while introduction remains visible');
    if(i>0)assert.ok(state.fraction>stages[i-1].fraction+.10,
      'Road did NOT grow into '+labels[i]+', previous '+stages[i-1].fraction+' next '+state.fraction);
-   const pixels=await paintedPixels(page);
-   assert.ok(pixels>150,'SVG road failed to paint at '+labels[i]+' ('+pixels+' pixels)');
-   stages.push({chapter:labels[i],fraction:state.fraction,pixels,top:state.road.top});
+   const coverage=await paintedCoverage(page);
+   const pixels=coverage.count;
+   assert.ok(pixels>150,'Original road rendered no ink at '+labels[i]+' ('+pixels+' pixels)');
+   assert.ok(coverage.maxY!==null,'Painted road boundary missing');
+   if(i>0){
+     assert.ok(coverage.maxY>=stages[i-1].paintedBottom-5,
+       'The painted road SHORTENED while scrolling: '+labels[i]+', '+coverage.maxY+
+       ' vs '+stages[i-1].paintedBottom);
+   }
+   if(i===4){
+     const achieved=(coverage.maxY-state.road.top)/state.road.height;
+     assert.ok(achieved>=.63,
+       'The completed road is TOO SHORT on screen: '+Math.round(achieved*100)+'% of fixed stage');
+   }
+   stages.push({chapter:labels[i],fraction:state.fraction,pixels,top:state.road.top,paintedBottom:coverage.maxY});
    if([320,390,1440].includes(width)) {
     await page.screenshot({path:join(output,engine+'-'+width+'-chapter-'+i+'.png'),animations:'disabled'});
    }
@@ -200,6 +235,8 @@ async function runOne(browser,engine,width) {
   // Real pixels (not just dash attribute values) must increase substantially
   // while artwork geometry remains fixed in viewport.
   assert.ok(later>earlier*1.35,'Road is NOT becoming visibly longer: '+earlier+' -> '+later);
+  assert.ok(stages[4].paintedBottom>stages[0].paintedBottom+180,
+    'Original ink did not materially EXTEND down screen while story advanced');
   // Reverse scrub: revisit previous chapters and measure actual mask rewind.
   await scroll(page,middles[1]-900*.16);
   const rewind=await checkpoint(page);
@@ -252,6 +289,7 @@ async function runOne(browser,engine,width) {
     assert.equal(resized.overflow,false,'Responsive resize introduced horizontal overflow');
     assert.ok(resized.fraction>.10&&resized.fraction<=1,'Road stopped drawing after responsive resize');
     assert.ok(resized.length>100,'Original winding mask should remain valid');
+    assert.equal(resized.scaling,1,'Responsive changes must still show the entire road height');
     assert.equal(resized.animatedOriginal,'assets/waymaking-editorial-ink.webp','Resize must preserve exact original art');
     for(const text of resized.texts){
       assert.equal(overlap(resized.road,text),0,'Road obscures copy after 390→1024 resizing');
