@@ -46,8 +46,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261021-fixed-original-extended-v18"
-          expected_road_js="waymaking-scroll.js?v=20261021-fixed-original-extended-v18"
+          expected_home="styles.css?v=20261022-original-ink-fullheight-v19"
+          expected_road_js="waymaking-scroll.js?v=20261022-original-ink-fullheight-v19"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -73,7 +73,7 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-editorial-ink.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261021-fixed-original-extended-v18' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-original-ink-fullheight-v19' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
@@ -93,7 +93,7 @@ jobs:
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
           grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq 'position: sticky;' /tmp/augustkring.css
+          grep -Fq 'position: fixed;' /tmp/augustkring.css
           grep -Fq '.waymaking-original-source' /tmp/augustkring.css
           grep -Fq '.waymaking-scene' /tmp/augustkring.css
           grep -Fq '.waymaking-original-reveal' /tmp/augustkring.css
@@ -115,7 +115,7 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.webp" -o /tmp/waymaking-editorial-ink.webp
           test "$(xxd -p -l 4 /tmp/waymaking-editorial-ink.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-editorial-ink.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261021-fixed-original-extended-v18" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-original-ink-fullheight-v19" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
@@ -287,6 +287,7 @@ jobs:
                     const road=document.querySelector('body > .waymaking-road-wrap[data-waymaking-viewport="true"]');
                     const svg=road.querySelector('.waymaking-original-reveal');
                     const mask=svg.querySelector('[data-waymaking-reveal]');
+                  const fullHeight=svg.preserveAspectRatio.baseVal.align;
                     const beatCopies=[...story.querySelectorAll('.waymaking-copy')];
                     const box=x=>{
                       const b=x.getBoundingClientRect();
@@ -301,12 +302,13 @@ jobs:
                       intro:box(document.querySelector('.thread-summary')),
                       texts:beatCopies.map(box),
                       maskLength:mask.getTotalLength(),
+                      fullHeight,
                       featherCount:svg.querySelectorAll('[data-waymaking-feather]').length,
                       maskOffset:parseFloat(mask.style.strokeDashoffset),
                       animated:story.dataset.waymakingAnimated==='true',
                       sticky:getComputedStyle(road).position==='sticky',
                       fixed:getComputedStyle(road).position==='fixed',
-                      clipTop:parseFloat(road.style.getPropertyValue('--waymaking-safe-top'))||0,
+                      clipTop:parseFloat(road.style.getPropertyValue('--waymaking-intro-clip'))||0,
                       parent:road.parentElement===document.body,
                       approvedSource:road.querySelector('.waymaking-original-source img')?.getAttribute('src'),
                       approvedPaint:svg.querySelector('image')?.getAttribute('href'),
@@ -322,6 +324,7 @@ jobs:
                   assert.equal(state.parent,true,'Road must be portaled to document.body');
                   assert.equal(state.approvedSource,'assets/waymaking-editorial-ink.webp','Source art was replaced');
                   assert.equal(state.approvedPaint,'assets/waymaking-editorial-ink.webp','SVG mask does not reveal original');
+                  assert.equal(state.fullHeight,1,'Extended original is not using full fixed viewport height');
                   assert.equal(state.opaqueBacking,false,'No rectangle/card around the art');
                   assert.equal(state.animated,true,'Progressive scroll controller failed');
                   assert.ok(state.fraction>=.09&&state.fraction<=1,

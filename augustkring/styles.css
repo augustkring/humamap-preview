@@ -575,23 +575,16 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   top: 16px;
   left: 50%;
   width: min(31vw, 350px);
-  height: min(86svh, 800px);
+  height: min(61svh, 560px);
   transform: translateX(-50%);
   margin: 0;
   display: none;
   visibility: hidden;
   pointer-events: none;
-  /* The road does not fade as a whole. Feather ONLY the final 28px of
-     the conclusion crop, matching the original ink's irregular tip. */
-  clip-path: inset(0 0 var(--waymaking-conclusion-cut, 0px) 0);
-  -webkit-mask-image: linear-gradient(to bottom,
-    #000 0,
-    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
-    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
-  mask-image: linear-gradient(to bottom,
-    #000 0,
-    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
-    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
+  /* Only protect the INTRO above the first story beat. Throughout the five
+     competency stages the full unchanged route remains in view, not clipped
+     from the bottom and never faded. */
+  clip-path: inset(var(--waymaking-intro-clip, 0px) 0 0 0);
   opacity: 1;
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {
@@ -633,15 +626,15 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   .waymaking-narrative .waymaking-original-reveal { display: none !important; }
 }
 .waymaking-resolution {
-  width: min(100%, 840px);
-  /* No oversized white handoff. Story → conclusion remains connected. */
-  margin: clamp(30px, 5svh, 70px) auto 0;
-  padding: clamp(50px, 6vw, 76px) 0 clamp(60px, 7vw, 88px);
-  text-align: center;
+  width: min(100%, 300px);
+  /* Keep conclusion beside fixed brush rather than obscuring the ink. */
+  margin: clamp(30px, 5svh, 70px) 0 0 auto;
+  padding: clamp(40px, 5vw, 62px) 0 clamp(48px, 6vw, 76px);
+  text-align: left;
 }
 .waymaking-resolution::before { content: none; }
 .waymaking-resolution p {
-  max-width: 840px;
+  max-width: 300px;
   margin: 0;
   color: var(--ink);
   font-family: 'AKOutfit', Arial, sans-serif;
@@ -1733,7 +1726,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     left: var(--gutter, 20px);
     width: min(34vw, 180px);
-    height: min(86svh, 780px);
+    height: min(61svh, 555px);
     transform: none;
   }
   /* Preserve the exact same source image on mobile and desktop. */
@@ -1756,7 +1749,11 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   }
   .waymaking-copy h3 { font-size: 24px; }
   .waymaking-copy p { font-size: 18px; }
-  .waymaking-resolution { padding-top: 38px; }
+  .waymaking-resolution { padding-top: 38px; width: min(100%, 290px); }
+  /* At tablet widths the next page heading shares the left rail with
+     the fixed ink. Give it enough post-conclusion breathing space to
+     enter AFTER the visual ink area, without adding space before Waymaker. */
+  .work-section--waymaking-output { padding-top: clamp(112px, 14svh, 152px); }
 }
 @media (max-width: 600px) {
   .waymaking-narrative { margin-top: 26px; }
@@ -1771,7 +1768,7 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
     left: 0;
     width: min(40vw, 150px);
-    height: min(83svh, 745px);
+    height: min(62svh, 558px);
   }
   .waymaking-beat {
     min-height: clamp(176px, 27svh, 238px);
@@ -1781,11 +1778,18 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] .waymaking-original-
   .waymaking-copy h3 { font-size: clamp(21px, 5.6vw, 24px); }
   .waymaking-copy p { font-size: 16px; line-height: 1.58; }
   .waymaking-resolution {
+    width: 58%;
     margin-top: clamp(28px, 4svh, 42px);
-    padding: 38px 0 68px;
+    margin-left: 42%;
+    margin-right: 0;
+    padding: 24px 0 56px;
   }
-  .waymaking-resolution p { font-size: 26px; }
-  .work-section--waymaking-output { padding-top: 54px; }
+  .waymaking-resolution p {
+    font-size: clamp(19px, 5.7vw, 23px);
+    line-height: 1.22;
+    overflow-wrap: anywhere;
+  }
+  .work-section--waymaking-output { padding-top: 120px; }
   .work-heading { align-items: flex-start; }
   .work-heading-copy > p { font-size: 17px; }
 }
