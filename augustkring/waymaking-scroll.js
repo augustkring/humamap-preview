@@ -1,6 +1,6 @@
 /*
- * Waymaking V22. The ink remains in its document-anchored artspace.
- * A pre-rendered transparent dry-brush texture reveals continuously along the scroll.
+ * Waymaking V25. The ink remains in its document-anchored artspace.
+ * One high-resolution tapered ink source is revealed along its own curved midline.
  * Text becomes legible near the middle of the reading viewport and never
  * dims after being passed. State follows scroll in either direction.
  */
@@ -9,11 +9,12 @@
 
   const story = document.querySelector('[data-waymaking-story]');
   const road = story?.querySelector('.waymaking-road-wrap');
-  const maskBody = road?.querySelector('[data-waymaking-reveal]');
-  const maskFront = road?.querySelector('[data-waymaking-brush-front]');
+  const revealPath = road?.querySelector('[data-waymaking-reveal-path]');
+  const brushTip = road?.querySelector('[data-waymaking-brush-tip]');
+  const completedMask = road?.querySelector('[data-waymaking-complete]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
 
-  if (!story || !road || !maskBody || !maskFront || beats.length !== 5) return;
+  if (!story || !road || !revealPath || !brushTip || !completedMask || beats.length !== 5) return;
 
   const content = beats.map(beat => ({
     beat,
@@ -38,7 +39,8 @@
   const TITLE_ACTIVE = [11, 34, 61];
   const BODY_MUTED = [95, 111, 127];
   const BODY_ACTIVE = [38, 59, 83];
-  const ROAD_VIEWBOX_HEIGHT = 2148;
+  const routeLength = revealPath.getTotalLength();
+  if (!Number.isFinite(routeLength) || routeLength <= 0) return;
 
   let frame = 0;
   let lastTime = 0;
@@ -79,27 +81,28 @@
   };
 
   const paintRoad = progress => {
-    // Always commit terminal 0/1 states: tiny interpolation differences must
-    // not leave a supposedly completed road permanently at 99.99%.
-    if (progress > 0 && progress < 1 &&
-        Math.abs(progress - renderedProgress) < 0.00025) return;
-    const reveal = clamp(progress) * ROAD_VIEWBOX_HEIGHT;
-    const feather = Math.min(260, reveal, ROAD_VIEWBOX_HEIGHT - reveal);
-    const solid = reveal - feather;
+    const fraction = clamp(progress);
+    if (fraction > 0 && fraction < 1 &&
+        Math.abs(fraction - renderedProgress) < 0.00015) return;
 
-    // The solid ink meets a soft, irregular brush silhouette with no
-    // horizontal clipping edge, no turbulence filter and no raster redraw.
-    maskBody.setAttribute('height', solid.toFixed(2));
-    maskFront.setAttribute(
-      'transform',
-      'translate(0 ' + solid.toFixed(2) + ') scale(1 ' +
-        (feather / 260).toFixed(5) + ')'
-    );
+    // The reveal follows the actual winding brush centreline.
+    // The radial alpha tip can only add ink: it never erases prior paint.
+    revealPath.style.strokeDashoffset = String(1 - fraction);
+    if (fraction > 0 && fraction < 1) {
+      const point = revealPath.getPointAtLength(routeLength * fraction);
+      brushTip.setAttribute('cx', point.x.toFixed(2));
+      brushTip.setAttribute('cy', point.y.toFixed(2));
+      brushTip.setAttribute('opacity', '1');
+    } else {
+      brushTip.setAttribute('opacity', '0');
+    }
+    // At 100% show every remaining dry-brush fibre of the tapered ending.
+    completedMask.setAttribute('opacity', fraction === 1 ? '1' : '0');
 
-    renderedProgress = progress;
-    story.dataset.waymakingProgress = progress.toFixed(4);
+    renderedProgress = fraction;
+    story.dataset.waymakingProgress = fraction.toFixed(4);
     road.dataset.waymakingState =
-      progress <= 0 ? 'before' : progress >= 1 ? 'complete' : 'drawing';
+      fraction <= 0 ? 'before' : fraction >= 1 ? 'complete' : 'drawing';
   };
 
   const frameUpdate = timestamp => {
@@ -118,6 +121,8 @@
     } else {
       roadProgress = desiredRoad;
     }
+    if (desiredRoad === 1 && roadProgress > 0.998) roadProgress = 1;
+    if (desiredRoad === 0 && roadProgress < 0.002) roadProgress = 0;
     paintRoad(roadProgress);
 
     for (const item of content) {

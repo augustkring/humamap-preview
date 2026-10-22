@@ -11,7 +11,6 @@ const engines=(process.env.ROAD_ENGINES||'chromium').split(',');
 const widths=(process.env.ROAD_WIDTHS||'320,390,768,1024,1440').split(',').map(Number);
 const browserTypes={chromium,firefox,webkit};
 const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven'];
-const revealHeight=2148;
 mkdirSync(output,{recursive:true});
 
 async function scroll(page,y) {
@@ -40,10 +39,12 @@ async function checkpoint(page) {
     const story=qs('[data-waymaking-story]');
     const beats=[...document.querySelectorAll('.waymaking-beat')];
     const art=qs('.waymaking-original-reveal');
-    const mask=art.querySelector('[data-waymaking-reveal]');
-    const front=art.querySelector('[data-waymaking-brush-front]');
-    const transform=front?.getAttribute('transform')||'';
-    const numbers=/translate\(0 ([\d.]+)\) scale\(1 ([\d.]+)\)/.exec(transform);
+    const drawPath=art.querySelector('[data-waymaking-reveal-path]');
+    const tip=art.querySelector('[data-waymaking-brush-tip]');
+    const completed=art.querySelector('[data-waymaking-complete]');
+    const progress=Number(story.dataset.waymakingProgress);
+    const length=drawPath.getTotalLength();
+    const expectedTip=drawPath.getPointAtLength(length*progress);
     const end=qs('.waymaking-scene');
     const roadBox=box(road);
     const artspaceBox=box(artspace);
@@ -52,9 +53,12 @@ async function checkpoint(page) {
     return {
       fraction:Number(story.dataset.waymakingProgress),
       animated:story.dataset.waymakingAnimated==='true',
-      maskSolid:parseFloat(mask.getAttribute('height')),
-      brushHeadTop:numbers?Number(numbers[1]):NaN,
-      brushHeadLength:numbers?Number(numbers[2])*260:NaN,
+      maskOffset:Number(drawPath.style.strokeDashoffset||drawPath.getAttribute('stroke-dashoffset')),
+      tipX:Number(tip.getAttribute('cx')),
+      tipY:Number(tip.getAttribute('cy')),
+      expectedTipX:expectedTip.x,
+      expectedTipY:expectedTip.y,
+      completedOpacity:Number(completed.getAttribute('opacity')),
       featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
       emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
       headingColors:beats.map(x=>getComputedStyle(x.querySelector('h3')).color),
@@ -148,16 +152,16 @@ async function runOne(browser,engine,width) {
     assert.equal(initial.roadParent,true,'Road must stay inside .waymaking-artspace');
     assert.equal(initial.sourceViewHeight,2148,'Extended original artwork changed');
     assert.equal(initial.scaling,1,'SVG must use preserveAspectRatio="none"');
-    assert.equal(initial.imagePieces,2,'One original ink image and one organic brush-mask image are required');
-    assert.equal(initial.imageSource,'assets/waymaking-ink-v22.webp');
-    assert.equal(initial.animatedOriginal,'assets/waymaking-ink-v22.webp');
+    assert.equal(initial.imagePieces,1,'Exactly one high-resolution ink image must be in the SVG');
+    assert.equal(initial.imageSource,'assets/waymaking-ink-v25.webp');
+    assert.equal(initial.animatedOriginal,'assets/waymaking-ink-v25.webp');
     assert.equal(initial.opaqueRect,false,'Road may not have a rectangular backing');
     assert.equal(initial.overflow,false,'No horizontal overflow');
     assert.ok(Math.abs(initial.roadDocumentTop-initial.artspaceDocumentTop)<1,
       'Road is not anchored to the Waymaking artspace top');
     const endInset=initial.artspaceDocumentBottom-initial.roadDocumentBottom;
-    assert.ok(Math.abs(endInset)<1.5,
-      'Road must show its complete tail without a bottom clip: '+endInset);
+    assert.ok(endInset>=40&&endInset<=83,
+      'Tapered road must end naturally before the section boundary: '+endInset);
     assert.ok(initial.roadDocumentTop>=initial.introDocumentBottom-2,
       'Road begins inside the preceding Where I add value copy');
 
@@ -199,10 +203,13 @@ async function runOne(browser,engine,width) {
       if(i>0) assert.ok(state.fraction>stages[i-1].fraction+.045,
         'Road is stalling between chapters instead of painting continuously');
       assert.equal(state.featherCount,0,'Expensive legacy feather paths returned');
-      assert.ok(Math.abs(state.maskSolid+state.brushHeadLength-state.fraction*revealHeight)<1.9,
-        'Organic brush reveal is not synchronized with scroll');
-      assert.ok(Math.abs(state.brushHeadTop-state.maskSolid)<.01,
-        'Organic brush head detached from solid ink');
+      assert.ok(Math.abs(state.maskOffset-(1-state.fraction))<0.003,
+        'Path dashoffset must match continuous scroll progress');
+      if(state.fraction>0&&state.fraction<1){
+        assert.ok(Math.hypot(state.tipX-state.expectedTipX,state.tipY-state.expectedTipY)<2.5,
+          'Paintbrush front must follow the actual winding path, not a horizontal line');
+        assert.equal(state.completedOpacity,0,'Cannot show the finished artwork before painting');
+      }
       for(let previous=0;previous<=i;previous++) {
         assert.ok(state.emphasis[previous]>.975,
           'Already-read heading/body faded out at '+labels[i]);
@@ -259,6 +266,8 @@ async function runOne(browser,engine,width) {
     const after=await checkpoint(page);
     assert.equal(after.position,'absolute');
     assert.equal(after.fraction,1,'Completed road must commit the exact 100% state');
+    assert.equal(after.maskOffset,0,'Finished path must be fully painted');
+    assert.equal(after.completedOpacity,1,'Final ink fibres must be revealed without clipping');
     const workTitleTop=await page.locator('#work-title').evaluate(el=>el.getBoundingClientRect().top);
     assert.ok(after.road.bottom<=workTitleTop-24,
       'Ink overlaps My current focus instead of ending above its heading');
@@ -324,7 +333,7 @@ async function runOne(browser,engine,width) {
       assert.equal(resized.overflow,false,'Responsive resize introduced overflow');
       assert.equal(resized.position,'absolute','Resize changed road to viewport positioning');
       assert.equal(resized.roadParent,true);
-      assert.equal(resized.animatedOriginal,'assets/waymaking-ink-v22.webp');
+      assert.equal(resized.animatedOriginal,'assets/waymaking-ink-v25.webp');
     }
 
     if(width<=840){
@@ -376,7 +385,8 @@ async function runOne(browser,engine,width) {
       await reduced.waitForTimeout(380);
       const reducedState=await checkpoint(reduced);
       assert.equal(reducedState.fraction,1,'Reduced-motion must show completed static road');
-      assert.ok(Math.abs(reducedState.maskSolid-revealHeight)<.01,'Reduced-motion road must be fully revealed');
+      assert.equal(reducedState.maskOffset,0,'Reduced-motion should show a fully drawn road');
+      assert.equal(reducedState.completedOpacity,1,'Reduced-motion artwork must include its tapered end');
       assert.equal(reducedState.position,'absolute');
       assert.equal(await reduced.locator('.waymaking-letter').count(),0);
       await reduced.close();

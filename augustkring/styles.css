@@ -501,7 +501,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   display: flex;
   flex-direction: column;
   gap: clamp(8px, 1svh, 12px);
-  padding-bottom: clamp(72px, 8svh, 104px);
+  padding-bottom: clamp(56px, 6svh, 80px);
 }
 /* The ink stays anchored in the Waymaking artspace; scroll only changes reveal. */
 .waymaking-beat {
@@ -561,9 +561,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   top: 0;
-  bottom: 0;
+  bottom: clamp(48px, 5svh, 80px);
   left: 50%;
-  width: min(31vw, 350px);
+  width: min(26vw, 300px);
   height: auto;
   transform: translateX(-50%);
   margin: 0;
@@ -581,7 +581,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   height: 100%;
 }
 .waymaking-original-source img {
-  object-fit: contain;
+  object-fit: fill;
   object-position: center top;
 }
 .waymaking-original-reveal {
@@ -1754,15 +1754,15 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-copy-column {
     z-index: 1;
-    padding-bottom: clamp(68px, 9svh, 108px);
+    padding-bottom: clamp(52px, 6svh, 76px);
   }
   .waymaking-artspace { z-index: 0; }
   .waymaking-road-wrap {
     position: absolute;
     top: 0;
-    bottom: 0;
+    bottom: clamp(44px, 5svh, 76px);
     left: 50%;
-    width: min(57%, 270px);
+    width: min(51%, 238px);
     height: auto;
     margin: 0;
     transform: translateX(-50%);
@@ -1793,12 +1793,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
 }
 @media (max-width: 600px) {
-  .waymaking-road-wrap { width: min(58%, 230px); opacity: .21; }
+  .waymaking-road-wrap { width: min(48%, 205px); opacity: .21; }
   .waymaking-beat,
   .waymaking-beat:first-child {
     min-height: clamp(205px, 33svh, 280px);
     padding: 24px 0;
   }
 }
-/* V24 organic brush-head performance contract:
-   static alpha texture, no per-frame SVG turbulence or whole-image filters. */
+/* V25 ink reveal: one lightweight path-dash mask and one feathered brush tip.
+   The artwork is document-anchored; browser scroll never changes its position. */
