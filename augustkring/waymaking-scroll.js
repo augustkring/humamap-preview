@@ -1,9 +1,9 @@
 /*
- * Waymaking V18: preserve original road pixels and mirror a second segment
- * to extend the original ink illustration. CSS fixes the graphic at top:16px
- * for the entire five-chapter reading interval. Scroll updates ONLY the
- * expanding SVG path reveal and foreground text focus, NEVER image position,
- * opacity or a late-stage fade.
+ * Waymaking V19: original black ink is visually fixed at top:16px.
+ * The SVG fills the complete responsive visual rail while its original
+ * brush-mask route extends with native scrolling through all five chapters.
+ * No runtime road movement, rescaling on scroll, whole-image fade, or
+ * conclusion crop. Outside the narrative the picture is simply offstage.
  */
 (() => {
   const story = document.querySelector('[data-waymaking-story]');
@@ -15,7 +15,6 @@
   const finalCopy = beats[4]?.querySelector('.waymaking-copy');
   const downstream = document.querySelector('#work');
   const picture = road?.querySelector('.waymaking-original-reveal');
-  let responsiveArtMode = '';
   const revealPaths = story ? [...story.querySelectorAll('[data-waymaking-reveal]')] : [];
   if (!story || !road || !signoff || !summary || !firstHeading ||
       !finalCopy || !downstream || beats.length !== 5 || revealPaths.length !== 1) return;
@@ -103,37 +102,24 @@
     return Math.min(entering, leaving);
   };
 
-  // Mobile must see the same ORIGINAL pixels, including the hairpin at the
-  // seam. Crop only the transparent margins of the SVG canvas, NEVER its ink.
-  // Attribute changes occur solely on responsive viewport changes.
-  const updateArtworkViewport = () => {
-    const mode = window.innerWidth <= 600 ? 'narrow' :
-      window.innerWidth <= 900 ? 'tablet' : 'desktop';
-    if (mode === responsiveArtMode) return;
-    picture.setAttribute('viewBox',mode==='narrow' ? '130 0 540 2148' :
-      mode==='tablet' ? '80 0 600 2148' : '0 0 720 2148');
-    picture.setAttribute('preserveAspectRatio','xMidYMin meet');
-    responsiveArtMode = mode;
-  };
-
-  // No fade: as the Waymaker conclusion enters, physically bound the
-  // *drawing* to the text-free area above it. The fixed image never shifts.
-  const updateConclusionCut = () => {
-    const rect = road.getBoundingClientRect();
-    const endAt = signoff.getBoundingClientRect().top - 18;
-    const cut = Math.max(0, Math.min(rect.height,rect.bottom - endAt));
-    road.style.setProperty('--waymaking-conclusion-cut',cut.toFixed(2)+'px');
+  // The SVG is authored with preserveAspectRatio="none" and covers the
+  // fixed artwork dimensions at every viewport. Never change its viewBox,
+  // sizing, transform or alpha in response to scrolling.
+  const protectIntroduction = () => {
+    const bounds = road.getBoundingClientRect();
+    const introBottom = summary.getBoundingClientRect().bottom;
+    const crop = Math.max(0, Math.min(bounds.height, introBottom + 12 - bounds.top));
+    road.style.setProperty('--waymaking-intro-clip',crop.toFixed(2)+'px');
   };
 
   const update = () => {
     frame = 0;
     if (reduced.matches) {
-      updateArtworkViewport();
-      updateConclusionCut();
+      protectIntroduction();
       document.body.dataset.waymakingRoadActive =
-        summary.getBoundingClientRect().bottom <= 16 &&
-        finalCopy.getBoundingClientRect().bottom > 16 &&
-        downstream.getBoundingClientRect().top > window.innerHeight * .45
+        firstHeading.getBoundingClientRect().top < window.innerHeight * .92 &&
+        finalCopy.getBoundingClientRect().bottom > 0 &&
+        downstream.getBoundingClientRect().top > window.innerHeight * .25
           ? 'true' : 'false';
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
@@ -146,16 +132,13 @@
     }
     prepareText();
 
-    updateArtworkViewport();
-    updateConclusionCut();
-    // No opacity fade-in or fade-out. The full-strength road is visible
-    // only after the preceding editorial intro has left the reading area,
-    // and until the final competency has passed the fixed top position.
-    // The next section must never share the viewport with the road
-    // once its heading has entered the central reading zone.
-    const active = summary.getBoundingClientRect().bottom <= 16 &&
-      finalCopy.getBoundingClientRect().bottom > 16 &&
-      downstream.getBoundingClientRect().top > window.innerHeight * .45;
+    protectIntroduction();
+    // Keep one continuous, fixed road during all FIVE competencies.
+    // At the introduction boundary crop ONLY ink behind prior text.
+    // After the fifth text exits, the whole layer is offstage. No fade.
+    const active = firstHeading.getBoundingClientRect().top < window.innerHeight * .92 &&
+      finalCopy.getBoundingClientRect().bottom > 0 &&
+      downstream.getBoundingClientRect().top > window.innerHeight * .25;
     document.body.dataset.waymakingRoadActive = active ? 'true' : 'false';
     const focus = window.innerHeight * 0.16;
     const centers = beats.map(beat => {

@@ -581,17 +581,10 @@ body > .waymaking-road-wrap[data-waymaking-viewport="true"] {
   display: none;
   visibility: hidden;
   pointer-events: none;
-  /* The road does not fade as a whole. Feather ONLY the final 28px of
-     the conclusion crop, matching the original ink's irregular tip. */
-  clip-path: inset(0 0 var(--waymaking-conclusion-cut, 0px) 0);
-  -webkit-mask-image: linear-gradient(to bottom,
-    #000 0,
-    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
-    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
-  mask-image: linear-gradient(to bottom,
-    #000 0,
-    #000 max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px) - 28px)),
-    transparent max(0px, calc(100% - var(--waymaking-conclusion-cut, 0px))));
+  /* Only protect the INTRO above the first story beat. Throughout the five
+     competency stages the full unchanged route remains in view, not clipped
+     from the bottom and never faded. */
+  clip-path: inset(var(--waymaking-intro-clip, 0px) 0 0 0);
   opacity: 1;
 }
 body[data-waymaking-road-active="true"] > .waymaking-road-wrap[data-waymaking-viewport="true"] {

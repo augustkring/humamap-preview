@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"75585698","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"919df138","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -62,7 +62,7 @@ assert.ok(thread.includes('href="assets/waymaking-editorial-ink.webp"'),'Animate
 assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
 assert.equal((thread.match(/<path data-waymaking-reveal /g)||[]).length,1,'Exactly one continuous, doubled-length original painting curve required');
 assert.ok(thread.includes('viewBox="0 0 720 2148"'),'Extended original artwork must have doubled height');
-assert.ok(thread.includes('preserveAspectRatio="none"'),'Source pixels must be stretched as ONE continuous original illustration');
+assert.ok(thread.includes('preserveAspectRatio="none"'),'Source pixels must be displayed as ONE full-height, uninterrupted illustration');
 assert.equal((thread.match(/<image href="assets\/waymaking-editorial-ink.webp"/g)||[]).length,1,'Extended road must use ONE original bitmap and never a repeated seam');
 assert.equal((thread.match(/data-waymaking-feather=/g)||[]).length,7,'Seven original brush feathers required');
 assert.ok(thread.includes('id="waymaking-brush-trail"')&&thread.includes('feTurbulence'),'Original authored mask missing');
@@ -74,7 +74,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261021-fixed-original-extended-v18'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-original-ink-fullheight-v19'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -114,7 +114,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261021-fixed-original-extended-v18':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261022-original-ink-fullheight-v19':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
