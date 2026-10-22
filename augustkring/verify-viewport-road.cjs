@@ -352,8 +352,12 @@ async function runOne(browser,engine,width) {
         sample.remove();
         return {tap:style.webkitTapHighlightColor,red};
       });
-      assert.ok(/(?:rgba\(0,\s*0,\s*0,\s*0\)|transparent)/.test(props.tap),
-        'Dark Safari tap highlight still visible: '+props.tap);
+      // Firefox does not expose the WebKit-only computed style property.
+      // In Safari/WebKit it must be transparent, never a navy tap overlay.
+      if(typeof props.tap==='string' && props.tap.length>0) {
+        assert.ok(/(?:rgba\(0,\s*0,\s*0,\s*0\)|transparent)/.test(props.tap),
+          'Dark Safari tap highlight still visible: '+props.tap);
+      }
       await link.hover();
       assert.equal(await link.evaluate(el=>getComputedStyle(el).color),props.red,
         'Navigation hover must be exclusively red');
