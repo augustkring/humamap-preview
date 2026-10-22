@@ -372,10 +372,15 @@ jobs:
                 await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),workY);
                 await page.waitForTimeout(130);
                 const aftermath=await page.locator('.waymaking-road-wrap').evaluate(el=>({
+                  top:el.getBoundingClientRect().top,
                   bottom:el.getBoundingClientRect().bottom,
+                  height:el.getBoundingClientRect().height,
                   position:getComputedStyle(el).position,
-                  progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress)
+                  progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress),
+                  workTop:document.querySelector('#work-title').getBoundingClientRect().top,
+                  resolutionBottom:document.querySelector('.waymaking-resolution').getBoundingClientRect().bottom
                 }));
+                console.log('Waymaking handoff',width,aftermath);
                 assert.equal(aftermath.position,'absolute','Road changed positioning after Waymaking');
                 assert.equal(aftermath.progress,1,'Completed road must remain at 100%');
                 assert.ok(aftermath.bottom<=1,'Road leaked into My current focus instead of scrolling away');
