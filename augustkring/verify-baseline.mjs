@@ -94,7 +94,7 @@ assert.ok(scrollController.includes('getTotalLength()') && scrollController.incl
 assert.ok(!scrollController.includes('road.style.opacity'),'Entire original road may NOT fade in/out');
 assert.ok(!scrollController.includes('waymakingRoadActive'),'Road may NOT be display-toggled by scroll position');
 assert.ok(scrollController.includes("fraction >= 1 ? 'complete' : 'drawing'"),'Road completion state must be explicit and persistent');
-assert.ok(scrollController.includes('return clamp((window.scrollY - range.start)'), 'Road progress must derive from one clamped scroll range');
+assert.ok(scrollController.includes('const raw = clamp((window.scrollY - range.start)') && scrollController.includes('Math.pow(raw, 0.75)'), 'Road progress must derive from one clamped scroll range with early brush easing');
 assert.ok(!scrollController.includes('--waymaking-safe-top'),'Original picture may NOT be progressively clipped behind the intro');
 assert.ok(scrollController.includes("reduced.matches"),'Reduced motion preference missing');
 for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.top','brush.setAttribute']){
