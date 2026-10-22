@@ -565,7 +565,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   position: absolute;
   z-index: 0;
   top: 0;
-  bottom: 0;
+  bottom: clamp(24px, 2vw, 36px);
   left: 50%;
   width: min(31vw, 350px);
   height: auto;
@@ -1705,7 +1705,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-wrap {
     top: 0;
-    bottom: 0;
+    bottom: 24px;
     left: 50%;
     width: min(100%, 150px);
     height: auto;
@@ -1743,7 +1743,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-road-wrap {
     top: 0;
-    bottom: 0;
+    bottom: 24px;
     left: 50%;
     width: 100%;
     height: auto;
