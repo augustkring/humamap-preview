@@ -576,12 +576,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   pointer-events: none;
   opacity: 1;
 }
-.waymaking-road-wrap .waymaking-original-source {
-  display: none;
-}
-.waymaking-road-wrap .waymaking-original-reveal {
-  display: block;
-}
 .waymaking-road-wrap [data-waymaking-reveal],
 .waymaking-road-wrap [data-waymaking-feather] {
   stroke-dasharray: 10000 10000;
