@@ -48,8 +48,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261022-waymaking-v26"
-          expected_road_js="waymaking-scroll.js?v=20261022-waymaking-v26"
+          expected_home="styles.css?v=20261022-waymaking-v27"
+          expected_road_js="waymaking-scroll.js?v=20261022-waymaking-v27"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future, together with bold people"
           for attempt in $(seq 1 24); do
@@ -75,12 +75,17 @@ jobs:
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
           grep -Fq 'src="assets/waymaking-ink-v25.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-waymaking-v26' /tmp/augustkring.html
+          grep -Fq 'waymaking-scroll.js?v=20261022-waymaking-v27' /tmp/augustkring.html
           grep -Fq '<path data-waymaking-reveal-path' /tmp/augustkring.html
           grep -Fq 'pathLength="1"' /tmp/augustkring.html
           grep -Fq 'mask-type="alpha"' /tmp/augustkring.html
+          grep -Fq 'stroke-width="190"' /tmp/augustkring.html
+          ! grep -Fq 'data-waymaking-brush-tip' /tmp/augustkring.html
+          ! grep -Fq 'data-waymaking-complete' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush-head-v24.png' /tmp/augustkring.html
           grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
+          grep -Fq 'Hands-On Execution</h3>' /tmp/augustkring.html
+          grep -Fq 'P&amp;L' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
@@ -125,13 +130,14 @@ jobs:
           curl -fsSL --max-time 20 "${base}assets/waymaking-ink-v25.webp" -o /tmp/waymaking-ink-v25.webp
           test "$(xxd -p -l 4 /tmp/waymaking-ink-v25.webp)" = "52494646"
           test "$(xxd -p -s 8 -l 4 /tmp/waymaking-ink-v25.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-waymaking-v26" -o /tmp/waymaking-scroll.js
+          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-waymaking-v27" -o /tmp/waymaking-scroll.js
           grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
           grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
           grep -Fq "revealPath.setAttribute('stroke-dashoffset'" /tmp/waymaking-scroll.js
-          grep -Fq 'getPointAtLength' /tmp/waymaking-scroll.js
-          grep -Fq "completedMask.setAttribute('opacity'" /tmp/waymaking-scroll.js
-          grep -Fq 'Math.exp(-elapsed / 72)' /tmp/waymaking-scroll.js
+          ! grep -Fq 'getPointAtLength' /tmp/waymaking-scroll.js
+          ! grep -Fq 'completedMask' /tmp/waymaking-scroll.js
+          ! grep -Fq 'brushTip' /tmp/waymaking-scroll.js
+          grep -Fq 'Math.exp(-elapsed / 32)' /tmp/waymaking-scroll.js
           grep -Fq 'const roadTarget = () =>' /tmp/waymaking-scroll.js
           ! grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
           grep -Fq 'road.dataset.waymakingDocument' /tmp/waymaking-scroll.js
@@ -296,7 +302,7 @@ jobs:
                 });
                 assert.deepEqual(positions.titles,[
                   'Creative Thinking','Commercial Understanding','Strategic Judgment',
-                  'AI-Native Building','Purpose Driven'
+                  'Hands-On Execution','Purpose Driven'
                 ]);
                 const stages=[];
                 let documentTop=null;
@@ -312,11 +318,8 @@ jobs:
                     const artspace=document.querySelector('.waymaking-artspace');
                     const svg=road.querySelector('.waymaking-original-reveal');
                     const drawPath=svg.querySelector('[data-waymaking-reveal-path]');
-                    const tip=svg.querySelector('[data-waymaking-brush-tip]');
-                    const complete=svg.querySelector('[data-waymaking-complete]');
-                    const fraction=Number(story.dataset.waymakingProgress);
-                    const expectedPoint=drawPath.getPointAtLength(
-                      drawPath.getTotalLength()*fraction);
+                    const overlays=svg.querySelectorAll(
+                      '[data-waymaking-brush-tip],[data-waymaking-complete],radialGradient');
                     const beats=[...story.querySelectorAll('.waymaking-beat')];
                     const box=x=>{
                       const b=x.getBoundingClientRect();
@@ -335,13 +338,10 @@ jobs:
                       routeDocumentTop:scrollY+route.top,
                       artspaceDocumentTop:scrollY+art.top,
                       texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
-                      offset:Number(drawPath.style.strokeDashoffset||
-                        drawPath.getAttribute('stroke-dashoffset')),
-                      tipX:Number(tip.getAttribute('cx')),
-                      tipY:Number(tip.getAttribute('cy')),
-                      expectedTipX:expectedPoint.x,
-                      expectedTipY:expectedPoint.y,
-                      completeOpacity:Number(complete.getAttribute('opacity')),
+                      offset:Number(drawPath.getAttribute('stroke-dashoffset')),
+                      maskWidth:Number(drawPath.getAttribute('stroke-width')),
+                      maskCap:drawPath.getAttribute('stroke-linecap'),
+                      overlayCount:overlays.length,
                       animated:story.dataset.waymakingAnimated==='true',
                       position:getComputedStyle(road).position,
                       parent:road.parentElement===artspace,
@@ -367,13 +367,10 @@ jobs:
                   assert.ok(state.fraction>=0&&state.fraction<=1,'Road progression out of range');
                   assert.ok(Math.abs(state.offset-(1-state.fraction))<0.003,
                     'Painted path must track normalized scroll progress');
-                  if(state.fraction>0&&state.fraction<1) {
-                    assert.ok(Math.hypot(state.tipX-state.expectedTipX,
-                      state.tipY-state.expectedTipY)<2.5,
-                      'Brush tip must follow the winding centreline');
-                    assert.equal(state.completeOpacity,0,
-                      'Completed image must not appear before the final stroke');
-                  }
+                  assert.equal(state.maskWidth,190,'Mask must not extend into adjacent bends');
+                  assert.equal(state.maskCap,'butt','Ink must start without a sudden round cap');
+                  assert.equal(state.overlayCount,0,
+                    'No independent brush-tip or completion overlay may appear');
                   if(index===0)assert.ok(state.fraction>.01,'Beginning of road not visible at Creative Thinking');
                   console.log('Waymaking reading stage',width,index,state.fraction,state.emphasis);
                   if(index>0)assert.ok(state.fraction>stages[index-1].fraction+.04,
@@ -444,12 +441,12 @@ jobs:
                   bottom:el.getBoundingClientRect().bottom,
                   position:getComputedStyle(el).position,
                   progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress),
-                  completion:Number(el.querySelector('[data-waymaking-complete]').getAttribute('opacity')),
-                  offset:Number(el.querySelector('[data-waymaking-reveal-path]').style.strokeDashoffset)
+                  overlayCount:el.querySelectorAll('[data-waymaking-brush-tip],[data-waymaking-complete]').length,
+                  offset:Number(el.querySelector('[data-waymaking-reveal-path]').getAttribute('stroke-dashoffset'))
                 }));
                 assert.equal(after.position,'absolute','Road must not be viewport pinned');
                 assert.equal(after.progress,1,'Road must finish fully painted');
-                assert.equal(after.completion,1,'Tapered final ink should be completely revealed');
+                assert.equal(after.overlayCount,0,'Completed road cannot flash a second mask layer');
                 assert.equal(after.offset,0,'Final path must have zero dashoffset');
                 const workTop=await page.locator('#work-title').evaluate(el=>el.getBoundingClientRect().top);
                 assert.ok(after.bottom<=workTop-24,'Ink overlaps My current focus');

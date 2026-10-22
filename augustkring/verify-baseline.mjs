@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"11ec6d6a","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"6ca39f16","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -45,11 +45,11 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must stay retired');
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','AI-Native Building','Purpose Driven']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -61,9 +61,9 @@ assert.ok(thread.includes('src="assets/waymaking-ink-v25.webp"'),'High-resolutio
 assert.ok(thread.includes('href="assets/waymaking-ink-v25.webp"'),'SVG mask must reveal new generated WebP');
 assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
 assert.equal((thread.match(/<path data-waymaking-reveal-path /g)||[]).length,1,'Exactly one curve-following paint path required');
-assert.equal((thread.match(/<circle data-waymaking-brush-tip /g)||[]).length,1,'Exactly one soft paintbrush tip required');
-assert.ok(thread.includes('mask-type="alpha"') && thread.includes('stroke-dasharray="1 1"'),'Normalized alpha-mask path reveal missing');
-assert.ok(thread.includes('data-waymaking-complete'),'Fully painted trailing fibres must remain visible');
+assert.ok(!thread.includes('data-waymaking-brush-tip'),'No independent brush-tip overlay may appear over ink');
+assert.ok(thread.includes('mask-type="alpha"') && thread.includes('stroke-dasharray="1 1"') && thread.includes('stroke-width="190"') && thread.includes('stroke-linecap="butt"'),'One narrow normalized alpha-mask stroke required');
+assert.ok(!thread.includes('data-waymaking-complete'),'No full-frame completion overlay may flash into view');
 assert.ok(!thread.includes('waymaking-brush-head-v24.png'),'Legacy artificial brushhead must not render');
 assert.ok(thread.includes('viewBox="0 0 720 2148"'),'Full-height artwork viewBox missing');
 assert.ok(thread.includes('maskUnits="userSpaceOnUse"'),'Native SVG mask missing');
@@ -78,7 +78,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v26'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v27'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -92,13 +92,14 @@ assert.ok(css.includes('.waymaking-road-wrap {\n  position: absolute;') && css.i
 assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.waymaking-copy-column::after'),'Wrong pre/post viewport spacers returned');
 assert.ok(css.includes('/* V23: a single reading column;') && css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile must use full-width reading column with centered background road');
 assert.ok(css.includes('-webkit-tap-highlight-color: transparent;') && css.includes('mobile-navigation-panel a:active'),'Mobile menu must use red-only navigation feedback');
+assert.ok(css.includes('min-height: clamp(190px, 29svh, 254px);') && css.includes('min-height: clamp(196px, 30svh, 260px);'),'Consistent breathing room restored for mobile Waymaking');
 assert.ok(!css.includes('.waymaking-resolution'),'Deleted Waymaker conclusion must not reserve spacing');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('lastParagraphBottom') && scrollController.includes('return easing(raw)'),'Continuous painted route must begin gradually and finish after the final paragraph');
-assert.ok(scrollController.includes("revealPath.setAttribute('stroke-dashoffset'") && scrollController.includes('getPointAtLength'),'Path-following paint must use one stroke and its true arc distance');
-assert.ok(scrollController.includes("completedMask.setAttribute('opacity'"),'Complete state must preserve all bottom ink fibres');
-assert.ok(scrollController.includes('Math.exp(-elapsed / 72)') && scrollController.includes('Math.exp(-elapsed / 58)'),'Frame-time road and text smoothing must be present');
+assert.ok(scrollController.includes("revealPath.setAttribute('stroke-dashoffset'") && !scrollController.includes('getPointAtLength'),'One SVG stroke should follow the native path without a trailing secondary layer');
+assert.ok(!scrollController.includes('completedMask') && !scrollController.includes('brushTip'),'Scroll drawing must not have additional overlay layers');
+assert.ok(scrollController.includes('Math.exp(-elapsed / 32)') && scrollController.includes('Math.exp(-elapsed / 58)'),'Frame-time smoothing should follow the finger without a delayed second stroke');
 assert.ok(scrollController.includes('const textTarget = heading =>') && scrollController.includes('const complete = height * 0.48'),'Reading activation must happen near the viewport middle');
 assert.ok(!scrollController.includes('glyphWeight') && !scrollController.includes('replaceChildren'),'Per-letter fade-out and DOM rewrites must not return');
 assert.ok(!scrollController.includes('road.style.opacity'),'Entire ink must never fade in/out');
@@ -112,6 +113,8 @@ for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.
 }
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(!scrollController.includes('waymaking-heading-word'),'Plain semantic headings must remain unfragmented');
+assert.ok(!thread.includes('AI-Native Building</h3>'),'Fourth chapter must emphasize hands-on execution');
+assert.ok(thread.includes('quick pretotypes') && thread.includes('P&amp;L'),'Execution and commercial experience must be communicated plainly');
 assert.ok(css.includes('.waymaking-copy h3 {') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand namespaces must be distinct');
 assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-reveal artwork styling missing');
 assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven should share competency typography');
@@ -127,7 +130,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261022-waymaking-v26':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261022-waymaking-v27':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

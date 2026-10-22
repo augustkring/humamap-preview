@@ -1,5 +1,5 @@
 /*
- * Waymaking V26. The ink remains in its document-anchored artspace.
+ * Waymaking V27. The ink remains in its document-anchored artspace.
  * One high-resolution tapered ink source is revealed along its own curved midline.
  * Text becomes legible near the middle of the reading viewport and never
  * dims after being passed. State follows scroll in either direction.
@@ -10,11 +10,9 @@
   const story = document.querySelector('[data-waymaking-story]');
   const road = story?.querySelector('.waymaking-road-wrap');
   const revealPath = road?.querySelector('[data-waymaking-reveal-path]');
-  const brushTip = road?.querySelector('[data-waymaking-brush-tip]');
-  const completedMask = road?.querySelector('[data-waymaking-complete]');
   const beats = story ? [...story.querySelectorAll('.waymaking-beat')] : [];
 
-  if (!story || !road || !revealPath || !brushTip || !completedMask || beats.length !== 5) return;
+  if (!story || !road || !revealPath || beats.length !== 5) return;
 
   const content = beats.map(beat => ({
     beat,
@@ -39,8 +37,7 @@
   const TITLE_ACTIVE = [11, 34, 61];
   const BODY_MUTED = [95, 111, 127];
   const BODY_ACTIVE = [38, 59, 83];
-  const routeLength = revealPath.getTotalLength();
-  if (!Number.isFinite(routeLength) || routeLength <= 0) return;
+  if (revealPath.getTotalLength() <= 0) return;
 
   let frame = 0;
   let lastTime = 0;
@@ -87,24 +84,10 @@
     if (fraction > 0 && fraction < 1 &&
         Math.abs(fraction - renderedProgress) < 0.00015) return;
 
-    // The reveal follows the actual winding brush centreline.
-    // The radial alpha tip can only add ink: it never erases prior paint.
-    // Use SVG's unitless presentation attribute: unitless CSS lengths are
-    // rejected by Firefox and can silently freeze the reveal.
-    revealPath.setAttribute('stroke-dashoffset', String(1 - fraction));
-    if (fraction > 0 && fraction < 1) {
-      const point = revealPath.getPointAtLength(routeLength * fraction);
-      brushTip.setAttribute('cx', point.x.toFixed(2));
-      brushTip.setAttribute('cy', point.y.toFixed(2));
-      // Avoid the instant large circle caused by a round 148px brush tip.
-      // Start with a thin ink fibre and gradually introduce the soft tip.
-      const tipWeight = easing((fraction - 0.012) / 0.065);
-      brushTip.setAttribute('opacity', (tipWeight * 0.52).toFixed(3));
-    } else {
-      brushTip.setAttribute('opacity', '0');
-    }
-    // At 100% show every remaining dry-brush fibre of the tapered ending.
-    completedMask.setAttribute('opacity', fraction === 1 ? '1' : '0');
+    // One persistent path mask only. The source artwork's alpha already
+    // contains the natural dry-brush fibres. The narrower 190-unit mask
+    // covers the visible ink without a radial overlay or 100%-state flash.
+    revealPath.setAttribute('stroke-dashoffset', (1 - fraction).toFixed(6));
 
     renderedProgress = fraction;
     story.dataset.waymakingProgress = fraction.toFixed(4);
@@ -116,7 +99,7 @@
     frame = 0;
     const elapsed = lastTime ? Math.max(1, timestamp - lastTime) : 16;
     lastTime = timestamp;
-    const factor = reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 72);
+    const factor = reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 32);
     const textFactor = reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 58);
     let needsAnotherFrame = false;
 
