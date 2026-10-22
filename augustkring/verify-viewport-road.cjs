@@ -337,6 +337,10 @@ async function runOne(browser,engine,width) {
     }
 
     if(width<=840){
+      // The 390px scenario resizes to 1024px above. Restore the phone
+      // viewport before testing the mobile-only navigation toggle.
+      await page.setViewportSize({width,height:900});
+      await page.waitForTimeout(150);
       await page.locator('[data-mobile-nav-open]').click();
       const link=page.locator('.mobile-navigation-panel a').first();
       const props=await link.evaluate(el=>{
