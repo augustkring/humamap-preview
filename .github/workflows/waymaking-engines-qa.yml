@@ -5,6 +5,12 @@ on:
     paths:
       - "augustkring/**"
       - ".github/workflows/waymaking-engines-qa.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "augustkring/**"
+      - ".github/workflows/waymaking-engines-qa.yml"
 
 permissions:
   contents: read
