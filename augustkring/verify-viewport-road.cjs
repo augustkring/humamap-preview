@@ -266,33 +266,25 @@ async function runOne(browser,engine,width) {
   assert.ok(Math.abs(rewind.fraction-stages[1].fraction)<.008,
     'Reverse scrolling must deterministically redraw same path fraction');
   await scroll(page,middles[4]-900*.16);
-  // Following sections MUST be clean; crop test to on-screen road region only.
+  // After the fifth chapter the road is DONE, not gone. It remains the same
+  // viewport-fixed background while the rest of the page scrolls past it.
   for(const selector of ['#work','#perspective','.homepage-contact','.home-footer']) {
    const pos=await page.locator(selector).first().evaluate(el=>
     scrollY+el.getBoundingClientRect().top-innerHeight*.42);
    await scroll(page,pos);
-   const pixels=await paintedPixels(page);
-   if(pixels>0){
-    const state=await checkpoint(page);
-    const coords=await page.evaluate(()=>({scrollY,viewportHeight:innerHeight}));
-    const bounds=await page.evaluate(()=>{
-      const r=x=>document.querySelector(x).getBoundingClientRect();
-      return {finalCopyBottom:r('.waymaking-purpose .waymaking-copy').bottom,
-        signoffTop:r('.waymaking-resolution p').top,
-        workTop:r('#work').top,workHeadingTop:r('#work-title').top,
-        introBottom:r('.thread-summary').bottom,
-        isActive:document.body.dataset.waymakingRoadActive};
-    });
-    console.log('EXIT_FAIL_DIAGNOSTIC',engine,width,selector,JSON.stringify({pixels,road:state.road,scene:state.scene,intro:state.intro,coords,storyGap:state.endTop-state.lastCopyBottom,bounds}));
-    await page.screenshot({path:join(output,engine+'-'+width+'-exit-debug.png'),animations:'disabled'});
-   }
-   assert.equal(pixels,0,'Road continued under '+selector+': '+pixels+' rendered pixels');
+   const state=await checkpoint(page);
+   assert.equal(state.visible,true,'Completed road disappeared under '+selector);
+   assert.equal(state.fixed,true,'Completed road stopped being viewport-fixed under '+selector);
+   assert.ok(Math.abs(state.road.top-16)<1,'Completed road moved under '+selector);
+   assert.equal(state.roadOpacity,1,'Completed road faded under '+selector);
+   assert.equal(state.fraction,1,'Completed road progress changed under '+selector);
   }
-  // A real visitor can scroll BACK from later sections; mask and road
-  // must return to their exact previous state, not remain faded or hidden.
+  // A real visitor can scroll BACK into the story; the same deterministic
+  // scroll range must rewind the paint without moving the fixed road.
   await scroll(page,middles[2]-900*.16);
   const restored=await checkpoint(page);
-  assert.ok(restored.roadOpacity>.99,'Road did not reappear after reverse scroll from later content');
+  assert.ok(restored.roadOpacity>.99,'Road opacity changed after reverse scroll');
+  assert.ok(Math.abs(restored.road.top-16)<1,'Road moved after reverse scroll');
   assert.ok(Math.abs(restored.fraction-stages[2].fraction)<.008,
     'Road did not rewind to Strategic Judgment after leaving story');
 
@@ -328,7 +320,7 @@ async function runOne(browser,engine,width) {
   }
 
   assert.deepEqual(problems,[],'Browser JS errors');
-  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:'approved-original',opaqueRect:false,overlaps:0,noLaterInk:true,reverseFromExit:true}));
+  console.log('PASS '+engine+' '+width+' '+JSON.stringify({stages,storyGap,bitmap:'approved-original',opaqueRect:false,overlaps:0,persistentAfterCompletion:true,reverseFromCompletion:true}));
  }finally {await page.close();}
 }
 (async()=>{
