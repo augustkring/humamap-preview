@@ -1800,3 +1800,5 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     padding: 24px 0;
   }
 }
+/* V24 organic brush-head performance contract:
+   static alpha texture, no per-frame SVG turbulence or whole-image filters. */
