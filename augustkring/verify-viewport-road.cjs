@@ -53,6 +53,7 @@ async function checkpoint(page) {
       maskOffset:Number(drawPath.getAttribute('stroke-dashoffset')),
       maskWidth:Number(drawPath.getAttribute('stroke-width')),
       maskCap:drawPath.getAttribute('stroke-linecap'),
+      offscreenStart:drawPath.getAttribute('d').startsWith('M 294,-132'),
       overlayCount:paintOverlays.length,
       featherCount:art.querySelectorAll('[data-waymaking-feather]').length,
       emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
@@ -149,7 +150,8 @@ async function runOne(browser,engine,width) {
     assert.equal(initial.scaling,1,'SVG must use preserveAspectRatio="none"');
     assert.equal(initial.imagePieces,1,'Exactly one high-resolution ink image must be in the SVG');
     assert.equal(initial.maskWidth,190,'Only a narrow source-fitting mask may reveal the ink');
-    assert.equal(initial.maskCap,'butt','No sudden round paint cap at the beginning');
+    assert.equal(initial.maskCap,'round','The leading edge must be naturally rounded');
+    assert.equal(initial.offscreenStart,true,'The brush cap must start outside the SVG to avoid an initial ink pop');
     assert.equal(initial.overlayCount,0,'No additional brush-tip or completion overlay may appear');
     assert.equal(initial.imageSource,'assets/waymaking-ink-v25.webp');
     assert.equal(initial.animatedOriginal,'assets/waymaking-ink-v25.webp');

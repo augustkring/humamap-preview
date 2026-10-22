@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"6ca39f16","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"281f5556","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -62,7 +62,7 @@ assert.ok(thread.includes('href="assets/waymaking-ink-v25.webp"'),'SVG mask must
 assert.ok(thread.includes('class="waymaking-original-reveal"'),'Original artwork reveal is missing');
 assert.equal((thread.match(/<path data-waymaking-reveal-path /g)||[]).length,1,'Exactly one curve-following paint path required');
 assert.ok(!thread.includes('data-waymaking-brush-tip'),'No independent brush-tip overlay may appear over ink');
-assert.ok(thread.includes('mask-type="alpha"') && thread.includes('stroke-dasharray="1 1"') && thread.includes('stroke-width="190"') && thread.includes('stroke-linecap="butt"'),'One narrow normalized alpha-mask stroke required');
+assert.ok(thread.includes('mask-type="alpha"') && thread.includes('stroke-dasharray="1 1"') && thread.includes('stroke-width="190"') && thread.includes('stroke-linecap="round"') && thread.includes('M 294,-132'),'One narrow, off-canvas-started, naturally capped alpha-mask stroke required');
 assert.ok(!thread.includes('data-waymaking-complete'),'No full-frame completion overlay may flash into view');
 assert.ok(!thread.includes('waymaking-brush-head-v24.png'),'Legacy artificial brushhead must not render');
 assert.ok(thread.includes('viewBox="0 0 720 2148"'),'Full-height artwork viewBox missing');
@@ -78,7 +78,7 @@ for(const [filename,sha] of [
  const actualSha=createHash('sha1').update('blob '+bytes.length+String.fromCharCode(0)).update(bytes).digest('hex');
  assert.equal(actualSha,sha,'APPROVED SOURCE ARTWORK HAS CHANGED: '+filename);
 }
-assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v27'),'Original artwork controller missing');
+assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v28'),'Original artwork controller missing');
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
@@ -130,7 +130,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261022-waymaking-v27':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261022-waymaking-v28':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
