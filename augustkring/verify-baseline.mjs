@@ -86,7 +86,7 @@ assert.ok(css.includes('.waymaking-beat:nth-child(odd)') && css.includes('.wayma
 assert.ok(css.includes('.waymaking-original-source')&&css.includes('.waymaking-original-reveal'),'Restored source/fallback styling missing');
 assert.ok(css.includes('position: fixed;\n  z-index: 10;\n  top: 16px;'),'Original road must be fixed at top 16px');
 assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.waymaking-copy-column::after'),'Wrong pre/post viewport spacers returned');
-assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) auto 0;'),'Waymaker transition must not be a blank viewport');
+assert.ok(css.includes('margin: clamp(30px, 5svh, 70px) 0 0 auto;'),'Waymaker transition must remain compact, in its own text column');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('paintStages = [0.16, 0.37, 0.59, 0.80, 1]'),'Progressive drawing must track five chapter checkpoints');
