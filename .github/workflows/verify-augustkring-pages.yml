@@ -120,7 +120,8 @@ jobs:
           grep -Fq 'const scheduleUpdate = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'strokeDashoffset' /tmp/waymaking-scroll.js
           grep -Fq 'getTotalLength()' /tmp/waymaking-scroll.js
-          grep -Fq 'const roadFraction = () =>' /tmp/waymaking-scroll.js
+          grep -Fq 'paintStages = [0.16, 0.37, 0.59, 0.80, 1]' /tmp/waymaking-scroll.js
+          grep -Fq 'const progressState = () =>' /tmp/waymaking-scroll.js
           grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
           ! grep -Fq 'updateBackdropClip' /tmp/waymaking-scroll.js
           ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
