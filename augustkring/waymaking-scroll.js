@@ -118,21 +118,23 @@
       return bounds.top + bounds.height * 0.5;
     });
 
-    // The ink can only begin once the preceding "Where I add value" copy has
-    // cleared the fixed 16px road origin. Fade-in is not used: a short
-    // clearance ramp grows the mask itself from zero, so there is no pop.
-    const clearance = smooth((16 - summaryBottom) /
-      Math.max(56, viewportHeight * 0.08));
-    if (clearance <= 0) return { fraction: 0, phase: 0 };
+    // Start only when "Where I add value" has cleared the fixed road origin.
+    // From that exact point to the Creative Thinking checkpoint, interpolate
+    // 0 -> 16%. Both values are derived from live geometry, so the reveal is
+    // continuous and identical in intent across responsive text heights.
+    const cleared = Math.max(0, 16 - summaryBottom);
+    if (cleared <= 0) return { fraction: 0, phase: 0 };
 
     let phase = 0;
     let fraction = 0;
 
     if (focus <= centers[0]) {
-      const firstTop = beats[0].getBoundingClientRect().top;
-      const entry = smooth((viewportHeight * 0.94 - firstTop) /
-        Math.max(1, viewportHeight * 0.70));
-      fraction = entry * paintStages[0] * clearance;
+      const distanceToFirstCheckpoint = Math.max(
+        1,
+        centers[0] - focus + cleared,
+      );
+      const firstProgress = smooth(cleared / distanceToFirstCheckpoint);
+      fraction = paintStages[0] * firstProgress;
     } else if (focus >= centers[centers.length - 1]) {
       phase = beats.length - 1;
       fraction = 1;
