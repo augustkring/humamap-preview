@@ -287,7 +287,7 @@ jobs:
                 let previousScroll=null;
                 for(let index=0;index<5;index++){
                   await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
-                    positions.centers[index]-900*.16);
+                    positions.centers[index]-900*.52);
                   await page.waitForTimeout(390);
                   const state=await page.evaluate(()=>{
                     const story=document.querySelector('[data-waymaking-story]');
@@ -342,6 +342,7 @@ jobs:
                   assert.ok(Math.abs(state.featherY-state.solid)<.1,
                     'Soft painting edge not continuous');
                   if(index===0)assert.ok(state.fraction>.01,'Beginning of road not visible at Creative Thinking');
+                  console.log('Waymaking reading stage',width,index,state.fraction,state.emphasis);
                   if(index>0)assert.ok(state.fraction>stages[index-1].fraction+.04,
                     'Road must keep growing, not pause at discrete chapter steps');
                   for(let previous=0;previous<=index;previous++){
@@ -377,8 +378,8 @@ jobs:
 
                 // Verify intermediate samples, not merely five checkpoints.
                 const transition=[];
-                const first=positions.centers[0]-900*.16;
-                const last=positions.centers[4]-900*.16;
+                const first=positions.centers[0]-900*.52;
+                const last=positions.centers[4]-900*.52;
                 for(let step=0;step<=12;step++){
                   await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
                     first+(last-first)*step/12);
