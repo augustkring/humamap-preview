@@ -492,10 +492,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   flex-direction: column;
   gap: clamp(8px, 1svh, 12px);
 }
-/* Enter with room for the approved full image to settle at top:16px
-   BEFORE Creative Thinking is first read, without overlap or a JS pop. */
-/* The first heading begins beside the visible start of the SVG.
-   No pre-chapter or full-viewport conclusion spacers. */
+/* The ink stays anchored in the Waymaking artspace; scroll only changes reveal. */
 .waymaking-beat {
   position: relative;
   display: grid;
@@ -541,18 +538,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-.waymaking-copy .waymaking-heading-word {
-  display: inline-block;
-  max-width: 100%;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  font-size: inherit;
-  line-height: inherit;
-  letter-spacing: inherit;
-}
-.waymaking-copy .waymaking-letter {
-  display: inline;
-}
 .waymaking-artspace {
   position: relative;
   grid-area: 1 / 1;
@@ -576,13 +561,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   pointer-events: none;
   opacity: 1;
 }
-.waymaking-road-wrap [data-waymaking-reveal],
-.waymaking-road-wrap [data-waymaking-feather] {
-  stroke-dasharray: 10000 10000;
-  stroke-dashoffset: 10000;
-}
 .home-header, .home-main, .home-footer { position: relative; z-index: 1; }
-/* Exact V12 source art; one original illustration, scroll-revealed. */
+/* Responsive transparent generated ink; lightweight scroll-progress mask. */
 .waymaking-original-source,
 .waymaking-original-source img {
   display: block;
