@@ -119,7 +119,7 @@
       document.body.dataset.waymakingRoadActive =
         firstHeading.getBoundingClientRect().top < window.innerHeight * .92 &&
         finalCopy.getBoundingClientRect().bottom > 0 &&
-        downstream.getBoundingClientRect().top > window.innerHeight * .25
+        downstream.getBoundingClientRect().top > window.innerHeight * .58
           ? 'true' : 'false';
       for (const {path,feathers} of strokes) {
         path.style.strokeDashoffset = '0';
@@ -138,7 +138,7 @@
     // After the fifth text exits, the whole layer is offstage. No fade.
     const active = firstHeading.getBoundingClientRect().top < window.innerHeight * .92 &&
       finalCopy.getBoundingClientRect().bottom > 0 &&
-      downstream.getBoundingClientRect().top > window.innerHeight * .25;
+      downstream.getBoundingClientRect().top > window.innerHeight * .58;
     document.body.dataset.waymakingRoadActive = active ? 'true' : 'false';
     const focus = window.innerHeight * 0.16;
     const centers = beats.map(beat => {

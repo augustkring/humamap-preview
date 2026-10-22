@@ -208,6 +208,18 @@ async function runOne(browser,engine,width) {
     assert.equal(collision,0,'Road overlays paragraph '+labels[index]+' at '+width+'px');
    }
    assert.ok(state.intro.bottom<=state.road.top+1,'Road activated while introduction remains visible');
+   if(i===4){
+     const signature=await page.locator('.waymaking-resolution p').evaluate(el=>{
+       const r=el.getBoundingClientRect();
+       return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
+     });
+     assert.equal(overlap(state.road,signature),0,'Fixed ink obscures Waymaker conclusion');
+     const heading=await page.locator('#work-title').evaluate(el=>{
+       const r=el.getBoundingClientRect();
+       return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
+     });
+     assert.equal(overlap(state.road,heading),0,'Fixed ink obscures My current focus heading');
+   }
    if(i>0)assert.ok(state.fraction>stages[i-1].fraction+.10,
      'Road did NOT grow into '+labels[i]+', previous '+stages[i-1].fraction+' next '+state.fraction);
    const coverage=await paintedCoverage(page);
