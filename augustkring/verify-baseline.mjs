@@ -96,7 +96,7 @@ assert.ok(!scrollController.includes('document.body.appendChild(road)'),'Road ma
 assert.ok(!scrollController.includes('data-waymaking-viewport'),'Viewport-fixed road mode may NOT return');
 assert.ok(!scrollController.includes('waymakingRoadActive'),'Road may NOT be display-toggled by scroll position');
 assert.ok(scrollController.includes("fraction >= 1 ? 'complete' : 'drawing'"),'Road completion state must remain explicit');
-assert.ok(scrollController.includes('const cleared = Math.max(0, 16 - summaryBottom)') && scrollController.includes('distanceToFirstCheckpoint') && scrollController.includes('return { fraction: clamp(fraction), phase }'),'Road reveal must interpolate from intro clearance to the Creative Thinking checkpoint and remain clamped');
+assert.ok(scrollController.includes('const entry = smooth((viewportHeight * 0.94 - firstTop)') && scrollController.includes('return { fraction: clamp(fraction), phase }'),'Road reveal must begin as the document-anchored scene enters and remain clamped');
 assert.ok(!scrollController.includes('--waymaking-safe-top'),'Original picture may NOT be progressively clipped behind the intro');
 assert.ok(scrollController.includes("reduced.matches"),'Reduced motion preference missing');
 for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.top','brush.setAttribute']){
