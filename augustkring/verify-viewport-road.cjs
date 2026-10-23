@@ -10,7 +10,7 @@ const output=process.env.ROAD_OUTPUT||'artifacts';
 const engines=(process.env.ROAD_ENGINES||'chromium').split(',');
 const widths=(process.env.ROAD_WIDTHS||'320,390,768,1024,1440').split(',').map(Number);
 const browserTypes={chromium,firefox,webkit};
-const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven'];
+const labels=['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile'];
 mkdirSync(output,{recursive:true});
 
 async function scroll(page,y) {
@@ -203,7 +203,7 @@ async function runOne(browser,engine,width) {
       assert.equal(state.visible,true,'Road must remain renderable inside its own section');
       assert.equal(state.overflow,false);
       assert.ok(state.fraction>=0&&state.fraction<=1,'Road must remain clamped');
-      if(i===0) assert.ok(state.fraction>.015,'First brush segment missing at Creative Thinking');
+      if(i===0) assert.ok(state.fraction>.015,'First brush segment missing at the first Waymaking chapter');
       console.log('Waymaking reading stage',engine,width,i,state.fraction,state.emphasis);
       if(i>0) assert.ok(state.fraction>stages[i-1].fraction+.045,
         'Road is stalling between chapters instead of painting continuously');

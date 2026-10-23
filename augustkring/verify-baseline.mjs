@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"281f5556","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"503ae853","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -45,16 +45,44 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must stay retired');
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
+for(const label of ['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
+for(const label of ['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
 }
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
+// Waymaking extends the introduction with five different, usable decisions
+// rather than restating the same personal traits and mission in new words.
+const waymakingEntries=[...thread.matchAll(/<article class="waymaking-beat(?: waymaking-purpose)?"[^>]*>[\\s\\S]*?<h3>([^<]+)<\\/h3>\\s*<p>([^<]+)<\\/p>/g)];
+assert.equal(waymakingEntries.length,5,'Exactly five complete Waymaking chapters required');
+const normalize=(value)=>value.replaceAll('&amp;','&').toLowerCase()
+  .match(/[a-z0-9]+(?:['-][a-z0-9]+)*/g)||[];
+const ngrams=(words,n)=>{
+  const values=new Set();
+  for(let i=0;i<=words.length-n;i++)values.add(words.slice(i,i+n).join(' '));
+  return values;
+};
+const priorWords=normalize(threadSummary);
+for(const [index,entry] of waymakingEntries.entries()){
+  const words=normalize(entry[2]);
+  assert.ok(words.length>=30&&words.length<=43,
+    'Each Waymaking paragraph must be short and comparable in length: '+entry[1]+' / '+words.length);
+  const overlap=ngrams(words,5);
+  assert.ok([...overlap].every(phrase=>!ngrams(priorWords,5).has(phrase)),
+    'Waymaking chapter repeats an entire phrase from Where I add value: '+entry[1]);
+  priorWords.push(...words);
+}
+for(const essential of [
+ 'an unmet need', 'a market shift', 'P&amp;L', 'customer acquisition',
+ 'how to get to market', 'proceed, change course or stop',
+ 'a quick pretotype to test demand', 'first working product',
+ 'people, planet and profit in practice'
+])assert.ok(thread.includes(essential),'Missing concrete capability, reason-to-believe or outcome: '+essential);
+
 assert.ok(thread.includes('class="waymaking-original-source"'),'Approved original artwork picture missing');
 assert.ok(!thread.includes('waymaking-editorial-ink.avif'),'Obsolete low-resolution AVIF must not be rendered');
 assert.ok(thread.includes('src="assets/waymaking-ink-v25.webp"'),'High-resolution generated WebP fallback missing');

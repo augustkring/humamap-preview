@@ -303,8 +303,8 @@ jobs:
                   };
                 });
                 assert.deepEqual(positions.titles,[
-                  'Creative Thinking','Commercial Understanding','Strategic Judgment',
-                  'Hands-On Execution','Purpose Driven'
+                  'Define the Opportunity','Check the Business Case','Choose a Direction',
+                  'Test and Build','Build Something Worthwhile'
                 ]);
                 const stages=[];
                 let documentTop=null;
@@ -375,7 +375,7 @@ jobs:
                   assert.equal(state.offscreenStart,true,'Brush must enter from outside the image, never pop into view');
                   assert.equal(state.overlayCount,0,
                     'No independent brush-tip or completion overlay may appear');
-                  if(index===0)assert.ok(state.fraction>.01,'Beginning of road not visible at Creative Thinking');
+                  if(index===0)assert.ok(state.fraction>.01,'Beginning of road not visible at first Waymaking chapter');
                   console.log('Waymaking reading stage',width,index,state.fraction,state.emphasis);
                   if(index>0)assert.ok(state.fraction>stages[index-1].fraction+.04,
                     'Road must keep growing, not pause at discrete chapter steps');
