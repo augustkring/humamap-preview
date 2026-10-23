@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"503ae853","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"6b4a33f4","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -79,7 +79,7 @@ for(const [index,entry] of waymakingEntries.entries()){
 for(const essential of [
  'an unmet need', 'a market shift', 'P&amp;L', 'customer acquisition',
  'how to get to market', 'proceed, change course or stop',
- 'a quick pretotype to test demand', 'first working product',
+ 'quick pretotypes to see whether customers actually want the idea', 'first working product',
  'people, planet and profit in practice'
 ])assert.ok(thread.includes(essential),'Missing concrete capability, reason-to-believe or outcome: '+essential);
 
