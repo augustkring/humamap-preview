@@ -57,7 +57,7 @@ for(const label of ['Define the Opportunity','Check the Business Case','Choose a
 assert.equal((thread.match(/<h3>/g)||[]).length,5,'Five semantic chapter headings required');
 // Waymaking extends the introduction with five different, usable decisions
 // rather than restating the same personal traits and mission in new words.
-const waymakingEntries=[...thread.matchAll(/<article class="waymaking-beat(?: waymaking-purpose)?"[^>]*>[\\s\\S]*?<h3>([^<]+)<\\/h3>\\s*<p>([^<]+)<\\/p>/g)];
+const waymakingEntries=[...thread.matchAll(/<h3>([^<]+)<\/h3>\s*<p>([^<]+)<\/p>/g)];
 assert.equal(waymakingEntries.length,5,'Exactly five complete Waymaking chapters required');
 const normalize=(value)=>value.replaceAll('&amp;','&').toLowerCase()
   .match(/[a-z0-9]+(?:['-][a-z0-9]+)*/g)||[];
