@@ -79,7 +79,7 @@ for(const [index,entry] of waymakingEntries.entries()){
 for(const essential of [
  'an unmet need', 'a market shift', 'P&amp;L', 'customer acquisition',
  'how to get to market', 'proceed, change course or stop',
- 'quick pretotypes to see whether customers actually want the idea', 'first working product',
+ 'quick pretotypes to see whether customers actually want the idea', 'an early working version or workflow',
  'people, planet and profit in practice'
 ])assert.ok(thread.includes(essential),'Missing concrete capability, reason-to-believe or outcome: '+essential);
 
