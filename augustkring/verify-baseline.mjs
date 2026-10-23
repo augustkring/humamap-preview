@@ -141,11 +141,11 @@ for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.
 }
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(!scrollController.includes('waymaking-heading-word'),'Plain semantic headings must remain unfragmented');
-assert.ok(!thread.includes('AI-Native Building</h3>'),'Fourth chapter must emphasize hands-on execution');
-assert.ok(thread.includes('quick pretotypes') && thread.includes('P&amp;L'),'Execution and commercial experience must be communicated plainly');
+assert.ok(!thread.includes('AI-Native Building</h3>') && !thread.includes('Hands-On Execution</h3>'),'Fourth chapter must explain real tests and prototypes, not a generic AI skill');
+assert.ok(thread.includes('a quick pretotype to test demand') && thread.includes('P&amp;L'),'Execution and commercial experience must be communicated plainly');
 assert.ok(css.includes('.waymaking-copy h3 {') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand namespaces must be distinct');
 assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-reveal artwork styling missing');
-assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven should share competency typography');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Build Something Worthwhile</h3>'),'Final value-based chapter should share competency typography');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');

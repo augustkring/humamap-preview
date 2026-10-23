@@ -85,9 +85,12 @@ jobs:
           ! grep -Fq 'data-waymaking-brush-tip' /tmp/augustkring.html
           ! grep -Fq 'data-waymaking-complete' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush-head-v24.png' /tmp/augustkring.html
-          grep -Fq 'Purpose Driven</h3>' /tmp/augustkring.html
-          grep -Fq 'Hands-On Execution</h3>' /tmp/augustkring.html
+          grep -Fq 'Build Something Worthwhile</h3>' /tmp/augustkring.html
+          grep -Fq 'Test and Build</h3>' /tmp/augustkring.html
           grep -Fq 'P&amp;L' /tmp/augustkring.html
+          grep -Fq 'Define the Opportunity</h3>' /tmp/augustkring.html
+          grep -Fq 'Check the Business Case</h3>' /tmp/augustkring.html
+          grep -Fq 'Choose a Direction</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
@@ -276,7 +279,7 @@ jobs:
                 }
                 assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
                 assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future, together with bold people, create things that matter and leave the world a little better than I found it.");
-                assert.equal(editorial.purposeTitle,'Purpose Driven');
+                assert.equal(editorial.purposeTitle,'Build Something Worthwhile');
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
                 assert.equal(editorial.waymakingTitle,'Waymaking');
