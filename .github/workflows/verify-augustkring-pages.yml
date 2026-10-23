@@ -55,7 +55,7 @@ jobs:
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html && grep -Fq '<h3>Creative Thinking</h3>' /tmp/augustkring.html && grep -Fq '<h3>Commercial Understanding</h3>' /tmp/augustkring.html && grep -Fq '<h3>Strategic Judgment</h3>' /tmp/augustkring.html && grep -Fq '<h3>Hands-On Execution</h3>' /tmp/augustkring.html && grep -Fq '<h3>Purpose Driven</h3>' /tmp/augustkring.html; then
               echo "Approved Waymaking homepage, stylesheet and script are published."
               break
             fi
