@@ -10,7 +10,7 @@ const output=process.env.ROAD_OUTPUT||'artifacts';
 const engines=(process.env.ROAD_ENGINES||'chromium').split(',');
 const widths=(process.env.ROAD_WIDTHS||'320,390,768,1024,1440').split(',').map(Number);
 const browserTypes={chromium,firefox,webkit};
-const labels=['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile'];
+const labels=['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven'];
 mkdirSync(output,{recursive:true});
 
 async function scroll(page,y) {

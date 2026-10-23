@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"6b4a33f4","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"c0d62a72","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -45,11 +45,11 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must stay retired');
-for(const label of ['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Define the Opportunity','Check the Business Case','Choose a Direction','Test and Build','Build Something Worthwhile']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -141,11 +141,11 @@ for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.
 }
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(!scrollController.includes('waymaking-heading-word'),'Plain semantic headings must remain unfragmented');
-assert.ok(!thread.includes('AI-Native Building</h3>') && !thread.includes('Hands-On Execution</h3>'),'Fourth chapter must explain real tests and prototypes, not a generic AI skill');
+assert.ok(thread.includes('<h3>Hands-On Execution</h3>') && !thread.includes('<h3>AI-Native Building</h3>'),'Hands-On Execution remains the established fourth chapter heading');
 assert.ok(thread.includes('quick pretotypes to see whether customers actually want the idea') && thread.includes('P&amp;L'),'Execution and commercial experience must be communicated plainly');
 assert.ok(css.includes('.waymaking-copy h3 {') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand namespaces must be distinct');
 assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-reveal artwork styling missing');
-assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Build Something Worthwhile</h3>'),'Final value-based chapter should share competency typography');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven retains the established fifth chapter heading');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
