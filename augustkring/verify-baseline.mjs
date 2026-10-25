@@ -67,7 +67,7 @@ const ngrams=(words,n)=>{
   return values;
 };
 const priorWords=normalize(threadSummary);
-const letterCount=(value)=>(value.match(/\\p{L}/gu)||[]).length;
+const letterCount=(value)=>(value.match(/\p{L}/gu)||[]).length;
 for(const [index,entry] of waymakingEntries.entries()){
   const words=normalize(entry[2]);
   const letters=letterCount(entry[2]);
