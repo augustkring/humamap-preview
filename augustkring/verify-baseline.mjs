@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"ffd2062d","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"02d42b9a","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -32,24 +32,24 @@ const thread=part(html,'<section id="thread"','</section>');
 const threadSummary=thread.slice(0,thread.indexOf('<section class="waymaking-narrative"'));
 for(const sentence of [
  "I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction.",
- "I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.",
+ "I combine creative thinking with commercial understanding and strategic judgement to spot opportunities and find better ways forward.",
  "I enjoy giving ambitious ideas direction and bringing people together around a shared vision.",
  "But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.",
- "build towards a positive future with bold people",
+ "build towards a positive future together with bold people",
  "leaving the world a little better than I found it."
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
-assert.ok(thread.includes('aria-label="Waymaking"') && thread.includes('<h2>What I mean by Waymaker</h2>') && !thread.includes('id="waymaking-title"'),'Approved Waymaker explanation heading must remain visible without reusing the retired waymaking-title id');
+assert.ok(thread.includes('aria-label="Waymaking"') && !thread.includes('What I mean by Waymaker') && !thread.includes('class="waymaking-intro"') && !thread.includes('id="waymaking-title"'),'Waymaking must begin directly with the five facets, without an explanatory intro section');
 assert.ok(!thread.includes("For me, that's what it means to be a") && !thread.includes('class="waymaking-resolution"'),'Redundant Waymaker conclusion must remain removed');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must stay retired');
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Leadership','Hands-On Execution','Purpose &amp; Impact']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgement','Hands-On Execution','Purpose &amp; Impact']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Leadership','Hands-On Execution','Purpose &amp; Impact']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgement','Hands-On Execution','Purpose &amp; Impact']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -69,7 +69,7 @@ const ngrams=(words,n)=>{
 const priorWords=normalize(threadSummary);
 for(const [index,entry] of waymakingEntries.entries()){
   const words=normalize(entry[2]);
-  assert.ok(words.length>=30&&words.length<=43,
+  assert.ok(words.length>=25&&words.length<=43,
     'Each Waymaking paragraph must be short and comparable in length: '+entry[1]+' / '+words.length);
   const overlap=ngrams(words,5);
   assert.ok([...overlap].every(phrase=>!ngrams(priorWords,5).has(phrase)),
@@ -77,11 +77,11 @@ for(const [index,entry] of waymakingEntries.entries()){
   priorWords.push(...words);
 }
 for(const essential of [
- 'Seeing connections, possibilities and different ways forward',
- 'real customer value, sound economics',
+ 'Seeing connections, possibilities and new angles',
+ 'customer value, sound economics',
  'decisions and priorities that matter most',
- 'shared direction',
- 'I use AI to build, test and turn ideas into something useful',
+ 'enough clarity for people to understand the goal',
+ 'I use AI to build and test ideas quickly',
  'commercial success to go hand in hand with positive impact'
 ])assert.ok(thread.includes(essential),'Missing approved Waymaking positioning language: '+essential);
 
@@ -112,7 +112,7 @@ assert.ok(html.includes('waymaking-scroll.js?v=20261022-waymaking-v28'),'Origina
 assert.ok(!part(html,'<section class="waymaking-narrative"','</section>').includes('—'),'Waymaking copy must contain no em dashes');
 const license=readFileSync(join(root,'assets/waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Existing original artwork license attribution must remain preserved');
-assert.ok(html.includes("Where I'm putting that way of thinking to work today."),'My current focus bridge copy missing');
+assert.ok(html.includes("How that shows up in what I'm building today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(css.includes('.waymaking-scene') && css.includes('.waymaking-artspace') && css.includes('.waymaking-road-wrap {\n  position: absolute;'),'Document-anchored Waymaking composition missing');
@@ -123,7 +123,7 @@ assert.ok(!css.includes('.waymaking-copy-column::before') && !css.includes('.way
 assert.ok(css.includes('/* V23: a single reading column;') && css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile must use full-width reading column with centered background road');
 assert.ok(css.includes('-webkit-tap-highlight-color: transparent;') && css.includes('mobile-navigation-panel a:active'),'Mobile menu must use red-only navigation feedback');
 assert.ok(css.includes('min-height: clamp(190px, 29svh, 254px);') && css.includes('min-height: clamp(196px, 30svh, 260px);'),'Consistent breathing room restored for mobile Waymaking');
-assert.ok(!css.includes('.waymaking-resolution'),'Deleted Waymaker conclusion must not reserve spacing');
+assert.ok(!css.includes('.waymaking-resolution') && !css.includes('.waymaking-intro'),'Removed Waymaker intro/conclusion must not reserve styling or spacing');
 assert.ok(!html.includes('class="waymaking-vector '),'Unapproved V15 vector must not appear');
 const scrollController=readFileSync(join(root,'waymaking-scroll.js'),'utf8');
 assert.ok(scrollController.includes('const roadTarget = () =>') && scrollController.includes('lastParagraphBottom') && scrollController.includes('return easing(raw)'),'Continuous painted route must begin gradually and finish after the final paragraph');
@@ -144,10 +144,12 @@ for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(!scrollController.includes('waymaking-heading-word'),'Plain semantic headings must remain unfragmented');
 assert.ok(thread.includes('<h3>Hands-On Execution</h3>') && !thread.includes('<h3>AI-Native Building</h3>'),'Hands-On Execution remains the established fourth chapter heading');
-assert.ok(thread.includes('I use AI to build, test and turn ideas into something useful') && thread.includes('real customer value, sound economics'),'Execution and commercial understanding must be communicated plainly');
+assert.ok(thread.includes('I use AI to build and test ideas quickly') && thread.includes('customer value, sound economics'),'Execution and commercial understanding must be communicated plainly');
 assert.ok(css.includes('.waymaking-copy h3 {') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand namespaces must be distinct');
 assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-reveal artwork styling missing');
 assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose &amp; Impact</h3>'),'Purpose & Impact retains the approved fifth chapter heading');
+assert.ok(html.includes("Blentera is the company’s AI foundation."),'Approved Blentera positioning copy missing');
+assert.ok(html.includes("How that shows up in what I'm building today."),'Approved My current focus bridge missing');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
@@ -160,7 +162,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261025-waymaking-copy-v29':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261025-waymaking-copy-v30':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
