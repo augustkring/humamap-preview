@@ -48,14 +48,14 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261025-waymaking-copy-v29"
+          expected_home="styles.css?v=20261025-waymaking-copy-v30"
           expected_road_js="waymaking-scroll.js?v=20261022-waymaking-v28"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
-          expected_copy="build towards a positive future with bold people"
+          expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html && grep -Fq '<h3>Creative Thinking</h3>' /tmp/augustkring.html && grep -Fq '<h3>Commercial Understanding</h3>' /tmp/augustkring.html && grep -Fq '<h3>Strategic Leadership</h3>' /tmp/augustkring.html && grep -Fq '<h3>Hands-On Execution</h3>' /tmp/augustkring.html && grep -Fq '<h3>Purpose &amp; Impact</h3>' /tmp/augustkring.html; then
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html && grep -Fq '<h3>Creative Thinking</h3>' /tmp/augustkring.html && grep -Fq '<h3>Commercial Understanding</h3>' /tmp/augustkring.html && grep -Fq '<h3>Strategic Judgement</h3>' /tmp/augustkring.html && grep -Fq '<h3>Hands-On Execution</h3>' /tmp/augustkring.html && grep -Fq '<h3>Purpose &amp; Impact</h3>' /tmp/augustkring.html; then
               echo "Approved Waymaking homepage, stylesheet and script are published."
               break
             fi
@@ -65,13 +65,13 @@ jobs:
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
           grep -Fq "But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong." /tmp/augustkring.html
-          grep -Fq 'build towards a positive future with bold people' /tmp/augustkring.html
+          grep -Fq 'build towards a positive future together with bold people' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq 'aria-label="Waymaking" data-waymaking-story' /tmp/augustkring.html
-          grep -Fq '<h2>What I mean by Waymaker</h2>' /tmp/augustkring.html
+          ! grep -Fq 'What I mean by Waymaker' /tmp/augustkring.html
           ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
           grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
@@ -88,16 +88,17 @@ jobs:
           ! grep -Fq 'waymaking-brush-head-v24.png' /tmp/augustkring.html
           grep -Fq 'Purpose &amp; Impact</h3>' /tmp/augustkring.html
           grep -Fq 'Hands-On Execution</h3>' /tmp/augustkring.html
-          grep -Fq 'real customer value, sound economics' /tmp/augustkring.html
+          grep -Fq 'customer value, sound economics' /tmp/augustkring.html
           grep -Fq 'Creative Thinking</h3>' /tmp/augustkring.html
           grep -Fq 'Commercial Understanding</h3>' /tmp/augustkring.html
-          grep -Fq 'Strategic Leadership</h3>' /tmp/augustkring.html
+          grep -Fq 'Strategic Judgement</h3>' /tmp/augustkring.html
           grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
           ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
           ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
           ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
           ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
-          grep -Fq "Where I'm putting that way of thinking to work today." /tmp/augustkring.html
+          grep -Fq "How that shows up in what I'm building today." /tmp/augustkring.html
+          grep -Fq "Blentera is the company’s AI foundation." /tmp/augustkring.html
           ! grep -Fq "For me, that" /tmp/augustkring.html
           ! grep -Fq 'class="waymaking-resolution"' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
@@ -262,7 +263,7 @@ jobs:
                   };
                 });
                 console.log('Editorial polish', width, editorial);
-                assert.equal(editorial.opener,'I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.');
+                assert.equal(editorial.opener,'I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgement to spot opportunities and find better ways forward.');
                 const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.perspective-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
                   text:el.textContent.trim(),
                   width:el.getBoundingClientRect().width
@@ -279,7 +280,7 @@ jobs:
                   assert.ok(summary.height>summary.lineHeight*2,'Holistic introduction should remain a readable paragraph');
                 }
                 assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
-                assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future with bold people: creating things that matter and leaving the world a little better than I found it.");
+                assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future together with bold people: creating things that matter and leaving the world a little better than I found it.");
                 assert.equal(editorial.purposeTitle,'Purpose & Impact');
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
@@ -307,7 +308,7 @@ jobs:
                   };
                 });
                 assert.deepEqual(positions.titles,[
-                  'Creative Thinking','Commercial Understanding','Strategic Leadership',
+                  'Creative Thinking','Commercial Understanding','Strategic Judgement',
                   'Hands-On Execution','Purpose & Impact'
                 ]);
                 const stages=[];
