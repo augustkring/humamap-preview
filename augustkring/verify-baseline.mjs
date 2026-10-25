@@ -36,10 +36,10 @@ for(const sentence of [
  "I enjoy giving ambitious ideas direction and bringing people together around a shared vision.",
  "But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.",
  "build towards a positive future with bold people",
- "leave the world a little better than I found it."
+ "leaving the world a little better than I found it."
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
-assert.ok(thread.includes('aria-label="Waymaking"') && !thread.includes('id="waymaking-title"'),'Waymaking should continue without a visible section title');
+assert.ok(thread.includes('aria-label="Waymaking"') && thread.includes('<h2>What I mean by Waymaker</h2>') && !thread.includes('id="waymaking-title"'),'Approved Waymaker explanation heading must remain visible without reusing the retired waymaking-title id');
 assert.ok(!thread.includes("For me, that's what it means to be a") && !thread.includes('class="waymaking-resolution"'),'Redundant Waymaker conclusion must remain removed');
 assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay removed');
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
