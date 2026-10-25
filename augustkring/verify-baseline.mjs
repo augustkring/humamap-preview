@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"02d42b9a","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"ab9615e4","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -67,10 +67,12 @@ const ngrams=(words,n)=>{
   return values;
 };
 const priorWords=normalize(threadSummary);
+const letterCount=(value)=>(value.match(/\\p{L}/gu)||[]).length;
 for(const [index,entry] of waymakingEntries.entries()){
   const words=normalize(entry[2]);
-  assert.ok(words.length>=25&&words.length<=43,
-    'Each Waymaking paragraph must be short and comparable in length: '+entry[1]+' / '+words.length);
+  const letters=letterCount(entry[2]);
+  assert.ok(letters>=140&&letters<=150,
+    'Each Waymaking paragraph must stay within the approved 140-150 letter range: '+entry[1]+' / '+letters);
   const overlap=ngrams(words,5);
   assert.ok([...overlap].every(phrase=>!ngrams(priorWords,5).has(phrase)),
     'Waymaking chapter repeats an entire phrase from Where I add value: '+entry[1]);
@@ -80,9 +82,9 @@ for(const essential of [
  'Seeing connections, possibilities and new angles',
  'customer value, sound economics',
  'decisions and priorities that matter most',
- 'enough clarity for people to understand the goal',
+ 'create clarity so people understand the goal',
  'I use AI to build and test ideas quickly',
- 'commercial success to go hand in hand with positive impact'
+ 'commercial success with positive impact'
 ])assert.ok(thread.includes(essential),'Missing approved Waymaking positioning language: '+essential);
 
 assert.ok(thread.includes('class="waymaking-original-source"'),'Approved original artwork picture missing');
@@ -150,6 +152,13 @@ assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-r
 assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose &amp; Impact</h3>'),'Purpose & Impact retains the approved fifth chapter heading');
 assert.ok(html.includes("Blentera is the company’s AI foundation."),'Approved Blentera positioning copy missing');
 assert.ok(html.includes("How that shows up in what I'm building today."),'Approved My current focus bridge missing');
+const work=part(html,'<section id="work"','</section>');
+const workParagraphs=[...work.matchAll(/<p>([^<]+)<\\/p>/g)].map(match=>match[1]).filter(value=>!value.includes("How that shows up in what I'm building today."));
+assert.equal(workParagraphs.length,4,'My current focus must contain exactly four venture descriptions');
+for(const copy of workParagraphs){
+  const letters=letterCount(copy);
+  assert.ok(letters>=220&&letters<=230,'Each My current focus description must stay within the approved 220-230 letter range: '+letters);
+}
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
@@ -162,7 +171,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261025-waymaking-copy-v30':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261025-waymaking-copy-v31':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
