@@ -17,7 +17,7 @@ function digest(s) {
  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0).toString(16).padStart(8,'0');
 }
-const approved={"main":"c0d62a72","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"ffd2062d","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
  main:digest(part(html,'<main','</main>')),
  footer:digest(part(html,'<footer','</footer>')),
@@ -31,11 +31,11 @@ assert.ok(!perspective.includes("But greater capacity doesn't automatically make
 const thread=part(html,'<section id="thread"','</section>');
 const threadSummary=thread.slice(0,thread.indexOf('<section class="waymaking-narrative"'));
 for(const sentence of [
- "I do my best work in the early stages, when a challenge calls for fresh thinking and clear direction.",
+ "I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction.",
  "I combine creative thinking with commercial understanding and strategic judgment to spot opportunities and find better ways forward.",
  "I enjoy giving ambitious ideas direction and bringing people together around a shared vision.",
  "But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.",
- "build towards a positive future, together with bold people",
+ "build towards a positive future with bold people",
  "leave the world a little better than I found it."
 ]) assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
 assert.equal((threadSummary.match(/<p>/g)||[]).length,3,'Where I add value should have three paragraphs');
@@ -45,11 +45,11 @@ assert.ok(!html.includes('roughjs@4.6.6'),'Rough.js dependency should stay remov
 assert.ok(!html.includes('perfect-freehand'),'perfect-freehand dependency should stay removed');
 assert.ok(!html.includes('waymaking-road.js'),'Waymaking road must stay static and dependency-free');
 assert.ok(!thread.includes('<canvas') && !html.includes('waymaking-brush.js'),'Runtime Canvas renderer must stay retired');
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Leadership','Hands-On Execution','Purpose &amp; Impact']){
  assert.ok(thread.includes(label),'Waymaking story beat missing: '+label);
 }
 let previous=-1;
-for(const label of ['Creative Thinking','Commercial Understanding','Strategic Judgment','Hands-On Execution','Purpose Driven']){
+for(const label of ['Creative Thinking','Commercial Understanding','Strategic Leadership','Hands-On Execution','Purpose &amp; Impact']){
  const offset=thread.indexOf(label);
  assert.ok(offset>previous,'Waymaking story order wrong: '+label);
  previous=offset;
@@ -77,11 +77,13 @@ for(const [index,entry] of waymakingEntries.entries()){
   priorWords.push(...words);
 }
 for(const essential of [
- 'an unmet need', 'a market shift', 'P&amp;L', 'customer acquisition',
- 'how to get to market', 'proceed, change course or stop',
- 'quick pretotypes to see whether customers actually want the idea', 'an early working version or workflow',
- 'people, planet and profit in practice'
-])assert.ok(thread.includes(essential),'Missing concrete capability, reason-to-believe or outcome: '+essential);
+ 'Seeing connections, possibilities and different ways forward',
+ 'real customer value, sound economics',
+ 'decisions and priorities that matter most',
+ 'shared direction',
+ 'I use AI to build, test and turn ideas into something useful',
+ 'commercial success to go hand in hand with positive impact'
+])assert.ok(thread.includes(essential),'Missing approved Waymaking positioning language: '+essential);
 
 assert.ok(thread.includes('class="waymaking-original-source"'),'Approved original artwork picture missing');
 assert.ok(!thread.includes('waymaking-editorial-ink.avif'),'Obsolete low-resolution AVIF must not be rendered');
@@ -142,10 +144,10 @@ for(const forbidden of ['updateBackdropClip','--waymaking-clip-top','road.style.
 assert.ok(!css.includes('body[data-waymaking-road-active="true"] .perspective-copy') && !css.includes('box-shadow: 0 0 34px'),'Downstream white patchwork masking must be removed');
 assert.ok(!scrollController.includes('waymaking-heading-word'),'Plain semantic headings must remain unfragmented');
 assert.ok(thread.includes('<h3>Hands-On Execution</h3>') && !thread.includes('<h3>AI-Native Building</h3>'),'Hands-On Execution remains the established fourth chapter heading');
-assert.ok(thread.includes('quick pretotypes to see whether customers actually want the idea') && thread.includes('P&amp;L'),'Execution and commercial experience must be communicated plainly');
+assert.ok(thread.includes('I use AI to build, test and turn ideas into something useful') && thread.includes('real customer value, sound economics'),'Execution and commercial understanding must be communicated plainly');
 assert.ok(css.includes('.waymaking-copy h3 {') && css.includes('.waymaking-word { font-size: 32px'),'Heading/brand namespaces must be distinct');
 assert.ok(css.includes('.waymaking-original-reveal'),'Approved original scroll-reveal artwork styling missing');
-assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose Driven</h3>'),'Purpose Driven retains the established fifth chapter heading');
+assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.includes('<h3>Purpose &amp; Impact</h3>'),'Purpose & Impact retains the approved fifth chapter heading');
 assert.ok(!css.includes('.waymaking-painted-edge--body'),'Obsolete vector brush body returned');
 assert.ok(!css.includes('.waymaking-painted-edge--texture'),'Obsolete vector brush texture returned');
 assert.ok(!css.includes('.waymaking-road-surface'),'Dark filled road treatment must not return');
@@ -158,7 +160,7 @@ assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
  const page=readFileSync(join(root,path),'utf8');
- const expectedStyles=path==='index.html'?'styles.css?v=20261022-waymaking-v28':'styles.css?v=20261014-subtitle-width-v1';
+ const expectedStyles=path==='index.html'?'styles.css?v=20261025-waymaking-copy-v29':'styles.css?v=20261014-subtitle-width-v1';
  assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
  assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
  assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
