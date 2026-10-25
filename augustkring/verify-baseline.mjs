@@ -153,7 +153,7 @@ assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"') && thread.
 assert.ok(html.includes("Blentera is the company’s AI foundation."),'Approved Blentera positioning copy missing');
 assert.ok(html.includes("How that shows up in what I'm building today."),'Approved My current focus bridge missing');
 const work=part(html,'<section id="work"','</section>');
-const workParagraphs=[...work.matchAll(/<p>([^<]+)<\\/p>/g)].map(match=>match[1]).filter(value=>!value.includes("How that shows up in what I'm building today."));
+const workParagraphs=[...work.matchAll(/<p>([^<]+)<\/p>/g)].map(match=>match[1]).filter(value=>!value.includes("How that shows up in what I'm building today."));
 assert.equal(workParagraphs.length,4,'My current focus must contain exactly four venture descriptions');
 for(const copy of workParagraphs){
   const letters=letterCount(copy);
