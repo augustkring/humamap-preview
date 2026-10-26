@@ -20,6 +20,7 @@ on:
       - "augustkring/assets/waymaking-dry-brush.png"
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
+      - "augustkring/verify-about-layout.cjs"
       - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
       - "augustkring/about/index.html"
@@ -49,8 +50,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v5"
-          expected_shared="styles.css?v=20261026-shared-v5"
+          expected_home="styles.css?v=20261026-shared-v6"
+          expected_shared="styles.css?v=20261026-shared-v6"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
