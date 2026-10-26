@@ -21,6 +21,7 @@ on:
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
       - "augustkring/verify-about-layout.cjs"
+      - "augustkring/verify-mobile-type.cjs"
       - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
       - "augustkring/about/index.html"
