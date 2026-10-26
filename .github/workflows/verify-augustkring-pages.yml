@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v7"
-          expected_shared="styles.css?v=20261026-shared-v7"
+          expected_home="styles.css?v=20261026-shared-v8"
+          expected_shared="styles.css?v=20261026-shared-v8"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -223,19 +223,26 @@ jobs:
                   const dot=document.querySelector('.wordmark-i');
                   const after=getComputedStyle(dot,'::after');
                   const before=getComputedStyle(dot,'::before');
+                  const wordmark=getComputedStyle(document.querySelector('.header-wordmark'));
                   return {
                     h1:parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
                     h2:parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
                     lead:parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
                     leadFamily:getComputedStyle(document.querySelector('.hero-focus')).fontFamily,
+                    wordmarkFontSize:parseFloat(wordmark.fontSize),
                     wordmarkDotWidth:parseFloat(after.width),
                     wordmarkDotHeight:parseFloat(after.height),
-                    wordmarkMaskWidth:parseFloat(before.width)
+                    wordmarkDotTop:parseFloat(after.top),
+                    wordmarkBeforeContent:before.content,
+                    wordmarkBeforeBackground:before.backgroundColor
                   };
                 });
                 if(width<=840) assert.ok(homepageTypography.wordmarkDotWidth>=14.4&&homepageTypography.wordmarkDotHeight>=14.4,'Mobile wordmark red dot should render at roughly double the original diameter');
                 else assert.ok(homepageTypography.wordmarkDotWidth>=12.9&&homepageTypography.wordmarkDotHeight>=12.9,'Desktop wordmark red dot should render at roughly double the original diameter');
-                assert.ok(homepageTypography.wordmarkMaskWidth>homepageTypography.wordmarkDotWidth,'Wordmark mask must fully clear the original i dot');
+                assert.ok(homepageTypography.wordmarkDotTop<0,'Wordmark dot must sit above the i');
+                assert.ok(homepageTypography.wordmarkDotTop+homepageTypography.wordmarkDotHeight<=homepageTypography.wordmarkFontSize*.31,'Wordmark dot must not extend lower than the original i-dot edge');
+                assert.ok(homepageTypography.wordmarkBeforeContent==='none'||homepageTypography.wordmarkBeforeContent==='normal','Wordmark must not render a white ::before halo');
+                assert.ok(homepageTypography.wordmarkBeforeBackground==='rgba(0, 0, 0, 0)'||homepageTypography.wordmarkBeforeBackground==='transparent','Wordmark halo background must be transparent');
                 const editorial = await page.evaluate(() => {
                   const statement = document.querySelector('.perspective-statement');
                   const readPerspectives = document.querySelector('.perspective-read-link');
