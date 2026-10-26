@@ -19,7 +19,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"d5c646af","footer":"35675fc9","tokens":"79885db3","contact":"254c04c6"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -145,12 +145,15 @@ for(const copy of workParagraphs){
 
 assert.ok(css.includes('-webkit-tap-highlight-color: transparent;')&&css.includes('.mobile-menu-toggle:focus-visible svg'),'Mobile menu must keep pointer feedback clean and keyboard focus visible');
 assert.ok(!css.includes('outline: 2px solid var(--red); outline-offset: 2px; background: transparent; color: var(--red);'),'Mobile menu controls must never use the retired red focus ring');
-assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Homepage signoff must use the shared contact-column token');
+assert.ok(css.includes('.homepage-contact-content { display: block; }'),'Homepage signoff must remain one cohesive personal block');
 assert.ok(html.includes('<p class="signoff-note">With curiosity and optimism,</p>'),'Approved personal signoff missing');
 assert.ok(!html.includes('Let’s connect'),'Retired contact heading returned');
 assert.ok(html.includes('data-work-pagination')&&!html.includes('data-work-prev')&&!html.includes('data-work-next'),'Current focus must use dots instead of arrows');
 assert.equal((html.match(/data-work-label=/g)||[]).length,4,'Each current-focus card needs one navigation label');
 assert.ok(css.includes('.work-carousel-dot[aria-current="true"]')&&css.includes('width: 44px;')&&css.includes('height: 44px;'),'Current-focus dot states/touch targets missing');
+assert.ok(css.includes('.work-brand-august { height: 40px; }')&&css.includes('.work-brand-humamap { height: 40px; }'),'August Works and HumaMap must retain their optically compensated logo height');
+assert.ok(css.includes('.work-brand-blentera { height: 37px; filter: none; }'),'Blentera reference logo height drifted');
+assert.ok(css.includes('.homepage-contact-actions { width: 100%; margin: 16px 0 0; display: grid;'),'Signoff actions must stay attached below the personal block');
 assert.ok(html.includes('Read my perspectives')&&!html.includes('Explore my perspectives'),'Homepage perspective link wording drift');
 assert.ok(!html.includes('class="perspective-links"'),'Homepage perspective preview cards must remain removed');
 assert.ok(!html.includes('waymaking-ventures')&&!html.includes('<sup>™</sup>'),'Waymaking focus logo must remain free of Ventures and TM');
@@ -175,15 +178,15 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261026-shared-v4';
+  const expectedStyles='styles.css?v=20261026-shared-v5';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
   const footer=part(page,'<footer class="home-footer"','</footer>');
-  assert.ok(footer.includes('href="mailto:ak@augustkring.com">Email</a>'),'Footer email action missing: '+path);
+  assert.ok(footer.includes('href="mailto:ak@augustkring.com">ak@augustkring.com</a>'),'Footer must show the actual email address: '+path);
   assert.ok(footer.includes('>Connect on LinkedIn</a>'),'Footer LinkedIn action missing: '+path);
   assert.ok(footer.includes('href="perspectives/#subscribe">Subscribe to Perspectives</a>'),'Footer Perspectives subscription action missing: '+path);
   assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: editorial homepage, dot carousel, personal signoff, utility footer and shared design-system baseline');
+console.log('PASS: final homepage polish, optical logo sizing, cohesive signoff, utility footer and shared design-system baseline');
