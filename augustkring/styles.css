@@ -1239,6 +1239,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   }
 }
 
+/* Homepage section subtitles keep the approved narrow editorial measure. */
+.home-main .thread-lead > p,
+.home-main .perspective-lead > p,
+.home-main .values-lead > p {
+  max-width: min(100%, var(--measure-narrow));
+}
+
 /* About V3: one narrative system, balanced toolkit, minimal reflection tabs. */
 .about-page { padding-bottom: 0; }
 
