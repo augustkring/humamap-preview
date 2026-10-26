@@ -79,9 +79,11 @@ const targets = [
             beforeBackground:before.backgroundColor
           };
         });
-        assert.ok(wordmark.dotWidth>=14&&wordmark.dotHeight>=14, engine+' '+width+' wordmark dot renders at doubled diameter');
+        const dotRatio=wordmark.dotWidth/wordmark.fontSize;
+        const dotBottomRatio=(wordmark.dotTop+wordmark.dotHeight)/wordmark.fontSize;
+        assert.ok(dotRatio>=.40&&dotRatio<=.41, engine+' '+width+' wordmark dot renders at the approved .405em diameter');
         assert.ok(wordmark.dotTop<0, engine+' '+width+' wordmark dot starts above the i');
-        assert.ok(wordmark.dotTop+wordmark.dotHeight<=wordmark.fontSize*.31, engine+' '+width+' wordmark dot does not intrude lower than the original i-dot edge');
+        assert.ok(dotBottomRatio>=.295&&dotBottomRatio<=.305, engine+' '+width+' wordmark dot preserves the original .30em lower-edge spacing');
         assert.ok(wordmark.beforeContent==='none'||wordmark.beforeContent==='normal', engine+' '+width+' wordmark has no ::before halo content');
         assert.ok(wordmark.beforeBackground==='rgba(0, 0, 0, 0)'||wordmark.beforeBackground==='transparent', engine+' '+width+' wordmark has no white halo background');
 
@@ -91,7 +93,7 @@ const targets = [
       await browser.close();
     }
   }
-  console.log('PASS: mobile reading sizes are 18px primary / 17px compact across pages; enlarged August Kring dot is halo-free and raised');
+  console.log('PASS: mobile reading sizes are 18px primary / 17px compact across pages; August Kring dot is optically reduced, halo-free and correctly spaced');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
