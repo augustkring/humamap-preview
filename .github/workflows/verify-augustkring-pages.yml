@@ -49,8 +49,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v4"
-          expected_shared="styles.css?v=20261026-shared-v4"
+          expected_home="styles.css?v=20261026-shared-v5"
+          expected_shared="styles.css?v=20261026-shared-v5"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -122,9 +122,11 @@ jobs:
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(186px, 17vw, 205px);' /tmp/augustkring.css
+          grep -Fq 'width: clamp(186px, 17vw, 198px);' /tmp/augustkring.css
           grep -Fq '.work-carousel-dot[aria-current="true"]' /tmp/augustkring.css
-          grep -Fq 'grid-template-columns: var(--contact-columns);' /tmp/augustkring.css
+          grep -Fq '.work-brand-august { height: 40px; }' /tmp/augustkring.css
+          grep -Fq '.work-brand-humamap { height: 40px; }' /tmp/augustkring.css
+          grep -Fq '.homepage-contact-content { display: block; }' /tmp/augustkring.css
           grep -Fq -- '--about-section-space: var(--section-space);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:last-child {' /tmp/augustkring.css
           grep -Fq 'padding-top: var(--section-space);' /tmp/augustkring.css
@@ -346,7 +348,10 @@ jobs:
                   const track=document.querySelector('[data-work-track]').getBoundingClientRect();
                   const pagination=document.querySelector('[data-work-pagination]').getBoundingClientRect();
                   const dots=[...document.querySelectorAll('[data-work-dot]')];
-                  const logos=[...document.querySelectorAll('.work-brand')].map(el=>el.querySelector('img,.waymaking-word').getBoundingClientRect().height);
+                  const logos=[...document.querySelectorAll('.work-card')].map(card=>({
+                    label:card.dataset.workLabel,
+                    height:card.querySelector('.work-brand img,.work-brand .waymaking-word').getBoundingClientRect().height
+                  }));
                   return {
                     gap:heading.top-purpose.bottom,
                     paginationTop:pagination.top,
@@ -369,7 +374,10 @@ jobs:
                 assert.equal(focusLayout.dotCount,4,'One current-focus dot per card');
                 assert.equal(focusLayout.activeDots,1,'Exactly one current-focus dot should be active');
                 assert.equal(focusLayout.hasArrows,false,'Current-focus arrow controls must stay removed');
-                assert.ok(Math.max(...focusLayout.logos)-Math.min(...focusLayout.logos)<=8,'Current focus logos should have comparable optical height');
+                const focusLogoHeights=Object.fromEntries(focusLayout.logos.map(item=>[item.label,item.height]));
+                assert.ok(focusLogoHeights['August Works']>=39.5,'August Works logo must retain optical height compensation');
+                assert.ok(focusLogoHeights.HumaMap>=39.5,'HumaMap logo must retain optical height compensation');
+                assert.ok(focusLogoHeights.Blentera>=36.5&&focusLogoHeights.Blentera<=37.5,'Blentera reference logo height drift');
                 const workDots=page.locator('[data-work-dot]');
                 await workDots.nth(3).click();
                 await page.waitForTimeout(280);
@@ -396,7 +404,7 @@ jobs:
                     noteBeforeSignature:noteBox.bottom<=sigBox.top+1, imageBeforeName:sigBox.bottom<nameBox.top,
                     insideContent:sigBox.left>=sectionBox.left-1&&sigBox.right<=sectionBox.right+1,
                     fontSize:parseFloat(getComputedStyle(name).fontSize),
-                    sideBySide:actionsBox.left>=sectionBox.right-1, stacked:actionsBox.top>=nameBox.bottom-1,
+                    actionsBelowName:actionsBox.top>=nameBox.bottom+8,
                     linkCount:actions.querySelectorAll('a').length, actionsDisplay:getComputedStyle(actions).display,
                     noHeading:!document.querySelector('.homepage-contact h2'),
                     horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
@@ -409,16 +417,15 @@ jobs:
                 assert.equal(signoff.nameVisible,true);
                 assert.equal(signoff.signatureLoaded,true);
                 assert.equal(signoff.signatureAlt,'Handwritten signature of August Kring');
-                if(width>760) assert.ok(signoff.signatureWidth>=185&&signoff.signatureWidth<=206,'Desktop signature scale');
+                if(width>760) assert.ok(signoff.signatureWidth>=185&&signoff.signatureWidth<=199,'Desktop signature scale');
                 else assert.ok(signoff.signatureWidth>=163&&signoff.signatureWidth<=165,'Mobile signature scale');
                 assert.ok(signoff.fontSize>=17.9&&signoff.fontSize<=18.1);
                 assert.ok(signoff.noteBeforeSignature&&signoff.imageBeforeName&&signoff.insideContent);
                 assert.equal(signoff.linkCount,2);
                 assert.equal(signoff.noHeading,true);
-                if(width>760) {
-                  assert.ok(signoff.sideBySide,'Desktop signoff/actions should share one row');
-                  assert.equal(signoff.actionsDisplay,'grid','Desktop contact actions should form a quiet vertical rail');
-                } else assert.ok(signoff.stacked,'Mobile signoff/actions should stack');
+                assert.ok(signoff.actionsBelowName,'Contact actions must remain attached below the personal signoff');
+                if(width>760) assert.equal(signoff.actionsDisplay,'flex','Desktop contact actions should form one restrained inline row');
+                else assert.equal(signoff.actionsDisplay,'grid','Mobile contact actions should retain the vertical stack');
                 assert.equal(signoff.horizontalOverflow,false);
                 await page.locator('.homepage-contact').screenshot({path:`/tmp/ak-browser-check/contact-${width}.png`});
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
@@ -527,16 +534,22 @@ jobs:
                     labels:[...nav.querySelectorAll('a')].map(a=>a.textContent.trim()),
                     navAlign:getComputedStyle(nav).alignItems,
                     metaJustify:getComputedStyle(meta).justifyContent,
+                    minLinkHeight:Math.min(...[...nav.querySelectorAll('a')].map(a=>a.getBoundingClientRect().height)),
+                    minLinkFont:Math.min(...[...nav.querySelectorAll('a')].map(a=>parseFloat(getComputedStyle(a).fontSize))),
                     horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
                 console.log('Utility footer rendering',width,footer);
                 assert.equal(footer.topRule,1,'Footer has one upper rule');
                 assert.ok(footer.copyrightVisible&&footer.privacyVisible&&footer.navLinks===3,'Footer actions and privacy');
-                assert.deepEqual(footer.labels,['Email','Connect on LinkedIn','Subscribe to Perspectives']);
+                assert.deepEqual(footer.labels,['ak@augustkring.com','Connect on LinkedIn','Subscribe to Perspectives']);
                 if(width<=760) {
                   assert.equal(footer.navAlign,'flex-start','Mobile footer actions must share the left alignment axis');
                   assert.equal(footer.metaJustify,'flex-start','Mobile footer meta must share the left alignment axis');
+                }
+                if(width<=520) {
+                  assert.ok(footer.minLinkHeight>=43.5,'Mobile footer actions need 44px interaction height');
+                  assert.ok(footer.minLinkFont>=15.9,'Mobile footer action text should remain 16px');
                 }
                 assert.ok(footer.noWordmark&&!footer.horizontalOverflow,'No footer wordmark or horizontal overflow');
 
