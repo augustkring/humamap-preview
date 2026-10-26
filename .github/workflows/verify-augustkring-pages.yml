@@ -7,6 +7,7 @@ on:
     paths:
       - "augustkring/index.html"
       - "augustkring/styles.css"
+      - "augustkring/work-carousel.js"
       - "augustkring/assets/waymaking-vector-road-desktop-v15.svg"
       - "augustkring/assets/waymaking-vector-road-mobile-v15.svg"
       - "augustkring/assets/waymaking-ink-road-brush.png"
@@ -48,8 +49,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-homepage-final-v38"
-          expected_shared="styles.css?v=20261026-shared-v3"
+          expected_home="styles.css?v=20261026-shared-v4"
+          expected_shared="styles.css?v=20261026-shared-v4"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -91,7 +92,12 @@ jobs:
           ! grep -Fq 'waymaking-ventures' /tmp/augustkring.html
           ! grep -Fq '<sup>™</sup>' /tmp/augustkring.html
           ! grep -Fq 'Let’s connect' /tmp/augustkring.html
-          ! grep -Fq 'With curiosity and optimism' /tmp/augustkring.html
+          grep -Fq '<p class="signoff-note">With curiosity and optimism,</p>' /tmp/augustkring.html
+          grep -Fq 'data-work-pagination' /tmp/augustkring.html
+          grep -Fq 'data-work-label="Waymaking"' /tmp/augustkring.html
+          ! grep -Fq 'data-work-prev' /tmp/augustkring.html
+          ! grep -Fq 'data-work-next' /tmp/augustkring.html
+          grep -Fq 'src="work-carousel.js?v=20261026-dots-v1"' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
@@ -116,7 +122,10 @@ jobs:
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(165px, 15vw, 182px);' /tmp/augustkring.css
+          grep -Fq 'width: clamp(186px, 17vw, 205px);' /tmp/augustkring.css
+          grep -Fq '.work-carousel-dot[aria-current="true"]' /tmp/augustkring.css
+          grep -Fq 'grid-template-columns: var(--contact-columns);' /tmp/augustkring.css
+          grep -Fq -- '--about-section-space: var(--section-space);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:last-child {' /tmp/augustkring.css
           grep -Fq 'padding-top: var(--section-space);' /tmp/augustkring.css
           grep -Fq 'width: 44px;' /tmp/augustkring.css
@@ -124,6 +133,10 @@ jobs:
           grep -Fq 'viewBox="0 0 340 314"' /tmp/august-signature.svg
           grep -Fq '<path d=' /tmp/august-signature.svg
           ! grep -Eq '<(script|image|foreignObject)' /tmp/august-signature.svg
+          curl -fsSL --max-time 20 "${base}work-carousel.js?v=20261026-dots-v1" -o /tmp/augustkring-work-carousel.js
+          grep -Fq "dot.dataset.workDot = ''" /tmp/augustkring-work-carousel.js
+          grep -Fq "aria-current" /tmp/augustkring-work-carousel.js
+          grep -Fq "prefers-reduced-motion" /tmp/augustkring-work-carousel.js
           curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261026-dark-focus-v5" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
           grep -Fq "!root.hasAttribute('data-nav-pointer')" /tmp/augustkring-mobile-nav.js
@@ -330,70 +343,83 @@ jobs:
                 const focusLayout=await page.evaluate(()=>{
                   const purpose=document.querySelector('.waymaking-purpose p').getBoundingClientRect();
                   const heading=document.querySelector('#work-title').getBoundingClientRect();
-                  const controls=document.querySelector('.work-carousel-controls').getBoundingClientRect();
-                  const logos=[...document.querySelectorAll('.work-brand')].map(el=>{
-                    const target=el.querySelector('img,.waymaking-word');
-                    return target.getBoundingClientRect().height;
-                  });
+                  const track=document.querySelector('[data-work-track]').getBoundingClientRect();
+                  const pagination=document.querySelector('[data-work-pagination]').getBoundingClientRect();
+                  const dots=[...document.querySelectorAll('[data-work-dot]')];
+                  const logos=[...document.querySelectorAll('.work-brand')].map(el=>el.querySelector('img,.waymaking-word').getBoundingClientRect().height);
                   return {
                     gap:heading.top-purpose.bottom,
-                    headingWidth:heading.width,
-                    controlsTop:controls.top,
-                    headingBottom:heading.bottom,
+                    paginationTop:pagination.top,
+                    cardsBottom:track.bottom,
+                    dotCount:dots.length,
+                    activeDots:dots.filter(dot=>dot.getAttribute('aria-current')==='true').length,
+                    minDotWidth:Math.min(...dots.map(dot=>dot.getBoundingClientRect().width)),
+                    minDotHeight:Math.min(...dots.map(dot=>dot.getBoundingClientRect().height)),
+                    hasArrows:!!document.querySelector('[data-work-prev],[data-work-next]'),
                     logos
                   };
                 });
                 if(width<=600) {
                   assert.ok(focusLayout.gap>=56&&focusLayout.gap<=61,'Purpose to current focus must use one 58px mobile section gap');
-                  assert.ok(focusLayout.controlsTop>=focusLayout.headingBottom+8,'Mobile carousel controls must sit below the heading');
+                  assert.ok(focusLayout.minDotWidth>=43.5&&focusLayout.minDotHeight>=43.5,'Mobile carousel dots need 44px touch targets');
                 } else if(width>=1024) {
                   assert.ok(focusLayout.gap>=70&&focusLayout.gap<=95,'Desktop Purpose-to-focus section gap drift');
                 }
+                assert.ok(focusLayout.paginationTop>=focusLayout.cardsBottom+10,'Current-focus pagination must sit below the cards');
+                assert.equal(focusLayout.dotCount,4,'One current-focus dot per card');
+                assert.equal(focusLayout.activeDots,1,'Exactly one current-focus dot should be active');
+                assert.equal(focusLayout.hasArrows,false,'Current-focus arrow controls must stay removed');
                 assert.ok(Math.max(...focusLayout.logos)-Math.min(...focusLayout.logos)<=8,'Current focus logos should have comparable optical height');
+                const workDots=page.locator('[data-work-dot]');
+                await workDots.nth(3).click();
+                await page.waitForTimeout(280);
+                assert.equal(await workDots.nth(3).getAttribute('aria-current'),'true','Clicking a dot activates that current-focus card');
+                await workDots.nth(0).click();
+                await page.waitForTimeout(180);
                 if(width===320||width===390||width===1440) await page.locator('.waymaking-narrative').screenshot({path:`/tmp/ak-browser-check/waymaking-${width}.png`});
                 await page.locator('.perspective-section').screenshot({path:`/tmp/ak-browser-check/perspectives-${width}.png`});
-                await page.locator('.work-heading').screenshot({path:`/tmp/ak-browser-check/focus-heading-${width}.png`});
+                await page.locator('.work-section').screenshot({path:`/tmp/ak-browser-check/focus-${width}.png`});
                 await page.locator('.personal-signoff .signoff-signature').scrollIntoViewIfNeeded();
                 await page.locator('.personal-signoff .signoff-signature').evaluate(img => img.decode());
                 const signoff = await page.evaluate(() => {
-                  const section = document.querySelector('.personal-signoff');
-                  const name = section.querySelector('.signoff-name');
-                  const signature = section.querySelector('.signoff-signature');
-                  const actions = document.querySelector('.homepage-contact-actions');
-                  const nameBox = name.getBoundingClientRect();
-                  const sigBox = signature.getBoundingClientRect();
-                  const sectionBox = section.getBoundingClientRect();
-                  const actionsBox = actions.getBoundingClientRect();
+                  const section=document.querySelector('.personal-signoff');
+                  const note=section.querySelector('.signoff-note');
+                  const name=section.querySelector('.signoff-name');
+                  const signature=section.querySelector('.signoff-signature');
+                  const actions=document.querySelector('.homepage-contact-actions');
+                  const noteBox=note.getBoundingClientRect(),nameBox=name.getBoundingClientRect(),sigBox=signature.getBoundingClientRect(),sectionBox=section.getBoundingClientRect(),actionsBox=actions.getBoundingClientRect();
                   return {
-                    name: name.textContent.trim(),
-                    nameVisible: nameBox.height > 0 && nameBox.width > 0,
-                    signatureLoaded: signature.complete && signature.naturalWidth === 340 && signature.naturalHeight === 314,
-                    signatureAlt: signature.alt,
-                    signatureWidth: sigBox.width,
-                    imageBeforeName: sigBox.bottom < nameBox.top,
-                    insideContent: sigBox.left >= sectionBox.left - 1 && sigBox.right <= sectionBox.right + 1,
-                    fontSize: parseFloat(getComputedStyle(name).fontSize),
-                    sideBySide: actionsBox.left >= sectionBox.right - 1,
-                    stacked: actionsBox.top >= nameBox.bottom - 1,
-                    linkCount: actions.querySelectorAll('a').length,
-                    noExtraCopy: !document.querySelector('.homepage-contact h2') && !document.querySelector('.homepage-contact-invite'),
-                    horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1
+                    note:note.textContent.trim(), noteVisible:noteBox.height>0&&noteBox.width>0,
+                    name:name.textContent.trim(), nameVisible:nameBox.height>0&&nameBox.width>0,
+                    signatureLoaded:signature.complete&&signature.naturalWidth===340&&signature.naturalHeight===314,
+                    signatureAlt:signature.alt, signatureWidth:sigBox.width,
+                    noteBeforeSignature:noteBox.bottom<=sigBox.top+1, imageBeforeName:sigBox.bottom<nameBox.top,
+                    insideContent:sigBox.left>=sectionBox.left-1&&sigBox.right<=sectionBox.right+1,
+                    fontSize:parseFloat(getComputedStyle(name).fontSize),
+                    sideBySide:actionsBox.left>=sectionBox.right-1, stacked:actionsBox.top>=nameBox.bottom-1,
+                    linkCount:actions.querySelectorAll('a').length, actionsDisplay:getComputedStyle(actions).display,
+                    noHeading:!document.querySelector('.homepage-contact h2'),
+                    horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('Homepage signoff', width, signoff);
-                assert.equal(signoff.name, 'August Kring');
-                assert.equal(signoff.nameVisible, true);
-                assert.equal(signoff.signatureLoaded, true);
-                assert.equal(signoff.signatureAlt, 'Handwritten signature of August Kring');
-                if(width>760) assert.ok(signoff.signatureWidth >= 164 && signoff.signatureWidth <= 183,'Desktop signature scale');
-                else assert.ok(signoff.signatureWidth >= 153 && signoff.signatureWidth <= 155,'Mobile signature scale');
-                assert.ok(signoff.fontSize >= 17.9 && signoff.fontSize <= 18.1);
-                assert.ok(signoff.imageBeforeName && signoff.insideContent);
+                console.log('Homepage signoff',width,signoff);
+                assert.equal(signoff.note,'With curiosity and optimism,');
+                assert.equal(signoff.noteVisible,true);
+                assert.equal(signoff.name,'August Kring');
+                assert.equal(signoff.nameVisible,true);
+                assert.equal(signoff.signatureLoaded,true);
+                assert.equal(signoff.signatureAlt,'Handwritten signature of August Kring');
+                if(width>760) assert.ok(signoff.signatureWidth>=185&&signoff.signatureWidth<=206,'Desktop signature scale');
+                else assert.ok(signoff.signatureWidth>=163&&signoff.signatureWidth<=165,'Mobile signature scale');
+                assert.ok(signoff.fontSize>=17.9&&signoff.fontSize<=18.1);
+                assert.ok(signoff.noteBeforeSignature&&signoff.imageBeforeName&&signoff.insideContent);
                 assert.equal(signoff.linkCount,2);
-                assert.equal(signoff.noExtraCopy,true);
-                if(width>760) assert.ok(signoff.sideBySide,'Desktop signoff/actions should share one row');
-                else assert.ok(signoff.stacked,'Mobile signoff/actions should stack');
-                assert.equal(signoff.horizontalOverflow, false);
+                assert.equal(signoff.noHeading,true);
+                if(width>760) {
+                  assert.ok(signoff.sideBySide,'Desktop signoff/actions should share one row');
+                  assert.equal(signoff.actionsDisplay,'grid','Desktop contact actions should form a quiet vertical rail');
+                } else assert.ok(signoff.stacked,'Mobile signoff/actions should stack');
+                assert.equal(signoff.horizontalOverflow,false);
                 await page.locator('.homepage-contact').screenshot({path:`/tmp/ak-browser-check/contact-${width}.png`});
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
 
@@ -494,21 +520,25 @@ jobs:
                   const computed=getComputedStyle(container);
                   return {
                     topRule:parseFloat(computed.borderTopWidth),
-                    copyrightVisible:meta.getBoundingClientRect().height>0 && meta.textContent.includes('August Kring'),
+                    copyrightVisible:meta.getBoundingClientRect().height>0&&meta.textContent.includes('August Kring'),
                     privacyVisible:!!meta.querySelector('a[href="privacy/"]'),
                     noWordmark:!container.querySelector('.footer-wordmark'),
                     navLinks:nav.querySelectorAll('a').length,
                     labels:[...nav.querySelectorAll('a')].map(a=>a.textContent.trim()),
                     navAlign:getComputedStyle(nav).alignItems,
+                    metaJustify:getComputedStyle(meta).justifyContent,
                     horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('Unified footer rendering',width,footer);
+                console.log('Utility footer rendering',width,footer);
                 assert.equal(footer.topRule,1,'Footer has one upper rule');
-                assert.ok(footer.copyrightVisible && footer.privacyVisible && footer.navLinks===3,'Footer navigation and privacy');
-                assert.deepEqual(footer.labels,['About','Perspectives','LinkedIn']);
-                if(width<=520) assert.equal(footer.navAlign,'flex-start','Mobile footer links must share the left alignment axis');
-                assert.ok(footer.noWordmark && !footer.horizontalOverflow,'No footer wordmark or horizontal overflow');
+                assert.ok(footer.copyrightVisible&&footer.privacyVisible&&footer.navLinks===3,'Footer actions and privacy');
+                assert.deepEqual(footer.labels,['Email','Connect on LinkedIn','Subscribe to Perspectives']);
+                if(width<=760) {
+                  assert.equal(footer.navAlign,'flex-start','Mobile footer actions must share the left alignment axis');
+                  assert.equal(footer.metaJustify,'flex-start','Mobile footer meta must share the left alignment axis');
+                }
+                assert.ok(footer.noWordmark&&!footer.horizontalOverflow,'No footer wordmark or horizontal overflow');
 
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/about/',{waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
