@@ -19,18 +19,20 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"f3116a48","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"5b5cb1d2","footer":"bf408a89","tokens":"3fe414f6","contact":"4d5aa686"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
   tokens:digest(part(css,':root {','\n}')),
-  contact:digest(part(css,'/* Homepage closing note:','.home-footer {\n  padding: 34px'))
+  contact:digest(part(css,'/* Homepage closing signoff:','.home-footer {\n  padding: 34px'))
 };
 for(const [key,val] of Object.entries(approved)) {
   assert.equal(actual[key],val,'Approved homepage/CSS changed: '+key);
 }
 
 const perspective=part(html,'<section id="perspective"','</section>');
+assert.ok(perspective.includes('<p class="perspective-statement">The real opportunity isn\'t AI itself. It\'s the companies we can build around it.</p>'),'The Shift I See statement must sit directly under its heading');
+assert.ok(!perspective.includes('The next decade will test even the strongest market positions.'),'Retired Shift subtitle returned');
 assert.ok(
   perspective.includes("<p>But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.</p>"),
   'Approved The shift I see argument changed'
@@ -39,11 +41,11 @@ assert.ok(
 const thread=part(html,'<section id="thread"','</section>');
 const threadSummary=thread.slice(0,thread.indexOf('<section class="waymaking-narrative"'));
 for(const sentence of [
-  "I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction.",
+  "I do my best work when something new is taking shape or a challenge calls for fresh thinking and clear direction.",
   "I combine creative thinking with commercial understanding and strategic judgement to spot opportunities and find better ways forward.",
   "I enjoy giving ambitious ideas direction and bringing people together around a shared vision.",
   "But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.",
-  "build towards a positive future together with bold people",
+  "What drives me is building towards a positive future together with bold people",
   "leaving the world a little better than I found it."
 ]) {
   assert.ok(threadSummary.includes(sentence),'Approved Where I add value copy drift: '+sentence);
@@ -108,7 +110,7 @@ assert.ok(css.includes('/* Waymaking editorial: five parallel facets, hierarchy 
 assert.ok(css.includes('.waymaking-copy-column {\n  position: relative;'),'Waymaking editorial container missing');
 assert.ok(css.includes('.waymaking-beat + .waymaking-beat {\n  border-top: 1px solid var(--line);'),'Waymaking must use only internal hairline dividers');
 assert.ok(!css.includes('.waymaking-copy-column {\n  border-top: 1px solid var(--line);')&&!css.includes('border-bottom: 1px solid var(--line);\n}'),'Waymaking must not be boxed by top/bottom rules');
-assert.ok(css.includes('grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);'),'Desktop editorial two-column grid missing');
+assert.ok(css.includes('grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'Waymaking desktop grid must align with Where I add value');
 assert.ok(css.includes('.thread-section { padding-bottom: 0; }'),'Corrected homepage thread must not add duplicate bottom spacing');
 assert.ok(css.includes('@media (max-width: 700px) {')&&css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile editorial stack missing');
 assert.ok(!thread.includes('waymaking-signature'),'Decorative Waymaking signature must remain removed');
@@ -123,19 +125,17 @@ for(const forbidden of [
 }
 assert.ok(!css.includes('.waymaking-resolution')&&!css.includes('.waymaking-intro'),'Removed Waymaker intro/conclusion styling returned');
 
-assert.ok(html.includes("How that shows up in what I'm building today."),'My current focus bridge copy missing');
+assert.ok(!html.includes("How that shows up in what I'm building today.")&&!html.includes("What I'm building and working on today."),'My current focus must not have a subtitle');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
 const threadClose=html.indexOf('</section>',html.indexOf('</section>',html.indexOf('<section class="waymaking-narrative"'))+10);
 assert.ok(threadClose>=0&&threadClose<html.indexOf('<section id="work"'),'Where I add value must close before My current focus');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(thread.includes('<h3>Hands-On Execution</h3>')&&!thread.includes('<h3>AI-Native Building</h3>'),'Hands-On Execution remains the fourth facet');
 assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"')&&thread.includes('<h3>Purpose &amp; Impact</h3>'),'Purpose & Impact remains the fifth facet');
-assert.ok(html.includes("Blentera is the company’s AI foundation."),'Approved Blentera positioning copy missing');
+assert.ok(html.includes("Blentera gives companies a shared foundation for AI."),'Approved Blentera positioning copy missing');
 
 const work=part(html,'<section id="work"','</section>');
-const workParagraphs=[...work.matchAll(/<p>([^<]+)<\/p>/g)]
-  .map(match=>match[1])
-  .filter(value=>!value.includes("How that shows up in what I'm building today."));
+const workParagraphs=[...work.matchAll(/<p>([^<]+)<\/p>/g)].map(match=>match[1]);
 assert.equal(workParagraphs.length,4,'My current focus must contain exactly four venture descriptions');
 for(const copy of workParagraphs){
   const letters=letterCount(copy);
@@ -143,8 +143,14 @@ for(const copy of workParagraphs){
     'Each My current focus description must stay within the approved 220-230 letter range: '+letters);
 }
 
-assert.ok(css.includes('-webkit-tap-highlight-color: transparent;')&&css.includes('mobile-navigation-panel a:active'),'Mobile menu must use red-only navigation feedback');
-assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Approved two-group close missing');
+assert.ok(css.includes('-webkit-tap-highlight-color: transparent;')&&css.includes('.mobile-menu-toggle:focus-visible svg'),'Mobile menu must keep pointer feedback clean and keyboard focus visible');
+assert.ok(!css.includes('outline: 2px solid var(--red); outline-offset: 2px; background: transparent; color: var(--red);'),'Mobile menu controls must never use the retired red focus ring');
+assert.ok(css.includes('grid-template-columns: minmax(0, 1fr) auto;'),'Homepage signoff must use the approved signature/actions composition');
+assert.ok(!html.includes('Let’s connect')&&!html.includes('With curiosity and optimism'),'Homepage close must remain a pure signoff');
+assert.ok(html.includes('Read my perspectives')&&!html.includes('Explore my perspectives'),'Homepage perspective link wording drift');
+assert.ok(!html.includes('class="perspective-links"'),'Homepage perspective preview cards must remain removed');
+assert.ok(!html.includes('waymaking-ventures')&&!html.includes('<sup>™</sup>'),'Waymaking focus logo must remain free of Ventures and TM');
+assert.ok(css.includes('.waymaking-beat:last-child {\n  padding-bottom: 0;')&&css.includes('.work-section--waymaking-output {\n  padding-top: var(--section-space);'),'Purpose-to-current-focus spacing must use one section gap');
 assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, 390px);\n}"),'Shared 390px subtitle measure missing');
 assert.ok(css.includes('.hero-copy > .hero-focus {\n  width: 100%;\n  max-width: none;'),'Approved full-column homepage hero description missing');
 assert.ok(css.includes('max-width: 900px;\n  margin-inline: auto;\n  padding: clamp(50px, 5vw, 66px) 0 clamp(68px, 7vw, 92px);\n  text-align: center;'),'Perspectives hero must stay centred');
@@ -156,10 +162,13 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v37':'styles.css?v=20261026-nav-focus-v2';
+  const expectedStyles=path==='index.html'?'styles.css?v=20261026-homepage-final-v38':'styles.css?v=20261026-shared-v3';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
+  const footer=part(page,'<footer class="home-footer"','</footer>');
+  assert.ok(footer.includes('>About</a>')&&footer.includes('>Perspectives</a>')&&footer.includes('>LinkedIn</a>'),'Shared footer navigation drift: '+path);
+  assert.ok(!footer.includes('Subscribe to Perspectives')&&!footer.includes('ak@augustkring.com'),'Shared footer must remain navigation-first: '+path);
 }
 
 console.log('PASS: editorial Waymaking, protected homepage copy, responsive structure and shared site baseline');
