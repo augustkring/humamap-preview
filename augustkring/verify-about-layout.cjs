@@ -179,6 +179,7 @@ const close = (actual, expected, tolerance, label) => {
 
         const secondTab = page.locator('.about-personality-tab').nth(1);
         await secondTab.hover();
+        await page.waitForTimeout(180);
         const hoverColor = await secondTab.evaluate(el => getComputedStyle(el).color);
         assert.equal(hoverColor, 'rgb(218, 56, 49)', engine + ' ' + width + ' Personality hover is red');
         await page.locator('.about-personality-tab').first().focus();
