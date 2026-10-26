@@ -1594,3 +1594,353 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   }
 }
 
+
+
+/* About V2: narrative first, skill set + mindset, borderless reflection tabs. */
+.about-page { padding-bottom: 0; }
+
+.about-page .about-personal-hero {
+  padding: clamp(54px, 5.5vw, 72px) 0 var(--section-space);
+  display: block;
+}
+.about-page .about-personal-copy {
+  max-width: 720px;
+}
+.about-page .about-personal-lead {
+  max-width: min(100%, var(--measure-reading));
+  margin-top: 24px;
+  color: var(--copy);
+  font-size: var(--editorial-lead-size);
+  line-height: 1.58;
+}
+
+.about-v2-section {
+  padding: var(--section-space) 0;
+}
+.about-section-lead h2,
+.about-toolkit-column > h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--editorial-h2-size);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+.about-section-lead > p,
+.about-toolkit-intro {
+  margin: 24px 0 0;
+  color: var(--ink);
+  font-size: var(--editorial-lead-size);
+  line-height: 1.55;
+}
+
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  gap: clamp(54px, 7vw, 92px);
+  align-items: start;
+}
+.about-story .about-section-lead > p {
+  max-width: var(--measure-narrow);
+}
+.about-story-beats {
+  max-width: var(--measure-reading);
+}
+.about-story-beat {
+  padding: clamp(25px, 2.8vw, 34px) 0;
+}
+.about-story-beat:first-child {
+  padding-top: 0;
+}
+.about-story-beat + .about-story-beat {
+  border-top: 1px solid var(--line);
+}
+.about-story-beat h3,
+.about-toolkit-list h3 {
+  margin: 0 0 9px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.7vw, 22px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+}
+.about-story-beat p {
+  margin: 0;
+  color: var(--copy);
+  font-size: var(--body-copy-size);
+  line-height: 1.65;
+}
+
+.about-toolkit {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(64px, 8vw, 112px);
+  align-items: start;
+}
+.about-toolkit-column {
+  min-width: 0;
+}
+.about-toolkit-intro {
+  max-width: var(--measure-narrow);
+}
+.about-toolkit-list {
+  margin-top: clamp(30px, 3.4vw, 42px);
+}
+.about-toolkit-list article {
+  padding: 22px 0 24px;
+  border-top: 1px solid var(--line);
+}
+.about-toolkit-list p {
+  margin: 0;
+  color: var(--copy);
+  font-size: var(--card-copy-size);
+  line-height: 1.62;
+}
+.about-toolkit-skills .about-toolkit-list,
+.about-toolkit-mindset .about-toolkit-list {
+  max-width: 500px;
+}
+
+.about-page .about-personality {
+  display: block;
+  padding: var(--section-space) 0;
+}
+.about-personality > .about-section-lead {
+  max-width: 760px;
+  margin-bottom: clamp(32px, 3.8vw, 46px);
+}
+.about-personality > .about-section-lead > p {
+  max-width: var(--measure-reading);
+}
+.about-personality-explorer {
+  width: 100%;
+}
+.about-personality-tabs {
+  display: none;
+  width: 100%;
+  margin: 0 0 clamp(32px, 3.5vw, 42px);
+  padding: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: clamp(22px, 3vw, 34px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.about-personality-tabs::-webkit-scrollbar { display: none; }
+.about-personality-explorer.is-enhanced .about-personality-tabs { display: flex; }
+.about-personality-explorer:not(.is-enhanced) .about-personality-panel + .about-personality-panel {
+  margin-top: 48px;
+}
+.about-personality-tab {
+  position: relative;
+  min-height: 48px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 700 15px/1.2 var(--font-display);
+  white-space: nowrap;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.about-personality-tab:hover {
+  color: var(--red);
+}
+.about-personality-tab[aria-selected="true"] {
+  color: var(--red);
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
+}
+.about-personality-tab:focus-visible {
+  outline: 0;
+  color: var(--red);
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
+}
+.about-personality-panels {
+  min-height: 0;
+}
+.about-personality-panel,
+.about-personality-panel[hidden] {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.about-personality-panel[hidden] { display: none; }
+.about-personality-panel-head {
+  display: block;
+}
+.about-personality-panel-head h3 {
+  margin: 7px 0 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(27px, 2.7vw, 34px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.035em;
+}
+.about-profile-kicker {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.about-personality-intro {
+  max-width: var(--measure-reading);
+  margin: 18px 0 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--body-copy-size);
+  font-weight: 500;
+  line-height: 1.6;
+}
+.about-personality-meaning {
+  max-width: 840px;
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(34px, 4.5vw, 52px);
+}
+.about-personality-meaning > div {
+  max-width: var(--measure-narrow);
+}
+.about-personality-meaning span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font: 700 11.5px/1.2 var(--font-display);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.about-personality-meaning p {
+  margin: 0;
+  color: var(--copy);
+  font-size: var(--card-copy-size);
+  line-height: 1.62;
+}
+.about-personality-markers {
+  max-width: 840px;
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--muted);
+}
+.about-personality-markers span {
+  color: inherit;
+  font: 500 12.5px/1.45 var(--font-body);
+}
+.about-personality-markers span:not(:last-child)::after {
+  content: '·';
+  margin-left: 18px;
+  color: var(--red);
+}
+.about-profile-cta {
+  margin-top: clamp(38px, 4.5vw, 56px);
+}
+.about-profile-link {
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
+
+@media (max-width: 840px) {
+  .about-story,
+  .about-toolkit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .about-story {
+    gap: 30px;
+  }
+  .about-toolkit {
+    gap: var(--section-space-mobile);
+  }
+  .about-toolkit-column,
+  .about-toolkit-skills .about-toolkit-list,
+  .about-toolkit-mindset .about-toolkit-list {
+    max-width: 680px;
+  }
+  .about-personality-meaning {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+  .about-personality-meaning > div {
+    max-width: var(--measure-reading);
+  }
+}
+
+@media (max-width: 760px) {
+  .about-page .about-personal-hero {
+    padding: 42px 0 62px;
+  }
+  .about-v2-section,
+  .about-page .about-personality {
+    padding: var(--section-space-mobile) 0;
+  }
+  .about-page .about-personal-lead,
+  .about-section-lead > p,
+  .about-toolkit-intro {
+    font-size: var(--editorial-lead-size);
+  }
+  .about-story {
+    gap: 26px;
+  }
+  .about-story-beat {
+    padding: 24px 0;
+  }
+  .about-toolkit {
+    gap: 58px;
+  }
+  .about-toolkit-list {
+    margin-top: 28px;
+  }
+  .about-toolkit-list article {
+    padding: 20px 0 22px;
+  }
+  .about-personality > .about-section-lead {
+    margin-bottom: 24px;
+  }
+  .about-personality-tabs {
+    width: calc(100% + var(--gutter));
+    margin-right: calc(var(--gutter) * -1);
+    margin-bottom: 28px;
+    padding-right: var(--gutter);
+    gap: 26px;
+  }
+  .about-personality-tab {
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .about-personality-panel-head h3 {
+    font-size: clamp(27px, 7.5vw, 31px);
+  }
+  .about-personality-intro {
+    font-size: var(--body-copy-size);
+  }
+  .about-personality-meaning {
+    margin-top: 24px;
+    gap: 24px;
+  }
+  .about-personality-markers {
+    margin-top: 22px;
+  }
+  .about-profile-cta {
+    margin-top: 40px;
+  }
+}
