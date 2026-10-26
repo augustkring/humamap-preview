@@ -167,8 +167,7 @@ a {
 }
 
 .wordmark-i { position: relative; display: inline-block; color: inherit; }
-.wordmark-i::before { content: ''; position: absolute; z-index: 1; width: .70em; height: .62em; left: 60%; top: -.14em; background: var(--page); transform: translateX(-50%); pointer-events: none; }
-.wordmark-i::after { content: ''; position: absolute; z-index: 2; width: .54em; height: .54em; left: 60%; top: -.10em; border-radius: 999px; background: var(--red); transform: translateX(-50%); pointer-events: none; }
+.wordmark-i::after { content: ''; position: absolute; z-index: 2; width: .54em; height: .54em; left: 60%; top: -.24em; border-radius: 999px; background: var(--red); transform: translateX(-50%); pointer-events: none; }
 
 .home-navigation {
   display: flex;
