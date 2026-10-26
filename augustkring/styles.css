@@ -967,323 +967,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   letter-spacing: -.045em;
 }
 
-.about-page { padding-bottom: 0; }
-
-.about-personal-hero {
-  padding: clamp(50px, 5vw, 66px) 0 var(--section-space);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: center;
-}
-.about-personal-copy { max-width: 760px; }
-.about-personal-copy h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--editorial-h1-size);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -.045em;
-}
-.about-personal-lead {
-  max-width: 760px;
-  margin: 22px 0 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--editorial-lead-size);
-  font-weight: 400;
-  line-height: 1.55;
-  letter-spacing: 0;
-}
-.about-home-section {
-  padding: var(--about-section-space) 0;
-  display: grid;
-  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
-  gap: clamp(54px, 7vw, 92px);
-  align-items: start;
-}
-.about-home-lead h2,
-.about-principles-intro h2,
-.about-story-intro h2 {
-  margin: 0;
-  font-family: var(--font-display);
-  color: var(--ink);
-  font-size: var(--editorial-h2-size);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -.04em;
-}
-.about-home-lead > p,
-.about-principles-intro > p {
-  max-width: 500px;
-  margin: 24px 0 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--editorial-lead-size);
-  font-weight: 400;
-  line-height: 1.55;
-  letter-spacing: 0;
-}
-
-.homepage-working .about-home-lead > p {
-  font-family: var(--font-body);
-  font-size: 19px;
-  font-weight: 400;
-  line-height: 1.55;
-  letter-spacing: 0;
-}
-
-.about-skill-grid {
-  max-width: 620px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 34px 30px;
-}
-.about-skill-grid article { min-width: 0; }
-.about-skills .about-home-lead > p {
-  max-width: 470px;
-}
-.about-skill-grid h3,
-.about-principle h3 {
-  margin: 0 0 9px;
-  font-family: var(--font-display);
-  color: var(--ink);
-  font-size: clamp(20px, 1.7vw, 22px);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -.025em;
-}
-.about-skill-grid p,
-.about-principle p {
-  margin: 0;
-  color: var(--copy);
-  font-size: var(--card-copy-size);
-  line-height: 1.6;
-}
-
-.about-principles-band {
-  margin: 0;
-  padding: var(--about-section-space) 0;
-  display: grid;
-  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
-  gap: clamp(54px, 7vw, 92px);
-  align-items: start;
-}
-.about-principles-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 30px 34px;
-}
-.about-principle-primary {
-  grid-column: 1 / -1;
-  max-width: 560px;
-}
-.about-principle-primary h3 {
-  font-size: clamp(24px, 2.3vw, 30px);
-  letter-spacing: -.03em;
-}
-
-.about-personality {
-  display: block;
-  padding-top: var(--about-section-space);
-}
-.about-personality > .about-home-lead {
-  max-width: 760px;
-  margin-bottom: clamp(34px, 3.8vw, 48px);
-}
-.about-personality > .about-home-lead > p {
-  max-width: 700px;
-}
-
-.about-personality-explorer {
-  width: 100%;
-}
-.about-personality-tabs {
-  display: none;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 0 24px;
-}
-.about-personality-explorer.is-enhanced .about-personality-tabs { display: flex; }
-.about-personality-explorer:not(.is-enhanced) .about-personality-panel + .about-personality-panel { margin-top: 24px; }
-
-.about-personality-tab {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
-  font: 700 14px/1 var(--font-display);
-  cursor: pointer;
-  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
-}
-.about-personality-tab:hover,
-.about-personality-tab:focus-visible {
-  color: var(--ink);
-  border-color: var(--line);
-}
-.about-personality-tab[aria-selected="true"] {
-  color: var(--ink);
-  background: var(--surface);
-  border-color: var(--line);
-}
-.about-personality-tab:focus-visible {
-  outline: var(--focus-ring-width) solid var(--red);
-  outline-offset: 2px;
-}
-
-.about-personality-panels {
-  min-height: 390px;
-}
-.about-personality-panel {
-  padding: clamp(28px, 3vw, 36px);
-  border-radius: var(--radius-sm);
-  background: var(--surface-card);
-}
-.about-personality-panel[hidden] { display: none; }
-
-.about-personality-panel-head {
-  display: block;
-}
-.about-personality-panel-head h3 {
-  margin: 6px 0 0;
-  font-family: var(--font-display);
-  color: var(--ink);
-  font-size: clamp(25px, 2.5vw, 32px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -.03em;
-}
-.about-profile-kicker {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
-}
-.about-personality-intro {
-  max-width: var(--measure-reading);
-  margin: 18px 0 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 1.58;
-  letter-spacing: 0;
-}
-.about-personality-meaning {
-  max-width: 840px;
-  margin-top: 26px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(32px, 4vw, 48px);
-}
-.about-personality-meaning > div {
-  max-width: 390px;
-}
-.about-personality-meaning span {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--ink);
-  font: 700 11.5px/1.2 var(--font-display);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.about-personality-meaning p {
-  margin: 0;
-  color: var(--copy);
-  font-size: var(--card-copy-size);
-  line-height: 1.6;
-}
-.about-personality-markers {
-  max-width: 840px;
-  margin-top: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-}
-.about-personality-markers span {
-  color: var(--ink);
-  font: 500 12.5px/1.45 var(--font-body);
-}
-.about-personality-markers span:not(:last-child)::after {
-  content: '·';
-  margin-left: 18px;
-  color: var(--red);
-}
-
-.about-future-copy,
-.about-working-copy {
-  max-width: 600px;
-}
-.about-future-copy p,
-.about-working-copy p,
-.about-story-content p {
-  margin: 0;
-  color: var(--copy);
-  font-size: var(--body-copy-size);
-  line-height: 1.6;
-}
-.about-future-copy p + p,
-.about-working-copy p + p,
-.about-story-content p + p { margin-top: 18px; }
-.about-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 26px;
-}
-.about-actions .arrow-link,
-.about-story-link { font-size: 16px; }
-.homepage-working .about-actions .arrow-link {
-  font-size: 18px;
-  line-height: 1.2;
-  letter-spacing: -.015em;
-}
-
-.about-story-bottom {
-  padding: var(--section-space) 0;
-  display: grid;
-  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
-  gap: clamp(54px, 7vw, 92px);
-  align-items: start;
-}
-.about-story-intro > p {
-  max-width: 480px;
-  margin: 24px 0 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 19px;
-  font-weight: 400;
-  line-height: 1.55;
-}
-/* Home + About section subtitles share one readable measure.
-   The homepage hero description intentionally keeps its approved full-column width. */
-.home-main .thread-lead > p,
-.home-main .perspective-lead > p,
-.home-main .values-lead > p,
-.home-main .about-home-lead > p,
-.home-main .about-principles-intro > p,
-.home-main .about-story-intro > p,
-.home-main .about-personal-lead {
-  max-width: min(100%, var(--measure-narrow));
-}
-
-.about-story-content { max-width: var(--measure-reading); }
-.about-story-content p a {
-  color: var(--ink);
-  text-decoration-color: var(--red);
-  text-underline-offset: 3px;
-}
-.about-story-content p a:hover,
-.about-story-content p a:focus-visible {
-  text-decoration-thickness: 2px;
-}
-.about-story-link {
-  margin-top: clamp(26px, 3vw, 34px);
-  font-size: 18px;
-  line-height: 1.2;
-  letter-spacing: -.015em;
-}
-
 .article-page { padding-bottom: clamp(88px, 9vw, 132px); }
 .article-hero {
   width: min(100%, 720px);
@@ -1380,35 +1063,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 }
 
-@media (max-width: 980px) {
-  .about-personality-meaning {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .about-personality-meaning > div {
-    max-width: 100%;
-  }
-}
-
 @media (max-width: 840px) {
   :root { --gutter: 24px; }
   .home-navigation { display: none; }
   .mobile-navigation { display: block; }
   .site-header.home-header { align-items: center; padding: 10px 0 8px; }
-  .about-personal-hero,
-  .about-home-section,
-  .about-principles-band,
-  .about-story-bottom { grid-template-columns: 1fr; }
-  .about-personal-hero { min-height: auto; gap: 32px; }
-  .about-personal-note { max-width: 620px; margin-left: 0; }
-  .about-home-section,
-  .about-story-bottom { gap: 24px; }
-  .about-principles-band { gap: 32px; }
-  .about-personality-meaning { grid-template-columns: 1fr; gap: 24px; }
-  .about-personality-meaning > div { max-width: 100%; }
-  .about-personality-panel-head { display: grid; gap: 10px; }
-
 
   .home-hero {
     grid-template-columns: 1fr;
@@ -1425,8 +1084,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     width: min(100%, 470px);
     margin-left: 0;
   }
-
-
 }
 
 @media (max-width: 760px) {
@@ -1450,20 +1107,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     font-size: 18px;
   }
 
-  .story-section,
-  .about-home-section { padding: var(--section-space-mobile) 0; }
+  .story-section { padding: var(--section-space-mobile) 0; }
 
-  .about-skill-grid,
-  .about-principles-grid { grid-template-columns: 1fr; gap: 24px; }
-  .about-principle-primary { grid-column: auto; max-width: none; }
-  .about-principles-band { margin-block: 0; padding: var(--section-space-mobile) 0; }
-  .about-personal-hero { padding: 42px 0 62px; }
-  .about-personality { padding: var(--section-space-mobile) 0; }
-  .about-story-bottom { padding: var(--section-space-mobile) 0; gap: 24px; }
-  .about-personality-panel { min-height: 0; padding: 24px 20px; }
-  .about-story-intro > p { font-size: var(--editorial-lead-size); }
-  .about-personal-lead, .about-page .about-home-lead > p, .about-principles-intro > p { font-size: var(--editorial-lead-size); }
-  .about-personality-intro { font-size: var(--body-copy-size); }
   .perspective-index-summary { font-size: var(--body-reading-size); }
   .article-comparison td { font-size: var(--card-copy-size); }
 
@@ -1594,27 +1239,34 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   }
 }
 
-
-
-/* About V2: narrative first, skill set + mindset, borderless reflection tabs. */
+/* About V3: one narrative system, balanced toolkit, minimal reflection tabs. */
 .about-page { padding-bottom: 0; }
 
-.about-page .about-personal-hero {
+.about-personal-hero {
   padding: clamp(54px, 5.5vw, 72px) 0 var(--section-space);
-  display: block;
 }
-.about-page .about-personal-copy {
+.about-personal-copy {
   max-width: 720px;
 }
-.about-page .about-personal-lead {
+.about-personal-copy h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--editorial-h1-size);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.about-personal-lead {
   max-width: min(100%, var(--measure-reading));
-  margin-top: 24px;
+  margin: 24px 0 0;
   color: var(--copy);
   font-size: var(--editorial-lead-size);
   line-height: 1.58;
 }
 
-.about-v2-section {
+.about-v3-section {
   padding: var(--section-space) 0;
 }
 .about-section-lead h2,
@@ -1628,22 +1280,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   letter-spacing: -.04em;
   text-wrap: balance;
 }
-.about-section-lead > p,
-.about-toolkit-intro {
-  margin: 24px 0 0;
-  color: var(--ink);
-  font-size: var(--editorial-lead-size);
-  line-height: 1.55;
-}
 
 .about-story {
   display: grid;
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
   align-items: start;
-}
-.about-story .about-section-lead > p {
-  max-width: var(--measure-narrow);
 }
 .about-story-beats {
   max-width: var(--measure-reading);
@@ -1678,16 +1320,25 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(64px, 8vw, 112px);
-  align-items: start;
+  align-items: stretch;
 }
 .about-toolkit-column {
   min-width: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
 }
 .about-toolkit-intro {
-  max-width: var(--measure-narrow);
+  min-height: 32px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
 }
 .about-toolkit-list {
-  margin-top: clamp(30px, 3.4vw, 42px);
+  max-width: 500px;
+  margin-top: 28px;
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
 }
 .about-toolkit-list article {
   padding: 22px 0 24px;
@@ -1699,21 +1350,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   font-size: var(--card-copy-size);
   line-height: 1.62;
 }
-.about-toolkit-skills .about-toolkit-list,
-.about-toolkit-mindset .about-toolkit-list {
-  max-width: 500px;
-}
 
-.about-page .about-personality {
+.about-personality {
   display: block;
-  padding: var(--section-space) 0;
 }
 .about-personality > .about-section-lead {
   max-width: 760px;
-  margin-bottom: clamp(32px, 3.8vw, 46px);
+  margin-bottom: clamp(30px, 3.5vw, 42px);
 }
 .about-personality > .about-section-lead > p {
   max-width: var(--measure-reading);
+  margin: 22px 0 0;
+  color: var(--copy);
+  font-size: var(--body-copy-size);
+  line-height: 1.6;
 }
 .about-personality-explorer {
   width: 100%;
@@ -1739,7 +1389,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   margin-top: 48px;
 }
 .about-personality-tab {
-  position: relative;
   min-height: 48px;
   flex: 0 0 auto;
   padding: 0;
@@ -1754,17 +1403,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
-.about-personality-tab:hover {
-  color: var(--red);
-}
+.about-personality-tab:hover,
 .about-personality-tab[aria-selected="true"] {
   color: var(--red);
-  background: transparent;
-  border: 0;
-  text-decoration: underline;
-  text-decoration-color: var(--red);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 7px;
 }
 .about-personality-tab:focus-visible {
   outline: 0;
@@ -1777,79 +1418,46 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-personality-panels {
   min-height: 0;
 }
-.about-personality-panel,
-.about-personality-panel[hidden] {
+.about-personality-panel {
   padding: 0;
   border-radius: 0;
   background: transparent;
 }
-.about-personality-panel[hidden] { display: none; }
-.about-personality-panel-head {
-  display: block;
+.about-personality-panel[hidden] {
+  display: none;
 }
-.about-personality-panel-head h3 {
-  margin: 7px 0 0;
+.about-personality-panel:focus-visible {
+  outline: var(--focus-ring-width) solid var(--red);
+  outline-offset: 8px;
+}
+.about-lens-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  gap: clamp(54px, 7vw, 92px);
+  align-items: start;
+}
+.about-lens-layout h3 {
+  max-width: 420px;
+  margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
   font-size: clamp(27px, 2.7vw, 34px);
   font-weight: 700;
-  line-height: 1.04;
+  line-height: 1.05;
   letter-spacing: -.035em;
+  text-wrap: balance;
 }
-.about-profile-kicker {
-  color: var(--muted);
-  font-size: 12.5px;
-  line-height: 1.4;
-}
-.about-personality-intro {
+.about-lens-copy {
   max-width: var(--measure-reading);
-  margin: 18px 0 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--body-copy-size);
-  font-weight: 500;
-  line-height: 1.6;
 }
-.about-personality-meaning {
-  max-width: 840px;
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(34px, 4.5vw, 52px);
-}
-.about-personality-meaning > div {
-  max-width: var(--measure-narrow);
-}
-.about-personality-meaning span {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--ink);
-  font: 700 11.5px/1.2 var(--font-display);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.about-personality-meaning p {
+.about-lens-copy p {
   margin: 0;
   color: var(--copy);
-  font-size: var(--card-copy-size);
-  line-height: 1.62;
+  font-size: var(--body-copy-size);
+  line-height: 1.65;
 }
-.about-personality-markers {
-  max-width: 840px;
-  margin-top: 26px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  color: var(--muted);
-}
-.about-personality-markers span {
-  color: inherit;
-  font: 500 12.5px/1.45 var(--font-body);
-}
-.about-personality-markers span:not(:last-child)::after {
-  content: '·';
-  margin-left: 18px;
-  color: var(--red);
+.about-lens-copy p + p {
+  margin-top: 18px;
 }
 .about-profile-cta {
   margin-top: clamp(38px, 4.5vw, 56px);
@@ -1862,44 +1470,41 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 @media (max-width: 840px) {
   .about-story,
-  .about-toolkit {
+  .about-toolkit,
+  .about-lens-layout {
     grid-template-columns: minmax(0, 1fr);
   }
   .about-story {
-    gap: 30px;
+    gap: 28px;
   }
   .about-toolkit {
     gap: var(--section-space-mobile);
   }
-  .about-toolkit-column,
-  .about-toolkit-skills .about-toolkit-list,
-  .about-toolkit-mindset .about-toolkit-list {
+  .about-toolkit-column {
     max-width: 680px;
+    grid-template-rows: auto auto auto;
   }
-  .about-personality-meaning {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 26px;
+  .about-toolkit-list {
+    grid-template-rows: none;
+    grid-auto-rows: auto;
   }
-  .about-personality-meaning > div {
+  .about-lens-layout {
+    gap: 24px;
+  }
+  .about-lens-layout h3 {
     max-width: var(--measure-reading);
   }
 }
 
 @media (max-width: 760px) {
-  .about-page .about-personal-hero {
+  .about-personal-hero {
     padding: 42px 0 62px;
   }
-  .about-v2-section,
-  .about-page .about-personality {
+  .about-v3-section {
     padding: var(--section-space-mobile) 0;
   }
-  .about-page .about-personal-lead,
-  .about-section-lead > p,
-  .about-toolkit-intro {
-    font-size: var(--editorial-lead-size);
-  }
   .about-story {
-    gap: 26px;
+    gap: 24px;
   }
   .about-story-beat {
     padding: 24px 0;
@@ -1907,19 +1512,24 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-toolkit {
     gap: 58px;
   }
+  .about-toolkit-intro {
+    min-height: 0;
+    margin-top: 14px;
+    font-size: 16px;
+  }
   .about-toolkit-list {
-    margin-top: 28px;
+    margin-top: 24px;
   }
   .about-toolkit-list article {
     padding: 20px 0 22px;
   }
   .about-personality > .about-section-lead {
-    margin-bottom: 24px;
+    margin-bottom: 22px;
   }
   .about-personality-tabs {
     width: calc(100% + var(--gutter));
     margin-right: calc(var(--gutter) * -1);
-    margin-bottom: 28px;
+    margin-bottom: 26px;
     padding-right: var(--gutter);
     gap: 26px;
   }
@@ -1927,18 +1537,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     min-height: 48px;
     font-size: 16px;
   }
-  .about-personality-panel-head h3 {
+  .about-lens-layout {
+    gap: 20px;
+  }
+  .about-lens-layout h3 {
     font-size: clamp(27px, 7.5vw, 31px);
-  }
-  .about-personality-intro {
-    font-size: var(--body-copy-size);
-  }
-  .about-personality-meaning {
-    margin-top: 24px;
-    gap: 24px;
-  }
-  .about-personality-markers {
-    margin-top: 22px;
   }
   .about-profile-cta {
     margin-top: 40px;
