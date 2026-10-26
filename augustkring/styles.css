@@ -656,8 +656,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   object-fit: contain;
   filter: brightness(0) saturate(100%) invert(11%) sepia(20%) saturate(1800%) hue-rotate(177deg) brightness(90%) contrast(102%);
 }
-.work-brand-august { height: 34px; }
-.work-brand-humamap { height: 35px; }
+.work-brand-august { height: 40px; }
+.work-brand-humamap { height: 40px; }
 .work-brand-blentera { height: 37px; filter: none; }
 .waymaking-logo {
   display: inline-flex; align-items: center;
@@ -736,18 +736,19 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   opacity: 1;
 }
 
-/* Homepage closing signoff: personal note + signature, with a quiet action rail on desktop. */
+/* Homepage closing signoff: one cohesive personal block across desktop and mobile. */
 .homepage-contact { width: 100%; margin: 0; padding: clamp(30px, 4vw, 44px) 0 clamp(64px, 7vw, 88px); }
-.homepage-contact-content { display: grid; grid-template-columns: var(--contact-columns); align-items: center; column-gap: clamp(56px, 8vw, 112px); }
-.homepage-contact .personal-signoff { width: min(100%, 360px); margin: 0; padding: 0; }
+.homepage-contact-content { display: block; }
+.homepage-contact .personal-signoff { width: min(100%, 440px); margin: 0; padding: 0; }
 .homepage-contact .signoff-note { margin: 0 0 8px; color: var(--copy); font-size: 16px; font-weight: 400; line-height: 1.5; letter-spacing: -.01em; opacity: .82; }
-.homepage-contact .personal-signoff .signoff-signature { width: clamp(186px, 17vw, 205px); margin: 6px 0 0; }
+.homepage-contact .personal-signoff .signoff-signature { width: clamp(186px, 17vw, 198px); margin: 6px 0 0; }
 .homepage-contact .personal-signoff .signoff-name { margin-top: 7px; font-size: 18px; }
-.homepage-contact-actions { min-width: 220px; margin: 0; display: grid; justify-items: start; justify-self: end; align-content: center; gap: 2px; }
+.homepage-contact-actions { width: 100%; margin: 16px 0 0; display: grid; justify-items: start; gap: 0; }
 .homepage-contact-actions .arrow-link { min-height: 44px; font-size: 17px; line-height: 1.25; letter-spacing: -.012em; white-space: nowrap; }
+@media (min-width: 761px) {
+  .homepage-contact-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 28px; }
+}
 @media (max-width: 760px) {
-  .homepage-contact-content { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
-  .homepage-contact-actions { width: 100%; min-width: 0; justify-self: start; }
   .homepage-contact .personal-signoff .signoff-signature { width: 164px; }
 }
 @media (max-width: 600px) { .homepage-contact { padding: 26px 0 58px; } }
@@ -1496,7 +1497,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .footer-links {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 0;
+  }
+  .footer-links a {
+    min-height: 44px;
+    font-size: 16px;
   }
 
 }
