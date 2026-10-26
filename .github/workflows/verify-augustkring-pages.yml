@@ -48,8 +48,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-waymaking-editorial-v37"
-          expected_shared="styles.css?v=20261026-nav-focus-v2"
+          expected_home="styles.css?v=20261026-homepage-final-v38"
+          expected_shared="styles.css?v=20261026-shared-v3"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -81,9 +81,17 @@ jobs:
           grep -Fq 'Hands-On Execution</h3>' /tmp/augustkring.html
           grep -Fq 'customer value, sound economics' /tmp/augustkring.html
           grep -Fq 'Strategic Judgement</h3>' /tmp/augustkring.html
-          grep -Fq "How that shows up in what I'm building today." /tmp/augustkring.html
-          grep -Fq "Blentera is the company’s AI foundation." /tmp/augustkring.html
-          grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
+          ! grep -Fq "How that shows up in what I'm building today." /tmp/augustkring.html
+          ! grep -Fq "What I'm building and working on today." /tmp/augustkring.html
+          grep -Fq "Blentera gives companies a shared foundation for AI." /tmp/augustkring.html
+          grep -Fq 'Read my perspectives' /tmp/augustkring.html
+          ! grep -Fq 'Explore my perspectives' /tmp/augustkring.html
+          ! grep -Fq 'class="perspective-links"' /tmp/augustkring.html
+          ! grep -Fq 'The next decade will test even the strongest market positions.' /tmp/augustkring.html
+          ! grep -Fq 'waymaking-ventures' /tmp/augustkring.html
+          ! grep -Fq '<sup>™</sup>' /tmp/augustkring.html
+          ! grep -Fq 'Let’s connect' /tmp/augustkring.html
+          ! grep -Fq 'With curiosity and optimism' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
@@ -94,7 +102,7 @@ jobs:
           grep -Fq 'stroke-width: 2.35;' /tmp/augustkring.css
           ! grep -Fq '.mobile-menu-close:focus-visible { outline: 2px solid var(--red)' /tmp/augustkring.css
           grep -Fq '/* Waymaking editorial: five parallel facets, hierarchy before decoration. */' /tmp/augustkring.css
-          grep -Fq 'grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);' /tmp/augustkring.css
+          grep -Fq 'grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat + .waymaking-beat {' /tmp/augustkring.css
           grep -Fq 'border-top: 1px solid var(--line);' /tmp/augustkring.css
           grep -Fq 'font-size: clamp(21px, calc(2vw - 2px), 26px);' /tmp/augustkring.css
@@ -108,7 +116,10 @@ jobs:
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
           grep -Fq 'scrollbar-gutter: stable;' /tmp/augustkring.css
-          grep -Fq 'width: clamp(136px, 12.5vw, 156px);' /tmp/augustkring.css
+          grep -Fq 'width: clamp(165px, 15vw, 182px);' /tmp/augustkring.css
+          grep -Fq '.waymaking-beat:last-child {' /tmp/augustkring.css
+          grep -Fq 'padding-top: var(--section-space);' /tmp/augustkring.css
+          grep -Fq 'width: 44px;' /tmp/augustkring.css
           curl -fsSL --max-time 20 "${base}assets/august-signature-vector-fine.svg?v=20261009-fine-ink-v1" -o /tmp/august-signature.svg
           grep -Fq 'viewBox="0 0 340 314"' /tmp/august-signature.svg
           grep -Fq '<path d=' /tmp/august-signature.svg
@@ -194,8 +205,7 @@ jobs:
                 }));
                 const editorial = await page.evaluate(() => {
                   const statement = document.querySelector('.perspective-statement');
-                  const perspectivesBlock = document.querySelector('.perspectives-block');
-                  const cardTitle = document.querySelector('.perspective-link-title');
+                  const readPerspectives = document.querySelector('.perspective-read-link');
                   return {
                     opener: document.querySelector('.thread-copy p:first-child').textContent.trim(),
                     visionCopy: document.querySelector('.thread-copy p:nth-child(2)').textContent.trim(),
@@ -208,19 +218,17 @@ jobs:
                     hasHomepageStory: !!document.querySelector('#about-title'),
                     statementTypeface: getComputedStyle(statement).fontFamily,
                     statementWeight: getComputedStyle(statement).fontWeight,
-                    perspectiveSpacing: parseFloat(getComputedStyle(perspectivesBlock).marginTop),
-                    cardTitleSize: parseFloat(getComputedStyle(cardTitle).fontSize),
+                    statementText: statement.textContent.trim(),
+                    readPerspectives: readPerspectives?.textContent.trim(),
+                    hasPerspectivePreviews: !!document.querySelector('.perspective-links'),
+                    hasWorkSubtitle: !!document.querySelector('.work-heading-copy > p'),
                     bodyOverflow: document.documentElement.scrollWidth > innerWidth + 1
                   };
                 });
                 console.log('Editorial polish', width, editorial);
-                assert.equal(editorial.opener,'I do my best work when something new is taking shape and a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgement to spot opportunities and find better ways forward.');
-                const homeSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.perspective-lead > p, .homepage-contact .about-home-lead > p')].map(el=>({
-                  text:el.textContent.trim(),
-                  width:el.getBoundingClientRect().width
-                })));
-                assert.equal(homeSubtitleWidths.length,2,'Remaining homepage section subtitles are present');
-                for(const entry of homeSubtitleWidths) assert.ok(entry.width<=390.5,'Homepage subtitle must stay within shared 390px measure: '+entry.text);
+                assert.equal(editorial.opener,'I do my best work when something new is taking shape or a challenge calls for fresh thinking and clear direction. I combine creative thinking with commercial understanding and strategic judgement to spot opportunities and find better ways forward.');
+                const shiftStatementWidth=await page.locator('.perspective-lead > .perspective-statement').evaluate(el=>el.getBoundingClientRect().width);
+                assert.ok(shiftStatementWidth<=390.5,'The Shift I See statement must stay within the shared editorial measure');
                 if(width===1440) {
                   const summary = await page.locator('.thread-copy p:first-child').evaluate(el => ({
                     width: el.getBoundingClientRect().width,
@@ -231,7 +239,7 @@ jobs:
                   assert.ok(summary.height>summary.lineHeight*2,'Holistic introduction should remain a readable paragraph');
                 }
                 assert.equal(editorial.visionCopy,"I enjoy giving ambitious ideas direction and bringing people together around a shared vision. But I also like getting hands-on, experimenting and building things myself, using AI to turn ideas into reality.");
-                assert.equal(editorial.purposeCopy,"What drives me is the desire to build towards a positive future together with bold people: creating things that matter and leaving the world a little better than I found it.");
+                assert.equal(editorial.purposeCopy,"What drives me is building towards a positive future together with bold people: creating things that matter and leaving the world a little better than I found it.");
                 assert.equal(editorial.purposeTitle,'Purpose & Impact');
                 assert.equal((await page.locator('.perspective-copy > p').nth(2).textContent()).trim(),"But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong.");
                 assert.equal(editorial.workHeading,'My current focus');
@@ -312,11 +320,36 @@ jobs:
                   }
                 }
 
-                assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
+                assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree');
                 assert.equal(editorial.statementWeight,'700');
-                assert.ok(editorial.perspectiveSpacing >= 39 && editorial.perspectiveSpacing <= 57,'Perspectives section is more closely spaced');
-                assert.ok(editorial.cardTitleSize >= 20.9 && editorial.cardTitleSize <= 26.1,'Perspective titles approximately 2px smaller');
+                assert.equal(editorial.statementText,"The real opportunity isn't AI itself. It's the companies we can build around it.");
+                assert.equal(editorial.readPerspectives,'Read my perspectives');
+                assert.equal(editorial.hasPerspectivePreviews,false);
+                assert.equal(editorial.hasWorkSubtitle,false);
                 assert.equal(editorial.bodyOverflow,false);
+                const focusLayout=await page.evaluate(()=>{
+                  const purpose=document.querySelector('.waymaking-purpose p').getBoundingClientRect();
+                  const heading=document.querySelector('#work-title').getBoundingClientRect();
+                  const controls=document.querySelector('.work-carousel-controls').getBoundingClientRect();
+                  const logos=[...document.querySelectorAll('.work-brand')].map(el=>{
+                    const target=el.querySelector('img,.waymaking-word');
+                    return target.getBoundingClientRect().height;
+                  });
+                  return {
+                    gap:heading.top-purpose.bottom,
+                    headingWidth:heading.width,
+                    controlsTop:controls.top,
+                    headingBottom:heading.bottom,
+                    logos
+                  };
+                });
+                if(width<=600) {
+                  assert.ok(focusLayout.gap>=56&&focusLayout.gap<=61,'Purpose to current focus must use one 58px mobile section gap');
+                  assert.ok(focusLayout.controlsTop>=focusLayout.headingBottom+8,'Mobile carousel controls must sit below the heading');
+                } else if(width>=1024) {
+                  assert.ok(focusLayout.gap>=70&&focusLayout.gap<=95,'Desktop Purpose-to-focus section gap drift');
+                }
+                assert.ok(Math.max(...focusLayout.logos)-Math.min(...focusLayout.logos)<=8,'Current focus logos should have comparable optical height');
                 if(width===320||width===390||width===1440) await page.locator('.waymaking-narrative').screenshot({path:`/tmp/ak-browser-check/waymaking-${width}.png`});
                 await page.locator('.perspective-section').screenshot({path:`/tmp/ak-browser-check/perspectives-${width}.png`});
                 await page.locator('.work-heading').screenshot({path:`/tmp/ak-browser-check/focus-heading-${width}.png`});
@@ -326,14 +359,13 @@ jobs:
                   const section = document.querySelector('.personal-signoff');
                   const name = section.querySelector('.signoff-name');
                   const signature = section.querySelector('.signoff-signature');
-                  const salutation = section.querySelector('p:not(.signoff-name)');
+                  const actions = document.querySelector('.homepage-contact-actions');
                   const nameBox = name.getBoundingClientRect();
                   const sigBox = signature.getBoundingClientRect();
                   const sectionBox = section.getBoundingClientRect();
+                  const actionsBox = actions.getBoundingClientRect();
                   return {
                     name: name.textContent.trim(),
-                    salutation: salutation.textContent.trim(),
-                    heading: document.querySelector('#work-title').textContent.trim(),
                     nameVisible: nameBox.height > 0 && nameBox.width > 0,
                     signatureLoaded: signature.complete && signature.naturalWidth === 340 && signature.naturalHeight === 314,
                     signatureAlt: signature.alt,
@@ -341,29 +373,27 @@ jobs:
                     imageBeforeName: sigBox.bottom < nameBox.top,
                     insideContent: sigBox.left >= sectionBox.left - 1 && sigBox.right <= sectionBox.right + 1,
                     fontSize: parseFloat(getComputedStyle(name).fontSize),
+                    sideBySide: actionsBox.left >= sectionBox.right - 1,
+                    stacked: actionsBox.top >= nameBox.bottom - 1,
+                    linkCount: actions.querySelectorAll('a').length,
+                    noExtraCopy: !document.querySelector('.homepage-contact h2') && !document.querySelector('.homepage-contact-invite'),
                     horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1
                   };
                 });
-                console.log('Name and original PNG signature', width, signoff);
-                assert.equal(signoff.heading, 'My current focus');
+                console.log('Homepage signoff', width, signoff);
                 assert.equal(signoff.name, 'August Kring');
-                assert.equal(signoff.salutation, 'With curiosity and optimism,');
                 assert.equal(signoff.nameVisible, true);
                 assert.equal(signoff.signatureLoaded, true);
                 assert.equal(signoff.signatureAlt, 'Handwritten signature of August Kring');
-                assert.ok(signoff.signatureWidth >= 125 && signoff.signatureWidth <= 144,'Signature matches approved scale');
-                assert.ok(signoff.fontSize >= 17 && signoff.fontSize <= 19);
+                if(width>760) assert.ok(signoff.signatureWidth >= 164 && signoff.signatureWidth <= 183,'Desktop signature scale');
+                else assert.ok(signoff.signatureWidth >= 153 && signoff.signatureWidth <= 155,'Mobile signature scale');
+                assert.ok(signoff.fontSize >= 17.9 && signoff.fontSize <= 18.1);
                 assert.ok(signoff.imageBeforeName && signoff.insideContent);
+                assert.equal(signoff.linkCount,2);
+                assert.equal(signoff.noExtraCopy,true);
+                if(width>760) assert.ok(signoff.sideBySide,'Desktop signoff/actions should share one row');
+                else assert.ok(signoff.stacked,'Mobile signoff/actions should stack');
                 assert.equal(signoff.horizontalOverflow, false);
-                const contact = await page.evaluate(() => {
-                  const invite=document.querySelector('.homepage-contact-invite').getBoundingClientRect();
-                  const signature=document.querySelector('.homepage-contact-signoff').getBoundingClientRect();
-                  return {sideBySide:signature.left>invite.right-1,stacked:signature.top>=invite.bottom-1,
-                    spacing:parseFloat(getComputedStyle(document.querySelector('.perspective-section')).paddingBottom)};
-                });
-                if(width>760) assert.ok(contact.sideBySide,'Approved desktop two-group contact');
-                else assert.ok(contact.stacked,'Approved mobile contact stacking');
-                assert.ok(contact.spacing>=57,'Approved closing rhythm');
                 await page.locator('.homepage-contact').screenshot({path:`/tmp/ak-browser-check/contact-${width}.png`});
                 await page.locator('.personal-signoff').screenshot({path:`/tmp/ak-browser-check/signoff-${width}.png`});
 
@@ -468,12 +498,16 @@ jobs:
                     privacyVisible:!!meta.querySelector('a[href="privacy/"]'),
                     noWordmark:!container.querySelector('.footer-wordmark'),
                     navLinks:nav.querySelectorAll('a').length,
+                    labels:[...nav.querySelectorAll('a')].map(a=>a.textContent.trim()),
+                    navAlign:getComputedStyle(nav).alignItems,
                     horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
                 console.log('Unified footer rendering',width,footer);
                 assert.equal(footer.topRule,1,'Footer has one upper rule');
                 assert.ok(footer.copyrightVisible && footer.privacyVisible && footer.navLinks===3,'Footer navigation and privacy');
+                assert.deepEqual(footer.labels,['About','Perspectives','LinkedIn']);
+                if(width<=520) assert.equal(footer.navAlign,'flex-start','Mobile footer links must share the left alignment axis');
                 assert.ok(footer.noWordmark && !footer.horizontalOverflow,'No footer wordmark or horizontal overflow');
 
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/about/',{waitUntil:'networkidle',timeout:45000});
