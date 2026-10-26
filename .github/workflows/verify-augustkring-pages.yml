@@ -50,8 +50,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v6"
-          expected_shared="styles.css?v=20261026-shared-v6"
+          expected_home="styles.css?v=20261026-shared-v7"
+          expected_shared="styles.css?v=20261026-shared-v7"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -127,6 +127,11 @@ jobs:
           grep -Fq '.work-carousel-dot[aria-current="true"]' /tmp/augustkring.css
           grep -Fq '.work-brand-august { height: 40px; }' /tmp/augustkring.css
           grep -Fq '.work-brand-humamap { height: 40px; }' /tmp/augustkring.css
+          grep -Fq 'width: .54em; height: .54em;' /tmp/augustkring.css
+          grep -Fq 'width: .70em; height: .62em;' /tmp/augustkring.css
+          grep -Fq -- '--body-copy-size: 18px;' /tmp/augustkring.css
+          grep -Fq -- '--body-reading-size: 18px;' /tmp/augustkring.css
+          grep -Fq -- '--card-copy-size: 17px;' /tmp/augustkring.css
           grep -Fq '.homepage-contact-content { display: block; }' /tmp/augustkring.css
           grep -Fq -- '--about-section-space: var(--section-space);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat:last-child {' /tmp/augustkring.css
@@ -213,12 +218,23 @@ jobs:
                 assert.equal(metrics.isVisible,true,'Hero paragraph visible');
                 assert.ok(metrics.approximateLines<= (width<600 ? 6:width<900 ? 4:3), 'Hero description uses reasonable line count');
                 assert.equal((await page.locator('.hero-focus').textContent()).trim(), 'Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable.');
-                const homepageTypography=await page.evaluate(() => ({
-                  h1:parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
-                  h2:parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
-                  lead:parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
-                  leadFamily:getComputedStyle(document.querySelector('.hero-focus')).fontFamily
-                }));
+                const homepageTypography=await page.evaluate(() => {
+                  const dot=document.querySelector('.wordmark-i');
+                  const after=getComputedStyle(dot,'::after');
+                  const before=getComputedStyle(dot,'::before');
+                  return {
+                    h1:parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
+                    h2:parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
+                    lead:parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
+                    leadFamily:getComputedStyle(document.querySelector('.hero-focus')).fontFamily,
+                    wordmarkDotWidth:parseFloat(after.width),
+                    wordmarkDotHeight:parseFloat(after.height),
+                    wordmarkMaskWidth:parseFloat(before.width)
+                  };
+                });
+                if(width<=840) assert.ok(homepageTypography.wordmarkDotWidth>=14.4&&homepageTypography.wordmarkDotHeight>=14.4,'Mobile wordmark red dot should render at roughly double the original diameter');
+                else assert.ok(homepageTypography.wordmarkDotWidth>=12.9&&homepageTypography.wordmarkDotHeight>=12.9,'Desktop wordmark red dot should render at roughly double the original diameter');
+                assert.ok(homepageTypography.wordmarkMaskWidth>homepageTypography.wordmarkDotWidth,'Wordmark mask must fully clear the original i dot');
                 const editorial = await page.evaluate(() => {
                   const statement = document.querySelector('.perspective-statement');
                   const readPerspectives = document.querySelector('.perspective-read-link');
@@ -612,7 +628,7 @@ jobs:
                 assert.equal(aboutProof.ctaMetrics.text,'View my LinkedIn profile');
                 assert.ok(aboutProof.ctaMetrics.height <= aboutProof.ctaMetrics.fontSize*1.5,
                   'LinkedIn link stays on one rendered line without shrinking or clipping');
-                assert.ok(Math.abs(aboutProof.fontSize-(width<=760?17:18))<.1);
+                assert.ok(Math.abs(aboutProof.fontSize-18)<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/perspectives/',{waitUntil:'networkidle',timeout:45000});
@@ -670,19 +686,20 @@ jobs:
           const { chromium } = require('playwright-core');
           const base = 'https://augustkring.github.io/humamap-preview/augustkring/';
           const cases = [
-            { path: '', selector: '.thread-copy p', desktop: 18, mobile: 17 },
-            { path: '', selector: '.waymaking-copy p', desktop: 16, mobile: 16 },
-            { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 17 },
-            { path: '', selector: '.work-card p', desktop: 16, mobile: 16 },
-            { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 16 },
-            { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 16 },
-            { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 17 },
+            { path: '', selector: '.thread-copy p', desktop: 18, mobile: 18 },
+            { path: '', selector: '.waymaking-copy p', desktop: 16, mobile: 17 },
+            { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 18 },
+            { path: '', selector: '.work-card p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-personality-intro', desktop: 17, mobile: 18 },
+            { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 18 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
-            { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 17 },
-            { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
-            { path: 'perspectives/rethinking-the-company/', selector: '.article-comparison td', desktop: 16, mobile: 16 },
-            { path: 'perspectives/europe-at-a-crossroads/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 17 },
-            { path: 'privacy/', selector: '.legal-content p', desktop: 18, mobile: 17 },
+            { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 18 },
+            { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 18 },
+            { path: 'perspectives/rethinking-the-company/', selector: '.article-comparison td', desktop: 16, mobile: 17 },
+            { path: 'perspectives/europe-at-a-crossroads/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 18 },
+            { path: 'privacy/', selector: '.legal-content p', desktop: 18, mobile: 18 },
           ];
           (async () => {
             const browser = await chromium.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox']});
