@@ -158,12 +158,12 @@ jobs:
           done
           for attempt in $(seq 1 30); do
             curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
-            if grep -Fq '<span>View my LinkedIn profile</span>' /tmp/augustkring-about.html && grep -Fq 'The story so far.' /tmp/augustkring-about.html; then
-              echo "The updated About story and shortened professional proof link are published."
+            if grep -Fq '<h1 id="story-title">How I got here.</h1>' /tmp/augustkring-about.html && grep -Fq '<span>For the full chronology, see LinkedIn</span>' /tmp/augustkring-about.html && grep -Fq 'data-personality-tab="high5">HIGH5</button>' /tmp/augustkring-about.html && grep -Fq 'data-personality-tab="via">VIA</button>' /tmp/augustkring-about.html; then
+              echo "The About V5 story-first layout and seven-lens profile are published."
               break
             fi
             if [ "$attempt" = "30" ]; then
-              echo "::error::GitHub Pages has not yet published the new About story revision"
+              echo "::error::GitHub Pages has not yet published the About V5 revision"
               exit 1
             fi
             sleep 10
