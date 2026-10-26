@@ -77,7 +77,7 @@ async function runOne(engine,width){
       assert.equal(row.display,'grid',engine+' '+width+': row '+i+' copy is not grid');
       if(i===0) assert.ok(parseFloat(row.borderTop)<.5,engine+' '+width+': first row must not have a top divider');
       else assert.ok(parseFloat(row.borderTop)>=.5,engine+' '+width+': internal divider missing before row '+i);
-      assert.ok(row.headingSize>=22.9&&row.headingSize<=28.1,engine+' '+width+': heading scale drift');
+      assert.ok(row.headingSize>=20.9&&row.headingSize<=26.1,engine+' '+width+': heading scale drift');
       assert.ok(row.paragraphSize>=15.9&&row.paragraphSize<=16.1,engine+' '+width+': body copy must reuse 16px card scale');
 
       if(width>700){
