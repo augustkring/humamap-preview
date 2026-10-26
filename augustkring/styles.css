@@ -39,23 +39,39 @@
 }
 
 :root {
+  --font-body: 'AKFigtree', Arial, sans-serif;
+  --font-display: 'AKOutfit', Arial, sans-serif;
+
   --page: #ffffff;
   --ink: #0b223d;
   --copy: #263b53;
   --muted: #43566c;
-  --red: #da3831;
+  --accent: #da3831;
+  --red: var(--accent);
   --line: rgba(11, 34, 61, .14);
   --surface: #f5f8fc;
+  --surface-card: #fbfcfe;
+  --surface-card-hover: #f6f9fd;
+
   --max: 1080px;
   --gutter: clamp(22px, 4.8vw, 56px);
+  --measure-reading: 620px;
+  --measure-narrow: 390px;
+  --radius-sm: 4px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 4px;
+
   --body-copy-size: 18px;
   --body-reading-size: 18px;
   --card-copy-size: 16px;
-  /* Approved editorial layout defaults. */
+  --nav-copy-size: 16px;
+  --small-copy-size: 13px;
+
   --section-space: clamp(72px, 6.8vw, 92px);
-  --about-section-space: clamp(68px, 6.8vw, 94px);
   --section-space-mobile: 58px;
-  --contact-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  --about-section-space: var(--section-space);
+  --contact-columns: minmax(0, .95fr) minmax(220px, .45fr);
+
   --editorial-h1-size: clamp(50px, 5.2vw, 67px);
   --editorial-h2-size: clamp(35px, 3.7vw, 46px);
   --editorial-lead-size: 19px;
@@ -71,7 +87,8 @@ body {
   padding: 0;
   background: var(--page);
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -93,7 +110,7 @@ a {
   left: 12px;
   transform: translateY(-180%);
   padding: 9px 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--ink);
   color: #fff;
   font: 700 13px/1.2 'AKOutfit', Arial, sans-serif;
@@ -104,9 +121,9 @@ a {
   transform: translateY(0);
 }
 
-a:focus-visible {
-  outline: 2px solid var(--red);
-  outline-offset: 4px;
+:where(a, button, input, select, textarea):focus-visible {
+  outline: var(--focus-ring-width) solid var(--red);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .home-header,
@@ -141,7 +158,7 @@ a:focus-visible {
 .august-wordmark {
   display: inline-flex;
   align-items: center;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
   line-height: .94;
@@ -185,7 +202,7 @@ a:focus-visible {
 .mobile-navigation { display: none; margin-left: auto; }
 .mobile-menu-toggle, .mobile-menu-close {
   width: 52px; height: 52px; padding: 0; display: grid; place-items: center;
-  border: 0; border-radius: 4px; appearance: none; -webkit-appearance: none;
+  border: 0; border-radius: var(--radius-sm); appearance: none; -webkit-appearance: none;
   outline: none; box-shadow: none; background: transparent; color: var(--ink);
   cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
@@ -284,7 +301,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   width: 100%;
   max-width: none;
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: var(--editorial-h1-size);
   font-weight: 700;
@@ -308,7 +325,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: none;
   text-wrap: wrap;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
@@ -328,7 +345,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   aspect-ratio: 4 / 5;
   margin: 0 0 0 auto;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
 }
 
@@ -368,7 +385,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .thread-lead h2,
 .values-lead h2 {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: var(--editorial-h2-size);
   font-weight: 700;
@@ -391,7 +408,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 390px;
   margin: 18px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(19px, 1.8vw, 22px);
   font-weight: 700;
   line-height: 1.35;
@@ -407,7 +424,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 .arrow-link {
   position: relative;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -462,7 +479,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 500px;
   margin: 24px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
@@ -532,7 +549,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 360px;
   margin: 0;
   color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(21px, calc(2vw - 2px), 26px);
   font-weight: 700;
   line-height: 1.1;
@@ -555,27 +572,48 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .work-heading {
   max-width: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
   margin-bottom: clamp(30px, 3.8vw, 48px);
 }
-.work-carousel-controls { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-.work-carousel-controls[hidden] { display: none; }
-.work-carousel-button {
-  width: 40px; height: 40px; padding: 0; display: grid; place-items: center;
-  background: #fff; color: var(--ink); border: 1px solid var(--line);
-  border-radius: 50%; cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease;
+.work-carousel-pagination {
+  min-height: 32px;
+  margin: clamp(18px, 2.4vw, 26px) auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
-.work-carousel-button svg {
-  width: 18px; height: 18px; fill: none; stroke: currentColor;
-  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+.work-carousel-pagination[hidden] { display: none; }
+.work-carousel-dot {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.work-carousel-button:hover:not(:disabled) { background: var(--surface); border-color: var(--muted); }
-.work-carousel-button:disabled { opacity: .32; cursor: default; }
-.work-carousel-button:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.work-carousel-dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(11, 34, 61, .24);
+  transform: scale(1);
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+.work-carousel-dot:hover::before { background: rgba(11, 34, 61, .42); }
+.work-carousel-dot[aria-current="true"]::before {
+  background: var(--red);
+  transform: scale(1.22);
+}
+.work-carousel-dot:focus-visible {
+  outline: var(--focus-ring-width) solid var(--red);
+  outline-offset: 1px;
+}
 
 .work-grid {
   --work-gap: clamp(16px, 2.3vw, 26px);
@@ -592,10 +630,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   --venture-copy-size: var(--card-copy-size);
   min-width: 0; min-height: 360px; padding: clamp(22px, 2.5vw, 30px);
   display: flex; flex-direction: column; scroll-snap-align: start;
-  scroll-snap-stop: always; background: #fbfcfe; border-radius: 4px;
+  scroll-snap-stop: always; background: var(--surface-card); border-radius: var(--radius-sm);
   transition: background-color 160ms ease;
 }
-.work-card--linked:hover, .work-card--linked:focus-within { background: #f6f9fd; }
+.work-card--linked:hover, .work-card--linked:focus-within { background: var(--surface-card-hover); }
 .work-card-link, .work-card-content {
   min-height: 0; width: 100%; flex: 1; display: flex; flex-direction: column;
   color: inherit; text-decoration: none;
@@ -623,7 +661,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .work-brand-blentera { height: 37px; filter: none; }
 .waymaking-logo {
   display: inline-flex; align-items: center;
-  font-family: 'AKOutfit', Arial, sans-serif; color: var(--ink);
+  font-family: var(--font-display); color: var(--ink);
 }
 .waymaking-word { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -.035em; }
 .waymaking-i { position: relative; display: inline-block; }
@@ -639,7 +677,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .work-cta {
   display: inline-flex; flex-wrap: wrap; align-items: center; align-self: flex-start;
   gap: 7px; margin-top: auto; padding-top: 24px; color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif; font-size: var(--venture-copy-size);
+  font-family: var(--font-body); font-size: var(--venture-copy-size);
   font-weight: 400; line-height: 1.5;
 }
 .work-cta-domain {
@@ -690,7 +728,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .personal-signoff .signoff-name {
   margin-top: 7px;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(17px, 1.7vw, 19px);
   font-weight: 500;
   line-height: 1.3;
@@ -698,118 +736,39 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   opacity: 1;
 }
 
-/* Homepage closing signoff: signature first, contact actions second. */
-.homepage-contact {
-  width: 100%;
-  margin: 0;
-  padding: clamp(24px, 3vw, 36px) 0 clamp(58px, 6vw, 76px);
-}
-.homepage-contact-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  column-gap: clamp(48px, 7vw, 104px);
-}
-.homepage-contact .personal-signoff {
-  width: min(100%, 250px);
-  margin: 0;
-  padding: 0;
-}
-.homepage-contact .personal-signoff .signoff-signature {
-  width: clamp(165px, 15vw, 182px);
-  margin: 0;
-}
-.homepage-contact .personal-signoff .signoff-name {
-  margin-top: 7px;
-  font-size: 18px;
-}
-.homepage-contact-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px 28px;
-  margin: 0 0 4px;
-}
-.homepage-contact-actions .arrow-link {
-  min-height: 40px;
-  font-size: 17px;
-  line-height: 1.25;
-  letter-spacing: -.012em;
-  white-space: nowrap;
-}
+/* Homepage closing signoff: personal note + signature, with a quiet action rail on desktop. */
+.homepage-contact { width: 100%; margin: 0; padding: clamp(30px, 4vw, 44px) 0 clamp(64px, 7vw, 88px); }
+.homepage-contact-content { display: grid; grid-template-columns: var(--contact-columns); align-items: center; column-gap: clamp(56px, 8vw, 112px); }
+.homepage-contact .personal-signoff { width: min(100%, 360px); margin: 0; padding: 0; }
+.homepage-contact .signoff-note { margin: 0 0 8px; color: var(--copy); font-size: 16px; font-weight: 400; line-height: 1.5; letter-spacing: -.01em; opacity: .82; }
+.homepage-contact .personal-signoff .signoff-signature { width: clamp(186px, 17vw, 205px); margin: 6px 0 0; }
+.homepage-contact .personal-signoff .signoff-name { margin-top: 7px; font-size: 18px; }
+.homepage-contact-actions { min-width: 220px; margin: 0; display: grid; justify-items: start; justify-self: end; align-content: center; gap: 2px; }
+.homepage-contact-actions .arrow-link { min-height: 44px; font-size: 17px; line-height: 1.25; letter-spacing: -.012em; white-space: nowrap; }
 @media (max-width: 760px) {
-  .homepage-contact-content {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 24px;
-  }
-  .homepage-contact-actions {
-    justify-content: flex-start;
-    margin-bottom: 0;
-  }
-  .homepage-contact .personal-signoff .signoff-signature {
-    width: 154px;
-  }
+  .homepage-contact-content { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  .homepage-contact-actions { width: 100%; min-width: 0; justify-self: start; }
+  .homepage-contact .personal-signoff .signoff-signature { width: 164px; }
 }
-@media (max-width: 600px) {
-  .homepage-contact {
-    padding: 22px 0 58px;
-  }
-  .homepage-contact-actions {
-    gap: 8px 22px;
-  }
-}
+@media (max-width: 600px) { .homepage-contact { padding: 26px 0 58px; } }
 
-.home-footer {
-  padding: 34px 0 38px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 28px;
-  row-gap: 18px;
-  align-items: center;
-  border-top: 1px solid var(--line);
-}
-.footer-links {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px 22px;
-}
-.footer-links a {
-  position: relative;
-  color: var(--copy);
-  font-weight: 500;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 15px;
-  text-decoration: none;
-}
-.footer-meta {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-.footer-meta a {
-  color: inherit;
-  text-decoration: none;
-}
-.footer-meta a:hover,
-.footer-meta a:focus-visible {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--red);
-  text-underline-offset: 3px;
+.home-footer { padding: 34px 0 38px; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 28px; row-gap: 18px; align-items: center; border-top: 1px solid var(--line); }
+.footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 26px; }
+.footer-links a { position: relative; min-height: 32px; display: inline-flex; align-items: center; color: var(--copy); font-size: 15px; font-weight: 500; line-height: 1.25; text-decoration: none; }
+.footer-links a::after { content: ''; position: absolute; right: 0; bottom: 4px; left: 0; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
+.footer-links a:hover::after, .footer-links a:focus-visible::after { transform: scaleX(1); }
+.footer-meta { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: var(--small-copy-size); line-height: 1.4; }
+.footer-meta a { color: inherit; text-decoration: none; }
+.footer-meta a:hover, .footer-meta a:focus-visible { color: var(--ink); text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 3px; }
+@media (max-width: 760px) {
+  .home-footer { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .footer-links { justify-content: flex-start; align-items: flex-start; }
+  .footer-meta { justify-content: flex-start; }
 }
 
 /* Perspectives */
 .about-more { font-size: 18px; line-height: 1.2; letter-spacing: -.015em; margin-top: 28px; }
-.perspective-index-action { width: fit-content; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-family: 'AKOutfit', Arial, sans-serif; font-weight: 700; }
+.perspective-index-action { width: fit-content; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-family: var(--font-display); font-weight: 700; }
 .perspective-index-action .arrow { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: var(--red); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 .header-wordmark { font-size: 28px; }
@@ -825,7 +784,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .perspectives-hero h1 {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: var(--editorial-h1-size);
   font-weight: 700;
@@ -897,7 +856,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .legal-hero h1 {
   margin: 0;
   color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(44px, 5vw, 62px);
   font-weight: 700;
   line-height: 1;
@@ -920,7 +879,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .legal-content h2 {
   margin: 46px 0 14px;
   color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(24px, 2.4vw, 31px);
   line-height: 1.1;
   letter-spacing: -.025em;
@@ -956,7 +915,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .perspective-index-title {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: clamp(25px, 2.7vw, 34px);
   font-weight: 700;
@@ -983,7 +942,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   align-items: center;
   gap: 7px;
   color: var(--ink);
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
 }
@@ -1002,7 +961,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 .article-heading h1 {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   line-height: .98;
   letter-spacing: -.045em;
@@ -1019,7 +978,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-personal-copy { max-width: 760px; }
 .about-personal-copy h1 {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: var(--editorial-h1-size);
   font-weight: 700;
   line-height: 1.04;
@@ -1029,7 +988,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 760px;
   margin: 22px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: var(--editorial-lead-size);
   font-weight: 400;
   line-height: 1.55;
@@ -1046,7 +1005,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-principles-intro h2,
 .about-story-intro h2 {
   margin: 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: var(--editorial-h2-size);
   font-weight: 700;
@@ -1058,7 +1017,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 500px;
   margin: 24px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: var(--editorial-lead-size);
   font-weight: 400;
   line-height: 1.55;
@@ -1066,7 +1025,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 
 .homepage-working .about-home-lead > p {
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
@@ -1086,7 +1045,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-skill-grid h3,
 .about-principle h3 {
   margin: 0 0 8px;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: 19px;
   font-weight: 700;
@@ -1178,7 +1137,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .about-personality-panel {
   padding: clamp(28px, 3.2vw, 40px);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
 }
 .about-personality-panel[hidden] { display: none; }
@@ -1188,7 +1147,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .about-personality-panel-head h3 {
   margin: 6px 0 0;
-  font-family: 'AKOutfit', Arial, sans-serif;
+  font-family: var(--font-display);
   color: var(--ink);
   font-size: clamp(25px, 2.5vw, 32px);
   font-weight: 700;
@@ -1204,7 +1163,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 760px;
   margin: 18px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 500;
   line-height: 1.58;
@@ -1290,7 +1249,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: 480px;
   margin: 24px 0 0;
   color: var(--ink);
-  font-family: 'AKFigtree', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
@@ -1304,7 +1263,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .home-main .about-principles-intro > p,
 .home-main .about-story-intro > p,
 .home-main .about-personal-lead {
-  max-width: min(100%, 390px);
+  max-width: min(100%, var(--measure-narrow));
 }
 
 .about-story-content { max-width: 620px; }
@@ -1354,8 +1313,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .article-prose p, .article-prose li { color: var(--copy); font-size: var(--body-reading-size); line-height: 1.7; }
 .article-prose p { margin: 0; }
 .article-prose p + p { margin-top: 20px; }
-.article-prose .article-lead { color: var(--ink); font-family: 'AKOutfit', Arial, sans-serif; font-size: clamp(25px, 2.4vw, 31px); font-weight: 700; line-height: 1.3; letter-spacing: -.025em; }
-.article-prose h2 { margin: 54px 0 18px; font-family: 'AKOutfit', Arial, sans-serif; font-size: clamp(27px, 2.8vw, 36px); line-height: 1.08; letter-spacing: -.035em; }
+.article-prose .article-lead { color: var(--ink); font-family: var(--font-display); font-size: clamp(25px, 2.4vw, 31px); font-weight: 700; line-height: 1.3; letter-spacing: -.025em; }
+.article-prose h2 { margin: 54px 0 18px; font-family: var(--font-display); font-size: clamp(27px, 2.8vw, 36px); line-height: 1.08; letter-spacing: -.035em; }
 .article-prose a { color: var(--ink); text-decoration-color: var(--red); text-underline-offset: 3px; }
 .article-comparison { overflow-x: auto; margin: 30px 0 36px; border-block: 1px solid var(--line); }
 .article-comparison table { width: 100%; min-width: 620px; border-collapse: collapse; }
@@ -1376,7 +1335,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .article-next > span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
 .article-next a { display: grid; gap: 6px; margin-top: 14px; color: inherit; text-decoration: none; }
-.article-next strong { font-family: 'AKOutfit', Arial, sans-serif; font-size: 27px; letter-spacing: -.025em; }
+.article-next strong { font-family: var(--font-display); font-size: 27px; letter-spacing: -.025em; }
 .article-next a span { color: var(--copy); font-size: 15px; line-height: 1.5; }
 
 @media (max-width: 920px) {
@@ -1604,18 +1563,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   }
 }
 @media (max-width: 600px) {
-  .work-heading {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
-  }
-  .work-carousel-controls {
-    align-self: flex-end;
-  }
-  .work-carousel-button {
-    width: 44px;
-    height: 44px;
-  }
+  .work-carousel-pagination { min-height: 44px; margin-top: 16px; gap: 0; }
+  .work-carousel-dot { width: 44px; height: 44px; }
 }
 /* V16: restored exact authored raster source, SVG mask paints it progressively. */
 @media (prefers-reduced-motion: reduce) {
