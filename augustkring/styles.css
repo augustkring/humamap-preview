@@ -1246,14 +1246,14 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: min(100%, var(--measure-narrow));
 }
 
-/* About V3: one narrative system, balanced toolkit, minimal reflection tabs. */
+/* About V4: continuous story, balanced toolkit, quiet framework lenses. */
 .about-page { padding-bottom: 0; }
 
 .about-personal-hero {
   padding: clamp(54px, 5.5vw, 72px) 0 var(--section-space);
 }
 .about-personal-copy {
-  max-width: 720px;
+  max-width: 760px;
 }
 .about-personal-copy h1 {
   margin: 0;
@@ -1266,14 +1266,20 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   text-wrap: balance;
 }
 .about-personal-lead {
-  max-width: min(100%, var(--measure-reading));
+  max-width: min(100%, 680px);
   margin: 24px 0 0;
   color: var(--copy);
   font-size: var(--editorial-lead-size);
   line-height: 1.58;
 }
+.about-hero-link {
+  margin-top: 28px;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
 
-.about-v3-section {
+.about-v4-section {
   padding: var(--section-space) 0;
 }
 .about-section-lead h2,
@@ -1294,33 +1300,17 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   gap: clamp(54px, 7vw, 92px);
   align-items: start;
 }
-.about-story-beats {
+.about-story-prose {
   max-width: var(--measure-reading);
 }
-.about-story-beat {
-  padding: clamp(25px, 2.8vw, 34px) 0;
-}
-.about-story-beat:first-child {
-  padding-top: 0;
-}
-.about-story-beat + .about-story-beat {
-  border-top: 1px solid var(--line);
-}
-.about-story-beat h3,
-.about-toolkit-list h3 {
-  margin: 0 0 9px;
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: clamp(20px, 1.7vw, 22px);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -.025em;
-}
-.about-story-beat p {
+.about-story-prose p {
   margin: 0;
   color: var(--copy);
   font-size: var(--body-copy-size);
-  line-height: 1.65;
+  line-height: 1.68;
+}
+.about-story-prose p + p {
+  margin-top: 20px;
 }
 
 .about-toolkit {
@@ -1335,10 +1325,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   grid-template-rows: auto auto 1fr;
 }
 .about-toolkit-intro {
-  min-height: 32px;
+  min-height: 52px;
+  max-width: 430px;
   margin: 18px 0 0;
-  color: var(--muted);
-  font-size: 16px;
+  color: var(--copy);
+  font-size: 17px;
   line-height: 1.5;
 }
 .about-toolkit-list {
@@ -1351,6 +1342,15 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   padding: 22px 0 24px;
   border-top: 1px solid var(--line);
 }
+.about-toolkit-list h3 {
+  margin: 0 0 9px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.7vw, 22px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+}
 .about-toolkit-list p {
   margin: 0;
   color: var(--copy);
@@ -1362,15 +1362,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   display: block;
 }
 .about-personality > .about-section-lead {
-  max-width: 760px;
-  margin-bottom: clamp(30px, 3.5vw, 42px);
-}
-.about-personality > .about-section-lead > p {
-  max-width: var(--measure-reading);
-  margin: 22px 0 0;
-  color: var(--copy);
-  font-size: var(--body-copy-size);
-  line-height: 1.6;
+  margin-bottom: 20px;
 }
 .about-personality-explorer {
   width: 100%;
@@ -1378,7 +1370,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-personality-tabs {
   display: none;
   width: 100%;
-  margin: 0 0 clamp(32px, 3.5vw, 42px);
+  margin: 0 0 clamp(30px, 3.2vw, 38px);
   padding: 0;
   flex-wrap: nowrap;
   align-items: center;
@@ -1393,7 +1385,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-personality-tabs::-webkit-scrollbar { display: none; }
 .about-personality-explorer.is-enhanced .about-personality-tabs { display: flex; }
 .about-personality-explorer:not(.is-enhanced) .about-personality-panel + .about-personality-panel {
-  margin-top: 48px;
+  margin-top: 44px;
 }
 .about-personality-tab {
   min-height: 48px;
@@ -1438,14 +1430,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   outline-offset: 8px;
 }
 .about-lens-layout {
-  display: grid;
-  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
-  gap: clamp(54px, 7vw, 92px);
-  align-items: start;
+  max-width: 760px;
 }
 .about-lens-layout h3 {
-  max-width: 420px;
-  margin: 0;
+  max-width: 680px;
+  margin: 0 0 20px;
   color: var(--ink);
   font-family: var(--font-display);
   font-size: clamp(27px, 2.7vw, 34px);
@@ -1455,30 +1444,21 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   text-wrap: balance;
 }
 .about-lens-copy {
-  max-width: var(--measure-reading);
+  max-width: 720px;
 }
 .about-lens-copy p {
   margin: 0;
   color: var(--copy);
   font-size: var(--body-copy-size);
-  line-height: 1.65;
+  line-height: 1.68;
 }
 .about-lens-copy p + p {
   margin-top: 18px;
 }
-.about-profile-cta {
-  margin-top: clamp(38px, 4.5vw, 56px);
-}
-.about-profile-link {
-  font-size: 18px;
-  line-height: 1.2;
-  letter-spacing: -.015em;
-}
 
 @media (max-width: 840px) {
   .about-story,
-  .about-toolkit,
-  .about-lens-layout {
+  .about-toolkit {
     grid-template-columns: minmax(0, 1fr);
   }
   .about-story {
@@ -1491,15 +1471,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     max-width: 680px;
     grid-template-rows: auto auto auto;
   }
+  .about-toolkit-intro {
+    min-height: 0;
+  }
   .about-toolkit-list {
     grid-template-rows: none;
     grid-auto-rows: auto;
-  }
-  .about-lens-layout {
-    gap: 24px;
-  }
-  .about-lens-layout h3 {
-    max-width: var(--measure-reading);
   }
 }
 
@@ -1507,22 +1484,24 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-personal-hero {
     padding: 42px 0 62px;
   }
-  .about-v3-section {
+  .about-v4-section {
     padding: var(--section-space-mobile) 0;
+  }
+  .about-hero-link {
+    margin-top: 24px;
   }
   .about-story {
     gap: 24px;
   }
-  .about-story-beat {
-    padding: 24px 0;
+  .about-story-prose p + p {
+    margin-top: 18px;
   }
   .about-toolkit {
     gap: 58px;
   }
   .about-toolkit-intro {
-    min-height: 0;
     margin-top: 14px;
-    font-size: 16px;
+    font-size: 17px;
   }
   .about-toolkit-list {
     margin-top: 24px;
@@ -1531,7 +1510,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     padding: 20px 0 22px;
   }
   .about-personality > .about-section-lead {
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
   .about-personality-tabs {
     width: calc(100% + var(--gutter));
@@ -1544,13 +1523,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     min-height: 48px;
     font-size: 16px;
   }
-  .about-lens-layout {
-    gap: 20px;
-  }
   .about-lens-layout h3 {
+    margin-bottom: 18px;
     font-size: clamp(27px, 7.5vw, 31px);
-  }
-  .about-profile-cta {
-    margin-top: 40px;
   }
 }
