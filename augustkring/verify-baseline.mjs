@@ -153,7 +153,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v35':'styles.css?v=20261014-subtitle-width-v1';
+  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v36':'styles.css?v=20261026-nav-focus-v2';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
