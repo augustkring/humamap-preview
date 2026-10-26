@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"84288b4c"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"56d522c1"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -163,19 +163,19 @@ assert.ok(css.includes('.waymaking-beat:last-child {\n  padding-bottom: 0;')&&cs
 for(const token of ['--font-body:','--font-display:','--accent:','--surface-card:','--measure-reading:','--measure-narrow:','--radius-sm:','--focus-ring-width:','--section-space:','--section-space-mobile:']) {
   assert.ok(css.includes(token),'Shared design-system token missing: '+token);
 }
-assert.ok(css.includes('/* About V2: narrative first, skill set + mindset, borderless reflection tabs. */'),'About V2 design marker missing');
-assert.ok(css.includes('.about-page .about-personal-lead {\n  max-width: min(100%, var(--measure-reading));'),'About V2 hero lead must use the 620px reading measure');
-assert.ok(css.includes('.about-story {\n  display: grid;\n  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'About V2 story must use the homepage editorial grid');
-assert.ok(css.includes('.about-story-beat + .about-story-beat {\n  border-top: 1px solid var(--line);'),'About V2 story must use internal hairline rhythm');
-assert.ok(css.includes('.about-toolkit {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));'),'Skill Set and Mindset must be parallel desktop columns');
-assert.ok(css.includes('.about-toolkit-list article {\n  padding: 22px 0 24px;\n  border-top: 1px solid var(--line);'),'Skill Set/Mindset rows must remain borderless cards with hairlines only');
-assert.ok(css.includes('.about-personality-tabs {')&&css.includes('overflow-x: auto;')&&css.includes('flex-wrap: nowrap;'),'Personality tabs must remain one horizontally scrollable row');
-assert.ok(css.includes('.about-personality-tab {\n  position: relative;\n  min-height: 48px;'),'Personality tabs must keep 48px interaction height');
-assert.ok(css.includes('.about-personality-tab[aria-selected="true"] {\n  color: var(--red);\n  background: transparent;\n  border: 0;'),'Selected personality tab must be red and borderless');
-assert.ok(css.includes('.about-personality-panel,\n.about-personality-panel[hidden] {\n  padding: 0;\n  border-radius: 0;\n  background: transparent;'),'Personality panels must stay free of card/background treatment');
-assert.ok(css.includes('.about-profile-link {\n  font-size: 18px;'),'About LinkedIn CTA must match the homepage editorial link hierarchy');
-assert.ok(css.includes('@media (max-width: 840px) {')&&css.includes('.about-story,\n  .about-toolkit {\n    grid-template-columns: minmax(0, 1fr);'),'About story/toolkit must stack below 840px');
-assert.ok(css.includes('width: calc(100% + var(--gutter));')&&css.includes('margin-right: calc(var(--gutter) * -1);'),'Mobile personality tabs must extend to the viewport edge for swipe affordance');
+assert.ok(css.includes('/* About V3: one narrative system, balanced toolkit, minimal reflection tabs. */'),'About V3 design marker missing');
+assert.ok(css.includes('.about-personal-lead {\n  max-width: min(100%, var(--measure-reading));'),'About V3 hero lead must use shared 620px reading measure');
+assert.ok(css.includes('.about-story {\n  display: grid;\n  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'About V3 story must use editorial two-column grid');
+assert.ok(css.includes('.about-story-beat + .about-story-beat {\n  border-top: 1px solid var(--line);'),'About V3 story uses hairline rhythm');
+assert.ok(css.includes('.about-toolkit {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));'),'Skill Set and Mindset must be equal desktop columns');
+assert.ok(css.includes('grid-template-rows: repeat(5, minmax(0, 1fr));'),'Skill Set and Mindset rows must stay aligned');
+assert.ok(css.includes('.about-personality-tab {\n  min-height: 48px;'),'Personality tabs must keep 48px touch targets');
+assert.ok(css.includes('.about-personality-tab:hover,\n.about-personality-tab[aria-selected="true"] {\n  color: var(--red);'),'Personality hover/selected state must be red text only');
+assert.ok(css.includes('.about-personality-panel {\n  padding: 0;\n  border-radius: 0;\n  background: transparent;'),'Personality panel must remain borderless and transparent');
+assert.ok(css.includes('.about-lens-layout {\n  display: grid;\n  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'Personality lens content must use the shared editorial grid');
+assert.ok(css.includes('width: calc(100% + var(--gutter));')&&css.includes('overflow-x: auto;'),'Mobile personality tabs must expose horizontal swipe');
+assert.ok(!aboutHtml.includes('about-profile-kicker')&&!aboutHtml.includes('about-personality-markers')&&!aboutHtml.includes('about-personality-meaning'),'About V3 must not reintroduce scores/source metadata/old meaning grids');
+assert.ok(!aboutHtml.includes('—'),'About V3 must not contain em dashes');
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
 assert.ok(css.includes("width: .405em; height: .405em;")&&css.includes("top: -.105em;"),'August Kring wordmark dot must remain 25 percent smaller than the doubled state while preserving the original lower edge');
 assert.ok(!css.includes('.wordmark-i::before'),'August Kring wordmark must not use a white clearing halo behind the red dot');
@@ -200,7 +200,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261026-shared-v10';
+  const expectedStyles='styles.css?v=20261026-shared-v11';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
@@ -211,4 +211,4 @@ for(const path of ['index.html','about/index.html','perspectives/index.html','pe
   assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: homepage baseline plus About V2 narrative/toolkit/personality system');
+console.log('PASS: homepage baseline plus simplified balanced About V3 system');
