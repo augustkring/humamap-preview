@@ -19,7 +19,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"95694502","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
+const approved={"main":"f3116a48","footer":"7bea4e97","tokens":"3fe414f6","contact":"c102b368"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -124,6 +124,8 @@ assert.ok(!css.includes('.waymaking-resolution')&&!css.includes('.waymaking-intr
 
 assert.ok(html.includes("How that shows up in what I'm building today."),'My current focus bridge copy missing');
 assert.ok(html.indexOf('id="work"') < html.indexOf('id="perspective"'),'My current focus must lead into The shift I see');
+const threadClose=html.indexOf('</section>',html.indexOf('</section>',html.indexOf('<section class="waymaking-narrative"'))+10);
+assert.ok(threadClose>=0&&threadClose<html.indexOf('<section id="work"'),'Where I add value must close before My current focus');
 assert.ok(!html.includes('<h2 id="about-title">My story</h2>'),'Homepage My story must remain removed');
 assert.ok(thread.includes('<h3>Hands-On Execution</h3>')&&!thread.includes('<h3>AI-Native Building</h3>'),'Hands-On Execution remains the fourth facet');
 assert.ok(thread.includes('class="waymaking-beat waymaking-purpose"')&&thread.includes('<h3>Purpose &amp; Impact</h3>'),'Purpose & Impact remains the fifth facet');
