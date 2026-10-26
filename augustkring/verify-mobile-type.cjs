@@ -25,7 +25,6 @@ const targets = [
   { path:'about/', selector:'.about-story-beat p', size:18, label:'About story body' },
   { path:'about/', selector:'.about-lens-copy p', size:18, label:'About personality body' },
   { path:'about/', selector:'.about-toolkit-list p', size:17, label:'About toolkit compact copy' },
-  { path:'about/', selector:'.about-lens-copy p', size:17, label:'About personality compact copy' },
   { path:'perspectives/', selector:'.perspective-index-summary', size:18, label:'Perspectives summary' },
   { path:'perspectives/rethinking-the-company/', selector:'.article-prose > p:not(.article-lead)', size:18, label:'Article body' },
   { path:'perspectives/rethinking-the-company/', selector:'.article-comparison td', size:17, label:'Article comparison compact copy' },
