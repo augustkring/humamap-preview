@@ -169,6 +169,7 @@ assert.ok(css.includes('padding: clamp(50px, 5vw, 66px) 0 var(--section-space);'
 assert.ok(css.includes('font-size: clamp(20px, 1.7vw, 22px);'),'About tertiary headings must use the approved compact editorial scale');
 assert.ok(css.includes('.about-personality {\n  display: block;\n  padding-top: var(--about-section-space);'),'Personality section must use the shared About section spacing');
 assert.ok(css.includes('.about-personality-tab {\n  min-height: 44px;')&&css.includes('font: 700 14px/1 var(--font-display);'),'Personality tabs must use shared type and 44px targets');
+assert.ok(css.includes('font: 700 11.5px/1.2 var(--font-display);')&&css.includes('font: 500 12.5px/1.45 var(--font-body);'),'About microtype must use shared font tokens');
 assert.ok(css.includes('background: var(--surface-card);'),'Personality panel must use the shared card surface');
 assert.ok(css.includes('.about-story-bottom {\n  padding: var(--section-space) 0;'),'About story must use the shared desktop section rhythm');
 assert.ok(css.includes('.about-story-content { max-width: var(--measure-reading); }'),'About story must use the shared reading measure');
