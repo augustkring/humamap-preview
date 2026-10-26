@@ -30,167 +30,162 @@ const close = (actual, expected, tolerance, label) => {
 
         await page.goto(base, { waitUntil: 'networkidle', timeout: 45000 });
         await page.evaluate(() => document.fonts.ready);
-        const home = await page.evaluate(() => {
-          const h1 = getComputedStyle(document.querySelector('.hero-copy h1'));
-          const h2 = getComputedStyle(document.querySelector('.thread-lead h2'));
-          const lead = getComputedStyle(document.querySelector('.hero-focus'));
-          return {
-            h1: parseFloat(h1.fontSize),
-            h2: parseFloat(h2.fontSize),
-            lead: parseFloat(lead.fontSize),
-            leadFamily: lead.fontFamily,
-            sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop),
-            red: getComputedStyle(document.documentElement).getPropertyValue('--red').trim()
-          };
-        });
+        const home = await page.evaluate(() => ({
+          h1: parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
+          h2: parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
+          lead: parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
+          leadFamily: getComputedStyle(document.querySelector('.hero-focus')).fontFamily,
+          sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop)
+        }));
 
         await page.goto(base + 'about/', { waitUntil: 'networkidle', timeout: 45000 });
         await page.evaluate(() => document.fonts.ready);
         await page.waitForFunction(() => document.querySelector('.about-personality-explorer')?.classList.contains('is-enhanced'));
 
-        const about = await page.evaluate(() => {
-          const q = selector => document.querySelector(selector);
-          const cs = selector => getComputedStyle(q(selector));
-          const rect = selector => q(selector).getBoundingClientRect();
-          const tabs = [...document.querySelectorAll('.about-personality-tab')];
-          const active = document.querySelector('.about-personality-tab[aria-selected="true"]');
-          const tablist = q('.about-personality-tabs');
-          const panel = q('.about-personality-panel:not([hidden])');
-          const panelStyle = getComputedStyle(panel);
-          const skillColumn = cs('.about-toolkit-skills');
-          const mindsetColumn = cs('.about-toolkit-mindset');
-          const hero = cs('.about-personal-hero');
-          const story = cs('.about-story');
+        const state = await page.evaluate(() => {
+          const q = s => document.querySelector(s);
+          const qa = s => [...document.querySelectorAll(s)];
+          const cs = s => getComputedStyle(q(s));
+          const rect = s => q(s).getBoundingClientRect();
           const toolkit = cs('.about-toolkit');
-          const personality = cs('.about-personality');
+          const lens = cs('.about-lens-layout');
+          const tabs = qa('.about-personality-tab');
+          const tablist = q('.about-personality-tabs');
+          const activePanel = q('.about-personality-panel:not([hidden])');
+          const skillRows = qa('.about-toolkit-skills .about-toolkit-list article').map(el => el.getBoundingClientRect());
+          const mindsetRows = qa('.about-toolkit-mindset .about-toolkit-list article').map(el => el.getBoundingClientRect());
+          const visibleText = q('main').innerText;
 
           return {
-            heroTitle: q('#about-page-title').textContent.trim(),
-            storyTitle: q('#story-title').textContent.trim(),
-            personalityTitle: q('#personality-title').textContent.trim(),
             h1: parseFloat(cs('.about-personal-copy h1').fontSize),
             h2: parseFloat(cs('.about-section-lead h2').fontSize),
             lead: parseFloat(cs('.about-personal-lead').fontSize),
             leadFamily: cs('.about-personal-lead').fontFamily,
             heroLeadWidth: rect('.about-personal-lead').width,
-            heroPaddingTop: parseFloat(hero.paddingTop),
-            heroPaddingBottom: parseFloat(hero.paddingBottom),
-            storyPaddingTop: parseFloat(story.paddingTop),
-            storyPaddingBottom: parseFloat(story.paddingBottom),
-            toolkitPaddingTop: parseFloat(toolkit.paddingTop),
-            toolkitPaddingBottom: parseFloat(toolkit.paddingBottom),
-            personalityPaddingTop: parseFloat(personality.paddingTop),
-            personalityPaddingBottom: parseFloat(personality.paddingBottom),
+            heroText: q('.about-personal-lead').textContent.trim(),
+            heroPaddingTop: parseFloat(cs('.about-personal-hero').paddingTop),
+            heroPaddingBottom: parseFloat(cs('.about-personal-hero').paddingBottom),
+            sectionPads: ['#story','#toolkit','#personality'].map(id => {
+              const style = getComputedStyle(q(id));
+              return [parseFloat(style.paddingTop), parseFloat(style.paddingBottom)];
+            }),
+            order: ['story','toolkit','personality'].map(id => q('#'+id).getBoundingClientRect().top + scrollY),
+            storyTitle: q('#story-title').textContent.trim(),
+            storyBeatTitles: qa('.about-story-beat h3').map(el => el.textContent.trim()),
             storyWidth: rect('.about-story-beats').width,
-            storyBeatCount: document.querySelectorAll('.about-story-beat').length,
-            storyBeatTitles: [...document.querySelectorAll('.about-story-beat h3')].map(el => el.textContent.trim()),
-            order: ['story','toolkit','personality'].map(id => q('#' + id).getBoundingClientRect().top + scrollY),
-            toolkitColumns: toolkit.gridTemplateColumns.split(' ').filter(Boolean).length,
-            skillCount: document.querySelectorAll('.about-toolkit-skills .about-toolkit-list article').length,
-            mindsetCount: document.querySelectorAll('.about-toolkit-mindset .about-toolkit-list article').length,
             skillHeading: q('.about-toolkit-skills > h2').textContent.trim(),
             mindsetHeading: q('.about-toolkit-mindset > h2').textContent.trim(),
-            skillColumnWidth: rect('.about-toolkit-skills').width,
-            mindsetColumnWidth: rect('.about-toolkit-mindset').width,
-            tabs: tabs.map(tab => {
-              const style = getComputedStyle(tab);
-              return {
-                text: tab.textContent.trim(),
-                height: tab.getBoundingClientRect().height,
-                borderTop: parseFloat(style.borderTopWidth),
-                background: style.backgroundColor,
-                color: style.color,
-                selected: tab.getAttribute('aria-selected') === 'true'
-              };
-            }),
-            tabFlexWrap: getComputedStyle(tablist).flexWrap,
-            tabOverflowX: getComputedStyle(tablist).overflowX,
+            skillIntro: q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),
+            mindsetIntro: q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim(),
+            skillCount: skillRows.length,
+            mindsetCount: mindsetRows.length,
+            toolkitColumns: toolkit.gridTemplateColumns.split(' ').filter(Boolean).length,
+            skillRows: skillRows.map(r => ({top:r.top,bottom:r.bottom,height:r.height})),
+            mindsetRows: mindsetRows.map(r => ({top:r.top,bottom:r.bottom,height:r.height})),
+            personalityTitle: q('#personality-title').textContent.trim(),
+            personalityLead: q('#personality .about-section-lead > p').textContent.trim(),
+            tabLabels: tabs.map(t => t.textContent.trim()),
+            tabHeights: tabs.map(t => t.getBoundingClientRect().height),
+            tabBorders: tabs.map(t => parseFloat(getComputedStyle(t).borderTopWidth)),
+            tabBackgrounds: tabs.map(t => getComputedStyle(t).backgroundColor),
+            tabWrap: getComputedStyle(tablist).flexWrap,
+            tabOverflow: getComputedStyle(tablist).overflowX,
             tabScrollable: tablist.scrollWidth > tablist.clientWidth + 1,
-            activeColor: getComputedStyle(active).color,
-            panelBackground: panelStyle.backgroundColor,
-            panelBorderRadius: parseFloat(panelStyle.borderTopLeftRadius),
-            panelPaddingTop: parseFloat(panelStyle.paddingTop),
-            panelPaddingLeft: parseFloat(panelStyle.paddingLeft),
-            meaningColumns: cs('.about-personality-meaning').gridTemplateColumns.split(' ').filter(Boolean).length,
+            activeColor: getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
+            panelBackground: getComputedStyle(activePanel).backgroundColor,
+            panelPaddingTop: parseFloat(getComputedStyle(activePanel).paddingTop),
+            panelRadius: parseFloat(getComputedStyle(activePanel).borderTopLeftRadius),
+            lensColumns: lens.gridTemplateColumns.split(' ').filter(Boolean).length,
+            activeLensTitle: q('.about-personality-panel:not([hidden]) h3').textContent.trim(),
+            lensParagraphCount: qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
+            metadataCount: qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning').length,
             profileLink: q('.about-profile-link').textContent.trim(),
-            profileLinkTop: rect('.about-profile-link').top,
-            personalityBottom: rect('#personality').bottom,
+            hasEmDash: visibleText.includes('—'),
             overflow: document.documentElement.scrollWidth > innerWidth + 1
           };
         });
 
-        close(about.h1, home.h1, .2, engine + ' ' + width + ' About H1 matches homepage');
-        close(about.h2, home.h2, .2, engine + ' ' + width + ' About H2 matches homepage');
-        close(about.lead, home.lead, .2, engine + ' ' + width + ' About lead matches homepage');
-        assert.equal(about.leadFamily, home.leadFamily, engine + ' ' + width + ' About lead family matches homepage');
-        assert.ok(about.heroLeadWidth <= 620.5, engine + ' ' + width + ' About hero lead stays within 620px reading measure');
-        assert.ok(about.storyWidth <= 620.5, engine + ' ' + width + ' About story stays within 620px reading measure');
-        assert.deepEqual(about.order.slice().sort((a,b)=>a-b), about.order, engine + ' ' + width + ' About order must be Story -> Skill Set/Mindset -> Personality');
-        assert.equal(about.storyBeatCount, 4, engine + ' ' + width + ' About story uses four narrative beats');
-        assert.deepEqual(about.storyBeatTitles, ['Early years','At 18','A reset','Building again']);
-        assert.equal(about.skillHeading, 'Skill Set');
-        assert.equal(about.mindsetHeading, 'Mindset');
-        assert.equal(about.skillCount, 6);
-        assert.equal(about.mindsetCount, 5);
-        assert.deepEqual(about.tabs.map(tab => tab.text), ['Big Five','BG5','MBTI','Enneagram','Human Design']);
-        assert.equal(about.tabFlexWrap, 'nowrap', engine + ' ' + width + ' Personality tabs stay on one horizontal line');
-        assert.equal(about.tabOverflowX, 'auto', engine + ' ' + width + ' Personality tab bar is horizontally scrollable');
-        assert.ok(about.tabs.every(tab => tab.height >= 47.5), engine + ' ' + width + ' Personality tabs use 48px touch targets');
-        assert.ok(about.tabs.every(tab => tab.borderTop < .5), engine + ' ' + width + ' Personality tabs have no borders');
-        assert.ok(about.tabs.every(tab => tab.background === 'rgba(0, 0, 0, 0)'), engine + ' ' + width + ' Personality tabs have no backgrounds');
-        assert.equal(about.activeColor, 'rgb(218, 56, 49)', engine + ' ' + width + ' Selected personality tab is red');
-        assert.equal(about.panelBackground, 'rgba(0, 0, 0, 0)', engine + ' ' + width + ' Personality panel is borderless/transparent');
-        assert.ok(about.panelBorderRadius < .5 && about.panelPaddingTop < .5 && about.panelPaddingLeft < .5,
-          engine + ' ' + width + ' Personality panel has no card treatment');
-        assert.equal(about.profileLink, 'View my LinkedIn profile');
-        assert.equal(about.overflow, false, engine + ' ' + width + ' About must not overflow horizontally');
+        close(state.h1, home.h1, .2, engine+' '+width+' About H1');
+        close(state.h2, home.h2, .2, engine+' '+width+' About H2');
+        close(state.lead, home.lead, .2, engine+' '+width+' About lead');
+        assert.equal(state.leadFamily, home.leadFamily);
+        assert.ok(state.heroLeadWidth <= 620.5, engine+' '+width+' hero measure');
+        assert.equal(state.heroText, 'I’ve always been drawn to building things and figuring out how they could work better. Today, that curiosity sits where people, business and technology meet.');
+        assert.equal(state.storyTitle, 'How I got here.');
+        assert.deepEqual(state.storyBeatTitles, ['Started early','At 18','Learning my limits','Back to building']);
+        assert.ok(state.storyWidth <= 620.5, engine+' '+width+' story measure');
+        assert.deepEqual(state.order.slice().sort((a,b)=>a-b), state.order, engine+' '+width+' About order');
+        assert.equal(state.skillHeading, 'Skill Set');
+        assert.equal(state.mindsetHeading, 'Mindset');
+        assert.equal(state.skillIntro, 'What I know how to do.');
+        assert.equal(state.mindsetIntro, 'How I approach the work.');
+        assert.equal(state.skillCount, 5);
+        assert.equal(state.mindsetCount, 5);
+        assert.equal(state.personalityTitle, 'Different lenses. Same person.');
+        assert.equal(state.personalityLead, 'None of these define me. I use them to notice patterns in how I think and work, and I pay most attention to where they overlap.');
+        assert.deepEqual(state.tabLabels, ['Big Five','BG5','MBTI','Enneagram','Human Design']);
+        assert.ok(state.tabHeights.every(h => h >= 47.5), engine+' '+width+' 48px tabs');
+        assert.ok(state.tabBorders.every(v => v < .5), engine+' '+width+' tabs borderless');
+        assert.ok(state.tabBackgrounds.every(v => v === 'rgba(0, 0, 0, 0)'), engine+' '+width+' tabs transparent');
+        assert.equal(state.tabWrap, 'nowrap');
+        assert.equal(state.tabOverflow, 'auto');
+        assert.equal(state.activeColor, 'rgb(218, 56, 49)');
+        assert.equal(state.panelBackground, 'rgba(0, 0, 0, 0)');
+        assert.ok(state.panelPaddingTop < .5 && state.panelRadius < .5, engine+' '+width+' lens panel no card treatment');
+        assert.equal(state.activeLensTitle, 'Curious, energetic, structured and direct.');
+        assert.equal(state.lensParagraphCount, 2);
+        assert.equal(state.metadataCount, 0, engine+' '+width+' no scores/source metadata/old meaning grids');
+        assert.equal(state.profileLink, 'View my LinkedIn profile');
+        assert.equal(state.hasEmDash, false, engine+' '+width+' no em dashes on About');
+        assert.equal(state.overflow, false, engine+' '+width+' no horizontal overflow');
 
         if (width <= 760) {
-          close(about.heroPaddingTop, 42, .2, engine + ' ' + width + ' mobile About hero top');
-          close(about.heroPaddingBottom, 62, .2, engine + ' ' + width + ' mobile About hero bottom');
+          close(state.heroPaddingTop, 42, .2, engine+' '+width+' mobile hero top');
+          close(state.heroPaddingBottom, 62, .2, engine+' '+width+' mobile hero bottom');
         } else {
-          close(about.heroPaddingBottom, home.sectionSpace, .5, engine + ' ' + width + ' About hero bottom uses shared section rhythm');
+          close(state.heroPaddingBottom, home.sectionSpace, .5, engine+' '+width+' hero bottom rhythm');
+        }
+        for (const [top,bottom] of state.sectionPads) {
+          close(top, home.sectionSpace, .5, engine+' '+width+' section top rhythm');
+          close(bottom, home.sectionSpace, .5, engine+' '+width+' section bottom rhythm');
         }
 
-        close(about.storyPaddingTop, home.sectionSpace, .5, engine + ' ' + width + ' story top rhythm');
-        close(about.storyPaddingBottom, home.sectionSpace, .5, engine + ' ' + width + ' story bottom rhythm');
-        close(about.toolkitPaddingTop, home.sectionSpace, .5, engine + ' ' + width + ' toolkit top rhythm');
-        close(about.toolkitPaddingBottom, home.sectionSpace, .5, engine + ' ' + width + ' toolkit bottom rhythm');
-        close(about.personalityPaddingTop, home.sectionSpace, .5, engine + ' ' + width + ' personality top rhythm');
-        close(about.personalityPaddingBottom, home.sectionSpace, .5, engine + ' ' + width + ' personality bottom rhythm');
-
         if (width <= 840) {
-          assert.equal(about.toolkitColumns, 1, engine + ' ' + width + ' Skill Set/Mindset stack below 840px');
-          assert.equal(about.meaningColumns, 1, engine + ' ' + width + ' Personality meaning stacks below 840px');
+          assert.equal(state.toolkitColumns, 1, engine+' '+width+' toolkit stacks');
+          assert.equal(state.lensColumns, 1, engine+' '+width+' lens stacks');
         } else {
-          assert.equal(about.toolkitColumns, 2, engine + ' ' + width + ' Skill Set/Mindset use two desktop columns');
-          assert.equal(about.meaningColumns, 2, engine + ' ' + width + ' Personality meaning uses two desktop columns');
-          assert.ok(Math.abs(about.skillColumnWidth-about.mindsetColumnWidth)<2, engine + ' ' + width + ' Skill Set/Mindset columns remain equal');
+          assert.equal(state.toolkitColumns, 2, engine+' '+width+' toolkit columns');
+          assert.equal(state.lensColumns, 2, engine+' '+width+' lens columns');
+          for (let i=0;i<5;i++) {
+            close(state.skillRows[i].top, state.mindsetRows[i].top, 1.5, engine+' '+width+' toolkit row '+i+' top alignment');
+            close(state.skillRows[i].height, state.mindsetRows[i].height, 1.5, engine+' '+width+' toolkit row '+i+' height alignment');
+          }
         }
 
         if (width <= 390) {
-          assert.equal(about.tabScrollable, true, engine + ' ' + width + ' Mobile personality tab bar must expose horizontal swipe');
-          const lastTab = page.locator('.about-personality-tab').last();
-          await lastTab.click();
+          assert.equal(state.tabScrollable, true, engine+' '+width+' tabs must be swipeable');
+          const last = page.locator('.about-personality-tab').last();
+          await last.click();
           await page.waitForTimeout(250);
-          assert.equal(await lastTab.getAttribute('aria-selected'), 'true', engine + ' ' + width + ' Last personality tab activates');
-          assert.ok(await page.locator('.about-personality-tabs').evaluate(el => el.scrollLeft > 0), engine + ' ' + width + ' Selecting offscreen tab advances horizontal tab bar');
+          assert.equal(await last.getAttribute('aria-selected'),'true');
+          assert.ok(await page.locator('.about-personality-tabs').evaluate(el => el.scrollLeft > 0), engine+' '+width+' selected tab reveals');
         }
 
-        const secondTab = page.locator('.about-personality-tab').nth(1);
-        await secondTab.hover();
+        const second = page.locator('.about-personality-tab').nth(1);
+        await second.hover();
         await page.waitForTimeout(180);
-        const hoverColor = await secondTab.evaluate(el => getComputedStyle(el).color);
-        assert.equal(hoverColor, 'rgb(218, 56, 49)', engine + ' ' + width + ' Personality hover is red');
+        assert.equal(await second.evaluate(el => getComputedStyle(el).color), 'rgb(218, 56, 49)', engine+' '+width+' hover red');
+
         await page.locator('.about-personality-tab').first().focus();
         await page.keyboard.press('ArrowRight');
-        assert.equal(await secondTab.getAttribute('aria-selected'), 'true', engine + ' ' + width + ' ArrowRight activates next personality tab');
+        assert.equal(await second.getAttribute('aria-selected'),'true', engine+' '+width+' keyboard activates next tab');
+        assert.equal(await page.locator('.about-personality-panel:not([hidden]) h3').textContent(),'Express Builder');
 
         if (output && (width === 390 || width === 1440)) {
-          await page.locator('.about-personal-hero').screenshot({ path: output + '/about-v2-hero-' + engine + '-' + width + '.png' });
-          await page.locator('#story').screenshot({ path: output + '/about-v2-story-' + engine + '-' + width + '.png' });
-          await page.locator('#toolkit').screenshot({ path: output + '/about-v2-toolkit-' + engine + '-' + width + '.png' });
-          await page.locator('#personality').screenshot({ path: output + '/about-v2-personality-' + engine + '-' + width + '.png' });
+          await page.locator('.about-personal-hero').screenshot({path:output+'/about-v3-hero-'+engine+'-'+width+'.png'});
+          await page.locator('#story').screenshot({path:output+'/about-v3-story-'+engine+'-'+width+'.png'});
+          await page.locator('#toolkit').screenshot({path:output+'/about-v3-toolkit-'+engine+'-'+width+'.png'});
+          await page.locator('#personality').screenshot({path:output+'/about-v3-personality-'+engine+'-'+width+'.png'});
         }
 
         await page.close();
@@ -200,7 +195,7 @@ const close = (actual, expected, tolerance, label) => {
     }
   }
 
-  console.log('PASS: About V2 narrative order, Skill Set/Mindset, borderless swipe tabs and homepage design-system rhythm');
+  console.log('PASS: About V3 is balanced, minimal, em-dash-free and responsive across browsers');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
