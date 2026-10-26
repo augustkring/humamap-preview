@@ -516,7 +516,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   max-width: 620px;
   margin: 0;
   color: var(--copy);
-  font-size: clamp(17px, 1.45vw, 19px);
+  font-size: clamp(18px, 1.45vw, 19px);
   line-height: 1.6;
   overflow-wrap: break-word;
 }
