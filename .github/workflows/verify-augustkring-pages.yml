@@ -784,6 +784,8 @@ jobs:
             /tmp/ak-browser-check/road-clean-exit-*.png
             /tmp/ak-browser-check/typography-*.png
             /tmp/ak-browser-check/about-story-*.png
+            /tmp/ak-browser-check/about-toolkit-*.png
+            /tmp/ak-browser-check/about-personality-*.png
             /tmp/ak-browser-check/perspectives-page-*.png
           if-no-files-found: warn
           retention-days: 7
