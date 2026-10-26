@@ -22,7 +22,7 @@ const targets = [
   { path:'', selector:'.perspective-copy > p:not(.perspective-statement)', size:18, label:'homepage perspective body' },
   { path:'', selector:'.waymaking-copy p', size:17, label:'Waymaking compact copy' },
   { path:'', selector:'.work-card p', size:17, label:'Current Focus card copy' },
-  { path:'about/', selector:'.about-story-beat p', size:18, label:'About story body' },
+  { path:'about/', selector:'.about-story-prose p', size:18, label:'About story body' },
   { path:'about/', selector:'.about-lens-copy p', size:18, label:'About personality body' },
   { path:'about/', selector:'.about-toolkit-list p', size:17, label:'About toolkit compact copy' },
   { path:'perspectives/', selector:'.perspective-index-summary', size:18, label:'Perspectives summary' },
