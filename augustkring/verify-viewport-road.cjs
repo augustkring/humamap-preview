@@ -78,7 +78,9 @@ async function runOne(engine,width){
       if(i===0) assert.ok(parseFloat(row.borderTop)<.5,engine+' '+width+': first row must not have a top divider');
       else assert.ok(parseFloat(row.borderTop)>=.5,engine+' '+width+': internal divider missing before row '+i);
       assert.ok(row.headingSize>=20.9&&row.headingSize<=26.1,engine+' '+width+': heading scale drift');
-      assert.ok(row.paragraphSize>=15.9&&row.paragraphSize<=16.1,engine+' '+width+': body copy must reuse 16px card scale');
+      const expectedBodySize=width<=760?17:16;
+      assert.ok(row.paragraphSize>=expectedBodySize-.1&&row.paragraphSize<=expectedBodySize+.1,
+        engine+' '+width+': Waymaking body copy must follow the shared '+expectedBodySize+'px compact scale');
 
       if(width>700){
         assert.ok(row.heading.right<=row.paragraph.left-20,
