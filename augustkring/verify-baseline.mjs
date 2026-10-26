@@ -181,7 +181,7 @@ assert.ok(css.includes("width: .405em; height: .405em;")&&css.includes("top: -.1
 assert.ok(!css.includes('.wordmark-i::before'),'August Kring wordmark must not use a white clearing halo behind the red dot');
 assert.ok(css.includes("--body-copy-size: 18px;")&&css.includes("--body-reading-size: 18px;")&&css.includes("--card-copy-size: 17px;"),'Mobile reading-size tokens must remain 18px / 17px');
 assert.ok(css.includes(".work-card { --venture-copy-size: 17px;"),'Mobile venture copy must use the 17px compact reading size');
-assert.ok(css.includes(".about-personality-intro { font-size: var(--body-copy-size); }"),'About personality intro must inherit 18px mobile body copy');
+assert.ok(css.includes('.about-lens-copy p {\n  margin: 0;\n  color: var(--copy);\n  font-size: var(--body-copy-size);'),'About V3 personality body must inherit 18px reading copy');
 assert.ok(css.includes(".perspective-index-summary { font-size: var(--body-reading-size); }"),'Perspective summaries must inherit 18px mobile reading copy');
 assert.ok(css.includes(".article-comparison td { font-size: var(--card-copy-size); }"),'Article comparison cells must inherit the 17px compact mobile size');
 assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, var(--measure-narrow));\n}"),'Shared 390px subtitle measure missing');
