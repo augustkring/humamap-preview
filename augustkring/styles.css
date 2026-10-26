@@ -968,10 +968,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   letter-spacing: -.045em;
 }
 
-.about-page { padding-bottom: clamp(96px, 9vw, 132px); }
+.about-page { padding-bottom: 0; }
 
 .about-personal-hero {
-  padding: clamp(50px, 5vw, 66px) 0 clamp(56px, 5.8vw, 76px);
+  padding: clamp(50px, 5vw, 66px) 0 var(--section-space);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
@@ -1045,13 +1045,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .about-skill-grid h3,
 .about-principle h3 {
-  margin: 0 0 8px;
+  margin: 0 0 9px;
   font-family: var(--font-display);
   color: var(--ink);
-  font-size: 19px;
+  font-size: clamp(20px, 1.7vw, 22px);
   font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: -.02em;
+  line-height: 1.12;
+  letter-spacing: -.025em;
 }
 .about-skill-grid p,
 .about-principle p {
@@ -1085,7 +1085,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 .about-personality {
   display: block;
-  padding-top: clamp(82px, 8vw, 108px);
+  padding-top: var(--about-section-space);
 }
 .about-personality > .about-home-lead {
   max-width: 760px;
@@ -1102,19 +1102,19 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   display: none;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 26px;
+  margin: 0 0 24px;
 }
 .about-personality-explorer.is-enhanced .about-personality-tabs { display: flex; }
 .about-personality-explorer:not(.is-enhanced) .about-personality-panel + .about-personality-panel { margin-top: 24px; }
 
 .about-personality-tab {
-  min-height: 40px;
-  padding: 0 15px;
+  min-height: 44px;
+  padding: 0 16px;
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
   color: var(--muted);
-  font: 700 13px/1 'AKOutfit', Arial, sans-serif;
+  font: 700 14px/1 var(--font-display);
   cursor: pointer;
   transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
@@ -1129,7 +1129,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   border-color: var(--line);
 }
 .about-personality-tab:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: var(--focus-ring-width) solid var(--red);
   outline-offset: 2px;
 }
 
@@ -1137,9 +1137,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   min-height: 390px;
 }
 .about-personality-panel {
-  padding: clamp(28px, 3.2vw, 40px);
+  padding: clamp(28px, 3vw, 36px);
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  background: var(--surface-card);
 }
 .about-personality-panel[hidden] { display: none; }
 
@@ -1161,7 +1161,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   line-height: 1.35;
 }
 .about-personality-intro {
-  max-width: 760px;
+  max-width: var(--measure-reading);
   margin: 18px 0 0;
   color: var(--ink);
   font-family: var(--font-body);
@@ -1171,11 +1171,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   letter-spacing: 0;
 }
 .about-personality-meaning {
+  max-width: 840px;
   margin-top: 26px;
   display: grid;
-  grid-template-columns: minmax(0, 390px) minmax(0, 390px);
-  justify-content: space-between;
-  gap: 48px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(32px, 4vw, 48px);
 }
 .about-personality-meaning > div {
   max-width: 390px;
@@ -1195,6 +1195,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   line-height: 1.6;
 }
 .about-personality-markers {
+  max-width: 840px;
   margin-top: 24px;
   display: flex;
   flex-wrap: wrap;
@@ -1240,7 +1241,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 
 .about-story-bottom {
-  padding: clamp(24px, 3.3vw, 44px) 0 clamp(8px, 1.5vw, 22px);
+  padding: var(--section-space) 0;
   display: grid;
   grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
   gap: clamp(54px, 7vw, 92px);
@@ -1267,7 +1268,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: min(100%, var(--measure-narrow));
 }
 
-.about-story-content { max-width: 620px; }
+.about-story-content { max-width: var(--measure-reading); }
 .about-story-content p a {
   color: var(--ink);
   text-decoration-color: var(--red);
@@ -1277,7 +1278,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-story-content p a:focus-visible {
   text-decoration-thickness: 2px;
 }
-.about-story-link { margin-top: 28px; }
+.about-story-link {
+  margin-top: clamp(26px, 3vw, 34px);
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
 
 .article-page { padding-bottom: clamp(88px, 9vw, 132px); }
 .article-hero {
@@ -1398,7 +1404,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-personal-hero { min-height: auto; gap: 32px; }
   .about-personal-note { max-width: 620px; margin-left: 0; }
   .about-home-section,
-  .about-story-bottom { gap: 32px; }
+  .about-story-bottom { gap: 24px; }
   .about-principles-band { gap: 32px; }
   .about-personality-meaning { grid-template-columns: 1fr; gap: 24px; }
   .about-personality-meaning > div { max-width: 100%; }
@@ -1451,8 +1457,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-principles-grid { grid-template-columns: 1fr; gap: 24px; }
   .about-principle-primary { grid-column: auto; max-width: none; }
   .about-principles-band { margin-block: 0; padding: var(--section-space-mobile) 0; }
-  .about-personality { padding-top: 58px; padding-bottom: 58px; }
-  .about-story-bottom { padding-top: 14px; gap: 28px; }
+  .about-personal-hero { padding: 42px 0 62px; }
+  .about-personality { padding: var(--section-space-mobile) 0; }
+  .about-story-bottom { padding: var(--section-space-mobile) 0; gap: 24px; }
+  .about-personality-panel { min-height: 0; padding: 24px 20px; }
   .about-story-intro > p { font-size: var(--editorial-lead-size); }
   .about-personal-lead, .about-page .about-home-lead > p, .about-principles-intro > p { font-size: var(--editorial-lead-size); }
 
