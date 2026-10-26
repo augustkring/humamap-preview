@@ -23,7 +23,7 @@ const targets = [
   { path:'', selector:'.waymaking-copy p', size:17, label:'Waymaking compact copy' },
   { path:'', selector:'.work-card p', size:17, label:'Current Focus card copy' },
   { path:'about/', selector:'.about-story-beat p', size:18, label:'About story body' },
-  { path:'about/', selector:'.about-personality-intro', size:18, label:'About personality intro' },
+  { path:'about/', selector:'.about-lens-copy p', size:18, label:'About personality body' },
   { path:'about/', selector:'.about-toolkit-list p', size:17, label:'About toolkit compact copy' },
   { path:'about/', selector:'.about-personality-meaning p', size:17, label:'About personality compact copy' },
   { path:'perspectives/', selector:'.perspective-index-summary', size:18, label:'Perspectives summary' },
