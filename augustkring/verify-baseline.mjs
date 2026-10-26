@@ -167,7 +167,8 @@ assert.ok(css.includes("/* Home + About section subtitles share one readable mea
 assert.ok(css.includes('.hero-copy > .hero-focus {\n  width: 100%;\n  max-width: none;'),'Approved full-column homepage hero description missing');
 assert.ok(css.includes('max-width: 900px;\n  margin-inline: auto;\n  padding: clamp(50px, 5vw, 66px) 0 clamp(68px, 7vw, 92px);\n  text-align: center;'),'Perspectives hero must stay centred');
 assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-inline: auto;'),'Perspectives article column must stay centred');
-assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
+assert.ok(css.includes('.homepage-contact-actions { width: 100%; margin: 16px 0 0; display: grid;'),'Contact mobile action stack missing');
+assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact .personal-signoff .signoff-signature { width: 164px; }'),'Contact mobile signature scale missing');
 
 const workCarousel=readFileSync(join(root,'work-carousel.js'),'utf8');
 assert.ok(workCarousel.includes("dot.dataset.workDot = ''")&&workCarousel.includes("aria-current")&&workCarousel.includes("prefers-reduced-motion"),'Dot carousel interaction/accessibility contract missing');
