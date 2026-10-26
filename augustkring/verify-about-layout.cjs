@@ -42,8 +42,7 @@ const close = (actual, expected, tolerance, label) => {
             h2: parseFloat(h2.fontSize),
             lead: parseFloat(lead.fontSize),
             leadFamily: lead.fontFamily,
-            sectionSpace: parseFloat(root.getPropertyValue('--section-space')),
-            mobileSectionSpace: parseFloat(root.getPropertyValue('--section-space-mobile')),
+            sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop),
             cardSurface: card.backgroundColor
           };
         });
@@ -104,11 +103,11 @@ const close = (actual, expected, tolerance, label) => {
         if (width <= 760) {
           close(about.heroPaddingTop, 42, .2, engine + ' ' + width + ' mobile About hero top');
           close(about.heroPaddingBottom, 62, .2, engine + ' ' + width + ' mobile About hero bottom');
-          close(about.sectionPaddingTop, home.mobileSectionSpace, .2, engine + ' ' + width + ' mobile About section top rhythm');
-          close(about.sectionPaddingBottom, home.mobileSectionSpace, .2, engine + ' ' + width + ' mobile About section bottom rhythm');
-          close(about.personalityPaddingTop, home.mobileSectionSpace, .2, engine + ' ' + width + ' mobile personality rhythm');
-          close(about.storyPaddingTop, home.mobileSectionSpace, .2, engine + ' ' + width + ' mobile story top rhythm');
-          close(about.storyPaddingBottom, home.mobileSectionSpace, .2, engine + ' ' + width + ' mobile story bottom rhythm');
+          close(about.sectionPaddingTop, home.sectionSpace, .2, engine + ' ' + width + ' mobile About section top rhythm');
+          close(about.sectionPaddingBottom, home.sectionSpace, .2, engine + ' ' + width + ' mobile About section bottom rhythm');
+          close(about.personalityPaddingTop, home.sectionSpace, .2, engine + ' ' + width + ' mobile personality rhythm');
+          close(about.storyPaddingTop, home.sectionSpace, .2, engine + ' ' + width + ' mobile story top rhythm');
+          close(about.storyPaddingBottom, home.sectionSpace, .2, engine + ' ' + width + ' mobile story bottom rhythm');
           close(about.storyGap, 24, .2, engine + ' ' + width + ' mobile story column gap');
           assert.equal(about.skillsColumns, 1, engine + ' ' + width + ' skills stack on mobile');
           assert.equal(about.principlesColumns, 1, engine + ' ' + width + ' principles stack on mobile');
