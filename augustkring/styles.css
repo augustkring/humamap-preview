@@ -167,8 +167,8 @@ a {
 }
 
 .wordmark-i { position: relative; display: inline-block; color: inherit; }
-.wordmark-i::before { content: ''; position: absolute; z-index: 1; width: .42em; height: .34em; left: 60%; top: -.03em; background: var(--page); transform: translateX(-50%); pointer-events: none; }
-.wordmark-i::after { content: ''; position: absolute; z-index: 2; width: .27em; height: .27em; left: 60%; top: .03em; border-radius: 999px; background: var(--red); transform: translateX(-50%); pointer-events: none; }
+.wordmark-i::before { content: ''; position: absolute; z-index: 1; width: .70em; height: .62em; left: 60%; top: -.14em; background: var(--page); transform: translateX(-50%); pointer-events: none; }
+.wordmark-i::after { content: ''; position: absolute; z-index: 2; width: .54em; height: .54em; left: 60%; top: -.10em; border-radius: 999px; background: var(--red); transform: translateX(-50%); pointer-events: none; }
 
 .home-navigation {
   display: flex;
@@ -1432,8 +1432,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 @media (max-width: 760px) {
   :root {
-    --body-copy-size: 17px;
-    --body-reading-size: 17px;
+    --body-copy-size: 18px;
+    --body-reading-size: 18px;
+    --card-copy-size: 17px;
     --editorial-h1-size: clamp(44px, 11.5vw, 52px);
     --editorial-h2-size: clamp(34px, 8.8vw, 44px);
     --editorial-lead-size: 18px;
@@ -1463,6 +1464,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-personality-panel { min-height: 0; padding: 24px 20px; }
   .about-story-intro > p { font-size: var(--editorial-lead-size); }
   .about-personal-lead, .about-page .about-home-lead > p, .about-principles-intro > p { font-size: var(--editorial-lead-size); }
+  .about-personality-intro { font-size: var(--body-copy-size); }
+  .perspective-index-summary { font-size: var(--body-reading-size); }
+  .article-comparison td { font-size: var(--card-copy-size); }
 
   .perspective-lead h2,
   .work-heading h2,
@@ -1500,7 +1504,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     width: min(calc(100% - 40px), var(--max));
   }
 
-  .work-card { --venture-copy-size: 16px; min-height: 326px; padding: 24px 22px; }
+  .work-card { --venture-copy-size: 17px; min-height: 326px; padding: 24px 22px; }
 
   .footer-links {
     flex-direction: column;
