@@ -48,8 +48,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-waymaking-editorial-v35"
-          expected_shared="styles.css?v=20261014-subtitle-width-v1"
+          expected_home="styles.css?v=20261026-waymaking-editorial-v36"
+          expected_shared="styles.css?v=20261026-nav-focus-v2"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -87,10 +87,12 @@ jobs:
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
           grep -Fq 'class="signoff-signature"' /tmp/augustkring.html
-          grep -Fq 'src="mobile-nav.js?v=20261009-input-focus-v4"' /tmp/augustkring.html
+          grep -Fq 'src="mobile-nav.js?v=20261026-dark-focus-v5"' /tmp/augustkring.html
           curl -fsSL --max-time 20 "${base}${expected_home}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
-          grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
+          grep -Fq '.mobile-menu-toggle:focus-visible svg' /tmp/augustkring.css
+          grep -Fq 'stroke-width: 2.35;' /tmp/augustkring.css
+          ! grep -Fq '.mobile-menu-close:focus-visible { outline: 2px solid var(--red)' /tmp/augustkring.css
           grep -Fq '/* Waymaking editorial: five parallel facets, hierarchy before decoration. */' /tmp/augustkring.css
           grep -Fq 'grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat + .waymaking-beat {' /tmp/augustkring.css
@@ -111,13 +113,15 @@ jobs:
           grep -Fq 'viewBox="0 0 340 314"' /tmp/august-signature.svg
           grep -Fq '<path d=' /tmp/august-signature.svg
           ! grep -Eq '<(script|image|foreignObject)' /tmp/august-signature.svg
-          curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261009-input-focus-v4" -o /tmp/augustkring-mobile-nav.js
+          curl -fsSL --max-time 20 "${base}mobile-nav.js?v=20261026-dark-focus-v5" -o /tmp/augustkring-mobile-nav.js
           grep -Fq 'dialog.focus({ preventScroll: true })' /tmp/augustkring-mobile-nav.js
+          grep -Fq "!root.hasAttribute('data-nav-pointer')" /tmp/augustkring-mobile-nav.js
+          grep -Fq 'opener.blur()' /tmp/augustkring-mobile-nav.js
           ! grep -Fq 'document.body.style.position' /tmp/augustkring-mobile-nav.js
           for route in about/ perspectives/ perspectives/rethinking-the-company/ perspectives/europe-at-a-crossroads/ privacy/ unsubscribe/; do
             curl -fsSL --max-time 20 "${base}${route}" -o /tmp/augustkring-subpage.html
             grep -Fq "$expected_shared" /tmp/augustkring-subpage.html
-            grep -Fq 'src="mobile-nav.js?v=20261009-input-focus-v4"' /tmp/augustkring-subpage.html
+            grep -Fq 'src="mobile-nav.js?v=20261026-dark-focus-v5"' /tmp/augustkring-subpage.html
           done
           for attempt in $(seq 1 30); do
             curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
