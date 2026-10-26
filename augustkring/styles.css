@@ -1246,37 +1246,52 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   max-width: min(100%, var(--measure-narrow));
 }
 
-/* About V6: simple page intro, balanced toolkit, descriptive reflection lenses. */
+/* About V7: personal belief, story, mindset, principles and reflection lenses. */
 .about-page { padding-bottom: 0; }
 
-.about-v6-section {
+.about-personal-hero {
+  padding: clamp(54px, 5.5vw, 72px) 0 0;
+}
+.about-personal-copy {
+  max-width: 780px;
+}
+.about-personal-copy h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--editorial-h1-size);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.about-personal-belief {
+  max-width: 680px;
+  margin: 24px 0 0;
+  color: var(--copy);
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1.42;
+  letter-spacing: -.018em;
+  text-wrap: balance;
+}
+
+.about-v7-section {
   padding: var(--section-space) 0;
 }
-.about-story-first {
-  padding-top: clamp(54px, 5.5vw, 72px);
-}
-.about-section-lead h1,
 .about-section-lead h2,
 .about-toolkit-column > h2 {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-weight: 700;
-  text-wrap: balance;
-}
-.about-section-lead h1 {
-  font-size: var(--editorial-h1-size);
-  line-height: 1.04;
-  letter-spacing: -.045em;
-}
-.about-section-lead h2,
-.about-toolkit-column > h2 {
   font-size: var(--editorial-h2-size);
+  font-weight: 700;
   line-height: 1.02;
   letter-spacing: -.04em;
+  text-wrap: balance;
 }
 
-.about-story {
+.about-story,
+.about-principles {
   display: grid;
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
@@ -1330,7 +1345,8 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   padding: 22px 0 24px;
   border-top: 1px solid var(--line);
 }
-.about-toolkit-list h3 {
+.about-toolkit-list h3,
+.about-principles-list h3 {
   margin: 0 0 9px;
   color: var(--ink);
   font-family: var(--font-display);
@@ -1339,11 +1355,31 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   line-height: 1.12;
   letter-spacing: -.025em;
 }
-.about-toolkit-list p {
+.about-toolkit-list p,
+.about-principles-list p {
   margin: 0;
   color: var(--copy);
   font-size: var(--card-copy-size);
   line-height: 1.62;
+}
+
+.about-principles > .about-section-lead > p {
+  max-width: var(--measure-narrow);
+  margin: 24px 0 0;
+  color: var(--copy);
+  font-size: 17px;
+  line-height: 1.55;
+}
+.about-principles-list {
+  max-width: var(--measure-reading);
+}
+.about-principles-list article {
+  padding: 24px 0 26px;
+  border-top: 1px solid var(--line);
+}
+.about-principles-list article:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .about-personality {
@@ -1430,10 +1466,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 
 @media (max-width: 840px) {
   .about-story,
-  .about-toolkit {
+  .about-toolkit,
+  .about-principles {
     grid-template-columns: minmax(0, 1fr);
   }
-  .about-story {
+  .about-story,
+  .about-principles {
     gap: 28px;
   }
   .about-toolkit {
@@ -1475,13 +1513,19 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 
 @media (max-width: 760px) {
-  .about-v6-section {
-    padding: var(--section-space-mobile) 0;
-  }
-  .about-story-first {
+  .about-personal-hero {
     padding-top: 42px;
   }
-  .about-story {
+  .about-personal-belief {
+    margin-top: 18px;
+    font-size: 21px;
+    line-height: 1.45;
+  }
+  .about-v7-section {
+    padding: var(--section-space-mobile) 0;
+  }
+  .about-story,
+  .about-principles {
     gap: 24px;
   }
   .about-story-prose p + p {
@@ -1503,6 +1547,13 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-toolkit-list article {
     padding: 20px 0 22px;
   }
+  .about-principles > .about-section-lead > p {
+    margin-top: 16px;
+    font-size: 17px;
+  }
+  .about-principles-list article {
+    padding: 20px 0 22px;
+  }
   .about-personality > .about-section-lead {
     margin-bottom: 18px;
   }
@@ -1516,3 +1567,4 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     font-size: 16px;
   }
 }
+
