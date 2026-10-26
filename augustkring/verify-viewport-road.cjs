@@ -32,7 +32,6 @@ async function runOne(engine,width){
     const state=await page.evaluate(()=>{
       const section=document.querySelector('.waymaking-narrative');
       const beats=[...document.querySelectorAll('.waymaking-beat')];
-      const signature=document.querySelector('.waymaking-signature');
       const box=el=>{
         const r=el.getBoundingClientRect();
         return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
@@ -40,9 +39,6 @@ async function runOne(engine,width){
       return {
         overflow:document.documentElement.scrollWidth>innerWidth+1,
         section:box(section),
-        signature:box(signature),
-        signatureColor:getComputedStyle(signature).backgroundColor,
-        signatureMask:getComputedStyle(signature).webkitMaskImage||getComputedStyle(signature).maskImage,
         hasRoad:!!document.querySelector('.waymaking-road-wrap,.waymaking-artspace,.waymaking-original-reveal'),
         hasRoadScript:[...document.scripts].some(s=>s.src.includes('waymaking-scroll.js')),
         titles:beats.map(x=>x.querySelector('h3').textContent.trim()),
@@ -59,7 +55,7 @@ async function runOne(engine,width){
             paragraph:box(paragraph),
             display:style.display,
             columns:style.gridTemplateColumns,
-            borderBottom:beatStyle.borderBottomWidth,
+            borderTop:beatStyle.borderTopWidth,
             headingSize:parseFloat(getComputedStyle(heading).fontSize),
             paragraphSize:parseFloat(getComputedStyle(paragraph).fontSize)
           };
@@ -72,10 +68,6 @@ async function runOne(engine,width){
     assert.equal(state.hasRoadScript,false,engine+' '+width+': retired road script still loaded');
     assert.deepEqual(state.titles,labels,engine+' '+width+': Waymaking facet order drift');
     assert.equal(state.rows.length,5);
-    assert.ok(state.signature.width>=70&&state.signature.width<=105,'Brush signature width out of range');
-    assert.ok(state.signature.right<=state.section.right+1&&state.signature.right>=state.section.right-3,
-      'Brush signature should punctuate the right edge');
-    assert.ok(state.signatureMask&&state.signatureMask!=='none','Brush signature mask missing');
 
     const heights=state.rows.map(x=>x.row.height);
     assert.ok(Math.max(...heights)-Math.min(...heights)<=95,
@@ -83,9 +75,10 @@ async function runOne(engine,width){
 
     for(const [i,row] of state.rows.entries()){
       assert.equal(row.display,'grid',engine+' '+width+': row '+i+' copy is not grid');
-      assert.ok(parseFloat(row.borderBottom)>=.5,engine+' '+width+': row '+i+' divider missing');
-      assert.ok(row.headingSize>=26,engine+' '+width+': heading too small');
-      assert.ok(row.paragraphSize>=16,engine+' '+width+': body copy too small');
+      if(i===0) assert.ok(parseFloat(row.borderTop)<.5,engine+' '+width+': first row must not have a top divider');
+      else assert.ok(parseFloat(row.borderTop)>=.5,engine+' '+width+': internal divider missing before row '+i);
+      assert.ok(row.headingSize>=22.9&&row.headingSize<=28.1,engine+' '+width+': heading scale drift');
+      assert.ok(row.paragraphSize>=15.9&&row.paragraphSize<=16.1,engine+' '+width+': body copy must reuse 16px card scale');
 
       if(width>700){
         assert.ok(row.heading.right<=row.paragraph.left-20,
