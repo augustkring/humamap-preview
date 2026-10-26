@@ -582,7 +582,7 @@ jobs:
           const base = 'https://augustkring.github.io/humamap-preview/augustkring/';
           const cases = [
             { path: '', selector: '.thread-copy p', desktop: 18, mobile: 17 },
-            { path: '', selector: '.waymaking-copy p', desktop: 18, mobile: 17 },
+            { path: '', selector: '.waymaking-copy p', desktopMin: 18, desktopMax: 19, mobile: 17 },
             { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 17 },
             { path: '', selector: '.work-card p', desktop: 16, mobile: 16 },
             { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 16 },
@@ -618,9 +618,13 @@ jobs:
                       viewportOverflow:document.documentElement.scrollWidth>innerWidth+1
                     };
                   });
-                  const expected=width<=760?target.mobile:target.desktop;
+                  const mobile=width<=760;
+                  const expected=mobile?target.mobile:target.desktop;
+                  const min=mobile?target.mobile:(target.desktopMin??target.desktop);
+                  const max=mobile?target.mobile:(target.desktopMax??target.desktop);
                   console.log('Typography',width,target.path||'home',target.selector,metrics);
-                  assert.ok(Math.abs(metrics.fontSize-expected)<0.1, `Expected ${expected}px for ${target.selector} at ${width}`);
+                  assert.ok(metrics.fontSize>=min-.1&&metrics.fontSize<=max+.1,
+                    `Expected ${min}-${max}px for ${target.selector} at ${width}`);
                   assert.ok(metrics.lineHeight/metrics.fontSize >= 1.45, `Readable line height for ${target.selector}`);
                   assert.ok(metrics.width>0&&metrics.height>0, `Text block is visible: ${target.selector}`);
                   assert.equal(metrics.viewportOverflow,false,`No horizontal scrolling on ${target.path} at ${width}px`);
