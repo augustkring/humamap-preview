@@ -40,6 +40,7 @@ jobs:
           /tmp/ak-v13-qa/node_modules/.bin/playwright install --with-deps firefox webkit
           ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=firefox,webkit ROAD_WIDTHS=390,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-viewport-road.cjs
           ABOUT_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ABOUT_OUTPUT=artifacts ABOUT_ENGINES=firefox,webkit ABOUT_WIDTHS=390,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-about-layout.cjs
+          TYPE_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ TYPE_ENGINES=firefox,webkit TYPE_WIDTHS=390 NODE_PATH=/tmp/ak-v13-qa/node_modules node augustkring/verify-mobile-type.cjs
       - name: Upload actual-browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
