@@ -48,7 +48,7 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-waymaking-editorial-v36"
+          expected_home="styles.css?v=20261026-waymaking-editorial-v37"
           expected_shared="styles.css?v=20261026-nav-focus-v2"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
