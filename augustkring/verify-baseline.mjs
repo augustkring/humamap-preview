@@ -109,6 +109,7 @@ assert.ok(css.includes('.waymaking-copy-column {\n  position: relative;'),'Wayma
 assert.ok(css.includes('.waymaking-beat + .waymaking-beat {\n  border-top: 1px solid var(--line);'),'Waymaking must use only internal hairline dividers');
 assert.ok(!css.includes('.waymaking-copy-column {\n  border-top: 1px solid var(--line);')&&!css.includes('border-bottom: 1px solid var(--line);\n}'),'Waymaking must not be boxed by top/bottom rules');
 assert.ok(css.includes('grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);'),'Desktop editorial two-column grid missing');
+assert.ok(css.includes('.thread-section { padding-bottom: 0; }'),'Corrected homepage thread must not add duplicate bottom spacing');
 assert.ok(css.includes('@media (max-width: 700px) {')&&css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile editorial stack missing');
 assert.ok(!thread.includes('waymaking-signature'),'Decorative Waymaking signature must remain removed');
 assert.ok(!css.includes('.waymaking-signature'),'Decorative Waymaking signature styling must remain removed');
@@ -155,7 +156,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v36':'styles.css?v=20261026-nav-focus-v2';
+  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v37':'styles.css?v=20261026-nav-focus-v2';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
