@@ -68,16 +68,22 @@ const targets = [
         const wordmark=await page.evaluate(() => {
           const i=document.querySelector('.header-wordmark .wordmark-i');
           const dot=getComputedStyle(i,'::after');
-          const mask=getComputedStyle(i,'::before');
+          const before=getComputedStyle(i,'::before');
+          const parent=getComputedStyle(document.querySelector('.header-wordmark'));
           return {
+            fontSize:parseFloat(parent.fontSize),
             dotWidth:parseFloat(dot.width),
             dotHeight:parseFloat(dot.height),
-            maskWidth:parseFloat(mask.width),
-            maskHeight:parseFloat(mask.height)
+            dotTop:parseFloat(dot.top),
+            beforeContent:before.content,
+            beforeBackground:before.backgroundColor
           };
         });
         assert.ok(wordmark.dotWidth>=14&&wordmark.dotHeight>=14, engine+' '+width+' wordmark dot renders at doubled diameter');
-        assert.ok(wordmark.maskWidth>wordmark.dotWidth&&wordmark.maskHeight>wordmark.dotHeight, engine+' '+width+' wordmark mask fully clears original dot');
+        assert.ok(wordmark.dotTop<0, engine+' '+width+' wordmark dot starts above the i');
+        assert.ok(wordmark.dotTop+wordmark.dotHeight<=wordmark.fontSize*.31, engine+' '+width+' wordmark dot does not intrude lower than the original i-dot edge');
+        assert.ok(wordmark.beforeContent==='none'||wordmark.beforeContent==='normal', engine+' '+width+' wordmark has no ::before halo content');
+        assert.ok(wordmark.beforeBackground==='rgba(0, 0, 0, 0)'||wordmark.beforeBackground==='transparent', engine+' '+width+' wordmark has no white halo background');
 
         await page.close();
       }
@@ -85,7 +91,7 @@ const targets = [
       await browser.close();
     }
   }
-  console.log('PASS: mobile reading sizes are 18px primary / 17px compact across pages; enlarged August Kring dot is intact');
+  console.log('PASS: mobile reading sizes are 18px primary / 17px compact across pages; enlarged August Kring dot is halo-free and raised');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
