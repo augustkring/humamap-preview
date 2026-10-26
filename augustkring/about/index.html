@@ -45,7 +45,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Outfit-Latin-Bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=20261026-shared-v12">
+  <link rel="stylesheet" href="styles.css?v=20261026-shared-v13">
 
   <script type="application/ld+json">
   {
@@ -148,17 +148,9 @@
   </dialog>
 
   <main id="main-content" class="home-main about-page" tabindex="-1">
-    <section class="about-personal-hero" aria-labelledby="about-page-title">
-      <div class="about-personal-copy">
-        <h1 id="about-page-title">Hi, I’m August.</h1>
-        <p class="about-personal-lead">I’ve spent most of my working life close to new ideas, early-stage businesses and the messy work of turning possibilities into something real. What keeps me interested is how people, business and technology can come together to create useful, positive change.</p>
-        <a class="arrow-link about-hero-link" href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener"><span>Connect on LinkedIn</span><svg class="arrow arrow-up-right" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg></a>
-      </div>
-    </section>
-
-    <section id="story" class="about-v4-section about-story" aria-labelledby="story-title">
+    <section id="story" class="about-v5-section about-story about-story-first" aria-labelledby="story-title">
       <div class="about-section-lead">
-        <h2 id="story-title">How I got here.</h2>
+        <h1 id="story-title">How I got here.</h1>
       </div>
 
       <div class="about-story-prose">
@@ -167,10 +159,11 @@
         <p>I also learned what happens when ambition is not matched by limits. I kept taking on more and pushing harder until I burnt out. Recovery took time, but it forced me to rethink how I wanted to work, lead and live. It made the human side of business much harder to ignore and changed what I considered sustainable performance.</p>
         <p>When generative AI began to take off, I became fascinated by what it could change about how companies are built and run. That interest eventually led me to KRING, where I worked on AI-native products and agentic AI with people who had been deep in the field for years.</p>
         <p>Today, I’m building ventures again. I still like speed, ambition and new possibilities, but I care more about what is worth building, how we build it and whether the result creates value for people, planet and business at the same time.</p>
+        <a class="arrow-link about-story-link" href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener"><span>For the full chronology, see LinkedIn</span><svg class="arrow arrow-up-right" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 11 11 3M6 3h5v5"/></svg></a>
       </div>
     </section>
 
-    <section id="toolkit" class="about-v4-section about-toolkit" aria-label="Skill Set and Mindset">
+    <section id="toolkit" class="about-v5-section about-toolkit" aria-label="Skill Set and Mindset">
       <div class="about-toolkit-column about-toolkit-skills">
         <h2>Skill Set</h2>
         <p class="about-toolkit-intro">What I bring when an idea needs to become something useful and commercially real.</p>
@@ -226,14 +219,16 @@
       </div>
     </section>
 
-    <section id="personality" class="about-v4-section about-personality" aria-labelledby="personality-title">
+    <section id="personality" class="about-v5-section about-personality" aria-labelledby="personality-title">
       <div class="about-section-lead">
         <h2 id="personality-title">Different lenses. Same person.</h2>
       </div>
 
       <div class="about-personality-explorer" data-personality-tabs>
-        <div class="about-personality-tabs" role="tablist" aria-label="Personality frameworks" aria-orientation="horizontal">
+        <div class="about-personality-tabs" role="tablist" aria-label="Reflection frameworks" aria-orientation="vertical">
           <button id="personality-tab-big-five" class="about-personality-tab" type="button" role="tab" aria-selected="true" aria-controls="personality-panel-big-five" data-personality-tab="big-five">Big Five</button>
+          <button id="personality-tab-high5" class="about-personality-tab" type="button" role="tab" aria-selected="false" aria-controls="personality-panel-high5" tabindex="-1" data-personality-tab="high5">HIGH5</button>
+          <button id="personality-tab-via" class="about-personality-tab" type="button" role="tab" aria-selected="false" aria-controls="personality-panel-via" tabindex="-1" data-personality-tab="via">VIA</button>
           <button id="personality-tab-bg5" class="about-personality-tab" type="button" role="tab" aria-selected="false" aria-controls="personality-panel-bg5" tabindex="-1" data-personality-tab="bg5">BG5</button>
           <button id="personality-tab-mbti" class="about-personality-tab" type="button" role="tab" aria-selected="false" aria-controls="personality-panel-mbti" tabindex="-1" data-personality-tab="mbti">MBTI</button>
           <button id="personality-tab-enneagram" class="about-personality-tab" type="button" role="tab" aria-selected="false" aria-controls="personality-panel-enneagram" tabindex="-1" data-personality-tab="enneagram">Enneagram</button>
@@ -243,10 +238,30 @@
         <div class="about-personality-panels">
           <article id="personality-panel-big-five" class="about-personality-panel" role="tabpanel" aria-labelledby="personality-tab-big-five" tabindex="0" data-personality-panel="big-five">
             <div class="about-lens-layout">
-              <h3>Curious, energetic, structured and direct.</h3>
+              <h3>Highly open, extraverted, structured and unusually direct.</h3>
               <div class="about-lens-copy">
-                <p>Taken together, my profile points to someone who seeks novelty, engages readily with people, likes structure around goals and is unusually willing to challenge assumptions rather than accommodate them.</p>
-                <p>The same pattern has a clear edge: directness can become impatience, intensity can rise under pressure, and conviction can make it easy to move faster than other people are ready for.</p>
+                <p>My Big Five profile combines exceptionally high openness, very high extraversion, high conscientiousness, moderately high neuroticism and exceptionally low agreeableness. In plain English, that points to curiosity, energy, structure, sensitivity to pressure and a very direct interpersonal style.</p>
+                <p>The most useful tension is between exploration and order. I like generating possibilities and challenging assumptions, but I also want structure around the work. Directness and assertiveness are useful when they are balanced with enough patience to keep conviction from becoming bluntness.</p>
+              </div>
+            </div>
+          </article>
+
+          <article id="personality-panel-high5" class="about-personality-panel" role="tabpanel" aria-labelledby="personality-tab-high5" tabindex="0" data-personality-panel="high5">
+            <div class="about-lens-layout">
+              <h3>Strategist. Coach. Catalyst. Philomath. Commander.</h3>
+              <div class="about-lens-copy">
+                <p>My HIGH5 profile is led by Strategist, Coach, Catalyst, Philomath and Commander. Together, they describe a pattern of connecting the dots, spotting potential in people, creating momentum, learning broadly and speaking up directly.</p>
+                <p>The trade-offs are just as recognisable: impatience with slow decisions, wasted potential or unnecessary waiting, and frustration when people avoid saying what they mean. The useful reminder is to pair momentum and clarity with enough space for other people to catch up.</p>
+              </div>
+            </div>
+          </article>
+
+          <article id="personality-panel-via" class="about-personality-panel" role="tabpanel" aria-labelledby="personality-tab-via" tabindex="0" data-personality-panel="via">
+            <div class="about-lens-layout">
+              <h3>Creativity. Perspective. Beauty. Spirituality. Learning.</h3>
+              <div class="about-lens-copy">
+                <p>My top VIA strengths are Creativity, Perspective, Appreciation of Beauty &amp; Excellence, Spirituality and Love of Learning. They point towards generating useful new ideas, making sense of complexity, noticing quality and beauty, looking for meaning and continuously adding to what I know.</p>
+                <p>What I recognise most is the combination of curiosity and direction. I tend to learn because I want to understand, create because I want to improve something and look for the wider meaning behind the work rather than treating it as an end in itself.</p>
               </div>
             </div>
           </article>
@@ -255,8 +270,8 @@
             <div class="about-lens-layout">
               <h3>Express Builder</h3>
               <div class="about-lens-copy">
-                <p>In BG5, the Express Builder is described as someone who responds first and can then move into action very quickly, often getting things up and running faster than a more step-by-step builder.</p>
-                <p>That speed comes with a trade-off the framework calls out directly: steps can be skipped and may need to be revisited. In my result, bigger decisions also benefit from waiting for emotional clarity before committing.</p>
+                <p>My BG5 report describes an Express Builder whose interaction style is to respond, then engage. The emphasis is on bringing strong creative energy to work that feels right, with satisfaction as the positive indicator and frustration as a sign that something is off.</p>
+                <p>My decision strategy adds an important counterweight to speed: respond first, then wait for emotional clarity before committing. The report also describes my information processing as collaborative and helped by movement, interaction and changing environments.</p>
               </div>
             </div>
           </article>
@@ -283,10 +298,10 @@
 
           <article id="personality-panel-human-design" class="about-personality-panel" role="tabpanel" aria-labelledby="personality-tab-human-design" tabindex="0" data-personality-panel="human-design">
             <div class="about-lens-layout">
-              <h3>Manifesting Generator</h3>
+              <h3>Manifesting Generator, 2/4</h3>
               <div class="about-lens-copy">
-                <p>In Human Design, a Manifesting Generator is still a Generator: the strategy is to respond, then move quickly once there is a real yes. Emotional Authority adds the idea that larger decisions need time to reach clarity.</p>
-                <p>My 2/4 profile adds another theme: natural strengths tend to develop in private but are often called out through relationships and networks. That combination is the part of the framework I recognise most.</p>
+                <p>My Human Design report identifies me as a Manifesting Generator with a strategy to wait to respond, Emotional Solar Plexus Authority and a 2/4 Hermit/Opportunist profile. It describes the ability to move quickly from response into action, along with a tendency to skip steps when moving too fast.</p>
+                <p>The two strongest reminders are to give larger decisions time to reach emotional clarity and to respect the tension in the 2/4 profile between developing natural strengths in private and being called into opportunities through relationships and networks.</p>
               </div>
             </div>
           </article>
@@ -306,7 +321,7 @@
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
-  <script src="about/about.js?v=20261026-about-v3" defer></script>
+  <script src="about/about.js?v=20261026-about-v5" defer></script>
   <script src="mobile-nav.js?v=20261026-dark-focus-v5" defer></script>
 </body>
 </html>
