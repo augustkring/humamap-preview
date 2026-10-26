@@ -112,7 +112,7 @@ assert.ok(css.includes('grid-template-columns: minmax(230px, .78fr) minmax(0, 1.
 assert.ok(css.includes('@media (max-width: 700px) {')&&css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile editorial stack missing');
 assert.ok(!thread.includes('waymaking-signature'),'Decorative Waymaking signature must remain removed');
 assert.ok(!css.includes('.waymaking-signature'),'Decorative Waymaking signature styling must remain removed');
-assert.ok(css.includes('font-size: clamp(24px, 2.35vw, 28px);'),'Waymaking headings must stay within the established secondary heading scale');
+assert.ok(css.includes('font-size: clamp(21px, calc(2vw - 2px), 26px);'),'Waymaking headings must stay within the established secondary heading scale');
 assert.ok(css.includes('font-size: var(--card-copy-size);'),'Waymaking body copy must reuse the established card-copy size');
 for(const forbidden of [
   '.waymaking-road-wrap','.waymaking-artspace','.waymaking-original-source','.waymaking-original-reveal',
@@ -153,7 +153,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v34':'styles.css?v=20261014-subtitle-width-v1';
+  const expectedStyles=path==='index.html'?'styles.css?v=20261026-waymaking-editorial-v35':'styles.css?v=20261014-subtitle-width-v1';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
