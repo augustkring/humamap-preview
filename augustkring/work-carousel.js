@@ -1,67 +1,99 @@
 (() => {
   const carousel = document.querySelector('[data-work-carousel]');
   if (!carousel) return;
-
   const track = carousel.querySelector('[data-work-track]');
-  const controls = carousel.querySelector('[data-work-controls]');
-  const previous = carousel.querySelector('[data-work-prev]');
-  const next = carousel.querySelector('[data-work-next]');
+  const pagination = carousel.querySelector('[data-work-pagination]');
   const status = carousel.querySelector('[data-work-status]');
   const cards = Array.from(track.querySelectorAll('.work-card'));
-  if (cards.length < 2) return;
+  if (!track || !pagination || cards.length < 2) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const clampIndex = value => Math.max(0, Math.min(cards.length - 1, value));
   const maxScroll = () => Math.max(0, track.scrollWidth - track.clientWidth);
-  const step = () => cards[1].getBoundingClientRect().left - cards[0].getBoundingClientRect().left;
-  const visible = () => {
-    const increment = step();
-    if (!increment) return cards.length;
-    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
-    return Math.min(cards.length, Math.max(1, Math.round((track.clientWidth + gap) / increment)));
-  };
-
-  const updateControls = () => {
+  const targetFor = index => {
     const last = maxScroll();
-    controls.hidden = last < 2;
-    previous.disabled = track.scrollLeft < 2;
-    next.disabled = track.scrollLeft >= last - 2;
+    return cards.length <= 1 ? 0 : last * (clampIndex(index) / (cards.length - 1));
+  };
+  const indexForScroll = () => {
+    const last = maxScroll();
+    if (last < 2) return 0;
+    return clampIndex(Math.round((track.scrollLeft / last) * (cards.length - 1)));
   };
 
-  const announce = () => {
-    const count = visible();
-    const current = Math.max(0, Math.min(cards.length - count, Math.round(track.scrollLeft / step())));
-    status.textContent = 'Showing ventures ' + (current + 1) + ' to ' + (current + count) + ' of ' + cards.length;
-  };
-
-  const move = direction => {
-    const increment = step();
-    if (!increment) return;
-    track.scrollTo({
-      left: Math.max(0, Math.min(maxScroll(), track.scrollLeft + direction * increment)),
-      behavior: reducedMotion.matches ? 'auto' : 'smooth'
-    });
-  };
-
-  previous.addEventListener('click', () => move(-1));
-  next.addEventListener('click', () => move(1));
+  let activeIndex = 0;
   let animationFrame = 0;
   let announcementTimer = 0;
+  const dots = cards.map((card, index) => {
+    const label = card.dataset.workLabel || 'Current focus ' + (index + 1);
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'work-carousel-dot';
+    dot.dataset.workDot = '';
+    dot.setAttribute('aria-label', 'Show ' + label + ' (' + (index + 1) + ' of ' + cards.length + ')');
+    dot.setAttribute('aria-controls', track.id);
+    dot.addEventListener('click', () => goTo(index, true));
+    dot.addEventListener('keydown', event => {
+      let nextIndex = null;
+      if (event.key === 'ArrowLeft') nextIndex = activeIndex - 1;
+      if (event.key === 'ArrowRight') nextIndex = activeIndex + 1;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = cards.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      const targetIndex = clampIndex(nextIndex);
+      goTo(targetIndex, true);
+      dots[targetIndex].focus();
+    });
+    pagination.append(dot);
+    return dot;
+  });
+
+  const setActive = index => {
+    activeIndex = clampIndex(index);
+    dots.forEach((dot, dotIndex) => {
+      if (dotIndex === activeIndex) {
+        dot.setAttribute('aria-current', 'true');
+        dot.tabIndex = 0;
+      } else {
+        dot.removeAttribute('aria-current');
+        dot.tabIndex = -1;
+      }
+    });
+  };
+  const announce = () => {
+    const label = cards[activeIndex].dataset.workLabel || 'Current focus ' + (activeIndex + 1);
+    status.textContent = label + ', card ' + (activeIndex + 1) + ' of ' + cards.length;
+  };
+  function goTo(index, shouldAnnounce = false) {
+    const nextIndex = clampIndex(index);
+    setActive(nextIndex);
+    track.scrollTo({ left: targetFor(nextIndex), behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+    if (shouldAnnounce) {
+      window.clearTimeout(announcementTimer);
+      announcementTimer = window.setTimeout(announce, reducedMotion.matches ? 0 : 220);
+    }
+  }
   track.addEventListener('scroll', () => {
     if (!animationFrame) {
-      animationFrame = window.requestAnimationFrame(() => {
-        animationFrame = 0;
-        updateControls();
-      });
+      animationFrame = window.requestAnimationFrame(() => { animationFrame = 0; setActive(indexForScroll()); });
     }
     window.clearTimeout(announcementTimer);
     announcementTimer = window.setTimeout(announce, 180);
   }, { passive: true });
+  track.addEventListener('keydown', event => {
+    if (event.target !== track || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+    event.preventDefault();
+    goTo(activeIndex + (event.key === 'ArrowRight' ? 1 : -1), true);
+  });
 
   track.setAttribute('data-work-enhanced', '');
-  if (typeof ResizeObserver === 'function') {
-    new ResizeObserver(updateControls).observe(track);
-  } else {
-    window.addEventListener('resize', updateControls);
-  }
-  updateControls();
+  pagination.hidden = maxScroll() < 2;
+  setActive(indexForScroll());
+  const syncAfterResize = () => {
+    pagination.hidden = maxScroll() < 2;
+    track.scrollTo({ left: targetFor(activeIndex), behavior: 'auto' });
+    setActive(activeIndex);
+  };
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => window.requestAnimationFrame(syncAfterResize)).observe(track);
+  else window.addEventListener('resize', syncAfterResize);
 })();
