@@ -273,7 +273,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   color: var(--ink);
   font-size: var(--editorial-h1-size);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.04;
   letter-spacing: -.045em;
   text-wrap: balance;
 }
@@ -510,7 +510,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   font-family: 'AKOutfit', Arial, sans-serif;
   font-size: clamp(24px, 2.35vw, 28px);
   font-weight: 700;
-  line-height: 1.04;
+  line-height: 1.1;
   letter-spacing: -.032em;
   text-wrap: balance;
 }
