@@ -19,12 +19,12 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"5b5cb1d2","footer":"bf408a89","tokens":"3fe414f6","contact":"4d5aa686"};
+const approved={"main":"d5c646af","footer":"35675fc9","tokens":"79885db3","contact":"254c04c6"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
   tokens:digest(part(css,':root {','\n}')),
-  contact:digest(part(css,'/* Homepage closing signoff:','.home-footer {\n  padding: 34px'))
+  contact:digest(part(css,'/* Homepage closing signoff:','\n.home-footer {'))
 };
 for(const [key,val] of Object.entries(approved)) {
   assert.equal(actual[key],val,'Approved homepage/CSS changed: '+key);
@@ -145,30 +145,45 @@ for(const copy of workParagraphs){
 
 assert.ok(css.includes('-webkit-tap-highlight-color: transparent;')&&css.includes('.mobile-menu-toggle:focus-visible svg'),'Mobile menu must keep pointer feedback clean and keyboard focus visible');
 assert.ok(!css.includes('outline: 2px solid var(--red); outline-offset: 2px; background: transparent; color: var(--red);'),'Mobile menu controls must never use the retired red focus ring');
-assert.ok(css.includes('grid-template-columns: minmax(0, 1fr) auto;'),'Homepage signoff must use the approved signature/actions composition');
-assert.ok(!html.includes('Let’s connect')&&!html.includes('With curiosity and optimism'),'Homepage close must remain a pure signoff');
+assert.ok(css.includes('grid-template-columns: var(--contact-columns);'),'Homepage signoff must use the shared contact-column token');
+assert.ok(html.includes('<p class="signoff-note">With curiosity and optimism,</p>'),'Approved personal signoff missing');
+assert.ok(!html.includes('Let’s connect'),'Retired contact heading returned');
+assert.ok(html.includes('data-work-pagination')&&!html.includes('data-work-prev')&&!html.includes('data-work-next'),'Current focus must use dots instead of arrows');
+assert.equal((html.match(/data-work-label=/g)||[]).length,4,'Each current-focus card needs one navigation label');
+assert.ok(css.includes('.work-carousel-dot[aria-current="true"]')&&css.includes('width: 44px;')&&css.includes('height: 44px;'),'Current-focus dot states/touch targets missing');
 assert.ok(html.includes('Read my perspectives')&&!html.includes('Explore my perspectives'),'Homepage perspective link wording drift');
 assert.ok(!html.includes('class="perspective-links"'),'Homepage perspective preview cards must remain removed');
 assert.ok(!html.includes('waymaking-ventures')&&!html.includes('<sup>™</sup>'),'Waymaking focus logo must remain free of Ventures and TM');
 assert.ok(css.includes('.waymaking-beat:last-child {\n  padding-bottom: 0;')&&css.includes('.work-section--waymaking-output {\n  padding-top: var(--section-space);'),'Purpose-to-current-focus spacing must use one section gap');
-assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, 390px);\n}"),'Shared 390px subtitle measure missing');
+for(const token of ['--font-body:','--font-display:','--accent:','--surface-card:','--measure-reading:','--measure-narrow:','--radius-sm:','--focus-ring-width:','--section-space:','--section-space-mobile:']) {
+  assert.ok(css.includes(token),'Shared design-system token missing: '+token);
+}
+assert.ok(css.includes('--about-section-space: var(--section-space);'),'About spacing must inherit the homepage section rhythm');
+assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
+assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, var(--measure-narrow));\n}"),'Shared 390px subtitle measure missing');
 assert.ok(css.includes('.hero-copy > .hero-focus {\n  width: 100%;\n  max-width: none;'),'Approved full-column homepage hero description missing');
 assert.ok(css.includes('max-width: 900px;\n  margin-inline: auto;\n  padding: clamp(50px, 5vw, 66px) 0 clamp(68px, 7vw, 92px);\n  text-align: center;'),'Perspectives hero must stay centred');
 assert.ok(css.includes('.perspectives-library { width: min(100%, 840px); margin-inline: auto;'),'Perspectives article column must stay centred');
 assert.ok(css.includes('@media (max-width: 760px) {\n  .homepage-contact-content'),'Contact mobile stacking missing');
+
+const workCarousel=readFileSync(join(root,'work-carousel.js'),'utf8');
+assert.ok(workCarousel.includes("dot.dataset.workDot = ''")&&workCarousel.includes("aria-current")&&workCarousel.includes("prefers-reduced-motion"),'Dot carousel interaction/accessibility contract missing');
+assert.ok(!workCarousel.includes('data-work-prev')&&!workCarousel.includes('data-work-next'),'Retired arrow control logic returned');
 
 const license=readFileSync(join(root,'assets','waymaking-dry-brush-LICENSE.txt'),'utf8');
 assert.ok(license.includes('MIT License'),'Waymaking brush license attribution must remain preserved');
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles=path==='index.html'?'styles.css?v=20261026-homepage-final-v38':'styles.css?v=20261026-shared-v3';
+  const expectedStyles='styles.css?v=20261026-shared-v4';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
   const footer=part(page,'<footer class="home-footer"','</footer>');
-  assert.ok(footer.includes('>About</a>')&&footer.includes('>Perspectives</a>')&&footer.includes('>LinkedIn</a>'),'Shared footer navigation drift: '+path);
-  assert.ok(!footer.includes('Subscribe to Perspectives')&&!footer.includes('ak@augustkring.com'),'Shared footer must remain navigation-first: '+path);
+  assert.ok(footer.includes('href="mailto:ak@augustkring.com">Email</a>'),'Footer email action missing: '+path);
+  assert.ok(footer.includes('>Connect on LinkedIn</a>'),'Footer LinkedIn action missing: '+path);
+  assert.ok(footer.includes('href="perspectives/#subscribe">Subscribe to Perspectives</a>'),'Footer Perspectives subscription action missing: '+path);
+  assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: editorial Waymaking, protected homepage copy, responsive structure and shared site baseline');
+console.log('PASS: editorial homepage, dot carousel, personal signoff, utility footer and shared design-system baseline');
