@@ -246,6 +246,17 @@ jobs:
                   assert.ok(/(?:rgba\(0,\s*0,\s*0,\s*0\)|transparent)/.test(tap),
                     'Dark Safari tap overlay still present: '+tap);
                   await page.locator('[data-mobile-nav-close]').click();
+                  const closedToggle=await page.locator('[data-mobile-nav-open]').evaluate(el=>({
+                    color:getComputedStyle(el).color,
+                    outlineStyle:getComputedStyle(el).outlineStyle,
+                    outlineWidth:getComputedStyle(el).outlineWidth,
+                    boxShadow:getComputedStyle(el).boxShadow,
+                    focused:document.activeElement===el
+                  }));
+                  assert.equal(closedToggle.color,'rgb(11, 34, 61)','Closed burger must stay dark');
+                  assert.ok(closedToggle.outlineStyle==='none'||closedToggle.outlineWidth==='0px','Closed burger must never keep an outline');
+                  assert.equal(closedToggle.boxShadow,'none','Closed burger must never keep a focus shadow');
+                  assert.equal(closedToggle.focused,false,'Pointer-close must not leave focus on the burger');
                 }
                 assert.equal(editorial.hasHomepageStory,false);
                 const waymaking=await page.evaluate(()=>{
