@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v10"
-          expected_shared="styles.css?v=20261026-shared-v10"
+          expected_home="styles.css?v=20261026-shared-v11"
+          expected_shared="styles.css?v=20261026-shared-v11"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -584,25 +584,29 @@ jobs:
                 await page.waitForFunction(() => document.querySelector('.about-personality-explorer')?.classList.contains('is-enhanced'));
                 const aboutProof=await page.evaluate(()=>{
                   const q=selector=>document.querySelector(selector);
+                  const qa=selector=>[...document.querySelectorAll(selector)];
                   const cs=selector=>getComputedStyle(q(selector));
                   const y=selector=>q(selector).getBoundingClientRect().top+scrollY;
-                  const panel=q('.about-personality-panel:not([hidden])');
-                  const tabs=[...document.querySelectorAll('.about-personality-tab')];
+                  const tabs=qa('.about-personality-tab');
                   const tablist=q('.about-personality-tabs');
+                  const panel=q('.about-personality-panel:not([hidden])');
                   return {
                     hero:q('#about-page-title').textContent.trim(),
+                    heroLead:q('.about-personal-lead').textContent.trim(),
                     h1:parseFloat(cs('.about-personal-copy h1').fontSize),
                     h2:parseFloat(cs('.about-section-lead h2').fontSize),
                     lead:parseFloat(cs('.about-personal-lead').fontSize),
                     leadFamily:cs('.about-personal-lead').fontFamily,
                     storyTitle:q('#story-title').textContent.trim(),
-                    storyBeatTitles:[...document.querySelectorAll('.about-story-beat h3')].map(e=>e.textContent.trim()),
+                    storyBeatTitles:qa('.about-story-beat h3').map(e=>e.textContent.trim()),
                     storyFontSize:parseFloat(cs('.about-story-beat p').fontSize),
                     order:[y('#story'),y('#toolkit'),y('#personality')],
                     toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
-                    skillCount:document.querySelectorAll('.about-toolkit-skills .about-toolkit-list article').length,
-                    mindsetCount:document.querySelectorAll('.about-toolkit-mindset .about-toolkit-list article').length,
+                    toolkitIntros:[q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim()],
+                    skillCount:qa('.about-toolkit-skills .about-toolkit-list article').length,
+                    mindsetCount:qa('.about-toolkit-mindset .about-toolkit-list article').length,
                     personalityTitle:q('#personality-title').textContent.trim(),
+                    personalityLead:q('#personality .about-section-lead > p').textContent.trim(),
                     tabLabels:tabs.map(e=>e.textContent.trim()),
                     tabWrap:getComputedStyle(tablist).flexWrap,
                     tabOverflow:getComputedStyle(tablist).overflowX,
@@ -610,22 +614,29 @@ jobs:
                     selectedColor:getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
                     panelBackground:getComputedStyle(panel).backgroundColor,
                     panelPaddingTop:parseFloat(getComputedStyle(panel).paddingTop),
+                    activeLensTitle:q('.about-personality-panel:not([hidden]) h3').textContent.trim(),
+                    lensParagraphCount:qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
+                    metadataCount:qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning').length,
                     profileLink:q('.about-profile-link').textContent.trim(),
+                    emDash:q('main').innerText.includes('—'),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('About V2 public proof',width,aboutProof);
+                console.log('About V3 public proof',width,aboutProof);
                 assert.equal(aboutProof.hero,'Hi, I’m August.');
+                assert.equal(aboutProof.heroLead,'I’ve always been drawn to building things and figuring out how they could work better. Today, that curiosity sits where people, business and technology meet.');
                 assert.ok(Math.abs(aboutProof.h1-homepageTypography.h1)<.2,'About H1 matches homepage');
                 assert.ok(Math.abs(aboutProof.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
                 assert.ok(Math.abs(aboutProof.lead-homepageTypography.lead)<.2&&aboutProof.leadFamily===homepageTypography.leadFamily,'About lead matches homepage');
-                assert.equal(aboutProof.storyTitle,'The story so far.');
-                assert.deepEqual(aboutProof.storyBeatTitles,['Early years','At 18','A reset','Building again']);
+                assert.equal(aboutProof.storyTitle,'How I got here.');
+                assert.deepEqual(aboutProof.storyBeatTitles,['Started early','At 18','Learning my limits','Back to building']);
                 assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Personality');
                 assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
-                assert.equal(aboutProof.skillCount,6);
+                assert.deepEqual(aboutProof.toolkitIntros,['What I know how to do.','How I approach the work.']);
+                assert.equal(aboutProof.skillCount,5);
                 assert.equal(aboutProof.mindsetCount,5);
                 assert.equal(aboutProof.personalityTitle,'Different lenses. Same person.');
+                assert.equal(aboutProof.personalityLead,'None of these define me. I use them to notice patterns in how I think and work, and I pay most attention to where they overlap.');
                 assert.deepEqual(aboutProof.tabLabels,['Big Five','BG5','MBTI','Enneagram','Human Design']);
                 assert.equal(aboutProof.tabWrap,'nowrap');
                 assert.equal(aboutProof.tabOverflow,'auto');
@@ -633,7 +644,11 @@ jobs:
                 assert.equal(aboutProof.selectedColor,'rgb(218, 56, 49)');
                 assert.equal(aboutProof.panelBackground,'rgba(0, 0, 0, 0)');
                 assert.ok(aboutProof.panelPaddingTop<.5,'Personality panel is not a card');
+                assert.equal(aboutProof.activeLensTitle,'Curious, energetic, structured and direct.');
+                assert.equal(aboutProof.lensParagraphCount,2);
+                assert.equal(aboutProof.metadataCount,0);
                 assert.equal(aboutProof.profileLink,'View my LinkedIn profile');
+                assert.equal(aboutProof.emDash,false);
                 assert.ok(Math.abs(aboutProof.storyFontSize-18)<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) {
@@ -701,8 +716,8 @@ jobs:
             { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 18 },
             { path: '', selector: '.work-card p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-toolkit-list p', desktop: 16, mobile: 17 },
-            { path: 'about/', selector: '.about-personality-intro', desktop: 17, mobile: 18 },
-            { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-lens-copy p', desktop: 17, mobile: 18 },
+            { path: 'about/', selector: '.about-lens-copy p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-story-beat p', desktop: 18, mobile: 18 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
             { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 18 },
