@@ -193,14 +193,29 @@ a:focus-visible {
 .mobile-menu-close:is(:focus, :focus-visible, :active) {
   outline: none; box-shadow: none;
 }
-/* Keyboard focus uses the approved red accent; pointer taps never show navy fills. */
+/* Menu controls stay visually dark in every state. Keyboard focus is shown
+   only by a slightly stronger icon stroke; pointer/touch never leaves a ring. */
 .mobile-menu-toggle:focus-visible,
-.mobile-menu-close:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; background: transparent; color: var(--red); }
-html[data-nav-pointer] .mobile-menu-toggle:focus-visible,
-html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparent; }
+.mobile-menu-close:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink);
+}
 .mobile-menu-toggle svg { width: 30px; height: 30px; }
 .mobile-menu-close svg { width: 28px; height: 28px; }
-.mobile-menu-toggle svg, .mobile-menu-close svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mobile-menu-toggle svg,
+.mobile-menu-close svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mobile-menu-toggle:focus-visible svg,
+.mobile-menu-close:focus-visible svg { stroke-width: 2.35; }
+html[data-nav-pointer] .mobile-menu-toggle:focus-visible svg,
+html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8; }
 .mobile-menu-dialog {
   position: fixed; inset: 0; width: 100%; max-width: none; height: 100vh;
   height: 100dvh; max-height: none; margin: 0; padding: 0;
