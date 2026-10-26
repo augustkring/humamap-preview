@@ -508,7 +508,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   margin: 0;
   color: var(--ink);
   font-family: 'AKOutfit', Arial, sans-serif;
-  font-size: clamp(24px, 2.35vw, 28px);
+  font-size: clamp(21px, calc(2vw - 2px), 26px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -.032em;
@@ -1580,7 +1580,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
     grid-template-columns: minmax(210px, .72fr) minmax(0, 1.28fr);
     column-gap: clamp(30px, 5vw, 52px);
   }
-  .waymaking-copy h3 { font-size: clamp(24px, 3.4vw, 27px); }
   .waymaking-copy p { font-size: var(--card-copy-size); }
   .work-section--waymaking-output { padding-top: 52px; }
 }
@@ -1593,7 +1592,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible { background: transparen
   }
   .waymaking-copy h3 {
     max-width: 100%;
-    font-size: clamp(23px, 6.4vw, 26px);
     line-height: 1.06;
   }
   .waymaking-copy p {
