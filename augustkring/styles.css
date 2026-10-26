@@ -349,6 +349,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .work-section {
   padding-top: var(--section-space);
 }
+.thread-section { padding-bottom: 0; }
 
 .perspective-story {
   display: grid;
