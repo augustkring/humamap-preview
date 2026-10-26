@@ -46,7 +46,7 @@
   <link rel="preload" href="assets/fonts/Figtree-Latin-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/august-portrait-hero.webp" as="image" type="image/webp" fetchpriority="high">
 
-  <link rel="stylesheet" href="styles.css?v=20261026-homepage-final-v38">
+  <link rel="stylesheet" href="styles.css?v=20261026-shared-v4">
 
   <script type="application/ld+json">
   {
@@ -229,14 +229,10 @@
         <div class="work-heading-copy">
           <h2 id="work-title">My current focus</h2>
         </div>
-        <div class="work-carousel-controls" data-work-controls hidden aria-label="Browse ventures">
-          <button class="work-carousel-button" type="button" data-work-prev aria-label="Previous venture" aria-controls="work-carousel-track"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M16 10H4m5-5-5 5 5 5"/></svg></button>
-          <button class="work-carousel-button" type="button" data-work-next aria-label="Next venture" aria-controls="work-carousel-track"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></button>
-        </div>
       </header>
 
       <div class="work-grid" id="work-carousel-track" data-work-track role="region" aria-roledescription="carousel" aria-label="Ventures and projects" tabindex="0">
-        <article class="work-card work-card--linked">
+        <article class="work-card work-card--linked" data-work-label="Blentera">
           <a class="work-card-link" href="https://blentera.com/" target="_blank" rel="noopener noreferrer" aria-label="Blentera: Read more at blentera.com (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><img class="work-brand-image work-brand-blentera" src="assets/blentera-horizontal-color.svg" width="563" height="113" alt="Blentera" loading="lazy" decoding="async"></span></h3>
             <p>Blentera gives companies a shared foundation for AI. It brings knowledge, ways of working, governance and AI capability together, so the whole business can keep what it learns, build on what works and stay in control as models, agents, tools and providers continue to change.</p>
@@ -247,7 +243,7 @@
           </a>
         </article>
 
-        <article class="work-card work-card--linked">
+        <article class="work-card work-card--linked" data-work-label="August Works">
           <a class="work-card-link" href="https://augustworks.dk/" target="_blank" rel="noopener noreferrer" aria-label="August Works: Read more at augustworks.dk (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><img class="work-brand-image work-brand-august" src="assets/august-works-logo.png" width="1024" height="146" alt="August Works" loading="lazy" decoding="async"></span></h3>
             <p>August Works brings AI into the everyday work of established businesses. AI employees take on real tasks alongside existing teams, giving the company more capacity, making better use of people’s time and reducing the amount of knowledge that depends on any one employee.</p>
@@ -258,7 +254,7 @@
           </a>
         </article>
 
-        <article class="work-card work-card--linked">
+        <article class="work-card work-card--linked" data-work-label="HumaMap">
           <a class="work-card-link" href="https://humamap.com/" target="_blank" rel="noopener noreferrer" aria-label="HumaMap: Read more at humamap.com (opens in a new tab)">
             <h3 class="work-brand-title"><span class="work-brand"><img class="work-brand-image work-brand-humamap" src="assets/humamap-logo.png" width="1200" height="249" alt="HumaMap" loading="lazy" decoding="async"></span></h3>
             <p>HumaMap makes the people side of work easier to understand. It helps people understand themselves and each other, turn differences into strengths and work better together, while giving leaders a clearer basis for decisions about people, teams, roles and collaboration.</p>
@@ -269,7 +265,7 @@
           </a>
         </article>
 
-        <article class="work-card work-card--static">
+        <article class="work-card work-card--static" data-work-label="Waymaking">
           <div class="work-card-content">
             <h3 class="work-brand-title">
               <span class="work-brand">
@@ -280,6 +276,7 @@
           </div>
         </article>
       </div>
+      <div class="work-carousel-pagination" data-work-pagination role="group" aria-label="Choose current focus card" hidden></div>
       <span class="sr-only" aria-live="polite" aria-atomic="true" data-work-status></span>
     </section>
 
@@ -307,6 +304,7 @@
     <section class="homepage-contact" aria-label="Contact August Kring">
       <div class="homepage-contact-content">
         <div class="personal-signoff homepage-contact-signoff">
+          <p class="signoff-note">With curiosity and optimism,</p>
           <img class="signoff-signature" src="assets/august-signature-vector-fine.svg?v=20261009-fine-ink-v1" alt="Handwritten signature of August Kring" width="340" height="314" loading="lazy" decoding="async">
           <p class="signoff-name">August Kring</p>
         </div>
@@ -320,17 +318,17 @@
   </main>
 
   <footer class="home-footer">
-    <nav class="footer-links" aria-label="Footer navigation">
-      <a href="about/">About</a>
-      <a href="perspectives/">Perspectives</a>
-      <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">LinkedIn</a>
+    <nav class="footer-links" aria-label="Footer actions">
+      <a href="mailto:ak@augustkring.com">Email</a>
+      <a href="https://www.linkedin.com/in/augustkring/" target="_blank" rel="me noopener">Connect on LinkedIn</a>
+      <a href="perspectives/#subscribe">Subscribe to Perspectives</a>
     </nav>
     <div class="footer-meta">
       <span>© 2026 August Kring</span>
       <a href="privacy/">Privacy</a>
     </div>
   </footer>
-  <script src="work-carousel.js" defer></script>
+  <script src="work-carousel.js?v=20261026-dots-v1" defer></script>
   <script src="mobile-nav.js?v=20261026-dark-focus-v5" defer></script>
 </body>
 </html>
