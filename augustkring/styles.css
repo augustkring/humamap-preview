@@ -1184,7 +1184,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   display: block;
   margin-bottom: 8px;
   color: var(--ink);
-  font: 700 11.5px/1.2 'AKOutfit', Arial, sans-serif;
+  font: 700 11.5px/1.2 var(--font-display);
   letter-spacing: .04em;
   text-transform: uppercase;
 }
@@ -1203,7 +1203,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .about-personality-markers span {
   color: var(--ink);
-  font: 500 12.5px/1.45 'AKFigtree', Arial, sans-serif;
+  font: 500 12.5px/1.45 var(--font-body);
 }
 .about-personality-markers span:not(:last-child)::after {
   content: '·';
