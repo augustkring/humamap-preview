@@ -48,7 +48,7 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-waymaking-editorial-v34"
+          expected_home="styles.css?v=20261026-waymaking-editorial-v35"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
@@ -95,7 +95,7 @@ jobs:
           grep -Fq 'grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);' /tmp/augustkring.css
           grep -Fq '.waymaking-beat + .waymaking-beat {' /tmp/augustkring.css
           grep -Fq 'border-top: 1px solid var(--line);' /tmp/augustkring.css
-          grep -Fq 'font-size: clamp(24px, 2.35vw, 28px);' /tmp/augustkring.css
+          grep -Fq 'font-size: clamp(21px, calc(2vw - 2px), 26px);' /tmp/augustkring.css
           grep -Fq 'font-size: var(--card-copy-size);' /tmp/augustkring.css
           ! grep -Fq '.waymaking-signature' /tmp/augustkring.css
           grep -Fq '@media (max-width: 700px) {' /tmp/augustkring.css
@@ -284,7 +284,7 @@ jobs:
                   assert.equal(row.display,'grid','Editorial row must use grid');
                   if(index===0) assert.ok(row.borderTop<.5,'First Waymaking row must not have a top divider');
                   else assert.ok(row.borderTop>=.5,'Internal Waymaking hairline divider missing');
-                  assert.ok(row.headingSize>=22.9&&row.headingSize<=28.1,'Waymaking heading scale drift');
+                  assert.ok(row.headingSize>=20.9&&row.headingSize<=26.1,'Waymaking heading scale drift');
                   assert.ok(row.bodySize>=15.9&&row.bodySize<=16.1,'Waymaking body must use the existing 16px card scale');
                   if(width>700){
                     assert.ok(row.heading.right<=row.paragraph.left-20,'Desktop heading/body columns collide');
