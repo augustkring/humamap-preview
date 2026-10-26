@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v9"
-          expected_shared="styles.css?v=20261026-shared-v9"
+          expected_home="styles.css?v=20261026-shared-v10"
+          expected_shared="styles.css?v=20261026-shared-v10"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -581,65 +581,66 @@ jobs:
 
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/about/',{waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
-                const aboutProof = await page.evaluate(() => {
-                  const hero=document.querySelector('.about-personal-hero');
-                  const story=document.querySelector('#story');
-                  const skills=document.querySelector('#skills');
-                  const paragraphs=[...document.querySelectorAll('#story .about-story-content p')];
-                  const externalLinks=[...document.querySelectorAll('#story .about-story-content p a')].map(a=>({text:a.textContent.trim(),href:a.href}));
-                  const style=getComputedStyle(paragraphs[0]);
+                await page.waitForFunction(() => document.querySelector('.about-personality-explorer')?.classList.contains('is-enhanced'));
+                const aboutProof=await page.evaluate(()=>{
+                  const q=selector=>document.querySelector(selector);
+                  const cs=selector=>getComputedStyle(q(selector));
+                  const y=selector=>q(selector).getBoundingClientRect().top+scrollY;
+                  const panel=q('.about-personality-panel:not([hidden])');
+                  const tabs=[...document.querySelectorAll('.about-personality-tab')];
+                  const tablist=q('.about-personality-tabs');
                   return {
-                    heading:document.querySelector('#story-title')?.textContent.trim(),
-                    paragraphCount:paragraphs.length,
-                    earlyRoots:paragraphs[0]?.textContent.includes('entrepreneurial family') && paragraphs[0]?.textContent.includes('early teens'),
-                    earlyResponsibility:paragraphs[1]?.textContent.includes('At 18') && paragraphs[2]?.textContent.includes('lean startup environment'),
-                    burnout:paragraphs[3]?.textContent.includes('burnt out'),
-                    recovery:paragraphs[4]?.textContent.includes('human-centred'),
-                    aiShift:paragraphs[5]?.textContent.includes('generative AI'),
-                    subsequentWork:paragraphs[6]?.textContent.includes('KRING'),
-                    currentWork:paragraphs[7]?.textContent.includes("building ventures again"),
-                    storyTop:story?.getBoundingClientRect().top + scrollY,
-                    skillsTop:skills?.getBoundingClientRect().top + scrollY,
-                    heroBottom:hero?.getBoundingClientRect().bottom + scrollY,
-                    fontSize:parseFloat(style.fontSize),
-                    externalLinks,
-                    ctaMetrics:(() => {
-                      const span=document.querySelector('#story .about-story-link span');
-                      const box=span.getBoundingClientRect();
-                      return { height:box.height, fontSize:parseFloat(getComputedStyle(span).fontSize), text:span.textContent.trim() };
-                    })(),
+                    hero:q('#about-page-title').textContent.trim(),
+                    h1:parseFloat(cs('.about-personal-copy h1').fontSize),
+                    h2:parseFloat(cs('.about-section-lead h2').fontSize),
+                    lead:parseFloat(cs('.about-personal-lead').fontSize),
+                    leadFamily:cs('.about-personal-lead').fontFamily,
+                    storyTitle:q('#story-title').textContent.trim(),
+                    storyBeatTitles:[...document.querySelectorAll('.about-story-beat h3')].map(e=>e.textContent.trim()),
+                    storyFontSize:parseFloat(cs('.about-story-beat p').fontSize),
+                    order:[y('#story'),y('#toolkit'),y('#personality')],
+                    toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
+                    skillCount:document.querySelectorAll('.about-toolkit-skills .about-toolkit-list article').length,
+                    mindsetCount:document.querySelectorAll('.about-toolkit-mindset .about-toolkit-list article').length,
+                    personalityTitle:q('#personality-title').textContent.trim(),
+                    tabLabels:tabs.map(e=>e.textContent.trim()),
+                    tabWrap:getComputedStyle(tablist).flexWrap,
+                    tabOverflow:getComputedStyle(tablist).overflowX,
+                    tabScrollable:tablist.scrollWidth>tablist.clientWidth+1,
+                    selectedColor:getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
+                    panelBackground:getComputedStyle(panel).backgroundColor,
+                    panelPaddingTop:parseFloat(getComputedStyle(panel).paddingTop),
+                    profileLink:q('.about-profile-link').textContent.trim(),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('About chronology and concrete proof',width,aboutProof);
-                const aboutType=await page.evaluate(()=>({
-                  h1:parseFloat(getComputedStyle(document.querySelector('.about-personal-copy h1')).fontSize),
-                  h2:parseFloat(getComputedStyle(document.querySelector('.about-story-intro h2')).fontSize),
-                  lead:parseFloat(getComputedStyle(document.querySelector('.about-personal-lead')).fontSize),
-                  leadFamily:getComputedStyle(document.querySelector('.about-personal-lead')).fontFamily,
-                  skills:[...document.querySelectorAll('.about-skill-grid h3')].map(e=>e.textContent.trim())
-                }));
-                assert.ok(Math.abs(aboutType.h1-homepageTypography.h1)<.2,'About H1 matches homepage');
-                assert.ok(Math.abs(aboutType.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
-                assert.ok(Math.abs(aboutType.lead-homepageTypography.lead)<.2 && aboutType.leadFamily===homepageTypography.leadFamily,'About lead matches homepage font');
-                assert.deepEqual(aboutType.skills,['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM','Strategic Leadership']);
-                const aboutSubtitleWidths=await page.evaluate(()=>[...document.querySelectorAll('.about-personal-lead, .about-home-lead > p, .about-principles-intro > p')].map(el=>({
-                  text:el.textContent.trim(),
-                  width:el.getBoundingClientRect().width
-                })));
-                assert.ok(aboutSubtitleWidths.length>=4,'About subtitles should all be included');
-                for(const entry of aboutSubtitleWidths) assert.ok(entry.width<=390.5,'About subtitle must stay within shared 390px measure: '+entry.text);
-                assert.equal(aboutProof.heading,'The story so far.');
-                assert.equal(aboutProof.paragraphCount,8);
-                assert.ok(aboutProof.earlyRoots && aboutProof.earlyResponsibility && aboutProof.burnout && aboutProof.recovery && aboutProof.aiShift && aboutProof.subsequentWork && aboutProof.currentWork);
-                assert.ok(aboutProof.skillsTop >= aboutProof.heroBottom - 1 && aboutProof.storyTop > aboutProof.skillsTop,'Current About order keeps skills before story');
-                assert.deepEqual(aboutProof.externalLinks,[]);
-                assert.equal(aboutProof.ctaMetrics.text,'View my LinkedIn profile');
-                assert.ok(aboutProof.ctaMetrics.height <= aboutProof.ctaMetrics.fontSize*1.5,
-                  'LinkedIn link stays on one rendered line without shrinking or clipping');
-                assert.ok(Math.abs(aboutProof.fontSize-18)<.1);
+                console.log('About V2 public proof',width,aboutProof);
+                assert.equal(aboutProof.hero,'Hi, I’m August.');
+                assert.ok(Math.abs(aboutProof.h1-homepageTypography.h1)<.2,'About H1 matches homepage');
+                assert.ok(Math.abs(aboutProof.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
+                assert.ok(Math.abs(aboutProof.lead-homepageTypography.lead)<.2&&aboutProof.leadFamily===homepageTypography.leadFamily,'About lead matches homepage');
+                assert.equal(aboutProof.storyTitle,'The story so far.');
+                assert.deepEqual(aboutProof.storyBeatTitles,['Early years','At 18','A reset','Building again']);
+                assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Personality');
+                assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
+                assert.equal(aboutProof.skillCount,6);
+                assert.equal(aboutProof.mindsetCount,5);
+                assert.equal(aboutProof.personalityTitle,'Different lenses. Same person.');
+                assert.deepEqual(aboutProof.tabLabels,['Big Five','BG5','MBTI','Enneagram','Human Design']);
+                assert.equal(aboutProof.tabWrap,'nowrap');
+                assert.equal(aboutProof.tabOverflow,'auto');
+                if(width<=390) assert.equal(aboutProof.tabScrollable,true,'Mobile personality tabs must swipe horizontally');
+                assert.equal(aboutProof.selectedColor,'rgb(218, 56, 49)');
+                assert.equal(aboutProof.panelBackground,'rgba(0, 0, 0, 0)');
+                assert.ok(aboutProof.panelPaddingTop<.5,'Personality panel is not a card');
+                assert.equal(aboutProof.profileLink,'View my LinkedIn profile');
+                assert.ok(Math.abs(aboutProof.storyFontSize-18)<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
-                if(width===390||width===1440) await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
+                if(width===390||width===1440) {
+                  await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
+                  await page.locator('#toolkit').screenshot({path:`/tmp/ak-browser-check/about-toolkit-${width}.png`});
+                  await page.locator('#personality').screenshot({path:`/tmp/ak-browser-check/about-personality-${width}.png`});
+                }
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/perspectives/',{waitUntil:'networkidle',timeout:45000});
                 await page.evaluate(() => document.fonts.ready);
                 const perspectivesType=await page.evaluate(()=>({
@@ -699,10 +700,10 @@ jobs:
             { path: '', selector: '.waymaking-copy p', desktop: 16, mobile: 17 },
             { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 18 },
             { path: '', selector: '.work-card p', desktop: 16, mobile: 17 },
-            { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-toolkit-list p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-personality-intro', desktop: 17, mobile: 18 },
             { path: 'about/', selector: '.about-personality-meaning p', desktop: 16, mobile: 17 },
-            { path: 'about/', selector: '.about-story-content p', desktop: 18, mobile: 18 },
+            { path: 'about/', selector: '.about-story-beat p', desktop: 18, mobile: 18 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
             { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 18 },
             { path: 'perspectives/rethinking-the-company/', selector: '.article-prose > p:not(.article-lead)', desktop: 18, mobile: 18 },
@@ -754,7 +755,7 @@ jobs:
                   // Representative 200%-sized prose at narrow viewports checks text
                   // growth and wrapping; this is not a complete WCAG conformance audit.
                   if (width===390) {
-                    const selected=route===''?'.thread-copy p':route==='about/'?'.about-skill-grid p':'.article-prose > p:not(.article-lead)';
+                    const selected=route===''?'.thread-copy p':route==='about/'?'.about-toolkit-list p':'.article-prose > p:not(.article-lead)';
                     await page.locator(selected).first().evaluate(e=>{e.style.fontSize='34px';e.style.lineHeight='1.5';});
                     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`Scaled text must reflow on ${route||'home'}`);
                   }
