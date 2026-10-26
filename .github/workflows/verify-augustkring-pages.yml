@@ -48,15 +48,14 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261025-waymaking-copy-v31"
-          expected_road_js="waymaking-scroll.js?v=20261022-waymaking-v28"
+          expected_home="styles.css?v=20261026-waymaking-editorial-v32"
           expected_shared="styles.css?v=20261014-subtitle-width-v1"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
             echo "Attempt ${attempt}: public HTML HTTP ${status}"
-            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_road_js" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html && grep -Fq '<h3>Creative Thinking</h3>' /tmp/augustkring.html && grep -Fq '<h3>Commercial Understanding</h3>' /tmp/augustkring.html && grep -Fq '<h3>Strategic Judgement</h3>' /tmp/augustkring.html && grep -Fq '<h3>Hands-On Execution</h3>' /tmp/augustkring.html && grep -Fq '<h3>Purpose &amp; Impact</h3>' /tmp/augustkring.html; then
-              echo "Approved Waymaking homepage, stylesheet and script are published."
+            if [ "$status" = "200" ] && grep -Fq "$expected_home" /tmp/augustkring.html && grep -Fq "$expected_copy" /tmp/augustkring.html && grep -Fq "Waymaking Ventures builds businesses" /tmp/augustkring.html && grep -Fq '<h3>Creative Thinking</h3>' /tmp/augustkring.html && grep -Fq '<h3>Commercial Understanding</h3>' /tmp/augustkring.html && grep -Fq '<h3>Strategic Judgement</h3>' /tmp/augustkring.html && grep -Fq '<h3>Hands-On Execution</h3>' /tmp/augustkring.html && grep -Fq '<h3>Purpose &amp; Impact</h3>' /tmp/augustkring.html; then
+              echo "Approved editorial Waymaking homepage and stylesheet are published."
               break
             fi
             if [ "$attempt" = "24" ]; then echo "::error::Public HTML is not updated"; exit 1; fi
@@ -71,36 +70,19 @@ jobs:
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
           grep -Fq '<h2 id="work-title">My current focus</h2>' /tmp/augustkring.html
           grep -Fq 'aria-label="Waymaking" data-waymaking-story' /tmp/augustkring.html
+          grep -Fq 'class="waymaking-copy-column" role="list"' /tmp/augustkring.html
+          test "$(grep -Fc 'role="listitem"' /tmp/augustkring.html)" -eq 5
+          grep -Fq 'class="waymaking-signature" aria-hidden="true"' /tmp/augustkring.html
           ! grep -Fq 'What I mean by Waymaker' /tmp/augustkring.html
-          ! grep -Fq 'id="waymaking-title"' /tmp/augustkring.html
-          grep -Fq 'class="waymaking-original-source"' /tmp/augustkring.html
-          grep -Fq 'class="waymaking-original-reveal"' /tmp/augustkring.html
-          grep -Fq 'src="assets/waymaking-ink-v25.webp"' /tmp/augustkring.html
-          grep -Fq 'waymaking-scroll.js?v=20261022-waymaking-v28' /tmp/augustkring.html
-          grep -Fq '<path data-waymaking-reveal-path' /tmp/augustkring.html
-          grep -Fq 'pathLength="1"' /tmp/augustkring.html
-          grep -Fq 'mask-type="alpha"' /tmp/augustkring.html
-          grep -Fq 'stroke-width="190"' /tmp/augustkring.html
-          grep -Fq 'stroke-linecap="round"' /tmp/augustkring.html
-          grep -Fq 'M 294,-132' /tmp/augustkring.html
-          ! grep -Fq 'data-waymaking-brush-tip' /tmp/augustkring.html
-          ! grep -Fq 'data-waymaking-complete' /tmp/augustkring.html
-          ! grep -Fq 'waymaking-brush-head-v24.png' /tmp/augustkring.html
+          ! grep -Fq 'waymaking-scroll.js' /tmp/augustkring.html
+          ! grep -Fq 'waymaking-road-wrap' /tmp/augustkring.html
+          ! grep -Fq 'waymaking-artspace' /tmp/augustkring.html
           grep -Fq 'Purpose &amp; Impact</h3>' /tmp/augustkring.html
           grep -Fq 'Hands-On Execution</h3>' /tmp/augustkring.html
           grep -Fq 'customer value, sound economics' /tmp/augustkring.html
-          grep -Fq 'Creative Thinking</h3>' /tmp/augustkring.html
-          grep -Fq 'Commercial Understanding</h3>' /tmp/augustkring.html
           grep -Fq 'Strategic Judgement</h3>' /tmp/augustkring.html
-          grep -Fq 'maskUnits="userSpaceOnUse"' /tmp/augustkring.html
-          ! grep -Fq 'waymaking-brush.js' /tmp/augustkring.html
-          ! grep -Fq 'roughjs@4.6.6' /tmp/augustkring.html
-          ! grep -Fq 'perfect-freehand' /tmp/augustkring.html
-          ! grep -Fq 'waymaking-road.js' /tmp/augustkring.html
           grep -Fq "How that shows up in what I'm building today." /tmp/augustkring.html
           grep -Fq "Blentera is the company’s AI foundation." /tmp/augustkring.html
-          ! grep -Fq "For me, that" /tmp/augustkring.html
-          ! grep -Fq 'class="waymaking-resolution"' /tmp/augustkring.html
           grep -Fq 'waymaking-ventures">Ventures</span>' /tmp/augustkring.html
           ! grep -Fq '<h2 id="about-title">My story</h2>' /tmp/augustkring.html
           grep -Fq '<p class="signoff-name">August Kring</p>' /tmp/augustkring.html
@@ -109,52 +91,17 @@ jobs:
           curl -fsSL --max-time 20 "${base}${expected_home}" -o /tmp/augustkring.css
           grep -Fq 'text-wrap: wrap;' /tmp/augustkring.css
           grep -Fq 'html[data-nav-pointer] .mobile-menu-close:focus-visible' /tmp/augustkring.css
-          grep -Fq 'max-width: none;' /tmp/augustkring.css
-          grep -Fq '.waymaking-road-wrap {' /tmp/augustkring.css
-          grep -Fq 'position: absolute;' /tmp/augustkring.css
-          ! grep -Fq 'body > .waymaking-road-wrap' /tmp/augustkring.css
-          grep -Fq '.waymaking-original-source' /tmp/augustkring.css
-          grep -Fq '.waymaking-scene' /tmp/augustkring.css
-          grep -Fq '.waymaking-original-reveal' /tmp/augustkring.css
-          grep -Fq 'grid-template-columns: minmax(100px, 36%) minmax(0, 1fr);' /tmp/augustkring.css
-          ! grep -Fq '.waymaking-copy-column::before' /tmp/augustkring.css
-          ! grep -Fq '.waymaking-copy-column::after' /tmp/augustkring.css
-          grep -Fq '.waymaking-beat:nth-child(odd)' /tmp/augustkring.css
-          grep -Fq '.waymaking-beat:nth-child(even)' /tmp/augustkring.css
-          ! grep -Fq '.waymaking-painted-edge--body' /tmp/augustkring.css
-          ! grep -Fq '.waymaking-painted-edge--texture' /tmp/augustkring.css
-          for art in waymaking-ink-road-brush.png waymaking-ink-road-brush-mobile.png; do
-            curl -fsSL --max-time 20 "${base}assets/${art}" -o "/tmp/${art}"
-            test "$(xxd -p -l 8 "/tmp/${art}")" = "89504e470d0a1a0a"
-            test "$(wc -c < "/tmp/${art}")" -gt 100000
-          done
-          curl -fsSL --max-time 20 "${base}assets/waymaking-editorial-ink.avif" -o /tmp/waymaking-editorial-ink.avif
-          test "$(xxd -p -s 4 -l 8 /tmp/waymaking-editorial-ink.avif)" = "6674797061766966"
-          test "$(wc -c < /tmp/waymaking-editorial-ink.avif)" -gt 4000
-          curl -fsSL --max-time 20 "${base}assets/waymaking-brush-head-v24.png" -o /tmp/waymaking-brush-head-v24.png
-          test "$(xxd -p -l 8 /tmp/waymaking-brush-head-v24.png)" = "89504e470d0a1a0a"
-          test "$(wc -c < /tmp/waymaking-brush-head-v24.png)" -gt 20000
-          curl -fsSL --max-time 20 "${base}assets/waymaking-ink-v25.webp" -o /tmp/waymaking-ink-v25.webp
-          test "$(xxd -p -l 4 /tmp/waymaking-ink-v25.webp)" = "52494646"
-          test "$(xxd -p -s 8 -l 4 /tmp/waymaking-ink-v25.webp)" = "57454250"
-          curl -fsSL --max-time 20 "${base}waymaking-scroll.js?v=20261022-waymaking-v28" -o /tmp/waymaking-scroll.js
-          grep -Fq "prefers-reduced-motion: reduce" /tmp/waymaking-scroll.js
-          grep -Fq 'const schedule = () =>' /tmp/waymaking-scroll.js
-          grep -Fq "revealPath.setAttribute('stroke-dashoffset'" /tmp/waymaking-scroll.js
-          ! grep -Fq 'getPointAtLength' /tmp/waymaking-scroll.js
-          ! grep -Fq 'completedMask' /tmp/waymaking-scroll.js
-          ! grep -Fq 'brushTip' /tmp/waymaking-scroll.js
-          grep -Fq 'Math.exp(-elapsed / 32)' /tmp/waymaking-scroll.js
-          grep -Fq 'const roadTarget = () =>' /tmp/waymaking-scroll.js
-          ! grep -Fq 'document.body.appendChild(road)' /tmp/waymaking-scroll.js
-          grep -Fq 'road.dataset.waymakingDocument' /tmp/waymaking-scroll.js
-          ! grep -Fq 'updateBackdropClip' /tmp/waymaking-scroll.js
-          ! grep -Fq -- '--waymaking-viewport-top' /tmp/waymaking-scroll.js
-          ! grep -Fq "!picture.currentSrc.endsWith('.avif')" /tmp/waymaking-scroll.js
-          ! grep -Fq 'waymakingRoadActive' /tmp/waymaking-scroll.js
-          ! grep -Fq 'data-waymaking-viewport' /tmp/waymaking-scroll.js
-          ! grep -Fq '.waymaking-road-surface' /tmp/augustkring.css
-          ! grep -Fq '.waymaking-road-underlay' /tmp/augustkring.css
+          grep -Fq '/* Waymaking editorial: five parallel facets, hierarchy before decoration. */' /tmp/augustkring.css
+          grep -Fq 'grid-template-columns: minmax(230px, .78fr) minmax(0, 1.22fr);' /tmp/augustkring.css
+          grep -Fq 'border-bottom: 1px solid var(--line);' /tmp/augustkring.css
+          grep -Fq "mask: url('assets/waymaking-dry-brush.png') center / contain no-repeat;" /tmp/augustkring.css
+          grep -Fq '@media (max-width: 700px) {' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-road-wrap' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-artspace' /tmp/augustkring.css
+          ! grep -Fq '.waymaking-beat:nth-child(odd)' /tmp/augustkring.css
+          curl -fsSL --max-time 20 "${base}assets/waymaking-dry-brush.png" -o /tmp/waymaking-dry-brush.png
+          test "$(xxd -p -l 8 /tmp/waymaking-dry-brush.png)" = "89504e470d0a1a0a"
+          test "$(wc -c < /tmp/waymaking-dry-brush.png)" -gt 1000
           curl -fsSL --max-time 20 "${base}assets/blentera-horizontal-color.svg" -o /dev/null
           grep -Fq '.personal-signoff .signoff-name {' /tmp/augustkring.css
           grep -Fq '.personal-signoff .signoff-signature {' /tmp/augustkring.css
@@ -297,173 +244,62 @@ jobs:
                   await page.locator('[data-mobile-nav-close]').click();
                 }
                 assert.equal(editorial.hasHomepageStory,false);
-                const positions=await page.evaluate(()=>{
+                const waymaking=await page.evaluate(()=>{
+                  const section=document.querySelector('.waymaking-narrative');
                   const beats=[...document.querySelectorAll('.waymaking-beat')];
+                  const signature=document.querySelector('.waymaking-signature');
+                  const box=el=>{
+                    const b=el.getBoundingClientRect();
+                    return {top:b.top,left:b.left,right:b.right,bottom:b.bottom,width:b.width,height:b.height};
+                  };
                   return {
                     titles:beats.map(x=>x.querySelector('h3').textContent.trim()),
-                    centers:beats.map(x=>{
-                      const b=x.getBoundingClientRect();
-                      return scrollY+b.top+b.height*.5;
+                    overflow:document.documentElement.scrollWidth>innerWidth+1,
+                    hasRoad:!!document.querySelector('.waymaking-road-wrap,.waymaking-artspace,.waymaking-original-reveal'),
+                    hasRoadScript:[...document.scripts].some(x=>x.src.includes('waymaking-scroll.js')),
+                    section:box(section),
+                    signature:box(signature),
+                    signatureMask:getComputedStyle(signature).webkitMaskImage||getComputedStyle(signature).maskImage,
+                    rows:beats.map(x=>{
+                      const copy=x.querySelector('.waymaking-copy');
+                      const heading=x.querySelector('h3');
+                      const paragraph=x.querySelector('p');
+                      return {
+                        row:box(x),heading:box(heading),paragraph:box(paragraph),
+                        display:getComputedStyle(copy).display,
+                        border:parseFloat(getComputedStyle(x).borderBottomWidth),
+                        headingSize:parseFloat(getComputedStyle(heading).fontSize),
+                        bodySize:parseFloat(getComputedStyle(paragraph).fontSize)
+                      };
                     })
                   };
                 });
-                assert.deepEqual(positions.titles,[
+                assert.deepEqual(waymaking.titles,[
                   'Creative Thinking','Commercial Understanding','Strategic Judgement',
                   'Hands-On Execution','Purpose & Impact'
                 ]);
-                const stages=[];
-                let documentTop=null;
-                let previousTop=null;
-                let previousScroll=null;
-                for(let index=0;index<5;index++){
-                  await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
-                    positions.centers[index]-900*.52);
-                  await page.waitForTimeout(390);
-                  const state=await page.evaluate(()=>{
-                    const story=document.querySelector('[data-waymaking-story]');
-                    const road=document.querySelector('.waymaking-artspace > .waymaking-road-wrap');
-                    const artspace=document.querySelector('.waymaking-artspace');
-                    const svg=road.querySelector('.waymaking-original-reveal');
-                    const drawPath=svg.querySelector('[data-waymaking-reveal-path]');
-                    const overlays=svg.querySelectorAll(
-                      '[data-waymaking-brush-tip],[data-waymaking-complete],radialGradient');
-                    const beats=[...story.querySelectorAll('.waymaking-beat')];
-                    const box=x=>{
-                      const b=x.getBoundingClientRect();
-                      return {top:b.top,left:b.left,right:b.right,bottom:b.bottom,
-                        width:b.width,height:b.height};
-                    };
-                    const route=box(road);
-                    const art=box(artspace);
-                    const source=road.querySelector('.waymaking-original-source img');
-                    return {
-                      fraction:Number(story.dataset.waymakingProgress),
-                      emphasis:beats.map(x=>Number(x.dataset.waymakingEmphasis)),
-                      scrollY,
-                      route,
-                      artspace:art,
-                      routeDocumentTop:scrollY+route.top,
-                      artspaceDocumentTop:scrollY+art.top,
-                      texts:beats.map(x=>box(x.querySelector('.waymaking-copy'))),
-                      offset:Number(drawPath.getAttribute('stroke-dashoffset')),
-                      maskWidth:Number(drawPath.getAttribute('stroke-width')),
-                      maskCap:drawPath.getAttribute('stroke-linecap'),
-                      offscreenStart:drawPath.getAttribute('d').startsWith('M 294,-132'),
-                      overlayCount:overlays.length,
-                      animated:story.dataset.waymakingAnimated==='true',
-                      position:getComputedStyle(road).position,
-                      parent:road.parentElement===artspace,
-                      artSource:source.getAttribute('src'),
-                      resolution:[source.naturalWidth,source.naturalHeight],
-                      paintSource:svg.querySelector('image')?.getAttribute('href'),
-                      opaqueBacking:!!svg.querySelector('[data-waymaking-original-pixels] rect,foreignObject'),
-                      overflow:document.documentElement.scrollWidth>innerWidth+1,
-                      opacity:Number(getComputedStyle(road).opacity)
-                    };
-                  });
-                  assert.equal(state.position,'absolute','Road must be document-anchored');
-                  assert.equal(state.parent,true,'Road must remain in Waymaking artspace');
-                  const expectedOpacity=width<=600?.21:width<=900?.24:1;
-                  assert.ok(Math.abs(state.opacity-expectedOpacity)<.011,
-                    'Static ink opacity changed with scrolling');
-                  assert.equal(state.artSource,'assets/waymaking-ink-v25.webp');
-                  assert.equal(state.paintSource,'assets/waymaking-ink-v25.webp');
-                  assert.deepEqual(state.resolution,[1440,4296],
-                    'Transparent artwork must be served at full high resolution');
-                  assert.equal(state.opaqueBacking,false,'No backing rectangle');
-                  assert.equal(state.animated,true,'Scroll controller not running');
-                  assert.ok(state.fraction>=0&&state.fraction<=1,'Road progression out of range');
-                  assert.ok(Math.abs(state.offset-(1-state.fraction))<0.003,
-                    'Painted path must track normalized scroll progress');
-                  assert.equal(state.maskWidth,190,'Mask must not extend into adjacent bends');
-                  assert.equal(state.maskCap,'round','Paintbrush edge must be naturally rounded');
-                  assert.equal(state.offscreenStart,true,'Brush must enter from outside the image, never pop into view');
-                  assert.equal(state.overlayCount,0,
-                    'No independent brush-tip or completion overlay may appear');
-                  if(index===0)assert.ok(state.fraction>.01,'Beginning of road not visible at first Waymaking chapter');
-                  console.log('Waymaking reading stage',width,index,state.fraction,state.emphasis);
-                  if(index>0)assert.ok(state.fraction>stages[index-1].fraction+.04,
-                    'Road must keep growing, not pause at discrete chapter steps');
-                  for(let previous=0;previous<=index;previous++){
-                    assert.ok(state.emphasis[previous]>.975,
-                      'Previously read title or paragraph faded out while reading later chapters');
-                  }
-                  if(documentTop===null)documentTop=state.routeDocumentTop;
-                  assert.ok(Math.abs(state.routeDocumentTop-documentTop)<1,
-                    'Road moved within the document while scrolling');
-                  assert.ok(Math.abs(state.routeDocumentTop-state.artspaceDocumentTop)<1,
-                    'Road lost its artspace anchor');
-                  if(previousTop!==null){
-                    assert.ok(state.scrollY>previousScroll,'Scroll did not advance');
-                    assert.ok(state.route.top<previousTop-40,
-                      'Road erroneously stays fixed below browser chrome');
-                  }
-                  previousTop=state.route.top;
-                  previousScroll=state.scrollY;
-                  const overlap=(x,y)=>
-                    Math.max(0,Math.min(x.right,y.right)-Math.max(x.left,y.left))*
-                    Math.max(0,Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top));
-                  if(width>900) for(const copy of state.texts){
-                    assert.equal(overlap(state.route,copy),0,'Desktop ink overlaps readable text');
-                  }
-                  if(width<=900) {
-                    assert.ok(state.texts.every(copy=>copy.width>=state.artspace.width*.94),
-                      'Mobile Waymaking text must occupy the full-width reading column');
-                    assert.ok(Math.abs(state.route.left+state.route.width/2-
-                      (state.artspace.left+state.artspace.width/2))<2,
-                      'Mobile ink must be centred behind the text');
-                  }
-                  assert.equal(state.overflow,false,'Horizontal page overflow');
-                  stages.push(state);
-                  if([320,390,1440].includes(width)){
-                    await page.screenshot({path:'/tmp/ak-browser-check/waymaking-progressive-'+width+'-'+index+'.png'});
+                assert.equal(waymaking.hasRoad,false,'Retired central road returned');
+                assert.equal(waymaking.hasRoadScript,false,'Retired Waymaking scroll script returned');
+                assert.equal(waymaking.overflow,false,'Waymaking creates horizontal overflow');
+                assert.ok(waymaking.signature.width>=70&&waymaking.signature.width<=105,'Brush signature scale drift');
+                assert.ok(waymaking.signatureMask&&waymaking.signatureMask!=='none','Brush signature mask missing');
+                const rowHeights=waymaking.rows.map(x=>x.row.height);
+                assert.ok(Math.max(...rowHeights)-Math.min(...rowHeights)<=95,'Waymaking row rhythm is too uneven');
+                for(const [index,row] of waymaking.rows.entries()){
+                  assert.equal(row.display,'grid','Editorial row must use grid');
+                  assert.ok(row.border>=.5,'Editorial hairline divider missing');
+                  assert.ok(row.headingSize>=26,'Waymaking heading too small');
+                  assert.ok(row.bodySize>=16,'Waymaking body copy too small');
+                  if(width>700){
+                    assert.ok(row.heading.right<=row.paragraph.left-20,'Desktop heading/body columns collide');
+                    assert.ok(Math.abs(row.heading.top-row.paragraph.top)<=8,'Desktop heading/body top alignment drift');
+                    assert.ok(row.paragraph.width>=280,'Desktop body column too narrow');
+                  }else{
+                    assert.ok(row.paragraph.top>=row.heading.bottom+10,'Mobile heading/body must stack');
+                    assert.ok(Math.abs(row.heading.left-row.paragraph.left)<=2,'Mobile left alignment drift');
+                    assert.ok(row.paragraph.width>=waymaking.section.width*.92,'Mobile body copy must use available width');
                   }
                 }
-                assert.ok(stages.at(-1).fraction-stages[0].fraction>.45,
-                  'Ink reveal is not growing through the section');
-
-                // Verify intermediate samples, not merely five checkpoints.
-                const transition=[];
-                const first=positions.centers[0]-900*.52;
-                const last=positions.centers[4]-900*.52;
-                for(let step=0;step<=12;step++){
-                  await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),
-                    first+(last-first)*step/12);
-                  await page.waitForTimeout(245);
-                  transition.push(await page.evaluate(()=>
-                    Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress)));
-                }
-                for(let step=1;step<transition.length;step++){
-                  assert.ok(transition[step]>=transition[step-1]-.005,
-                    'Ink unexpectedly reversed while scrolling down');
-                  assert.ok(transition[step]-transition[step-1]<.16,
-                    'Ink animation jumps in large discrete steps');
-                }
-                assert.ok(new Set(transition.map(x=>x.toFixed(3))).size>=10,
-                  'Painting remains divided into visible chapters');
-
-                const workY=await page.locator('#work-title').evaluate(el=>
-                  scrollY+el.getBoundingClientRect().top-innerHeight*.30);
-                await page.evaluate(y=>scrollTo({top:Math.max(0,y),behavior:'instant'}),workY);
-                await page.waitForTimeout(430);
-                const after=await page.locator('.waymaking-road-wrap').evaluate(el=>({
-                  bottom:el.getBoundingClientRect().bottom,
-                  position:getComputedStyle(el).position,
-                  progress:Number(document.querySelector('[data-waymaking-story]').dataset.waymakingProgress),
-                  overlayCount:el.querySelectorAll('[data-waymaking-brush-tip],[data-waymaking-complete]').length,
-                  offset:Number(el.querySelector('[data-waymaking-reveal-path]').getAttribute('stroke-dashoffset'))
-                }));
-                assert.equal(after.position,'absolute','Road must not be viewport pinned');
-                assert.equal(after.progress,1,'Road must finish fully painted');
-                assert.equal(after.overlayCount,0,'Completed road cannot flash a second mask layer');
-                assert.equal(after.offset,0,'Final path must have zero dashoffset');
-                const workTop=await page.locator('#work-title').evaluate(el=>el.getBoundingClientRect().top);
-                assert.ok(after.bottom<=workTop-24,'Ink overlaps My current focus');
-                await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),workY+900*.55);
-                await page.waitForTimeout(240);
-                assert.ok(await page.locator('.waymaking-road-wrap').evaluate(el=>
-                  el.getBoundingClientRect().bottom<=1),
-                  'Ink continues into the current-focus cards');
 
                 assert.ok(editorial.statementTypeface.includes('AKFigtree'),'Perspective statement uses Figtree without changing its weight or scale');
                 assert.equal(editorial.statementWeight,'700');
@@ -746,7 +582,7 @@ jobs:
           const base = 'https://augustkring.github.io/humamap-preview/augustkring/';
           const cases = [
             { path: '', selector: '.thread-copy p', desktop: 18, mobile: 17 },
-            { path: '', selector: '.waymaking-copy p', desktop: 18, mobile: 16 },
+            { path: '', selector: '.waymaking-copy p', desktop: 18, mobile: 17 },
             { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 17 },
             { path: '', selector: '.work-card p', desktop: 16, mobile: 16 },
             { path: 'about/', selector: '.about-skill-grid p', desktop: 16, mobile: 16 },
