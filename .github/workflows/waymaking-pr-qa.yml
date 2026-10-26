@@ -34,6 +34,7 @@ jobs:
           CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME_BIN"
           ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=chromium ROAD_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-viewport-road.cjs
+          ABOUT_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ABOUT_OUTPUT=artifacts ABOUT_ENGINES=chromium ABOUT_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-about-layout.cjs
       - name: Upload actual-browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
