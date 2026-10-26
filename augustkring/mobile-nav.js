@@ -27,7 +27,11 @@
     needsCloseCleanup = false;
     root.classList.remove('nav-open');
     opener.setAttribute('aria-expanded', 'false');
-    if (!desktop.matches) opener.focus({ preventScroll: true });
+    if (!desktop.matches && !root.hasAttribute('data-nav-pointer')) {
+      opener.focus({ preventScroll: true });
+    } else if (document.activeElement === opener) {
+      opener.blur();
+    }
   };
 
   const closeMenu = () => {
