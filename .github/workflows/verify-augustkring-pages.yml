@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v12"
-          expected_shared="styles.css?v=20261026-shared-v12"
+          expected_home="styles.css?v=20261026-shared-v13"
+          expected_shared="styles.css?v=20261026-shared-v13"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -591,70 +591,70 @@ jobs:
                   const tablist=q('.about-personality-tabs');
                   const panel=q('.about-personality-panel:not([hidden])');
                   const storyParagraphs=qa('.about-story-prose p');
+                  const explorer=cs('.about-personality-explorer');
                   return {
-                    hero:q('#about-page-title').textContent.trim(),
-                    heroLead:q('.about-personal-lead').textContent.trim(),
-                    heroLink:q('.about-hero-link').textContent.trim(),
-                    h1:parseFloat(cs('.about-personal-copy h1').fontSize),
-                    h2:parseFloat(cs('.about-section-lead h2').fontSize),
-                    lead:parseFloat(cs('.about-personal-lead').fontSize),
-                    leadFamily:cs('.about-personal-lead').fontFamily,
-                    storyTitle:q('#story-title').textContent.trim(),
+                    heroCount:qa('.about-personal-hero').length,
+                    h1:q('#story-title').textContent.trim(),
+                    h1Size:parseFloat(cs('#story-title').fontSize),
                     storyParagraphCount:storyParagraphs.length,
                     storyHasSubheads:qa('#story h3').length>0,
                     storyFontSize:parseFloat(cs('.about-story-prose p').fontSize),
+                    chronology:q('.about-story-link').textContent.trim(),
                     order:[y('#story'),y('#toolkit'),y('#personality')],
                     toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
-                    toolkitIntros:[q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim()],
                     skillCount:qa('.about-toolkit-skills .about-toolkit-list article').length,
                     mindsetCount:qa('.about-toolkit-mindset .about-toolkit-list article').length,
                     personalityTitle:q('#personality-title').textContent.trim(),
-                    personalityLeadCount:qa('#personality > .about-section-lead > p').length,
                     tabLabels:tabs.map(e=>e.textContent.trim()),
-                    tabWrap:getComputedStyle(tablist).flexWrap,
+                    tabOrientation:tablist.getAttribute('aria-orientation'),
+                    tabDirection:getComputedStyle(tablist).flexDirection,
                     tabOverflow:getComputedStyle(tablist).overflowX,
                     tabScrollable:tablist.scrollWidth>tablist.clientWidth+1,
+                    explorerDisplay:explorer.display,
+                    explorerColumns:explorer.gridTemplateColumns.split(' ').filter(Boolean).length,
                     selectedColor:getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
                     panelBackground:getComputedStyle(panel).backgroundColor,
                     panelPaddingTop:parseFloat(getComputedStyle(panel).paddingTop),
-                    lensDisplay:cs('.about-lens-layout').display,
                     activeLensTitle:q('.about-personality-panel:not([hidden]) h3').textContent.trim(),
                     lensParagraphCount:qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
+                    panelCount:qa('.about-personality-panel').length,
                     metadataCount:qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning').length,
-                    bottomProfileCtaCount:qa('.about-profile-cta,.about-profile-link').length,
                     emDash:q('main').innerText.includes('—'),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('About V4 public proof',width,aboutProof);
-                assert.equal(aboutProof.hero,'Hi, I’m August.');
-                assert.equal(aboutProof.heroLead,'I’ve spent most of my working life close to new ideas, early-stage businesses and the messy work of turning possibilities into something real. What keeps me interested is how people, business and technology can come together to create useful, positive change.');
-                assert.equal(aboutProof.heroLink,'Connect on LinkedIn');
-                assert.ok(Math.abs(aboutProof.h1-homepageTypography.h1)<.2,'About H1 matches homepage');
-                assert.ok(Math.abs(aboutProof.h2-homepageTypography.h2)<.2,'About H2 matches homepage');
-                assert.ok(Math.abs(aboutProof.lead-homepageTypography.lead)<.2&&aboutProof.leadFamily===homepageTypography.leadFamily,'About lead matches homepage');
-                assert.equal(aboutProof.storyTitle,'How I got here.');
+                console.log('About V5 public proof',width,aboutProof);
+                assert.equal(aboutProof.heroCount,0);
+                assert.equal(aboutProof.h1,'How I got here.');
+                assert.ok(Math.abs(aboutProof.h1Size-homepageTypography.h1)<.2,'About H1 matches homepage');
                 assert.equal(aboutProof.storyParagraphCount,5);
                 assert.equal(aboutProof.storyHasSubheads,false);
+                assert.equal(aboutProof.chronology,'For the full chronology, see LinkedIn');
                 assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Personality');
                 assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
-                assert.deepEqual(aboutProof.toolkitIntros,['What I bring when an idea needs to become something useful and commercially real.','How I tend to think, decide and work when there is something worth building.']);
                 assert.equal(aboutProof.skillCount,5);
                 assert.equal(aboutProof.mindsetCount,5);
                 assert.equal(aboutProof.personalityTitle,'Different lenses. Same person.');
-                assert.equal(aboutProof.personalityLeadCount,0);
-                assert.deepEqual(aboutProof.tabLabels,['Big Five','BG5','MBTI','Enneagram','Human Design']);
-                assert.equal(aboutProof.tabWrap,'nowrap');
-                assert.equal(aboutProof.tabOverflow,'auto');
-                if(width<=390) assert.equal(aboutProof.tabScrollable,true,'Mobile personality tabs must swipe horizontally');
+                assert.deepEqual(aboutProof.tabLabels,['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
+                assert.equal(aboutProof.panelCount,7);
+                if(width<=840) {
+                  assert.equal(aboutProof.explorerDisplay,'block');
+                  assert.equal(aboutProof.tabOrientation,'horizontal');
+                  assert.equal(aboutProof.tabDirection,'row');
+                  assert.equal(aboutProof.tabOverflow,'auto');
+                  if(width<=390) assert.equal(aboutProof.tabScrollable,true,'Mobile lens navigation must swipe horizontally');
+                } else {
+                  assert.equal(aboutProof.explorerDisplay,'grid');
+                  assert.equal(aboutProof.explorerColumns,2);
+                  assert.equal(aboutProof.tabOrientation,'vertical');
+                  assert.equal(aboutProof.tabDirection,'column');
+                }
                 assert.equal(aboutProof.selectedColor,'rgb(218, 56, 49)');
                 assert.equal(aboutProof.panelBackground,'rgba(0, 0, 0, 0)');
-                assert.ok(aboutProof.panelPaddingTop<.5,'Personality panel is not a card');
-                assert.equal(aboutProof.lensDisplay,'block');
-                assert.equal(aboutProof.activeLensTitle,'Curious, energetic, structured and direct.');
+                assert.ok(aboutProof.panelPaddingTop<.5,'Lens panel is not a card');
+                assert.equal(aboutProof.activeLensTitle,'Highly open, extraverted, structured and unusually direct.');
                 assert.equal(aboutProof.lensParagraphCount,2);
                 assert.equal(aboutProof.metadataCount,0);
-                assert.equal(aboutProof.bottomProfileCtaCount,0);
                 assert.equal(aboutProof.emDash,false);
                 assert.ok(Math.abs(aboutProof.storyFontSize-18)<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
@@ -724,7 +724,6 @@ jobs:
             { path: '', selector: '.work-card p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-toolkit-list p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-lens-copy p', desktop: 17, mobile: 18 },
-            { path: 'about/', selector: '.about-lens-copy p', desktop: 16, mobile: 17 },
             { path: 'about/', selector: '.about-story-prose p', desktop: 18, mobile: 18 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
             { path: 'perspectives/', selector: '.perspective-index-summary', desktop: 17, mobile: 18 },
@@ -771,7 +770,7 @@ jobs:
                   await page.goto(base + route, {waitUntil:'networkidle',timeout:45000});
                   await page.evaluate(() => document.fonts.ready);
                   if (width===390||width===1440) {
-                    const section=route===''?'.thread-section':route==='about/'?'.about-skills':'.article-layout';
+                    const section=route===''?'.thread-section':route==='about/'?'#toolkit':'.article-layout';
                     await page.locator(section).first().screenshot({path:`/tmp/ak-browser-check/typography-${route.replaceAll('/','-')||'home'}-${width}.png`});
                   }
                   // Representative 200%-sized prose at narrow viewports checks text
