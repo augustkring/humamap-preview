@@ -177,8 +177,8 @@ assert.ok(css.includes('.about-story-link {\n  margin-top: clamp(26px, 3vw, 34px
 assert.ok(css.includes('.about-personal-hero { padding: 42px 0 62px; }'),'About mobile hero rhythm missing');
 assert.ok(css.includes('.about-story-bottom { padding: var(--section-space-mobile) 0; gap: 24px; }'),'About mobile story rhythm missing');
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
-assert.ok(css.includes("width: .54em; height: .54em;")&&css.includes("top: -.10em;"),'August Kring wordmark dot must remain exactly 2x the former diameter and optically centred');
-assert.ok(css.includes("width: .70em; height: .62em;")&&css.includes("top: -.14em;"),'Wordmark dot mask must scale with the enlarged red dot');
+assert.ok(css.includes("width: .54em; height: .54em;")&&css.includes("top: -.24em;"),'August Kring wordmark dot must remain exactly 2x the former diameter and grow upward from the original lower edge');
+assert.ok(!css.includes('.wordmark-i::before'),'August Kring wordmark must not use a white clearing halo behind the red dot');
 assert.ok(css.includes("--body-copy-size: 18px;")&&css.includes("--body-reading-size: 18px;")&&css.includes("--card-copy-size: 17px;"),'Mobile reading-size tokens must remain 18px / 17px');
 assert.ok(css.includes(".work-card { --venture-copy-size: 17px;"),'Mobile venture copy must use the 17px compact reading size');
 assert.ok(css.includes(".about-personality-intro { font-size: var(--body-copy-size); }"),'About personality intro must inherit 18px mobile body copy');
@@ -200,7 +200,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261026-shared-v7';
+  const expectedStyles='styles.css?v=20261026-shared-v8';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
@@ -211,4 +211,4 @@ for(const path of ['index.html','about/index.html','perspectives/index.html','pe
   assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: homepage/About baseline plus enlarged wordmark dot and mobile reading-size system');
+console.log('PASS: homepage/About baseline plus clean raised wordmark dot and mobile reading-size system');
