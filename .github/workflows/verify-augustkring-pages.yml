@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v14"
-          expected_shared="styles.css?v=20261026-shared-v14"
+          expected_home="styles.css?v=20261026-shared-v15"
+          expected_shared="styles.css?v=20261026-shared-v15"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -158,12 +158,12 @@ jobs:
           done
           for attempt in $(seq 1 30); do
             curl -fsSL --max-time 20 "${base}about/?verification=${GITHUB_SHA}" -o /tmp/augustkring-about.html
-            if grep -Fq '<h1 id="about-title">About.</h1>' /tmp/augustkring-about.html && grep -Fq '<h2 id="personality-title">Different lenses.</h2>' /tmp/augustkring-about.html && grep -Fq '<span>For the full chronology, see LinkedIn</span>' /tmp/augustkring-about.html && grep -Fq 'data-personality-tab="high5">HIGH5</button>' /tmp/augustkring-about.html && grep -Fq 'data-personality-tab="via">VIA</button>' /tmp/augustkring-about.html; then
-              echo "The About V6 rewritten copy and seven-lens profile are published."
+            if grep -Fq '<h1 id="about-page-title">Hi, I’m August.</h1>' /tmp/augustkring-about.html && grep -Fq 'I believe the future is shaped by what we choose to build together.' /tmp/augustkring-about.html && grep -Fq '<h2 id="story-title">My story.</h2>' /tmp/augustkring-about.html && grep -Fq '<h3>Entrepreneurial</h3>' /tmp/augustkring-about.html && grep -Fq '<h3>Connective</h3>' /tmp/augustkring-about.html && grep -Fq '<h2 id="principles-title">Principles.</h2>' /tmp/augustkring-about.html && grep -Fq '<h3>Think big. Start small. Scale fast.</h3>' /tmp/augustkring-about.html && grep -Fq '<h3>People, planet &amp; profit.</h3>' /tmp/augustkring-about.html; then
+              echo "The About V7 belief, mindset and principles revision is published."
               break
             fi
             if [ "$attempt" = "30" ]; then
-              echo "::error::GitHub Pages has not yet published the About V6 revision"
+              echo "::error::GitHub Pages has not yet published the About V7 revision"
               exit 1
             fi
             sleep 10
@@ -590,19 +590,24 @@ jobs:
                   const tabs=qa('.about-personality-tab');
                   const tablist=q('.about-personality-tabs');
                   const panel=q('.about-personality-panel:not([hidden])');
-                  const storyParagraphs=qa('.about-story-prose p');
                   const explorer=cs('.about-personality-explorer');
+                  const lengths=selector=>qa(selector).map(el=>el.textContent.trim().length);
                   return {
-                    h1:q('#about-title').textContent.trim(),
-                    h1Size:parseFloat(cs('#about-title').fontSize),
-                    storyParagraphCount:storyParagraphs.length,
-                    storyFontSize:parseFloat(cs('.about-story-prose p').fontSize),
+                    hero:q('#about-page-title').textContent.trim(),
+                    belief:q('.about-personal-belief').textContent.trim(),
+                    heroSize:parseFloat(cs('#about-page-title').fontSize),
+                    storyTitle:q('#story-title').textContent.trim(),
+                    storySize:parseFloat(cs('#story-title').fontSize),
+                    storyParagraphCount:qa('.about-story-prose p').length,
                     chronology:q('.about-story-link').textContent.trim(),
-                    order:[y('#story'),y('#toolkit'),y('#personality')],
+                    order:['story','toolkit','principles','personality'].map(id=>y('#'+id)),
                     toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
-                    toolkitIntros:[q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim()],
-                    skillCount:qa('.about-toolkit-skills .about-toolkit-list article').length,
-                    mindsetCount:qa('.about-toolkit-mindset .about-toolkit-list article').length,
+                    mindsetTitles:qa('.about-toolkit-mindset .about-toolkit-list h3').map(e=>e.textContent.trim()),
+                    skillLengths:lengths('.about-toolkit-skills .about-toolkit-list p'),
+                    mindsetLengths:lengths('.about-toolkit-mindset .about-toolkit-list p'),
+                    principlesTitle:q('#principles-title').textContent.trim(),
+                    principlesTitles:qa('.about-principles-list h3').map(e=>e.textContent.trim()),
+                    principlesLengths:lengths('.about-principles-list p'),
                     personalityTitle:q('#personality-title').textContent.trim(),
                     tabLabels:tabs.map(e=>e.textContent.trim()),
                     tabOrientation:tablist.getAttribute('aria-orientation'),
@@ -613,30 +618,31 @@ jobs:
                     explorerColumns:explorer.gridTemplateColumns.split(' ').filter(Boolean).length,
                     selectedColor:getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
                     panelBackground:getComputedStyle(panel).backgroundColor,
-                    panelPaddingTop:parseFloat(getComputedStyle(panel).paddingTop),
                     lensH3Count:qa('.about-personality-panel h3').length,
                     lensCopyCount:qa('.about-lens-copy').length,
                     lensParagraphCount:qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
-                    activeFirstParagraph:q('.about-personality-panel:not([hidden]) .about-lens-copy p')?.textContent.trim()||'',
-                    panelCount:qa('.about-personality-panel').length,
-                    metadataCount:qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning,.about-lens-layout').length,
                     emDash:q('main').innerText.includes('—'),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
                   };
                 });
-                console.log('About V6 public proof',width,aboutProof);
-                assert.equal(aboutProof.h1,'About.');
-                assert.ok(Math.abs(aboutProof.h1Size-homepageTypography.h1)<.2,'About H1 matches homepage');
+                console.log('About V7 public proof',width,aboutProof);
+                assert.equal(aboutProof.hero,'Hi, I’m August.');
+                assert.equal(aboutProof.belief,'I believe the future is shaped by what we choose to build together.');
+                assert.ok(Math.abs(aboutProof.heroSize-homepageTypography.h1)<.2,'About H1 matches homepage');
+                assert.equal(aboutProof.storyTitle,'My story.');
+                assert.ok(Math.abs(aboutProof.storySize-homepageTypography.h2)<.2,'About story H2 matches homepage');
                 assert.equal(aboutProof.storyParagraphCount,5);
                 assert.equal(aboutProof.chronology,'For the full chronology, see LinkedIn');
-                assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Personality');
+                assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Principles -> Personality');
                 assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
-                assert.deepEqual(aboutProof.toolkitIntros,['The capabilities I use most often when turning a new idea into a real product or business.','The principles that shape how I make decisions, work with others and move from idea to execution.']);
-                assert.equal(aboutProof.skillCount,5);
-                assert.equal(aboutProof.mindsetCount,5);
+                assert.deepEqual(aboutProof.mindsetTitles,['Entrepreneurial','Strategic','Curious','Adaptive','Connective']);
+                assert.ok(Math.max(...aboutProof.skillLengths)-Math.min(...aboutProof.skillLengths)<=16);
+                assert.ok(Math.max(...aboutProof.mindsetLengths)-Math.min(...aboutProof.mindsetLengths)<=10);
+                assert.equal(aboutProof.principlesTitle,'Principles.');
+                assert.deepEqual(aboutProof.principlesTitles,['Think big. Start small. Scale fast.','Execution over fear.','Learn, unlearn, relearn.','People, planet & profit.']);
+                assert.ok(Math.max(...aboutProof.principlesLengths)-Math.min(...aboutProof.principlesLengths)<=14);
                 assert.equal(aboutProof.personalityTitle,'Different lenses.');
                 assert.deepEqual(aboutProof.tabLabels,['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
-                assert.equal(aboutProof.panelCount,7);
                 if(width<=840) {
                   assert.equal(aboutProof.explorerDisplay,'block');
                   assert.equal(aboutProof.tabOrientation,'horizontal');
@@ -651,18 +657,16 @@ jobs:
                 }
                 assert.equal(aboutProof.selectedColor,'rgb(218, 56, 49)');
                 assert.equal(aboutProof.panelBackground,'rgba(0, 0, 0, 0)');
-                assert.ok(aboutProof.panelPaddingTop<.5,'Lens panel is not a card');
-                assert.equal(aboutProof.lensH3Count,0,'Lens panels have no slogan/result headings');
+                assert.equal(aboutProof.lensH3Count,0);
                 assert.equal(aboutProof.lensCopyCount,7);
                 assert.equal(aboutProof.lensParagraphCount,2);
-                assert.ok(aboutProof.activeFirstParagraph.startsWith('The clearest pattern in my Big Five results'));
-                assert.equal(aboutProof.metadataCount,0);
                 assert.equal(aboutProof.emDash,false);
-                assert.ok(Math.abs(aboutProof.storyFontSize-18)<.1);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) {
+                  await page.locator('.about-personal-hero').screenshot({path:`/tmp/ak-browser-check/about-hero-${width}.png`});
                   await page.locator('#story').screenshot({path:`/tmp/ak-browser-check/about-story-${width}.png`});
                   await page.locator('#toolkit').screenshot({path:`/tmp/ak-browser-check/about-toolkit-${width}.png`});
+                  await page.locator('#principles').screenshot({path:`/tmp/ak-browser-check/about-principles-${width}.png`});
                   await page.locator('#personality').screenshot({path:`/tmp/ak-browser-check/about-personality-${width}.png`});
                 }
                 await page.goto('https://augustkring.github.io/humamap-preview/augustkring/perspectives/',{waitUntil:'networkidle',timeout:45000});
