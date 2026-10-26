@@ -4,6 +4,7 @@ const { chromium, firefox, webkit } = require('playwright');
 const base = process.env.TYPE_BASE || 'http://127.0.0.1:8765/humamap-preview/augustkring/';
 const engines = (process.env.TYPE_ENGINES || 'chromium').split(',').map(v => v.trim()).filter(Boolean);
 const widths = (process.env.TYPE_WIDTHS || '320,390').split(',').map(Number).filter(Boolean);
+const output = process.env.TYPE_OUTPUT || '';
 
 const launch = async name => {
   const launcher = { chromium, firefox, webkit }[name];
@@ -86,6 +87,12 @@ const targets = [
         assert.ok(dotBottomRatio>=.295&&dotBottomRatio<=.305, engine+' '+width+' wordmark dot preserves the original .30em lower-edge spacing');
         assert.ok(wordmark.beforeContent==='none'||wordmark.beforeContent==='normal', engine+' '+width+' wordmark has no ::before halo content');
         assert.ok(wordmark.beforeBackground==='rgba(0, 0, 0, 0)'||wordmark.beforeBackground==='transparent', engine+' '+width+' wordmark has no white halo background');
+        if(output && (width===390 || width===1440)) {
+          await page.locator('.header-wordmark').screenshot({
+            path:output+'/wordmark-'+engine+'-'+width+'.png',
+            animations:'disabled'
+          });
+        }
 
         await page.close();
       }
