@@ -32,7 +32,6 @@ const close = (actual, expected, tolerance, label) => {
         await page.evaluate(() => document.fonts.ready);
         const home = await page.evaluate(() => ({
           h1: parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
-          h2: parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
           sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop)
         }));
 
@@ -57,9 +56,8 @@ const close = (actual, expected, tolerance, label) => {
           const mainText = q('main').innerText;
 
           return {
-            heroCount: qa('.about-personal-hero').length,
-            pageH1: q('#story-title').textContent.trim(),
-            h1Size: parseFloat(cs('#story-title').fontSize),
+            pageH1: q('#about-title').textContent.trim(),
+            h1Size: parseFloat(cs('#about-title').fontSize),
             storyPaddingTop: parseFloat(cs('#story').paddingTop),
             storyPaddingBottom: parseFloat(cs('#story').paddingBottom),
             sectionPads: ['#toolkit','#personality'].map(id => {
@@ -69,10 +67,11 @@ const close = (actual, expected, tolerance, label) => {
             order: ['story','toolkit','personality'].map(id => q('#'+id).getBoundingClientRect().top + scrollY),
             storyParagraphCount: storyParagraphs.length,
             storyWidth: rect('.about-story-prose').width,
-            storyHasSubheads: qa('#story h3').length > 0,
             chronologyText: q('.about-story-link').textContent.trim(),
             chronologyTop: rect('.about-story-link').top,
             storyLastBottom: storyParagraphs.at(-1).getBoundingClientRect().bottom,
+            skillIntro: q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),
+            mindsetIntro: q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim(),
             skillCount: skillRows.length,
             mindsetCount: mindsetRows.length,
             toolkitColumns: toolkit.gridTemplateColumns.split(' ').filter(Boolean).length,
@@ -92,28 +91,30 @@ const close = (actual, expected, tolerance, label) => {
             activeColor: getComputedStyle(q('.about-personality-tab[aria-selected="true"]')).color,
             panelBackground: getComputedStyle(activePanel).backgroundColor,
             panelPaddingTop: parseFloat(getComputedStyle(activePanel).paddingTop),
-            lensWidth: rect('.about-lens-layout').width,
-            lensHeadings: panels.map(panel => panel.querySelector('h3')?.textContent.trim()),
+            lensH3Count: qa('.about-personality-panel h3').length,
+            lensCopyCount: qa('.about-lens-copy').length,
             lensParagraphCounts: panels.map(panel => panel.querySelectorAll('.about-lens-copy p').length),
-            metadataCount: qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning').length,
+            activeParagraphs: qa('.about-personality-panel:not([hidden]) .about-lens-copy p').map(p => p.textContent.trim()),
+            metadataCount: qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning,.about-lens-layout').length,
             hasEmDash: mainText.includes('—'),
             overflow: document.documentElement.scrollWidth > innerWidth + 1
           };
         });
 
-        assert.equal(state.heroCount, 0, engine+' '+width+' About hero is removed');
-        assert.equal(state.pageH1, 'How I got here.');
-        close(state.h1Size, home.h1, .2, engine+' '+width+' About story H1 matches homepage H1');
+        assert.equal(state.pageH1, 'About.');
+        close(state.h1Size, home.h1, .2, engine+' '+width+' About H1 matches homepage H1');
         assert.equal(state.storyParagraphCount, 5);
         assert.ok(state.storyWidth <= 620.5, engine+' '+width+' story reading measure');
-        assert.equal(state.storyHasSubheads, false);
         assert.equal(state.chronologyText, 'For the full chronology, see LinkedIn');
         assert.ok(state.chronologyTop >= state.storyLastBottom + 22, engine+' '+width+' chronology CTA follows prose with breathing room');
         assert.deepEqual(state.order.slice().sort((a,b)=>a-b), state.order);
 
+        assert.equal(state.skillIntro, 'The capabilities I use most often when turning a new idea into a real product or business.');
+        assert.equal(state.mindsetIntro, 'The principles that shape how I make decisions, work with others and move from idea to execution.');
         assert.equal(state.skillCount, 5);
         assert.equal(state.mindsetCount, 5);
-        assert.equal(state.personalityTitle, 'Different lenses. Same person.');
+
+        assert.equal(state.personalityTitle, 'Different lenses.');
         assert.deepEqual(state.tabLabels, ['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
         assert.ok(state.tabHeights.every(h => h >= (width<=840?47.5:43.5)), engine+' '+width+' lens targets');
         assert.ok(state.tabBorders.every(v => v < .5));
@@ -121,17 +122,10 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.activeColor, 'rgb(218, 56, 49)');
         assert.equal(state.panelBackground, 'rgba(0, 0, 0, 0)');
         assert.ok(state.panelPaddingTop < .5);
-        assert.ok(state.lensWidth <= 760.5);
-        assert.deepEqual(state.lensHeadings, [
-          'Highly open, extraverted, structured and unusually direct.',
-          'Strategist. Coach. Catalyst. Philomath. Commander.',
-          'Creativity. Perspective. Beauty. Spirituality. Learning.',
-          'Express Builder',
-          'ENFP',
-          '7w8',
-          'Manifesting Generator, 2/4'
-        ]);
-        assert.ok(state.lensParagraphCounts.every(count => count === 2));
+        assert.equal(state.lensH3Count, 0, engine+' '+width+' lens panels must not use slogan/result headings');
+        assert.equal(state.lensCopyCount, 7, engine+' '+width+' each lens has one descriptive copy block');
+        assert.ok(state.lensParagraphCounts.every(count => count === 2), engine+' '+width+' each lens has two descriptive paragraphs');
+        assert.ok(state.activeParagraphs[0].startsWith('The clearest pattern in my Big Five results'), engine+' '+width+' Big Five opens as descriptive prose');
         assert.equal(state.metadataCount, 0);
         assert.equal(state.hasEmDash, false);
         assert.equal(state.overflow, false);
@@ -183,12 +177,13 @@ const close = (actual, expected, tolerance, label) => {
         await first.focus();
         await page.keyboard.press(width<=840 ? 'ArrowRight' : 'ArrowDown');
         assert.equal(await second.getAttribute('aria-selected'),'true', engine+' '+width+' orientation-aware keyboard navigation');
-        assert.equal(await page.locator('.about-personality-panel:not([hidden]) h3').textContent(),'Strategist. Coach. Catalyst. Philomath. Commander.');
+        const high5Text = await page.locator('.about-personality-panel:not([hidden])').innerText();
+        assert.ok(high5Text.includes('Strategist') && high5Text.includes('Coach') && high5Text.includes('Catalyst') && high5Text.includes('Philomath') && high5Text.includes('Commander'));
 
         if (output && (width === 390 || width === 1440)) {
-          await page.locator('#story').screenshot({path:output+'/about-v5-story-'+engine+'-'+width+'.png'});
-          await page.locator('#toolkit').screenshot({path:output+'/about-v5-toolkit-'+engine+'-'+width+'.png'});
-          await page.locator('#personality').screenshot({path:output+'/about-v5-personality-'+engine+'-'+width+'.png'});
+          await page.locator('#story').screenshot({path:output+'/about-v6-story-'+engine+'-'+width+'.png'});
+          await page.locator('#toolkit').screenshot({path:output+'/about-v6-toolkit-'+engine+'-'+width+'.png'});
+          await page.locator('#personality').screenshot({path:output+'/about-v6-personality-'+engine+'-'+width+'.png'});
         }
 
         await page.close();
@@ -198,7 +193,7 @@ const close = (actual, expected, tolerance, label) => {
     }
   }
 
-  console.log('PASS: About V5 starts with story and uses seven responsive reflection lenses');
+  console.log('PASS: About V6 uses simple page copy and descriptive seven-lens panels');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
