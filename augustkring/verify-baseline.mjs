@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 
 const root=dirname(fileURLToPath(import.meta.url));
 const html=readFileSync(join(root,'index.html'),'utf8');
+const aboutHtml=readFileSync(join(root,'about/index.html'),'utf8');
 const css=readFileSync(join(root,'styles.css'),'utf8');
 
 function part(s,a,b) {
@@ -19,12 +20,13 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"fdc5ddb2"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
   tokens:digest(part(css,':root {','\n}')),
-  contact:digest(part(css,'/* Homepage closing signoff:','\n.home-footer {'))
+  contact:digest(part(css,'/* Homepage closing signoff:','\n.home-footer {')),
+  aboutMain:digest(part(aboutHtml,'<main','</main>'))
 };
 for(const [key,val] of Object.entries(approved)) {
   assert.equal(actual[key],val,'Approved homepage/CSS changed: '+key);
@@ -162,6 +164,17 @@ for(const token of ['--font-body:','--font-display:','--accent:','--surface-card
   assert.ok(css.includes(token),'Shared design-system token missing: '+token);
 }
 assert.ok(css.includes('--about-section-space: var(--section-space);'),'About spacing must inherit the homepage section rhythm');
+assert.ok(css.includes('.about-page { padding-bottom: 0; }'),'About page must not add a second bottom-spacing system');
+assert.ok(css.includes('padding: clamp(50px, 5vw, 66px) 0 var(--section-space);'),'About hero must use the shared desktop section rhythm');
+assert.ok(css.includes('font-size: clamp(20px, 1.7vw, 22px);'),'About tertiary headings must use the approved compact editorial scale');
+assert.ok(css.includes('.about-personality {\n  display: block;\n  padding-top: var(--about-section-space);'),'Personality section must use the shared About section spacing');
+assert.ok(css.includes('.about-personality-tab {\n  min-height: 44px;')&&css.includes('font: 700 14px/1 var(--font-display);'),'Personality tabs must use shared type and 44px targets');
+assert.ok(css.includes('background: var(--surface-card);'),'Personality panel must use the shared card surface');
+assert.ok(css.includes('.about-story-bottom {\n  padding: var(--section-space) 0;'),'About story must use the shared desktop section rhythm');
+assert.ok(css.includes('.about-story-content { max-width: var(--measure-reading); }'),'About story must use the shared reading measure');
+assert.ok(css.includes('.about-story-link {\n  margin-top: clamp(26px, 3vw, 34px);\n  font-size: 18px;'),'About story CTA must match homepage CTA hierarchy');
+assert.ok(css.includes('.about-personal-hero { padding: 42px 0 62px; }'),'About mobile hero rhythm missing');
+assert.ok(css.includes('.about-story-bottom { padding: var(--section-space-mobile) 0; gap: 24px; }'),'About mobile story rhythm missing');
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
 assert.ok(css.includes("/* Home + About section subtitles share one readable measure.\n   The homepage hero description intentionally keeps its approved full-column width. */\n.home-main .thread-lead > p,\n.home-main .perspective-lead > p,\n.home-main .values-lead > p,\n.home-main .about-home-lead > p,\n.home-main .about-principles-intro > p,\n.home-main .about-story-intro > p,\n.home-main .about-personal-lead {\n  max-width: min(100%, var(--measure-narrow));\n}"),'Shared 390px subtitle measure missing');
 assert.ok(css.includes('.hero-copy > .hero-focus {\n  width: 100%;\n  max-width: none;'),'Approved full-column homepage hero description missing');
@@ -179,7 +192,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261026-shared-v5';
+  const expectedStyles='styles.css?v=20261026-shared-v6';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
@@ -190,4 +203,4 @@ for(const path of ['index.html','about/index.html','perspectives/index.html','pe
   assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: final homepage polish, optical logo sizing, cohesive signoff, utility footer and shared design-system baseline');
+console.log('PASS: homepage baseline plus About design-system alignment with About copy locked');
