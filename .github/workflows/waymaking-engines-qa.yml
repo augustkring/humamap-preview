@@ -23,13 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check approved editorial baseline
         run: node augustkring/verify-baseline.mjs
-      - name: Run actual firefox,webkit progressive vector road and visual-overlap QA
+      - name: Run actual firefox,webkit editorial layout and responsive-overlap QA
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/ak-road-site/humamap-preview artifacts
-          cp -R augustkring /tmp/ak-road-site/humamap-preview/augustkring
-          python3 -m http.server 8765 --directory /tmp/ak-road-site >/tmp/ak-road-server.log 2>&1 &
+          mkdir -p /tmp/ak-editorial-site/humamap-preview artifacts
+          cp -R augustkring /tmp/ak-editorial-site/humamap-preview/augustkring
+          python3 -m http.server 8765 --directory /tmp/ak-editorial-site >/tmp/ak-editorial-server.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
           for i in $(seq 1 30); do
@@ -43,6 +43,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: waymaking-progressive-v15-firefox,webkit-screenshots
+          name: waymaking-editorial-firefox,webkit-screenshots
           path: artifacts/
           if-no-files-found: warn
