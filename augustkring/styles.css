@@ -1333,7 +1333,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   grid-template-rows: repeat(5, minmax(0, 1fr));
 }
 .about-toolkit-list article {
-  padding: 22px 0 24px;
+  padding: 18px 0 20px;
   border-top: 1px solid var(--line);
 }
 .about-toolkit-list h3,
@@ -1348,7 +1348,9 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   letter-spacing: -.032em;
   text-wrap: balance;
 }
-.about-toolkit-list p,
+.about-toolkit-list h3 {
+  margin-bottom: 0;
+}
 .about-principles-list p {
   margin: 0;
   color: var(--copy);
@@ -1538,7 +1540,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     margin-top: 26px;
   }
   .about-toolkit-list article {
-    padding: 20px 0 22px;
+    padding: 16px 0 18px;
   }
   .about-principles > .about-section-lead > p {
     margin-top: 16px;
