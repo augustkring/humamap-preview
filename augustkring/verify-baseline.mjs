@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"6662554f","aboutToolkit":"772637ca"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"2ace5ec7","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -205,6 +205,28 @@ assert.ok(approvedStory.includes('I became responsible for a small team'),'User-
 assert.ok(!approvedStory.includes('around 15 people'),'Unapproved team size has returned');
 assert.ok(!approvedPrinciples.includes('A few principles I return to when choosing what to build and how to build it.'),'Removed Principles undertext has returned');
 assert.ok(approvedPrinciples.includes('Aim high, but test the idea before betting everything on it.'),'Approved principles text changed');
+
+assert.ok(approvedPrinciples.includes('Build for commercial success without overlooking people or the planet. All three shape how the business works.'),
+  'Approved People, planet & profit copy changed');
+assert.ok(css.includes('min-height: 2.2em;'), 'Two-line Principles title alignment is required');
+
+// The Perspectives list must quote each article's actual introduction, not an invented teaser.
+const listing = readFileSync(join(root,'perspectives/index.html'),'utf8');
+assert.ok(!listing.includes('Read perspective') && !listing.includes('perspective-index-action'),
+  'Redundant Read perspective CTA must remain removed');
+for(const [title,slug] of [
+  ['Rethinking the company','rethinking-the-company'],
+  ['Europe at a crossroads','europe-at-a-crossroads']
+]) {
+  const article = readFileSync(join(root,'perspectives',slug,'index.html'),'utf8');
+  const header = article.match(/<div class="article-heading">\s*<h1>([^<]+)<\/h1>\s*<p>([^<]+)<\/p>/);
+  assert.ok(header && header[1] === title, 'Article headline/intro missing: '+slug);
+  const match = listing.match(new RegExp('<h3 class="perspective-index-title">'+title+'<\\/h3>\\s*<p class="perspective-index-summary">([^<]+)<\\/p>'));
+  assert.ok(match && match[1] === header[2], 'Perspective excerpt differs from article text: '+title);
+}
+assert.ok(css.includes('-webkit-line-clamp: 2;') && css.includes('text-overflow: ellipsis;'),
+  'Perspective excerpts must be limited to two lines with ellipsis');
+
 assert.ok(approvedLenses.includes('My Big Five results show a striking mix:'),'Approved Big Five reflection missing');
 assert.ok(approvedLenses.includes('rather than a scientific personality measure.'),'Approved Human Design qualification missing');
 assert.equal((approvedLenses.match(/class="about-lens-copy"/g)||[]).length,7,'All seven reflection lenses required');
@@ -233,7 +255,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261027-shared-v17';
+  const expectedStyles='styles.css?v=20261027-shared-v18';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
