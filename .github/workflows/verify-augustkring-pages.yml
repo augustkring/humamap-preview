@@ -129,8 +129,8 @@ jobs:
           grep -Fq '.work-carousel-dot[aria-current="true"]' /tmp/augustkring.css
           grep -Fq '.work-brand-august { height: 40px; }' /tmp/augustkring.css
           grep -Fq '.work-brand-humamap { height: 40px; }' /tmp/augustkring.css
-          grep -Fq 'width: .54em; height: .54em;' /tmp/augustkring.css
-          grep -Fq 'width: .70em; height: .62em;' /tmp/augustkring.css
+          grep -Fq 'width: .405em; height: .405em;' /tmp/augustkring.css
+          grep -Fq 'width: .34em; height: .34em;' /tmp/augustkring.css
           grep -Fq -- '--body-copy-size: 18px;' /tmp/augustkring.css
           grep -Fq -- '--body-reading-size: 18px;' /tmp/augustkring.css
           grep -Fq -- '--card-copy-size: 17px;' /tmp/augustkring.css
