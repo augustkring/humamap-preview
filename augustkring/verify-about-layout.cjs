@@ -36,7 +36,7 @@ const close = (actual, expected, tolerance, label) => {
             return {size:s.fontSize, family:s.fontFamily, weight:s.fontWeight, lineHeight:s.lineHeight, tracking:s.letterSpacing};
           };
           const purpose = document.querySelector('.waymaking-purpose');
-          const work = document.querySelector('#work');
+          const work = document.querySelector('#work .work-heading');
           return {
             h1: parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
             h2: parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
