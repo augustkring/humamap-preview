@@ -21,6 +21,7 @@ on:
       - "augustkring/assets/waymaking-dry-brush-LICENSE.txt"
       - "augustkring/verify-baseline.mjs"
       - "augustkring/verify-about-layout.cjs"
+      - "augustkring/verify-perspectives-index.cjs"
       - "augustkring/verify-mobile-type.cjs"
       - "augustkring/EDITORIAL_DESIGN_BASELINE.md"
       - "augustkring/mobile-nav.js"
@@ -51,8 +52,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261027-shared-v17"
-          expected_shared="styles.css?v=20261027-shared-v17"
+          expected_home="styles.css?v=20261027-shared-v18"
+          expected_shared="styles.css?v=20261027-shared-v18"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -168,6 +169,12 @@ jobs:
             fi
             sleep 10
           done
+          curl -fsSL --max-time 20 "${base}perspectives/?verification=${GITHUB_SHA}" -o /tmp/augustkring-perspectives.html
+          grep -Fq 'AI advantage will depend less on how many tools a company adopts and more on how deeply it redesigns itself around what AI makes possible.' /tmp/augustkring-perspectives.html
+          grep -Fq 'Europe should not define success in the AI era only by whether it wins the frontier-model race. A major opportunity lies in turning AI into productive, resilient and human-centric companies.' /tmp/augustkring-perspectives.html
+          ! grep -Fq 'Read perspective' /tmp/augustkring-perspectives.html
+          grep -Fq 'class="perspective-index-summary"' /tmp/augustkring-perspectives.html
+          echo "Published Perspectives excerpts use the exact article introductions with no duplicate CTA."
           echo "Published hero, signature+name, shared mobile menu and CSS are consistent across pages."
 
       - name: Check hero text rendering in desktop and mobile Chrome
@@ -610,6 +617,14 @@ jobs:
                     principlesTitle:q('#principles-title').textContent.trim(),
                     principlesTitles:qa('.about-principles-list h3').map(e=>e.textContent.trim()),
                     principlesLengths:lengths('.about-principles-list p'),
+                    principlesMetrics:qa('.about-principles-list article').map(article=>{
+                      const p=article.querySelector('p');
+                      return {
+                        top:p.getBoundingClientRect().top,
+                        lines:p.getBoundingClientRect().height/parseFloat(getComputedStyle(p).lineHeight),
+                        notClipped:p.scrollHeight<=p.clientHeight+1
+                      };
+                    }),
                     personalityTitle:q('#personality-title').textContent.trim(),
                     tabLabels:tabs.map(e=>e.textContent.trim()),
                     tabOrientation:tablist.getAttribute('aria-orientation'),
@@ -643,7 +658,14 @@ jobs:
                 assert.equal(aboutProof.toolkitHeadingOnly,true);
                 assert.equal(aboutProof.principlesTitle,'Principles.');
                 assert.deepEqual(aboutProof.principlesTitles,['Think big. Start small. Scale fast.','Execution over fear.','Learn, unlearn, relearn.','People, planet & profit.']);
-                assert.ok(Math.max(...aboutProof.principlesLengths)-Math.min(...aboutProof.principlesLengths)<=20);
+                assert.ok(aboutProof.principlesMetrics.every(m=>m.lines<=4.05 && m.notClipped),
+                  'All Principles text fits within four lines without truncation');
+                const principleColumns=width>920?4:width>600?2:1;
+                for(let i=0;i<4;i+=principleColumns) {
+                  const bodyTops=aboutProof.principlesMetrics.slice(i,i+principleColumns).map(m=>m.top);
+                  assert.ok(Math.max(...bodyTops)-Math.min(...bodyTops)<1.5,
+                    'All Principles descriptions in the row are vertically aligned');
+                }
                 assert.equal(aboutProof.personalityTitle,'Different lenses.');
                 assert.deepEqual(aboutProof.tabLabels,['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
                 if(width<=840) {
