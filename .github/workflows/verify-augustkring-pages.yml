@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261027-shared-v16"
-          expected_shared="styles.css?v=20261027-shared-v16"
+          expected_home="styles.css?v=20261027-shared-v17"
+          expected_shared="styles.css?v=20261027-shared-v17"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -603,8 +603,10 @@ jobs:
                     order:['story','toolkit','principles','personality'].map(id=>y('#'+id)),
                     toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
                     mindsetTitles:qa('.about-toolkit-mindset .about-toolkit-list h3').map(e=>e.textContent.trim()),
-                    skillLengths:lengths('.about-toolkit-skills .about-toolkit-list p'),
-                    mindsetLengths:lengths('.about-toolkit-mindset .about-toolkit-list p'),
+                    skillDescriptions:qa('.about-toolkit-skills .about-toolkit-list p').length,
+                    mindsetDescriptions:qa('.about-toolkit-mindset .about-toolkit-list p').length,
+                    toolkitHeadingOnly:qa('.about-toolkit-list article').length===10 &&
+                      qa('.about-toolkit-list article').every(el=>el.children.length===1&&el.firstElementChild.tagName==='H3'),
                     principlesTitle:q('#principles-title').textContent.trim(),
                     principlesTitles:qa('.about-principles-list h3').map(e=>e.textContent.trim()),
                     principlesLengths:lengths('.about-principles-list p'),
@@ -636,8 +638,9 @@ jobs:
                 assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Principles -> Personality');
                 assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
                 assert.deepEqual(aboutProof.mindsetTitles,['Entrepreneurial','Strategic','Curious','Adaptive','Connective']);
-                assert.ok(Math.max(...aboutProof.skillLengths)-Math.min(...aboutProof.skillLengths)<=16);
-                assert.ok(Math.max(...aboutProof.mindsetLengths)-Math.min(...aboutProof.mindsetLengths)<=10);
+                assert.equal(aboutProof.skillDescriptions,0);
+                assert.equal(aboutProof.mindsetDescriptions,0);
+                assert.equal(aboutProof.toolkitHeadingOnly,true);
                 assert.equal(aboutProof.principlesTitle,'Principles.');
                 assert.deepEqual(aboutProof.principlesTitles,['Think big. Start small. Scale fast.','Execution over fear.','Learn, unlearn, relearn.','People, planet & profit.']);
                 assert.ok(Math.max(...aboutProof.principlesLengths)-Math.min(...aboutProof.principlesLengths)<=20);
@@ -728,7 +731,7 @@ jobs:
             { path: '', selector: '.waymaking-copy p', desktop: 16, mobile: 17 },
             { path: '', selector: '.perspective-copy > p:not(.perspective-statement)', desktop: 18, mobile: 18 },
             { path: '', selector: '.work-card p', desktop: 16, mobile: 17 },
-            { path: 'about/', selector: '.about-toolkit-list p', desktop: 16, mobile: 17 },
+            { path: 'about/', selector: '.about-toolkit-list h3', desktop: 21, desktopMin: 21, desktopMax: 26, mobile: 21, heading: true },
             { path: 'about/', selector: '.about-lens-copy p', desktop: 17, mobile: 18 },
             { path: 'about/', selector: '.about-story-prose p', desktop: 18, mobile: 18 },
             { path: 'perspectives/', selector: '.perspectives-hero > p', desktop: 19, mobile: 18 },
@@ -768,7 +771,7 @@ jobs:
                   console.log('Typography',width,target.path||'home',target.selector,metrics);
                   assert.ok(metrics.fontSize>=min-.1&&metrics.fontSize<=max+.1,
                     `Expected ${min}-${max}px for ${target.selector} at ${width}`);
-                  assert.ok(metrics.lineHeight/metrics.fontSize >= 1.45, `Readable line height for ${target.selector}`);
+                  assert.ok(metrics.lineHeight/metrics.fontSize >= (target.heading ? 1.05 : 1.45), `Readable line height for ${target.selector}`);
                   assert.ok(metrics.width>0&&metrics.height>0, `Text block is visible: ${target.selector}`);
                   assert.equal(metrics.viewportOverflow,false,`No horizontal scrolling on ${target.path} at ${width}px`);
                 }
@@ -782,7 +785,7 @@ jobs:
                   // Representative 200%-sized prose at narrow viewports checks text
                   // growth and wrapping; this is not a complete WCAG conformance audit.
                   if (width===390) {
-                    const selected=route===''?'.thread-copy p':route==='about/'?'.about-toolkit-list p':'.article-prose > p:not(.article-lead)';
+                    const selected=route===''?'.thread-copy p':route==='about/'?'.about-toolkit-list h3':'.article-prose > p:not(.article-lead)';
                     await page.locator(selected).first().evaluate(e=>{e.style.fontSize='34px';e.style.lineHeight='1.5';});
                     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`Scaled text must reflow on ${route||'home'}`);
                   }

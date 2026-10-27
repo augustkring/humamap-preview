@@ -24,7 +24,7 @@ const targets = [
   { path:'', selector:'.work-card p', size:17, label:'Current Focus card copy' },
   { path:'about/', selector:'.about-story-prose p', size:18, label:'About story body' },
   { path:'about/', selector:'.about-lens-copy p', size:18, label:'About personality body' },
-  { path:'about/', selector:'.about-toolkit-list p', size:17, label:'About toolkit compact copy' },
+  { path:'about/', selector:'.about-toolkit-list h3', size:21, label:'About Skill Set and Mindset titles', heading:true },
   { path:'perspectives/', selector:'.perspective-index-summary', size:18, label:'Perspectives summary' },
   { path:'perspectives/rethinking-the-company/', selector:'.article-prose > p:not(.article-lead)', size:18, label:'Article body' },
   { path:'perspectives/rethinking-the-company/', selector:'.article-comparison td', size:17, label:'Article comparison compact copy' },
@@ -58,7 +58,7 @@ const targets = [
             };
           });
           assert.ok(Math.abs(metrics.fontSize-target.size)<.1, engine+' '+width+' '+target.label+' expected '+target.size+'px, got '+metrics.fontSize);
-          assert.ok(metrics.lineHeight/metrics.fontSize>=1.45, engine+' '+width+' '+target.label+' keeps readable line-height');
+          assert.ok(metrics.lineHeight/metrics.fontSize >= (target.heading ? 1.05 : 1.45), engine+' '+width+' '+target.label+' keeps readable line-height');
           assert.ok(metrics.width>0&&metrics.height>0, engine+' '+width+' '+target.label+' is visible');
           assert.equal(metrics.overflow,false, engine+' '+width+' '+target.path+' must not overflow horizontally');
         }
@@ -99,7 +99,7 @@ const targets = [
       await browser.close();
     }
   }
-  console.log('PASS: mobile reading sizes are 18px primary / 17px compact across pages; August Kring dot is optically reduced, halo-free and correctly spaced');
+  console.log('PASS: mobile reading sizes are 18px primary / 17px compact, About title-only lists stay 21px; wordmark dot is optically reduced and correctly spaced');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
