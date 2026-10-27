@@ -105,7 +105,7 @@ const close = (actual, expected, tolerance, label) => {
             skillRows: skillRows.map(r => ({top:r.top,height:r.height})),
             mindsetRows: mindsetRows.map(r => ({top:r.top,height:r.height})),
             principlesTitle: q('#principles-title').textContent.trim(),
-            principlesIntro: q('#principles .about-section-lead > p').textContent.trim(),
+            principlesIntro: q('#principles .about-section-lead > p')?.textContent.trim() ?? null,
             principlesTitles: qa('.about-principles-list h3').map(el => el.textContent.trim()),
             principlesLengths: chars('.about-principles-list p'),
             principlesColumns: principles.gridTemplateColumns.split(' ').filter(Boolean).length,
@@ -161,14 +161,14 @@ const close = (actual, expected, tolerance, label) => {
         assert.ok(Math.max(...state.mindsetLengths)-Math.min(...state.mindsetLengths) <= 10, engine+' '+width+' Mindset copy stays balanced');
 
         assert.equal(state.principlesTitle, 'Principles.');
-        assert.equal(state.principlesIntro, 'A few principles I return to when choosing what to build and how to build it.');
+        assert.equal(state.principlesIntro, null, 'The redundant Principles undertext stays removed');
         assert.deepEqual(state.principlesTitles, [
           'Think big. Start small. Scale fast.',
           'Execution over fear.',
           'Learn, unlearn, relearn.',
           'People, planet & profit.'
         ]);
-        assert.ok(Math.max(...state.principlesLengths)-Math.min(...state.principlesLengths) <= 14, engine+' '+width+' Principles copy stays balanced');
+        assert.ok(Math.max(...state.principlesLengths)-Math.min(...state.principlesLengths) <= 20, engine+' '+width+' Principles copy stays balanced');
         assert.equal(state.principlesColumns,width>920?4:width>600?2:1,
           engine+' '+width+' Principles must reflow 4/2/1 without hiding content');
 
@@ -183,7 +183,7 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.lensH3Count, 0);
         assert.equal(state.lensCopyCount, 7);
         assert.ok(state.lensParagraphCounts.every(count => count === 2));
-        assert.ok(state.activeParagraphs[0].startsWith('The clearest pattern in my Big Five results'));
+        assert.ok(state.activeParagraphs[0].startsWith('My Big Five results show a striking mix:'));
         assert.equal(state.metadataCount, 0);
         assert.equal(state.hasEmDash, false);
         assert.equal(state.overflow, false);

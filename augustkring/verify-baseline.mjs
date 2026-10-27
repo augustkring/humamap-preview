@@ -20,13 +20,14 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"5419610a"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"ad0ffa70","aboutToolkit":"eec4f86f"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
   tokens:digest(part(css,':root {','\n}')),
   contact:digest(part(css,'/* Homepage closing signoff:','\n.home-footer {')),
-  aboutMain:digest(part(aboutHtml,'<main','</main>'))
+  aboutMain:digest(part(aboutHtml,'<main','</main>')),
+  aboutToolkit:digest(part(aboutHtml,'<section id="toolkit"','</section>'))
 };
 for(const [key,val] of Object.entries(approved)) {
   assert.equal(actual[key],val,'Approved homepage/CSS changed: '+key);
@@ -188,6 +189,20 @@ assert.equal((aboutHtml.match(/data-personality-panel=/g)||[]).length,7,'About V
 assert.equal((aboutHtml.match(/class="about-lens-copy"/g)||[]).length,7,'Each About V7 lens must use one descriptive copy block');
 assert.ok(!aboutHtml.includes('about-profile-kicker')&&!aboutHtml.includes('about-personality-markers')&&!aboutHtml.includes('about-personality-meaning'),'About V7 must not reintroduce scores/source metadata/old meaning grids');
 assert.ok(!aboutHtml.includes('—'),'About V7 must not contain em dashes');
+// Approved 2026-10-27 content changes are limited to Story, Principles and Different lenses.
+// Skill Set and Mindset remain digest-locked pending their separate editorial revision.
+const approvedStory = part(aboutHtml,'<section id="story"','</section>');
+const approvedPrinciples = part(aboutHtml,'<section id="principles"','</section>');
+const approvedLenses = part(aboutHtml,'<section id="personality"','</section>');
+assert.equal((approvedStory.match(/<p>/g)||[]).length,5,'Approved story must retain five narrative paragraphs');
+assert.ok(approvedStory.includes('I became responsible for a small team'),'User-approved small-team wording missing');
+assert.ok(!approvedStory.includes('around 15 people'),'Unapproved team size has returned');
+assert.ok(!approvedPrinciples.includes('A few principles I return to when choosing what to build and how to build it.'),'Removed Principles undertext has returned');
+assert.ok(approvedPrinciples.includes('Aim high, but test the idea before betting everything on it.'),'Approved principles text changed');
+assert.ok(approvedLenses.includes('My Big Five results show a striking mix:'),'Approved Big Five reflection missing');
+assert.ok(approvedLenses.includes('rather than a scientific personality measure.'),'Approved Human Design qualification missing');
+assert.equal((approvedLenses.match(/class="about-lens-copy"/g)||[]).length,7,'All seven reflection lenses required');
+
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
 assert.ok(css.includes("width: .405em; height: .405em;")&&css.includes("top: -.105em;"),'August Kring wordmark dot must remain 25 percent smaller than the doubled state while preserving the original lower edge');
 assert.ok(!css.includes('.wordmark-i::before'),'August Kring wordmark must not use a white clearing halo behind the red dot');
