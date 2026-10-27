@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"cba8f29f","aboutToolkit":"772637ca"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"56aecb66","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -228,13 +228,13 @@ assert.ok(css.includes('-webkit-line-clamp: 2;') && css.includes('text-overflow:
   'Perspective excerpts must be limited to two lines with ellipsis');
 
 const expectedLenses = [
-  ['big-five','The Big Five report describes August','Orderliness'],
-  ['high5',"HIGH5 ranks August's leading strengths",'Philomath'],
-  ['via','VIA places Creativity','Appreciation of Beauty &amp; Excellence'],
-  ['bg5','BG5 identifies August as an Express Builder','Collaborative'],
-  ['mbti',"August's MBTI type is listed as ENFP",'ENFP profile'],
-  ['enneagram','The Enneagram type listed for August is 7w8','Type Seven'],
-  ['human-design',"August's Human Design report identifies him as a Manifesting Generator",'Hermit/Opportunist']
+  ['big-five',"August's Big Five profile suggests someone curious",'organised'],
+  ['high5','HIGH5 sees someone who spots the bigger picture','helping people grow'],
+  ['via','VIA highlights creativity, perspective','a search for meaning'],
+  ['bg5','BG5 calls August an Express Builder','movement and changing surroundings'],
+  ['mbti',"In MBTI, August's ENFP type describes someone",'spontaneity'],
+  ['enneagram','The Enneagram describes August as a 7w8','Eight wing'],
+  ['human-design','Human Design calls August a Manifesting Generator',"not scientific findings"]
 ];
 const lensPanels = [...approvedLenses.matchAll(/<article id="personality-panel-([^"]+)"[\s\S]*?<div class="about-lens-copy">([\s\S]*?)<\/div>\s*<\/article>/g)];
 assert.equal(lensPanels.length,7,'All seven Different lenses profiles required');
@@ -251,6 +251,24 @@ for(let i=0;i<expectedLenses.length;i++) {
 }
 assert.ok(!/I recognise|What resonates|I treat it as|The risk is moving faster than the people around me/i.test(approvedLenses),
   'Old autobiographical Different lenses narration returned');
+
+// The seven lenses must be readable and very close in length, including a literal-letter check.
+const profiles=lensPanels.map(([,id,html])=>{
+  const paragraphs=[...html.matchAll(/<p>([^<]*)<\/p>/g)].map(m=>m[1]);
+  const text=paragraphs.join(' ');
+  return {id,text,chars:text.length,letters:(text.match(/[A-Za-z]/g)||[]).length};
+});
+const spread=xs=>Math.max(...xs)-Math.min(...xs);
+assert.ok(spread(profiles.map(p=>p.chars))<=10,
+  'Different lenses exceed 10-character length spread: '+JSON.stringify(profiles.map(p=>[p.id,p.chars])));
+assert.ok(spread(profiles.map(p=>p.letters))<=10,
+  'Different lenses exceed 10-letter length spread: '+JSON.stringify(profiles.map(p=>[p.id,p.letters])));
+assert.ok(css.includes('.about-toolkit {\n    gap: var(--section-space);\n  }') &&
+  css.includes('.about-toolkit {\n    gap: var(--section-space-mobile);\n  }'),
+  'Stacked Skill Set and Mindset must use one homepage section-spacing unit instead of two');
+assert.ok(!css.includes('gap: calc(var(--section-space) + var(--section-space));') &&
+  !css.includes('gap: calc(var(--section-space-mobile) + var(--section-space-mobile));'),
+  'Excessive double section gap returned inside About Skill Set/Mindset');
 
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
 assert.ok(css.includes("width: .405em; height: .405em;")&&css.includes("top: -.105em;"),'August Kring wordmark dot must remain 25 percent smaller than the doubled state while preserving the original lower edge');
@@ -276,7 +294,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261027-shared-v18';
+  const expectedStyles='styles.css?v=20261027-shared-v19';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);

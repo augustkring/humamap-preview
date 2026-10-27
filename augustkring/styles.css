@@ -1460,7 +1460,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     gap: 28px;
   }
   .about-toolkit {
-    gap: calc(var(--section-space) + var(--section-space));
+    gap: var(--section-space);
   }
   .about-toolkit-column {
     max-width: 680px;
@@ -1516,7 +1516,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     margin-top: 26px;
   }
   .about-toolkit {
-    gap: calc(var(--section-space-mobile) + var(--section-space-mobile));
+    gap: var(--section-space-mobile);
   }
   .about-toolkit-list {
     margin-top: 26px;

@@ -52,8 +52,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261027-shared-v18"
-          expected_shared="styles.css?v=20261027-shared-v18"
+          expected_home="styles.css?v=20261027-shared-v19"
+          expected_shared="styles.css?v=20261027-shared-v19"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"
@@ -234,6 +234,7 @@ jobs:
                   return {
                     h1:parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
                     h2:parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
+                    sectionSpace:parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop),
                     lead:parseFloat(getComputedStyle(document.querySelector('.hero-focus')).fontSize),
                     leadFamily:getComputedStyle(document.querySelector('.hero-focus')).fontFamily,
                     wordmarkFontSize:parseFloat(wordmark.fontSize),
@@ -608,6 +609,10 @@ jobs:
                     storyParagraphCount:qa('.about-story-prose p').length,
                     chronology:q('.about-story-link').textContent.trim(),
                     order:['story','toolkit','principles','personality'].map(id=>y('#'+id)),
+                    sectionPads:['story','toolkit','principles','personality'].map(id=>{
+                      const style=cs('#'+id);return [parseFloat(style.paddingTop),parseFloat(style.paddingBottom)];
+                    }),
+                    toolkitGap:parseFloat(cs('.about-toolkit').rowGap),
                     toolkitHeadings:[q('.about-toolkit-skills > h2').textContent.trim(),q('.about-toolkit-mindset > h2').textContent.trim()],
                     mindsetTitles:qa('.about-toolkit-mindset .about-toolkit-list h3').map(e=>e.textContent.trim()),
                     skillDescriptions:qa('.about-toolkit-skills .about-toolkit-list p').length,
@@ -638,6 +643,8 @@ jobs:
                     lensH3Count:qa('.about-personality-panel h3').length,
                     lensCopyCount:qa('.about-lens-copy').length,
                     lensIntros:qa('.about-personality-panel').map(p=>p.querySelector('.about-lens-copy p').textContent.trim()),
+                    lensChars:qa('.about-personality-panel').map(panel=>[...panel.querySelectorAll('.about-lens-copy p')].map(p=>p.textContent.trim()).join(' ').length),
+                    lensLetters:qa('.about-personality-panel').map(panel=>([...panel.querySelectorAll('.about-lens-copy p')].map(p=>p.textContent.trim()).join(' ').match(/[A-Za-z]/g)||[]).length),
                     lensHasSelfReflection:qa('.about-personality-panel').some(p=>/\b(I|me|my|mine|we|our)\b/i.test(p.querySelector('.about-lens-copy').textContent)),
                     lensParagraphCount:qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
                     emDash:q('main').innerText.includes('—'),
@@ -653,6 +660,14 @@ jobs:
                 assert.equal(aboutProof.storyParagraphCount,5);
                 assert.equal(aboutProof.chronology,'For the full chronology, see LinkedIn');
                 assert.deepEqual(aboutProof.order.slice().sort((x,y)=>x-y),aboutProof.order,'About order is Story -> Toolkit -> Principles -> Personality');
+                for(const [top,bottom] of aboutProof.sectionPads) {
+                  assert.ok(Math.abs(top-homepageTypography.sectionSpace)<.6 && Math.abs(bottom-homepageTypography.sectionSpace)<.6,
+                    'About section padding must match the homepage on the same viewport');
+                }
+                if(width<=840) {
+                  assert.ok(Math.abs(aboutProof.toolkitGap-homepageTypography.sectionSpace)<.6,
+                    'Stacked Skill Set and Mindset must use exactly one homepage section spacing unit');
+                }
                 assert.deepEqual(aboutProof.toolkitHeadings,['Skill Set','Mindset']);
                 assert.deepEqual(aboutProof.mindsetTitles,['Entrepreneurial','Strategic','Curious','Adaptive','Connective']);
                 assert.equal(aboutProof.skillDescriptions,0);
@@ -688,17 +703,19 @@ jobs:
                 assert.equal(aboutProof.lensCopyCount,7);
                 assert.equal(aboutProof.lensParagraphCount,2);
                 const expectedLensSources=[
-                  'The Big Five report describes August',
-                  "HIGH5 ranks August's leading strengths",
-                  'VIA places Creativity',
-                  'BG5 identifies August as an Express Builder',
-                  "August's MBTI type is listed as ENFP",
-                  'The Enneagram type listed for August is 7w8',
-                  "August's Human Design report identifies him as a Manifesting Generator"
+                  "August's Big Five profile suggests someone curious",
+                  'HIGH5 sees someone who spots the bigger picture',
+                  'VIA highlights creativity, perspective',
+                  'BG5 calls August an Express Builder',
+                  "In MBTI, August's ENFP type describes someone",
+                  'The Enneagram describes August as a 7w8',
+                  'Human Design calls August a Manifesting Generator'
                 ];
                 assert.equal(aboutProof.lensIntros.length,expectedLensSources.length);
                 assert.ok(aboutProof.lensIntros.every((s,i)=>s.startsWith(expectedLensSources[i])),
                   'Each Different lenses panel must report its own framework characterisation');
+                assert.ok(Math.max(...aboutProof.lensChars)-Math.min(...aboutProof.lensChars)<=10,'Seven profiles differ by at most ten characters');
+                assert.ok(Math.max(...aboutProof.lensLetters)-Math.min(...aboutProof.lensLetters)<=10,'Seven profiles differ by at most ten letters');
                 assert.equal(aboutProof.lensHasSelfReflection,false,
                   'No first-person self-interpretation in the assessment lenses');
                 assert.equal(aboutProof.emDash,false);
