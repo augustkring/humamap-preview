@@ -142,6 +142,8 @@ const close = (actual, expected, tolerance, label) => {
             lensH3Count: qa('.about-personality-panel h3').length,
             lensCopyCount: qa('.about-lens-copy').length,
             lensParagraphCounts: panels.map(panel => panel.querySelectorAll('.about-lens-copy p').length),
+            lensOpenings: panels.map(panel => panel.querySelector('.about-lens-copy p').textContent.trim()),
+            lensHasSelfReflection: panels.some(panel => /\b(I|me|my|mine|we|our)\b/i.test(panel.querySelector('.about-lens-copy').textContent)),
             activeParagraphs: qa('.about-personality-panel:not([hidden]) .about-lens-copy p').map(p => p.textContent.trim()),
             metadataCount: qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning,.about-lens-layout').length,
             hasEmDash: mainText.includes('—'),
@@ -215,7 +217,19 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.lensH3Count, 0);
         assert.equal(state.lensCopyCount, 7);
         assert.ok(state.lensParagraphCounts.every(count => count === 2));
-        assert.ok(state.activeParagraphs[0].startsWith('My Big Five results show a striking mix:'));
+        const sourceLensOpenings = [
+          'The Big Five report describes August',
+          "HIGH5 ranks August's leading strengths",
+          'VIA places Creativity',
+          'BG5 identifies August as an Express Builder',
+          "August's MBTI type is listed as ENFP",
+          'The Enneagram type listed for August is 7w8',
+          "August's Human Design report identifies him as a Manifesting Generator"
+        ];
+        assert.ok(state.lensOpenings.every((p,i)=>p.startsWith(sourceLensOpenings[i])),
+          engine+' '+width+' every lens must lead with its own assessment');
+        assert.equal(state.lensHasSelfReflection,false,
+          engine+' '+width+' lens descriptions must not narrate personal interpretation');
         assert.equal(state.metadataCount, 0);
         assert.equal(state.hasEmDash, false);
         assert.equal(state.overflow, false);
@@ -266,6 +280,19 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(await second.getAttribute('aria-selected'),'true', engine+' '+width+' orientation-aware keyboard navigation');
         const high5Text = await page.locator('.about-personality-panel:not([hidden])').innerText();
         assert.ok(high5Text.includes('Strategist') && high5Text.includes('Coach') && high5Text.includes('Catalyst') && high5Text.includes('Philomath') && high5Text.includes('Commander'));
+        for(let i=0;i<sourceLensOpenings.length;i++) {
+          const tab = page.locator('.about-personality-tab').nth(i);
+          await tab.click();
+          assert.equal(await tab.getAttribute('aria-selected'),'true',
+            engine+' '+width+' tab '+i+' is selected');
+          const active = page.locator('.about-personality-panel:not([hidden]) .about-lens-copy p');
+          assert.equal(await active.count(),2,engine+' '+width+' lens '+i+' has exactly two paragraphs');
+          assert.ok((await active.first().innerText()).startsWith(sourceLensOpenings[i]),
+            engine+' '+width+' lens '+i+' shows the correct framework viewpoint');
+          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1),
+            false,engine+' '+width+' no horizontal overflow on lens '+i);
+        }
+        await first.click();
 
         if (output && (width === 390 || width === 1440)) {
           await page.locator('.about-personal-hero').screenshot({path:output+'/about-v7-hero-'+engine+'-'+width+'.png'});
