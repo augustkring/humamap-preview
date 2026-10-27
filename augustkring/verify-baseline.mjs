@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"ad0ffa70","aboutToolkit":"eec4f86f"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"6662554f","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -191,6 +191,12 @@ assert.ok(!aboutHtml.includes('about-profile-kicker')&&!aboutHtml.includes('abou
 assert.ok(!aboutHtml.includes('—'),'About V7 must not contain em dashes');
 // Approved 2026-10-27 content changes are limited to Story, Principles and Different lenses.
 // Skill Set and Mindset remain digest-locked pending their separate editorial revision.
+const headingsOnlyToolkit = part(aboutHtml,'<section id="toolkit"','</section>');
+const toolkitArticles = [...headingsOnlyToolkit.matchAll(/<article>([\s\S]*?)<\/article>/g)].map(match => match[1].trim());
+assert.equal(toolkitArticles.length,10,'Five Skill Set and five Mindset items required');
+assert.ok(toolkitArticles.every(article => /^<h3>[^<]+<\/h3>$/.test(article)),'Each Skill Set and Mindset item contains only its H3');
+assert.equal((headingsOnlyToolkit.match(/<p(?:\s|>)/g)||[]).length,0,'No descriptions under Skill Set or Mindset');
+assert.ok(css.includes('.about-toolkit-list h3 {\n  margin-bottom: 0;\n}'),'Headings-only lists must not retain unused paragraph margin');
 const approvedStory = part(aboutHtml,'<section id="story"','</section>');
 const approvedPrinciples = part(aboutHtml,'<section id="principles"','</section>');
 const approvedLenses = part(aboutHtml,'<section id="personality"','</section>');
@@ -227,7 +233,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261027-shared-v16';
+  const expectedStyles='styles.css?v=20261027-shared-v17';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
@@ -238,4 +244,4 @@ for(const path of ['index.html','about/index.html','perspectives/index.html','pe
   assert.ok(!footer.includes('>About</a>')&&!footer.includes('>Perspectives</a>'),'Retired footer navigation returned: '+path);
 }
 
-console.log('PASS: homepage baseline plus belief, mindset and principles About V7 system');
+console.log('PASS: homepage baseline and About V7 headings-only Skill Set/Mindset with approved Story, Principles and Lenses');
