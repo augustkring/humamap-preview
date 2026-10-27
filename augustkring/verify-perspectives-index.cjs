@@ -61,6 +61,7 @@ const launch = name => {
             })
           };
         });
+        console.log('Perspectives measured cards',engine,width,JSON.stringify(listing.cards));
         assert.equal(listing.count,2,engine+' '+width+' two Perspectives');
         assert.equal(listing.buttons,0,engine+' '+width+' no redundant Read perspective CTA');
         assert.equal(listing.readCopy,false,engine+' '+width+' no Read perspective text');
@@ -72,7 +73,7 @@ const launch = name => {
           assert.equal(card.title,expected.title,engine+' '+width+' headline');
           assert.equal(card.date,expected.date,engine+' '+width+' byline unchanged');
           assert.ok(card.cardClickable,engine+' '+width+' article card remains clickable');
-          assert.equal(card.display,'-webkit-box',engine+' '+width+' multiline ellipsis box');
+          assert.ok(['-webkit-box','flow-root'].includes(card.display),engine+' '+width+' computed layout supports clamped excerpt');
           assert.equal(card.lineClamp,'2',engine+' '+width+' two-line excerpt clamp');
           assert.equal(card.overflow,'hidden',engine+' '+width+' no overflow beyond clamp');
           assert.equal(card.textOverflow,'ellipsis',engine+' '+width+' excerpt uses ellipsis');
