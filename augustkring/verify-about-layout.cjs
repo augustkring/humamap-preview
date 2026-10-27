@@ -30,11 +30,24 @@ const close = (actual, expected, tolerance, label) => {
 
         await page.goto(base, { waitUntil: 'networkidle', timeout: 45000 });
         await page.evaluate(() => document.fonts.ready);
-        const home = await page.evaluate(() => ({
-          h1: parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
-          h2: parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
-          sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop)
-        }));
+        const home = await page.evaluate(() => {
+          const type = el => {
+            const s = getComputedStyle(el);
+            return {size:s.fontSize, family:s.fontFamily, weight:s.fontWeight, lineHeight:s.lineHeight, tracking:s.letterSpacing};
+          };
+          const purpose = document.querySelector('.waymaking-purpose');
+          const work = document.querySelector('#work');
+          return {
+            h1: parseFloat(getComputedStyle(document.querySelector('.hero-copy h1')).fontSize),
+            h2: parseFloat(getComputedStyle(document.querySelector('.thread-lead h2')).fontSize),
+            sectionSpace: parseFloat(getComputedStyle(document.querySelector('.story-section')).paddingTop),
+            heading: type(document.querySelector('.waymaking-copy h3')),
+            body: type(document.querySelector('.waymaking-copy p')),
+            heroFocus: type(document.querySelector('.hero-focus')),
+            purposeToWork: work.getBoundingClientRect().top - purpose.getBoundingClientRect().bottom
+          };
+        });
+        close(home.purposeToWork, 2 * home.sectionSpace, 1, engine+' '+width+' Purpose-to-Current-Focus matches section rhythm');
 
         await page.goto(base + 'about/', { waitUntil: 'networkidle', timeout: 45000 });
         await page.evaluate(() => document.fonts.ready);
@@ -46,7 +59,7 @@ const close = (actual, expected, tolerance, label) => {
           const cs = s => getComputedStyle(q(s));
           const rect = s => q(s).getBoundingClientRect();
           const toolkit = cs('.about-toolkit');
-          const principles = cs('.about-principles');
+          const principles = cs('.about-principles-list');
           const explorer = cs('.about-personality-explorer');
           const tabs = qa('.about-personality-tab');
           const tablist = q('.about-personality-tabs');
@@ -57,12 +70,17 @@ const close = (actual, expected, tolerance, label) => {
           const panels = qa('.about-personality-panel');
           const mainText = q('main').innerText;
           const chars = selector => qa(selector).map(el => el.textContent.trim().length);
+          const type = el => {
+            const s = getComputedStyle(el);
+            return {size:s.fontSize, family:s.fontFamily, weight:s.fontWeight, lineHeight:s.lineHeight, tracking:s.letterSpacing};
+          };
 
           return {
             heroTitle: q('#about-page-title').textContent.trim(),
             heroH1Size: parseFloat(cs('#about-page-title').fontSize),
             belief: q('.about-personal-belief').textContent.trim(),
             beliefWidth: rect('.about-personal-belief').width,
+            beliefType: type(q('.about-personal-belief')),
             heroPaddingTop: parseFloat(cs('.about-personal-hero').paddingTop),
             storyTitle: q('#story-title').textContent.trim(),
             storyH2Size: parseFloat(cs('#story-title').fontSize),
@@ -76,8 +94,9 @@ const close = (actual, expected, tolerance, label) => {
             chronologyText: q('.about-story-link').textContent.trim(),
             chronologyTop: rect('.about-story-link').top,
             storyLastBottom: storyParagraphs.at(-1).getBoundingClientRect().bottom,
-            skillIntro: q('.about-toolkit-skills .about-toolkit-intro').textContent.trim(),
-            mindsetIntro: q('.about-toolkit-mindset .about-toolkit-intro').textContent.trim(),
+            toolkitIntroCount: qa('.about-toolkit-intro').length,
+            headingStyles: qa('.about-toolkit-list h3,.about-principles-list h3').map(type),
+            bodyStyles: qa('.about-toolkit-list p,.about-principles-list p').map(type),
             skillTitles: qa('.about-toolkit-skills .about-toolkit-list h3').map(el => el.textContent.trim()),
             mindsetTitles: qa('.about-toolkit-mindset .about-toolkit-list h3').map(el => el.textContent.trim()),
             skillLengths: chars('.about-toolkit-skills .about-toolkit-list p'),
@@ -118,6 +137,16 @@ const close = (actual, expected, tolerance, label) => {
         close(state.heroH1Size, home.h1, .2, engine+' '+width+' About H1 matches homepage H1');
         assert.equal(state.belief, 'I believe the future is shaped by what we choose to build together.');
         assert.ok(state.beliefWidth <= 680.5, engine+' '+width+' belief measure');
+        assert.equal(state.beliefType.family, home.heroFocus.family, engine+' '+width+' belief uses homepage hero Figtree');
+        assert.equal(state.beliefType.weight, home.heroFocus.weight, engine+' '+width+' belief uses homepage body weight');
+        close(parseFloat(state.beliefType.lineHeight)/parseFloat(state.beliefType.size),
+          parseFloat(home.heroFocus.lineHeight)/parseFloat(home.heroFocus.size), .01,
+          engine+' '+width+' belief uses homepage hero leading');
+        close(parseFloat(state.beliefType.tracking)||0,parseFloat(home.heroFocus.tracking)||0,.01,
+          engine+' '+width+' belief uses homepage tracking');
+        assert.equal(state.toolkitIntroCount,0,'Redundant Toolkit introduction lines must stay removed');
+        for(const heading of state.headingStyles) assert.deepEqual(heading,home.heading,engine+' '+width+' About heading typography parity');
+        for(const body of state.bodyStyles) assert.deepEqual(body,home.body,engine+' '+width+' About body typography parity');
         assert.equal(state.storyTitle, 'My story.');
         close(state.storyH2Size, home.h2, .2, engine+' '+width+' story H2 matches homepage H2');
         assert.equal(state.storyParagraphCount, 5);
@@ -126,8 +155,6 @@ const close = (actual, expected, tolerance, label) => {
         assert.ok(state.chronologyTop >= state.storyLastBottom + 22, engine+' '+width+' chronology CTA spacing');
         assert.deepEqual(state.order.slice().sort((a,b)=>a-b), state.order);
 
-        assert.equal(state.skillIntro, 'The capabilities I use most often when turning a new idea into a real product or business.');
-        assert.equal(state.mindsetIntro, 'The patterns that most consistently shape how I approach opportunities, uncertainty and other people.');
         assert.deepEqual(state.skillTitles, ['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM']);
         assert.deepEqual(state.mindsetTitles, ['Entrepreneurial','Strategic','Curious','Adaptive','Connective']);
         assert.ok(Math.max(...state.skillLengths)-Math.min(...state.skillLengths) <= 16, engine+' '+width+' Skill Set copy stays balanced');
@@ -142,6 +169,8 @@ const close = (actual, expected, tolerance, label) => {
           'People, planet & profit.'
         ]);
         assert.ok(Math.max(...state.principlesLengths)-Math.min(...state.principlesLengths) <= 14, engine+' '+width+' Principles copy stays balanced');
+        assert.equal(state.principlesColumns,width>920?4:width>600?2:1,
+          engine+' '+width+' Principles must reflow 4/2/1 without hiding content');
 
         assert.equal(state.personalityTitle, 'Different lenses.');
         assert.deepEqual(state.tabLabels, ['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
@@ -169,14 +198,12 @@ const close = (actual, expected, tolerance, label) => {
 
         if (width <= 840) {
           assert.equal(state.toolkitColumns, 1);
-          assert.equal(state.principlesColumns, 1);
           assert.equal(state.explorerDisplay, 'block');
           assert.equal(state.tabOrientation, 'horizontal');
           assert.equal(state.tabDirection, 'row');
           assert.equal(state.tabOverflowX, 'auto');
         } else {
           assert.equal(state.toolkitColumns, 2);
-          assert.equal(state.principlesColumns, 2);
           assert.equal(state.explorerDisplay, 'grid');
           assert.equal(state.explorerColumns, 2);
           assert.equal(state.tabOrientation, 'vertical');

@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"1cd5bf82"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"5419610a"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -113,7 +113,7 @@ assert.ok(css.includes('.waymaking-copy-column {\n  position: relative;'),'Wayma
 assert.ok(css.includes('.waymaking-beat + .waymaking-beat {\n  border-top: 1px solid var(--line);'),'Waymaking must use only internal hairline dividers');
 assert.ok(!css.includes('.waymaking-copy-column {\n  border-top: 1px solid var(--line);')&&!css.includes('border-bottom: 1px solid var(--line);\n}'),'Waymaking must not be boxed by top/bottom rules');
 assert.ok(css.includes('grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'Waymaking desktop grid must align with Where I add value');
-assert.ok(css.includes('.thread-section { padding-bottom: 0; }'),'Corrected homepage thread must not add duplicate bottom spacing');
+assert.ok(!css.includes('.thread-section { padding-bottom: 0; }'),'Homepage must not collapse the Purpose-to-Current-Focus section gap');
 assert.ok(css.includes('@media (max-width: 700px) {')&&css.includes('grid-template-columns: minmax(0, 1fr);'),'Mobile editorial stack missing');
 assert.ok(!thread.includes('waymaking-signature'),'Decorative Waymaking signature must remain removed');
 assert.ok(!css.includes('.waymaking-signature'),'Decorative Waymaking signature styling must remain removed');
@@ -159,7 +159,7 @@ assert.ok(css.includes('.homepage-contact-actions { width: 100%; margin: 16px 0 
 assert.ok(html.includes('Read my perspectives')&&!html.includes('Explore my perspectives'),'Homepage perspective link wording drift');
 assert.ok(!html.includes('class="perspective-links"'),'Homepage perspective preview cards must remain removed');
 assert.ok(!html.includes('waymaking-ventures')&&!html.includes('<sup>™</sup>'),'Waymaking focus logo must remain free of Ventures and TM');
-assert.ok(css.includes('.waymaking-beat:last-child {\n  padding-bottom: 0;')&&css.includes('.work-section--waymaking-output {\n  padding-top: var(--section-space);'),'Purpose-to-current-focus spacing must use one section gap');
+assert.ok(css.includes('.waymaking-beat:last-child {\n  padding-bottom: 0;')&&css.includes('.story-section {\n  padding: var(--section-space) 0;')&&css.includes('.work-section--waymaking-output {\n  padding-top: var(--section-space);'),'Purpose-to-current-focus spacing must use the full two-sided section rhythm');
 for(const token of ['--font-body:','--font-display:','--accent:','--surface-card:','--measure-reading:','--measure-narrow:','--radius-sm:','--focus-ring-width:','--section-space:','--section-space-mobile:']) {
   assert.ok(css.includes(token),'Shared design-system token missing: '+token);
 }
@@ -168,10 +168,12 @@ assert.ok(aboutHtml.includes('<h1 id="about-page-title">Hi, I’m August.</h1>')
 assert.ok(aboutHtml.includes('<p class="about-personal-belief">I believe the future is shaped by what we choose to build together.</p>'),'About V7 belief statement changed');
 assert.ok(aboutHtml.includes('<h2 id="story-title">My story.</h2>'),'About V7 My story heading missing');
 assert.ok(css.includes('.about-personal-belief {\n  max-width: 680px;'),'About V7 belief measure missing');
-assert.ok(css.includes('.about-story,\n.about-principles {\n  display: grid;\n  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);'),'Story and Principles must use the shared editorial grid');
+assert.ok(css.includes('.about-story {\n  display: grid;\n  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);')&&css.includes('.about-principles {\n  display: block;')&&css.includes('grid-template-columns: repeat(4, minmax(0, 1fr));'),'Story keeps editorial split and Principles spans one horizontal row');
 assert.ok(aboutHtml.includes('<span>For the full chronology, see LinkedIn</span>'),'About V7 chronology CTA missing');
 assert.ok(css.includes('.about-toolkit {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));'),'Skill Set and Mindset must remain equal desktop columns');
 assert.ok(css.includes('grid-template-rows: repeat(5, minmax(0, 1fr));'),'Skill Set and Mindset rows must remain aligned');
+assert.ok(!aboutHtml.includes('about-toolkit-intro'),'Redundant Skill Set and Mindset intros must not return');
+assert.ok(css.includes('.about-toolkit-list h3,\n.about-principles-list h3 {')&&css.includes('.about-principles-list {\n  display: grid;'),'About typography and horizontal Principles system missing');
 for(const mindset of ['Entrepreneurial','Strategic','Curious','Adaptive','Connective']) {
   assert.ok(aboutHtml.includes('<h3>'+mindset+'</h3>'),'About V7 mindset missing: '+mindset);
 }
@@ -210,7 +212,7 @@ assert.ok(license.includes('MIT License'),'Waymaking brush license attribution m
 
 for(const path of ['index.html','about/index.html','perspectives/index.html','perspectives/rethinking-the-company/index.html','perspectives/europe-at-a-crossroads/index.html','privacy/index.html','unsubscribe/index.html']){
   const page=readFileSync(join(root,path),'utf8');
-  const expectedStyles='styles.css?v=20261026-shared-v15';
+  const expectedStyles='styles.css?v=20261027-shared-v16';
   assert.ok(page.includes(expectedStyles),'Shared stylesheet drift: '+path);
   assert.ok(page.includes('name="robots" content="noindex,nofollow"'),'Preview indexing protection missing: '+path);
   assert.ok(!page.includes('footer-wordmark'),'Footer branding must stay removed: '+path);
