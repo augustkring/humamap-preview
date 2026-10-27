@@ -35,6 +35,7 @@ jobs:
           test -n "$CHROME_BIN"
           ROAD_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ROAD_OUTPUT=artifacts ROAD_ENGINES=chromium ROAD_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-viewport-road.cjs
           ABOUT_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ ABOUT_OUTPUT=artifacts ABOUT_ENGINES=chromium ABOUT_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-about-layout.cjs
+          PERSPECTIVES_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ PERSPECTIVES_OUTPUT=artifacts PERSPECTIVES_ENGINES=chromium PERSPECTIVES_WIDTHS=320,390,768,1024,1440 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-perspectives-index.cjs
           TYPE_BASE=http://127.0.0.1:8765/humamap-preview/augustkring/ TYPE_OUTPUT=artifacts TYPE_ENGINES=chromium TYPE_WIDTHS=320,390 NODE_PATH=/tmp/ak-v13-qa/node_modules CHROME_BIN="$CHROME_BIN" node augustkring/verify-mobile-type.cjs
       - name: Upload actual-browser screenshots
         if: always()
