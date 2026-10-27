@@ -637,6 +637,8 @@ jobs:
                     panelBackground:getComputedStyle(panel).backgroundColor,
                     lensH3Count:qa('.about-personality-panel h3').length,
                     lensCopyCount:qa('.about-lens-copy').length,
+                    lensIntros:qa('.about-personality-panel').map(p=>p.querySelector('.about-lens-copy p').textContent.trim()),
+                    lensHasSelfReflection:qa('.about-personality-panel').some(p=>/\b(I|me|my|mine|we|our)\b/i.test(p.querySelector('.about-lens-copy').textContent)),
                     lensParagraphCount:qa('.about-personality-panel:not([hidden]) .about-lens-copy p').length,
                     emDash:q('main').innerText.includes('—'),
                     bodyOverflow:document.documentElement.scrollWidth>innerWidth+1
@@ -685,6 +687,20 @@ jobs:
                 assert.equal(aboutProof.lensH3Count,0);
                 assert.equal(aboutProof.lensCopyCount,7);
                 assert.equal(aboutProof.lensParagraphCount,2);
+                const expectedLensSources=[
+                  'The Big Five report describes August',
+                  "HIGH5 ranks August's leading strengths",
+                  'VIA places Creativity',
+                  'BG5 identifies August as an Express Builder',
+                  "August's MBTI type is listed as ENFP",
+                  'The Enneagram type listed for August is 7w8',
+                  "August's Human Design report identifies him as a Manifesting Generator"
+                ];
+                assert.equal(aboutProof.lensIntros.length,expectedLensSources.length);
+                assert.ok(aboutProof.lensIntros.every((s,i)=>s.startsWith(expectedLensSources[i])),
+                  'Each Different lenses panel must report its own framework characterisation');
+                assert.equal(aboutProof.lensHasSelfReflection,false,
+                  'No first-person self-interpretation in the assessment lenses');
                 assert.equal(aboutProof.emDash,false);
                 assert.equal(aboutProof.bodyOverflow,false);
                 if(width===390||width===1440) {
