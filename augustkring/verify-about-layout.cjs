@@ -190,6 +190,7 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.principlesBodies[3],
           'Build for commercial success without overlooking people or the planet. All three shape how the business works.',
           engine+' '+width+' approved shorter People, planet & profit description');
+        console.log('Principles measured lines',engine,width,JSON.stringify(state.principlesMetrics));
         assert.ok(state.principlesMetrics.every(p => p.bodyLines <= 4.05),
           engine+' '+width+' all Principles descriptions fit in four lines');
         assert.ok(state.principlesMetrics.every(p => p.fullTextVisible),
