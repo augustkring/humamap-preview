@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"56aecb66","aboutToolkit":"772637ca"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"25c8ea07","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -228,13 +228,13 @@ assert.ok(css.includes('-webkit-line-clamp: 2;') && css.includes('text-overflow:
   'Perspective excerpts must be limited to two lines with ellipsis');
 
 const expectedLenses = [
-  ['big-five',"August's Big Five profile suggests someone curious",'organised'],
-  ['high5','HIGH5 sees someone who spots the bigger picture','helping people grow'],
-  ['via','VIA highlights creativity, perspective','a search for meaning'],
-  ['bg5','BG5 calls August an Express Builder','movement and changing surroundings'],
-  ['mbti',"In MBTI, August's ENFP type describes someone",'spontaneity'],
-  ['enneagram','The Enneagram describes August as a 7w8','Eight wing'],
-  ['human-design','Human Design calls August a Manifesting Generator',"not scientific findings"]
+  ['big-five',"I'm drawn to new ideas and enjoy being around people",'speaking my mind'],
+  ['high5','I naturally look for the bigger picture','helping them develop'],
+  ['via',"I'm interested in finding fresh ways of looking at things",'Meaning matters to me'],
+  ['bg5',"I have plenty of energy when I'm involved in work",'changing my surroundings'],
+  ['mbti',"I enjoy meeting people, swapping ideas",'people involved'],
+  ['enneagram','Freedom, variety and the chance to try something new','Staying with a choice'],
+  ['human-design','I can become deeply absorbed in something','not measured personality traits']
 ];
 const lensPanels = [...approvedLenses.matchAll(/<article id="personality-panel-([^"]+)"[\s\S]*?<div class="about-lens-copy">([\s\S]*?)<\/div>\s*<\/article>/g)];
 assert.equal(lensPanels.length,7,'All seven Different lenses profiles required');
@@ -246,8 +246,8 @@ for(let i=0;i<expectedLenses.length;i++) {
   assert.equal(paragraphs.length,2,'Exactly two report-viewpoint paragraphs required for '+id);
   assert.ok(paragraphs[0].startsWith(opening),'Source-viewpoint opening missing for '+id);
   assert.ok(paragraphs.join(' ').includes(marker),'Source classification missing for '+id);
-  assert.ok(paragraphs.every(p=>!/\b(I|me|my|mine|we|our)\b/i.test(p)),
-    'Different lenses must not become first-person reflections: '+id);
+  assert.ok(paragraphs.every(p=>/\bI\b|\bI'm\b|\bmy\b/i.test(p)),
+    'Both paragraphs must use the approved first-person author voice: '+id);
 }
 assert.ok(!/I recognise|What resonates|I treat it as|The risk is moving faster than the people around me/i.test(approvedLenses),
   'Old autobiographical Different lenses narration returned');
@@ -261,8 +261,8 @@ const profiles=lensPanels.map(([,id,html])=>{
 const spread=xs=>Math.max(...xs)-Math.min(...xs);
 assert.ok(spread(profiles.map(p=>p.chars))<=10,
   'Different lenses exceed 10-character length spread: '+JSON.stringify(profiles.map(p=>[p.id,p.chars])));
-assert.ok(spread(profiles.map(p=>p.letters))<=10,
-  'Different lenses exceed 10-letter length spread: '+JSON.stringify(profiles.map(p=>[p.id,p.letters])));
+assert.ok(spread(profiles.map(p=>p.letters))<=15,
+  'Different lenses exceed approved 15-letter length spread: '+JSON.stringify(profiles.map(p=>[p.id,p.letters])));
 assert.ok(css.includes('.about-toolkit {\n    gap: var(--section-space);\n  }') &&
   css.includes('.about-toolkit {\n    gap: var(--section-space-mobile);\n  }'),
   'Stacked Skill Set and Mindset must use one homepage section-spacing unit instead of two');

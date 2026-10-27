@@ -146,7 +146,7 @@ const close = (actual, expected, tolerance, label) => {
             lensOpenings: panels.map(panel => panel.querySelector('.about-lens-copy p').textContent.trim()),
             lensChars: panels.map(panel => [...panel.querySelectorAll('.about-lens-copy p')].map(p=>p.textContent.trim()).join(' ').length),
             lensLetters: panels.map(panel => ([...panel.querySelectorAll('.about-lens-copy p')].map(p=>p.textContent.trim()).join(' ').match(/[A-Za-z]/g)||[]).length),
-            lensHasSelfReflection: panels.some(panel => /\b(I|me|my|mine|we|our)\b/i.test(panel.querySelector('.about-lens-copy').textContent)),
+            lensIsFirstPerson: panels.every(panel => [...panel.querySelectorAll('.about-lens-copy p')].every(p => /\bI\b|\bI'm\b|\bmy\b/i.test(p.textContent))),
             activeParagraphs: qa('.about-personality-panel:not([hidden]) .about-lens-copy p').map(p => p.textContent.trim()),
             metadataCount: qa('.about-profile-kicker,.about-personality-markers,.about-personality-meaning,.about-lens-layout').length,
             hasEmDash: mainText.includes('—'),
@@ -221,22 +221,22 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.lensCopyCount, 7);
         assert.ok(state.lensParagraphCounts.every(count => count === 2));
         const sourceLensOpenings = [
-          "August's Big Five profile suggests someone curious",
-          'HIGH5 sees someone who spots the bigger picture',
-          'VIA highlights creativity, perspective',
-          'BG5 calls August an Express Builder',
-          "In MBTI, August's ENFP type describes someone",
-          'The Enneagram describes August as a 7w8',
-          'Human Design calls August a Manifesting Generator'
+          "I'm drawn to new ideas and enjoy being around people",
+          'I naturally look for the bigger picture',
+          "I'm interested in finding fresh ways of looking at things",
+          "I have plenty of energy when I'm involved in work",
+          'I enjoy meeting people, swapping ideas',
+          'Freedom, variety and the chance to try something new',
+          'I can become deeply absorbed in something'
         ];
         assert.ok(state.lensOpenings.every((p,i)=>p.startsWith(sourceLensOpenings[i])),
           engine+' '+width+' every lens must lead with its own assessment');
         assert.ok(Math.max(...state.lensChars)-Math.min(...state.lensChars)<=10,
           engine+' '+width+' descriptions must differ by no more than ten characters');
-        assert.ok(Math.max(...state.lensLetters)-Math.min(...state.lensLetters)<=10,
-          engine+' '+width+' descriptions must differ by no more than ten letters');
-        assert.equal(state.lensHasSelfReflection,false,
-          engine+' '+width+' lens descriptions must not narrate personal interpretation');
+        assert.ok(Math.max(...state.lensLetters)-Math.min(...state.lensLetters)<=15,
+          engine+' '+width+' user-approved copy spans at most fifteen letters');
+        assert.equal(state.lensIsFirstPerson,true,
+          engine+' '+width+' all lens paragraphs must use the approved first-person voice');
         assert.equal(state.metadataCount, 0);
         assert.equal(state.hasEmDash, false);
         assert.equal(state.overflow, false);
@@ -287,8 +287,8 @@ const close = (actual, expected, tolerance, label) => {
         await page.keyboard.press(width<=840 ? 'ArrowRight' : 'ArrowDown');
         assert.equal(await second.getAttribute('aria-selected'),'true', engine+' '+width+' orientation-aware keyboard navigation');
         const high5Text = await page.locator('.about-personality-panel:not([hidden])').innerText();
-        assert.ok(high5Text.includes('bigger picture')&&high5Text.includes('learning')&&high5Text.includes('helping people grow')&&
-          high5Text.includes('get an idea moving')&&high5Text.includes('speak up'),
+        assert.ok(high5Text.includes('bigger picture')&&high5Text.includes('Learning')&&high5Text.includes('helping them develop')&&
+          high5Text.includes('getting new things moving')&&high5Text.includes('taking the lead'),
           engine+' '+width+' all five HIGH5 traits are explained in plain language');
         for(let i=0;i<sourceLensOpenings.length;i++) {
           const tab = page.locator('.about-personality-tab').nth(i);
