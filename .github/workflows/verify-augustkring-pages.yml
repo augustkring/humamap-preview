@@ -68,7 +68,7 @@ jobs:
           grep -Fq "Exploring how AI and human-centric innovation can make businesses more adaptive, resilient and sustainable." /tmp/augustkring.html
           grep -Fq '<h2 id="thread-title">Where I add value</h2>' /tmp/augustkring.html
           grep -Fq "But greater capacity doesn't automatically make a company more competitive. AI raises the stakes: it amplifies the value of what a company gets right and the cost of what it gets wrong." /tmp/augustkring.html
-          grep -Fq 'build towards a positive future together with bold people' /tmp/augustkring.html
+          grep -Fq 'building towards a positive future together with bold people' /tmp/augustkring.html
           grep -Fq '<span>Connect on LinkedIn</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq '<span>Email me</span><svg class="arrow arrow-up-right"' /tmp/augustkring.html
           grep -Fq 'href="mailto:ak@augustkring.com"' /tmp/augustkring.html
