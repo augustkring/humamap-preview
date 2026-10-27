@@ -114,6 +114,16 @@ const close = (actual, expected, tolerance, label) => {
             principlesIntro: q('#principles .about-section-lead > p')?.textContent.trim() ?? null,
             principlesTitles: qa('.about-principles-list h3').map(el => el.textContent.trim()),
             principlesLengths: chars('.about-principles-list p'),
+            principlesBodies: qa('.about-principles-list p').map(p => p.textContent.trim()),
+            principlesMetrics: qa('.about-principles-list article').map(article => {
+              const p = article.querySelector('p');
+              const s = getComputedStyle(p);
+              return {
+                bodyTop: p.getBoundingClientRect().top,
+                bodyLines: p.getBoundingClientRect().height / parseFloat(s.lineHeight),
+                fullTextVisible: p.scrollHeight <= p.clientHeight + 1
+              };
+            }),
             principlesColumns: principles.gridTemplateColumns.split(' ').filter(Boolean).length,
             personalityTitle: q('#personality-title').textContent.trim(),
             explorerDisplay: explorer.display,
@@ -177,7 +187,19 @@ const close = (actual, expected, tolerance, label) => {
           'Learn, unlearn, relearn.',
           'People, planet & profit.'
         ]);
-        assert.ok(Math.max(...state.principlesLengths)-Math.min(...state.principlesLengths) <= 20, engine+' '+width+' Principles copy stays balanced');
+        assert.equal(state.principlesBodies[3],
+          'Build for commercial success without overlooking people or the planet. All three shape how the business works.',
+          engine+' '+width+' approved shorter People, planet & profit description');
+        assert.ok(state.principlesMetrics.every(p => p.bodyLines <= 4.05),
+          engine+' '+width+' all Principles descriptions fit in four lines');
+        assert.ok(state.principlesMetrics.every(p => p.fullTextVisible),
+          engine+' '+width+' Principles descriptions show full text with no clipping');
+        const rowColumns = width > 920 ? 4 : width > 600 ? 2 : 1;
+        for(let start=0; start<4; start+=rowColumns) {
+          const tops=state.principlesMetrics.slice(start,start+rowColumns).map(p=>p.bodyTop);
+          assert.ok(Math.max(...tops)-Math.min(...tops)<1.5,
+            engine+' '+width+' Principles descriptions align below the heading row');
+        }
         assert.equal(state.principlesColumns,width>920?4:width>600?2:1,
           engine+' '+width+' Principles must reflow 4/2/1 without hiding content');
 
