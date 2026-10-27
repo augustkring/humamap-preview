@@ -228,7 +228,7 @@ assert.ok(css.includes('-webkit-line-clamp: 2;') && css.includes('text-overflow:
   'Perspective excerpts must be limited to two lines with ellipsis');
 
 const expectedLenses = [
-  ['big-five',"I'm drawn to new ideas and enjoy being around people",'speak my mind'],
+  ['big-five',"I'm drawn to new ideas and enjoy being around people",'speaking my mind'],
   ['high5','I naturally look for the bigger picture','helping them develop'],
   ['via',"I'm interested in finding fresh ways of looking at things",'Meaning matters to me'],
   ['bg5',"I have plenty of energy when I'm involved in work",'changing my surroundings'],
