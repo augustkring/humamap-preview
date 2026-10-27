@@ -51,8 +51,8 @@ jobs:
           set -euo pipefail
           trap 'printf "::error::Published check failed at line %s: %s\n" "$LINENO" "$BASH_COMMAND"' ERR
           base="https://augustkring.github.io/humamap-preview/augustkring/"
-          expected_home="styles.css?v=20261026-shared-v15"
-          expected_shared="styles.css?v=20261026-shared-v15"
+          expected_home="styles.css?v=20261027-shared-v16"
+          expected_shared="styles.css?v=20261027-shared-v16"
           expected_copy="build towards a positive future together with bold people"
           for attempt in $(seq 1 24); do
             status="$(curl -sSL --max-time 15 -o /tmp/augustkring.html -w '%{http_code}' "${base}?verification=${GITHUB_SHA}" || true)"

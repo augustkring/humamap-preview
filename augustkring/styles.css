@@ -365,7 +365,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .work-section {
   padding-top: var(--section-space);
 }
-.thread-section { padding-bottom: 0; }
 
 .perspective-story {
   display: grid;
@@ -1204,7 +1203,6 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     column-gap: clamp(30px, 5vw, 52px);
   }
   .waymaking-copy p { font-size: var(--card-copy-size); }
-  .work-section--waymaking-output { padding-top: var(--section-space-mobile); }
 }
 @media (max-width: 700px) {
   .waymaking-narrative { margin-top: 30px; }
@@ -1268,10 +1266,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-personal-belief {
   max-width: 680px;
   margin: 24px 0 0;
-  color: var(--copy);
+  color: var(--ink);
+  font-family: var(--font-body);
   font-size: clamp(22px, 2.2vw, 28px);
-  line-height: 1.42;
-  letter-spacing: -.018em;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -1290,8 +1290,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   text-wrap: balance;
 }
 
-.about-story,
-.about-principles {
+.about-story {
   display: grid;
   grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(54px, 7vw, 92px);
@@ -1325,19 +1324,11 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 .about-toolkit-column {
   min-width: 0;
   display: grid;
-  grid-template-rows: auto auto 1fr;
-}
-.about-toolkit-intro {
-  min-height: 52px;
-  max-width: 430px;
-  margin: 18px 0 0;
-  color: var(--copy);
-  font-size: 17px;
-  line-height: 1.5;
+  grid-template-rows: auto 1fr;
 }
 .about-toolkit-list {
   max-width: 500px;
-  margin-top: 28px;
+  margin-top: clamp(34px, 3.8vw, 44px);
   display: grid;
   grid-template-rows: repeat(5, minmax(0, 1fr));
 }
@@ -1347,22 +1338,28 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
 }
 .about-toolkit-list h3,
 .about-principles-list h3 {
+  max-width: 360px;
   margin: 0 0 9px;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(20px, 1.7vw, 22px);
+  font-size: clamp(21px, calc(2vw - 2px), 26px);
   font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -.025em;
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  text-wrap: balance;
 }
 .about-toolkit-list p,
 .about-principles-list p {
   margin: 0;
   color: var(--copy);
   font-size: var(--card-copy-size);
-  line-height: 1.62;
+  line-height: 1.6;
+  overflow-wrap: break-word;
 }
 
+.about-principles {
+  display: block;
+}
 .about-principles > .about-section-lead > p {
   max-width: var(--measure-narrow);
   margin: 24px 0 0;
@@ -1371,15 +1368,16 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   line-height: 1.55;
 }
 .about-principles-list {
-  max-width: var(--measure-reading);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: clamp(18px, 2.4vw, 28px);
+  row-gap: clamp(34px, 4vw, 44px);
+  margin-top: clamp(38px, 4vw, 50px);
 }
 .about-principles-list article {
-  padding: 24px 0 26px;
+  min-width: 0;
+  padding: 22px 0 0;
   border-top: 1px solid var(--line);
-}
-.about-principles-list article:first-child {
-  padding-top: 0;
-  border-top: 0;
 }
 
 .about-personality {
@@ -1464,25 +1462,25 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   margin-top: 18px;
 }
 
+@media (max-width: 920px) {
+  .about-principles-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 840px) {
   .about-story,
-  .about-toolkit,
-  .about-principles {
+  .about-toolkit {
     grid-template-columns: minmax(0, 1fr);
   }
-  .about-story,
-  .about-principles {
+  .about-story {
     gap: 28px;
   }
   .about-toolkit {
-    gap: var(--section-space-mobile);
+    gap: calc(var(--section-space) + var(--section-space));
   }
   .about-toolkit-column {
     max-width: 680px;
-    grid-template-rows: auto auto auto;
-  }
-  .about-toolkit-intro {
-    min-height: 0;
+    grid-template-rows: auto auto;
   }
   .about-toolkit-list {
     grid-template-rows: none;
@@ -1519,13 +1517,12 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   .about-personal-belief {
     margin-top: 18px;
     font-size: 21px;
-    line-height: 1.45;
+    line-height: 1.55;
   }
   .about-v7-section {
     padding: var(--section-space-mobile) 0;
   }
-  .about-story,
-  .about-principles {
+  .about-story {
     gap: 24px;
   }
   .about-story-prose p + p {
@@ -1535,14 +1532,10 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     margin-top: 26px;
   }
   .about-toolkit {
-    gap: 58px;
-  }
-  .about-toolkit-intro {
-    margin-top: 14px;
-    font-size: 17px;
+    gap: calc(var(--section-space-mobile) + var(--section-space-mobile));
   }
   .about-toolkit-list {
-    margin-top: 24px;
+    margin-top: 26px;
   }
   .about-toolkit-list article {
     padding: 20px 0 22px;
@@ -1552,7 +1545,7 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
     font-size: 17px;
   }
   .about-principles-list article {
-    padding: 20px 0 22px;
+    padding-top: 20px;
   }
   .about-personality > .about-section-lead {
     margin-bottom: 18px;
@@ -1568,3 +1561,16 @@ html[data-nav-pointer] .mobile-menu-close:focus-visible svg { stroke-width: 1.8;
   }
 }
 
+
+@media (max-width: 700px) {
+  .about-toolkit-list h3,
+  .about-principles-list h3 {
+    line-height: 1.06;
+  }
+}
+@media (max-width: 600px) {
+  .about-principles-list {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 30px;
+  }
+}
