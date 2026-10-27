@@ -96,11 +96,17 @@ const close = (actual, expected, tolerance, label) => {
             storyLastBottom: storyParagraphs.at(-1).getBoundingClientRect().bottom,
             toolkitIntroCount: qa('.about-toolkit-intro').length,
             headingStyles: qa('.about-toolkit-list h3,.about-principles-list h3').map(type),
-            bodyStyles: qa('.about-toolkit-list p,.about-principles-list p').map(type),
+            bodyStyles: qa('.about-principles-list p').map(type),
             skillTitles: qa('.about-toolkit-skills .about-toolkit-list h3').map(el => el.textContent.trim()),
             mindsetTitles: qa('.about-toolkit-mindset .about-toolkit-list h3').map(el => el.textContent.trim()),
-            skillLengths: chars('.about-toolkit-skills .about-toolkit-list p'),
-            mindsetLengths: chars('.about-toolkit-mindset .about-toolkit-list p'),
+            toolkitDescriptionCount: qa('.about-toolkit-list article p').length,
+            toolkitArticleCount: qa('.about-toolkit-list article').length,
+            toolkitHeadingOnly: qa('.about-toolkit-list article').every(el => el.children.length === 1 && el.firstElementChild.tagName === 'H3'),
+            toolkitHeadingBottomMargins: qa('.about-toolkit-list h3').map(el => parseFloat(getComputedStyle(el).marginBottom)),
+            toolkitRowPaddings: qa('.about-toolkit-list article').map(el => {
+              const cs = getComputedStyle(el);
+              return [parseFloat(cs.paddingTop),parseFloat(cs.paddingBottom)];
+            }),
             toolkitColumns: toolkit.gridTemplateColumns.split(' ').filter(Boolean).length,
             skillRows: skillRows.map(r => ({top:r.top,height:r.height})),
             mindsetRows: mindsetRows.map(r => ({top:r.top,height:r.height})),
@@ -157,8 +163,11 @@ const close = (actual, expected, tolerance, label) => {
 
         assert.deepEqual(state.skillTitles, ['Agentic AI & Strategy','Strategic Innovation','Business Development','Product Development','Market Validation & GTM']);
         assert.deepEqual(state.mindsetTitles, ['Entrepreneurial','Strategic','Curious','Adaptive','Connective']);
-        assert.ok(Math.max(...state.skillLengths)-Math.min(...state.skillLengths) <= 16, engine+' '+width+' Skill Set copy stays balanced');
-        assert.ok(Math.max(...state.mindsetLengths)-Math.min(...state.mindsetLengths) <= 10, engine+' '+width+' Mindset copy stays balanced');
+        assert.equal(state.toolkitDescriptionCount, 0, engine+' '+width+' Skill Set and Mindset must have no descriptions');
+        assert.equal(state.toolkitArticleCount, 10, engine+' '+width+' exactly ten headings-only entries');
+        assert.equal(state.toolkitHeadingOnly, true, engine+' '+width+' each list item contains only its heading');
+        assert.ok(state.toolkitHeadingBottomMargins.every(n => n < .1), engine+' '+width+' no empty paragraph margin');
+        assert.ok(state.toolkitRowPaddings.every(([top,bottom]) => top <= 18.1 && bottom <= 20.1), engine+' '+width+' compact heading-only list spacing');
 
         assert.equal(state.principlesTitle, 'Principles.');
         assert.equal(state.principlesIntro, null, 'The redundant Principles undertext stays removed');
@@ -250,7 +259,7 @@ const close = (actual, expected, tolerance, label) => {
     }
   }
 
-  console.log('PASS: About V7 separates belief, mindset, principles and reflection lenses');
+  console.log('PASS: About V7 shows Skill Set and Mindset headings only; belief, Principles and lenses preserved');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
