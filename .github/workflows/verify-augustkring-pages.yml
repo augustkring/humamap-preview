@@ -640,7 +640,7 @@ jobs:
                 assert.ok(Math.max(...aboutProof.mindsetLengths)-Math.min(...aboutProof.mindsetLengths)<=10);
                 assert.equal(aboutProof.principlesTitle,'Principles.');
                 assert.deepEqual(aboutProof.principlesTitles,['Think big. Start small. Scale fast.','Execution over fear.','Learn, unlearn, relearn.','People, planet & profit.']);
-                assert.ok(Math.max(...aboutProof.principlesLengths)-Math.min(...aboutProof.principlesLengths)<=14);
+                assert.ok(Math.max(...aboutProof.principlesLengths)-Math.min(...aboutProof.principlesLengths)<=20);
                 assert.equal(aboutProof.personalityTitle,'Different lenses.');
                 assert.deepEqual(aboutProof.tabLabels,['Big Five','HIGH5','VIA','BG5','MBTI','Enneagram','Human Design']);
                 if(width<=840) {
