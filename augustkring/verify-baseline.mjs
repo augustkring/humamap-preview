@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"2ace5ec7","aboutToolkit":"772637ca"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"4229529c","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -204,7 +204,7 @@ assert.equal((approvedStory.match(/<p>/g)||[]).length,5,'Approved story must ret
 assert.ok(approvedStory.includes('I became responsible for a small team'),'User-approved small-team wording missing');
 assert.ok(!approvedStory.includes('around 15 people'),'Unapproved team size has returned');
 assert.ok(!approvedPrinciples.includes('A few principles I return to when choosing what to build and how to build it.'),'Removed Principles undertext has returned');
-assert.ok(approvedPrinciples.includes('Aim high, but test the idea before betting everything on it.'),'Approved principles text changed');
+assert.ok(approvedPrinciples.includes('Aim high, but start small enough to test the idea.'),'Approved shortened Think big description changed');
 
 assert.ok(approvedPrinciples.includes('Build for commercial success without overlooking people or the planet. All three shape how the business works.'),
   'Approved People, planet & profit copy changed');
