@@ -183,7 +183,7 @@ const close = (actual, expected, tolerance, label) => {
         assert.equal(state.lensH3Count, 0);
         assert.equal(state.lensCopyCount, 7);
         assert.ok(state.lensParagraphCounts.every(count => count === 2));
-        assert.ok(state.activeParagraphs[0].startsWith('The clearest pattern in my Big Five results'));
+        assert.ok(state.activeParagraphs[0].startsWith('My Big Five results show a striking mix:'));
         assert.equal(state.metadataCount, 0);
         assert.equal(state.hasEmDash, false);
         assert.equal(state.overflow, false);
