@@ -20,7 +20,7 @@ function digest(s) {
   return (h>>>0).toString(16).padStart(8,'0');
 }
 
-const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"4229529c","aboutToolkit":"772637ca"};
+const approved={"main":"18b21e8f","footer":"b1c59284","tokens":"79885db3","contact":"864e4a37","aboutMain":"cba8f29f","aboutToolkit":"772637ca"};
 const actual={
   main:digest(part(html,'<main','</main>')),
   footer:digest(part(html,'<footer','</footer>')),
@@ -189,8 +189,8 @@ assert.equal((aboutHtml.match(/data-personality-panel=/g)||[]).length,7,'About V
 assert.equal((aboutHtml.match(/class="about-lens-copy"/g)||[]).length,7,'Each About V7 lens must use one descriptive copy block');
 assert.ok(!aboutHtml.includes('about-profile-kicker')&&!aboutHtml.includes('about-personality-markers')&&!aboutHtml.includes('about-personality-meaning'),'About V7 must not reintroduce scores/source metadata/old meaning grids');
 assert.ok(!aboutHtml.includes('—'),'About V7 must not contain em dashes');
-// Approved 2026-10-27 content changes are limited to Story, Principles and Different lenses.
-// Skill Set and Mindset remain digest-locked pending their separate editorial revision.
+// Approved changes are limited to the named About sections; Skill Set and Mindset stay headings-only.
+// The seven Different lenses now report how each framework characterizes August, not his personal reflections.
 const headingsOnlyToolkit = part(aboutHtml,'<section id="toolkit"','</section>');
 const toolkitArticles = [...headingsOnlyToolkit.matchAll(/<article>([\s\S]*?)<\/article>/g)].map(match => match[1].trim());
 assert.equal(toolkitArticles.length,10,'Five Skill Set and five Mindset items required');
@@ -227,9 +227,30 @@ for(const [title,slug] of [
 assert.ok(css.includes('-webkit-line-clamp: 2;') && css.includes('text-overflow: ellipsis;'),
   'Perspective excerpts must be limited to two lines with ellipsis');
 
-assert.ok(approvedLenses.includes('My Big Five results show a striking mix:'),'Approved Big Five reflection missing');
-assert.ok(approvedLenses.includes('rather than a scientific personality measure.'),'Approved Human Design qualification missing');
-assert.equal((approvedLenses.match(/class="about-lens-copy"/g)||[]).length,7,'All seven reflection lenses required');
+const expectedLenses = [
+  ['big-five','The Big Five report describes August','Orderliness'],
+  ['high5',"HIGH5 ranks August's leading strengths",'Philomath'],
+  ['via','VIA places Creativity','Appreciation of Beauty &amp; Excellence'],
+  ['bg5','BG5 identifies August as an Express Builder','Collaborative'],
+  ['mbti',"August's MBTI type is listed as ENFP",'ENFP profile'],
+  ['enneagram','The Enneagram type listed for August is 7w8','Type Seven'],
+  ['human-design',"August's Human Design report identifies him as a Manifesting Generator",'Hermit/Opportunist']
+];
+const lensPanels = [...approvedLenses.matchAll(/<article id="personality-panel-([^"]+)"[\s\S]*?<div class="about-lens-copy">([\s\S]*?)<\/div>\s*<\/article>/g)];
+assert.equal(lensPanels.length,7,'All seven Different lenses profiles required');
+assert.equal((approvedLenses.match(/class="about-lens-copy"/g)||[]).length,7,'Every lens has one profile copy block');
+for(let i=0;i<expectedLenses.length;i++) {
+  const [id,opening,marker]=expectedLenses[i];
+  assert.equal(lensPanels[i][1],id,'Different lenses order changed: '+id);
+  const paragraphs=[...lensPanels[i][2].matchAll(/<p>([^<]*)<\/p>/g)].map(x=>x[1]);
+  assert.equal(paragraphs.length,2,'Exactly two report-viewpoint paragraphs required for '+id);
+  assert.ok(paragraphs[0].startsWith(opening),'Source-viewpoint opening missing for '+id);
+  assert.ok(paragraphs.join(' ').includes(marker),'Source classification missing for '+id);
+  assert.ok(paragraphs.every(p=>!/\b(I|me|my|mine|we|our)\b/i.test(p)),
+    'Different lenses must not become first-person reflections: '+id);
+}
+assert.ok(!/I recognise|What resonates|I treat it as|The risk is moving faster than the people around me/i.test(approvedLenses),
+  'Old autobiographical Different lenses narration returned');
 
 assert.ok(css.includes(':where(a, button, input, select, textarea):focus-visible'),'Shared interactive focus default missing');
 assert.ok(css.includes("width: .405em; height: .405em;")&&css.includes("top: -.105em;"),'August Kring wordmark dot must remain 25 percent smaller than the doubled state while preserving the original lower edge');
